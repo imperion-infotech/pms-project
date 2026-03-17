@@ -18,6 +18,15 @@ const PmsDashboard = () => {
   const [isRoomTypeModalOpen, setIsRoomTypeModalOpen] = useState(false);
   const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
 
   const [newFloor, setNewFloor] = useState({ name: '', description: '' });
   const [newRoomType, setNewRoomType] = useState({
@@ -113,7 +122,7 @@ const PmsDashboard = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#f4f7fa] text-slate-800 font-sans overflow-hidden">
+    <div className={`flex h-screen ${darkMode ? 'bg-[#0f172a] text-slate-100' : 'bg-[#f4f7fa] text-slate-800'} font-sans overflow-hidden transition-colors duration-300`}>
       <Sidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
@@ -126,9 +135,15 @@ const PmsDashboard = () => {
       <div className="flex-1 flex flex-col overflow-hidden relative min-w-0 h-full">
         <Navbar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
 
-        <PageHeader activeItem={activeItem} onRefresh={fetchData} isLoading={isLoading} />
+        <PageHeader 
+          activeItem={activeItem} 
+          onRefresh={fetchData} 
+          isLoading={isLoading} 
+          isDarkMode={darkMode}
+          toggleTheme={() => setDarkMode(!darkMode)}
+        />
 
-        <main className="flex-1 overflow-auto bg-[#f8fafc] custom-scrollbar p-3 md:p-6 lg:p-8">
+        <main className={`flex-1 overflow-auto ${darkMode ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'} custom-scrollbar p-3 md:p-6 lg:p-8 transition-colors duration-300`}>
           <div className="max-w-[1600px] mx-auto space-y-4 md:y-6">
             {activeItem === 'Floor' ? (
               <FloorManagement floors={floors} setIsFloorModalOpen={setIsFloorModalOpen} />

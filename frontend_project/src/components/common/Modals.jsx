@@ -11,8 +11,8 @@ export const FloorModal = ({ isFloorModalOpen, setIsFloorModalOpen, newFloor, se
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={() => setIsFloorModalOpen(false)}
       ></div>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md relative z-10 overflow-hidden animate-in zoom-in-95 duration-300">
-        <div className="p-6 bg-[#1e293b] text-white flex justify-between items-center">
+      <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-2xl w-full max-w-md relative z-10 overflow-hidden animate-in zoom-in-95 duration-300 transition-colors duration-300">
+        <div className="p-6 bg-[#1e293b] dark:bg-[#0f172a] text-white flex justify-between items-center">
           <div className="flex items-center gap-3">
             <PlusCircle className="w-6 h-6 text-emerald-400" />
             <div>
@@ -29,7 +29,7 @@ export const FloorModal = ({ isFloorModalOpen, setIsFloorModalOpen, newFloor, se
         </div>
         <form onSubmit={handleAddFloor} className="p-6 space-y-5">
           <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Floor Name</label>
+            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Floor Name</label>
             <input
               autoFocus
               required
@@ -37,24 +37,24 @@ export const FloorModal = ({ isFloorModalOpen, setIsFloorModalOpen, newFloor, se
               value={newFloor.name}
               onChange={(e) => setNewFloor({ ...newFloor, name: e.target.value })}
               placeholder="e.g. 6th Floor"
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-inner"
+              className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-inner"
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Description</label>
+            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Description</label>
             <textarea
               rows="3"
               value={newFloor.description}
               onChange={(e) => setNewFloor({ ...newFloor, description: e.target.value })}
               placeholder="Enter details about this floor..."
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-inner resize-none"
+              className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-inner resize-none"
             ></textarea>
           </div>
           <div className="flex gap-3 pt-2">
             <button
               type="button"
               onClick={() => setIsFloorModalOpen(false)}
-              className="flex-1 py-3 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors"
+              className="flex-1 py-3 text-sm font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-colors"
             >
               CANCEL
             </button>
@@ -80,8 +80,8 @@ export const RoomTypeModal = ({ isRoomTypeModalOpen, setIsRoomTypeModalOpen, new
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={() => setIsRoomTypeModalOpen(false)}
       ></div>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden animate-in zoom-in-95 duration-300">
-        <div className="p-6 bg-[#1a2b4b] text-white flex justify-between items-center">
+      <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden animate-in zoom-in-95 duration-300 transition-colors duration-300">
+        <div className="p-6 bg-[#1a2b4b] dark:bg-[#0f172a] text-white flex justify-between items-center">
           <div className="flex items-center gap-3">
             <LayoutDashboard className="w-6 h-6 text-emerald-400" />
             <div>
@@ -98,61 +98,61 @@ export const RoomTypeModal = ({ isRoomTypeModalOpen, setIsRoomTypeModalOpen, new
         </div>
         <form onSubmit={handleAddRoomType} className="p-6 grid grid-cols-2 gap-4">
           <div className="col-span-1">
-            <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Short Name</label>
+            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1.5">Short Name</label>
             <input
               required
               type="text"
               value={newRoomType.shortName}
               onChange={(e) => setNewRoomType({ ...newRoomType, shortName: e.target.value })}
               placeholder="e.g. DXL"
-              className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:border-emerald-500 outline-none"
+              className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm dark:text-slate-200 focus:border-emerald-500 outline-none"
             />
           </div>
           <div className="col-span-1">
-            <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Full Name</label>
+            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1.5">Full Name</label>
             <input
               required
               type="text"
               value={newRoomType.name}
               onChange={(e) => setNewRoomType({ ...newRoomType, name: e.target.value })}
               placeholder="e.g. Deluxe Room"
-              className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:border-emerald-500 outline-none"
+              className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm dark:text-slate-200 focus:border-emerald-500 outline-none"
             />
           </div>
           <div className="col-span-1">
-            <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Color Preference</label>
+            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1.5">Color Preference</label>
             <input
               type="color"
               value={newRoomType.color}
               onChange={(e) => setNewRoomType({ ...newRoomType, color: e.target.value })}
-              className="w-full h-9 p-1 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer"
+              className="w-full h-9 p-1 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer"
             />
           </div>
           <div className="col-span-1 flex items-end">
-            <label className="flex items-center gap-3 cursor-pointer p-2 hover:bg-slate-50 rounded-lg transition-colors w-full border border-slate-100">
+            <label className="flex items-center gap-3 cursor-pointer p-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg transition-colors w-full border border-slate-100 dark:border-slate-700">
               <input
                 type="checkbox"
                 checked={newRoomType.allowed}
                 onChange={(e) => setNewRoomType({ ...newRoomType, allowed: e.target.checked })}
                 className="w-4 h-4 rounded text-emerald-500 accent-emerald-500"
               />
-              <span className="text-xs font-bold text-slate-600 uppercase">Allowed In-Occupancy</span>
+              <span className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase">Allowed In-Occupancy</span>
             </label>
           </div>
           <div className="col-span-2">
-            <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Description</label>
+            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1.5">Description</label>
             <textarea
               rows="2"
               value={newRoomType.description}
               onChange={(e) => setNewRoomType({ ...newRoomType, description: e.target.value })}
-              className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:border-emerald-500 outline-none resize-none"
+              className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm dark:text-slate-200 focus:border-emerald-500 outline-none resize-none"
             ></textarea>
           </div>
           <div className="col-span-2 flex gap-3 mt-2">
             <button
               type="button"
               onClick={() => setIsRoomTypeModalOpen(false)}
-              className="flex-1 py-2.5 text-sm font-bold text-slate-500"
+              className="flex-1 py-2.5 text-sm font-bold text-slate-500 dark:hover:text-slate-300 transition-colors"
             >
               DISCARD
             </button>
@@ -178,8 +178,8 @@ export const RoomModal = ({ isRoomModalOpen, setIsRoomModalOpen, newRoom, setNew
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={() => setIsRoomModalOpen(false)}
       ></div>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-300">
-        <div className="p-6 bg-[#1a2b4b] text-white flex justify-between items-center">
+      <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-2xl w-full max-w-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-300 transition-colors duration-300">
+        <div className="p-6 bg-[#1a2b4b] dark:bg-[#0f172a] text-white flex justify-between items-center">
           <div className="flex items-center gap-3">
             <DoorOpen className="w-6 h-6 text-emerald-400" />
             <div>
@@ -197,43 +197,43 @@ export const RoomModal = ({ isRoomModalOpen, setIsRoomModalOpen, newRoom, setNew
         <form onSubmit={handleAddRoom} className="p-8 space-y-6">
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Room Name</label>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Room Name</label>
               <input
                 required
                 type="text"
                 value={newRoom.roomName}
                 onChange={(e) => setNewRoom({ ...newRoom, roomName: e.target.value })}
                 placeholder="e.g. 101"
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Short Name</label>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Short Name</label>
               <input
                 required
                 type="text"
                 value={newRoom.shortName}
                 onChange={(e) => setNewRoom({ ...newRoom, shortName: e.target.value })}
                 placeholder="e.g. 101"
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Room Type</label>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Room Type</label>
               <select
                 value={newRoom.roomType}
                 onChange={(e) => setNewRoom({ ...newRoom, roomType: e.target.value })}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all appearance-none"
+                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all appearance-none"
               >
                 {roomTypes.map(rt => <option key={rt.shortName} value={rt.name}>{rt.name}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Floor</label>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Floor</label>
               <select
                 value={newRoom.floor}
                 onChange={(e) => setNewRoom({ ...newRoom, floor: e.target.value })}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all appearance-none"
+                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all appearance-none"
               >
                 {floors.map(f => <option key={f.name} value={f.name}>{f.name}</option>)}
               </select>
@@ -241,9 +241,9 @@ export const RoomModal = ({ isRoomModalOpen, setIsRoomModalOpen, newRoom, setNew
           </div>
 
           <div className="space-y-4">
-            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Room Features</label>
+            <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800 pb-2">Room Features</label>
             <div className="grid grid-cols-2 gap-4">
-              <label className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all border-2 group ${newRoom.isSmoking ? 'bg-orange-50 border-orange-200 ring-2 ring-orange-500/10' : 'bg-slate-50 border-slate-100 hover:border-slate-200'}`}>
+              <label className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all border-2 group ${newRoom.isSmoking ? 'bg-orange-50 dark:bg-orange-500/5 border-orange-200 dark:border-orange-500/20 ring-2 ring-orange-500/10' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600'}`}>
                 <div className="relative">
                   <input
                     type="checkbox"
@@ -254,14 +254,14 @@ export const RoomModal = ({ isRoomModalOpen, setIsRoomModalOpen, newRoom, setNew
                 </div>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
-                    <Cigarette className={`w-4 h-4 ${newRoom.isSmoking ? 'text-orange-500' : 'text-slate-400 font-bold'}`} />
-                    <span className={`text-sm font-bold ${newRoom.isSmoking ? 'text-orange-700' : 'text-slate-600'}`}>Smoking</span>
+                    <Cigarette className={`w-4 h-4 ${newRoom.isSmoking ? 'text-orange-500' : 'text-slate-400 font-bold dark:text-slate-500'}`} />
+                    <span className={`text-sm font-bold ${newRoom.isSmoking ? 'text-orange-700 dark:text-orange-400' : 'text-slate-600 dark:text-slate-400'}`}>Smoking</span>
                   </div>
                   <span className="text-[10px] text-slate-400 font-medium">Guest can smoke in room</span>
                 </div>
               </label>
 
-              <label className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all border-2 group ${newRoom.isHandicap ? 'bg-blue-50 border-blue-200 ring-2 ring-blue-500/10' : 'bg-slate-50 border-slate-100 hover:border-slate-200'}`}>
+              <label className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all border-2 group ${newRoom.isHandicap ? 'bg-blue-50 dark:bg-blue-500/5 border-blue-200 dark:border-blue-500/20 ring-2 ring-blue-500/10' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600'}`}>
                 <div className="relative">
                   <input
                     type="checkbox"
@@ -272,27 +272,26 @@ export const RoomModal = ({ isRoomModalOpen, setIsRoomModalOpen, newRoom, setNew
                 </div>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
-                    <Accessibility className={`w-4 h-4 ${newRoom.isHandicap ? 'text-blue-500' : 'text-slate-400 font-bold'}`} />
-                    <span className={`text-sm font-bold ${newRoom.isHandicap ? 'text-blue-700' : 'text-slate-600'}`}>Handicap</span>
+                    <Accessibility className={`w-4 h-4 ${newRoom.isHandicap ? 'text-blue-500' : 'text-slate-400 font-bold dark:text-slate-500'}`} />
+                    <span className={`text-sm font-bold ${newRoom.isHandicap ? 'text-blue-700 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400'}`}>Handicap</span>
                   </div>
                   <span className="text-[10px] text-slate-400 font-medium">Specially designed for access</span>
                 </div>
               </label>
 
-              <label className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all border-2 group ${newRoom.isNonRoom ? 'bg-red-50 border-red-200 ring-2 ring-red-500/10' : 'bg-slate-50 border-slate-100 hover:border-slate-200'}`}>
+              <label className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all border-2 group ${newRoom.isNonRoom ? 'bg-red-50 dark:bg-red-500/5 border-red-200 dark:border-red-500/20 ring-2 ring-red-500/10' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600'}`}>
                 <div className="relative">
                   <input
                     type="checkbox"
                     checked={newRoom.isNonRoom}
                     onChange={(e) => setNewRoom({ ...newRoom, isNonRoom: e.target.checked })}
-
                     className="w-5 h-5 accent-red-500 rounded-md cursor-pointer transition-transform group-active:scale-90"
                   />
                 </div>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
-                    <Ban className={`w-4 h-4 ${newRoom.isNonRoom ? 'text-red-500' : 'text-slate-400 font-bold'}`} />
-                    <span className={`text-sm font-bold ${newRoom.isNonRoom ? 'text-red-700' : 'text-slate-600'}`}>Non-Room</span>
+                    <Ban className={`w-4 h-4 ${newRoom.isNonRoom ? 'text-red-500' : 'text-slate-400 font-bold dark:text-slate-500'}`} />
+                    <span className={`text-sm font-bold ${newRoom.isNonRoom ? 'text-red-700 dark:text-red-400' : 'text-slate-600 dark:text-slate-400'}`}>Non-Room</span>
                   </div>
                   <span className="text-[10px] text-slate-400 font-medium">Internal service/utility space</span>
                 </div>
@@ -304,7 +303,7 @@ export const RoomModal = ({ isRoomModalOpen, setIsRoomModalOpen, newRoom, setNew
             <button
               type="button"
               onClick={() => setIsRoomModalOpen(false)}
-              className="flex-1 py-3 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors"
+              className="flex-1 py-3 text-sm font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
             >
               DISCARD
             </button>
@@ -320,3 +319,4 @@ export const RoomModal = ({ isRoomModalOpen, setIsRoomModalOpen, newRoom, setNew
     </div>
   );
 };
+
