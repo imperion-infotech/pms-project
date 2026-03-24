@@ -1,5 +1,4 @@
 // Page layout structures - Navbar
-import React from 'react';
 import { Menu, Building2, Home, ChevronDown, UserCircle } from 'lucide-react';
 
 const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {

@@ -1,5 +1,4 @@
 // Page layout structures - PageHeader
-import React from 'react';
 import { Layers, Search, RotateCw, Sun, Moon } from 'lucide-react';
 
 const PageHeader = ({ activeItem, onRefresh, isLoading, isDarkMode, toggleTheme }) => {

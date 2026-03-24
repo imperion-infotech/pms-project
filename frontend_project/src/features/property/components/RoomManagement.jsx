@@ -1,5 +1,4 @@
 // "Property" feature ke components - RoomManagement
-import React from 'react';
 import { PlusCircle, Search, X, Cigarette, CigaretteOff, Accessibility, Check, Minus, Ban, Pencil, Trash2 } from 'lucide-react';
 
 const RoomManagement = ({ rooms, setIsRoomModalOpen }) => {

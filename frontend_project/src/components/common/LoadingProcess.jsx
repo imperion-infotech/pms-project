@@ -1,6 +1,4 @@
-import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
 /**
  * LoadingBar - A sleek top-level progress bar.
  */
@@ -9,16 +7,16 @@ export const LoadingBar = ({ isLoading }) => (
     {isLoading && (
       <motion.div
         initial={{ scaleX: 0, opacity: 1, originX: 0 }}
-        animate={{ 
-          scaleX: [0, 0.2, 0.4, 0.8, 0.95], 
-          opacity: 1 
+        animate={{
+          scaleX: [0, 0.2, 0.4, 0.8, 0.95],
+          opacity: 1
         }}
-        exit={{ 
+        exit={{
           scaleX: 1,
           opacity: 0,
           transition: { duration: 0.3 }
         }}
-        transition={{ 
+        transition={{
           duration: 1.5,
           ease: "easeInOut",
           times: [0, 0.3, 0.6, 0.8, 1],

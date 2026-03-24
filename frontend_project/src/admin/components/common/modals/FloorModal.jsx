@@ -1,4 +1,3 @@
-import React from 'react';
 import { PlusCircle, X } from 'lucide-react';
 
 export const FloorModal = ({ isFloorModalOpen, setIsFloorModalOpen, newFloor, setNewFloor, handleAddFloor, floors = [] }) => {
@@ -38,7 +37,7 @@ export const FloorModal = ({ isFloorModalOpen, setIsFloorModalOpen, newFloor, se
         <form onSubmit={onSubmit} className="p-6 space-y-5">
           <div>
             <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Floor Name</label>
-              <input
+            <input
               autoFocus
               required
               type="text"

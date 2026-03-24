@@ -5,7 +5,6 @@
  * Gives context on what module the admin is currently viewing.
  */
 // Page layout structures - PageHeader
-import React from 'react';
 import { Layers, Search, RotateCw, Sun, Moon, Home } from 'lucide-react';
 
 const PageHeader = ({ activeItem, onRefresh, isLoading, isDarkMode, toggleTheme }) => {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Pencil, X, Cigarette, Accessibility, Ban } from 'lucide-react';
 
 export const RoomEditModal = ({ isOpen, setIsOpen, editRoom, setEditRoom, handleUpdateRoom, roomTypes, floors, rooms = [] }) => {

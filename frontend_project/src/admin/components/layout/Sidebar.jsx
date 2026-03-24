@@ -6,7 +6,6 @@
  * to the standalone User HomeScreen page.
  */
 // Page layout structures - Sidebar
-import React from 'react';
 import { Menu, Building, ChevronDown, ChevronUp, Layers, LayoutDashboard, DoorOpen, CheckSquare, Home, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 

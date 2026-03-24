@@ -19,7 +19,7 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         const name = payload.sub || payload.username || payload.name || 'User';
-        
+
         let rawRole = 'User';
         if (payload.role) rawRole = payload.role;
         else if (payload.roles) rawRole = Array.isArray(payload.roles) ? payload.roles[0] : payload.roles;
@@ -66,56 +66,56 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 
       <div className="flex items-center gap-5">
         <div className="flex items-center gap-3">
-        <div className="relative">
-          <button 
-            onClick={() => {
-              setIsNotificationOpen(!isNotificationOpen);
-              if (showNotification) setShowNotification(false);
-            }}
-            className="hidden sm:flex relative p-2 mr-2 text-slate-400 hover:text-emerald-400 hover:bg-slate-800 rounded-lg transition-colors group z-50"
-          >
-            <Bell className="w-5 h-5 transition-transform origin-top group-hover:rotate-12" />
-            {showNotification && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 border-2 border-[#1e293b] rounded-full"></span>}
-          </button>
-          
-          {/* Right Side Notification Dropdown */}
-          {isNotificationOpen && (
-            <>
-              {/* Overlay for clicking outside */}
-              <div 
-                className="fixed inset-0 z-40" 
-                onClick={() => setIsNotificationOpen(false)}
-              ></div>
-              
-              <div className="absolute right-0 mt-3 w-80 bg-[#1e293b] border border-slate-700/80 rounded-2xl shadow-[0_10px_40px_-5px_rgba(0,0,0,0.6)] z-50 overflow-hidden animate-in fade-in slide-in-from-top-4">
-                <div className="p-4 border-b border-slate-700/80 flex justify-between items-center bg-[#1e293b]/95 backdrop-blur-sm">
-                  <h3 className="font-bold text-white text-sm">Dashboard Alerts</h3>
-                  <span className="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-bold">1 New</span>
-                </div>
-                <div className="max-h-[60vh] overflow-y-auto custom-scrollbar bg-[#1e293b]/90 backdrop-blur-sm">
-                  <div className="p-4 hover:bg-slate-800/80 transition-colors border-l-2 border-emerald-500 cursor-pointer">
-                    <p className="text-sm text-slate-200 font-medium mb-1 capitalize">Welcome back, {userDetails.username}!</p>
-                    <p className="text-xs text-slate-400">Admin session started successfully.</p>
-                    <p className="text-[10px] text-slate-500 mt-2 font-medium">Just now</p>
+          <div className="relative">
+            <button
+              onClick={() => {
+                setIsNotificationOpen(!isNotificationOpen);
+                if (showNotification) setShowNotification(false);
+              }}
+              className="hidden sm:flex relative p-2 mr-2 text-slate-400 hover:text-emerald-400 hover:bg-slate-800 rounded-lg transition-colors group z-50"
+            >
+              <Bell className="w-5 h-5 transition-transform origin-top group-hover:rotate-12" />
+              {showNotification && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 border-2 border-[#1e293b] rounded-full"></span>}
+            </button>
+
+            {/* Right Side Notification Dropdown */}
+            {isNotificationOpen && (
+              <>
+                {/* Overlay for clicking outside */}
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setIsNotificationOpen(false)}
+                ></div>
+
+                <div className="absolute right-0 mt-3 w-80 bg-[#1e293b] border border-slate-700/80 rounded-2xl shadow-[0_10px_40px_-5px_rgba(0,0,0,0.6)] z-50 overflow-hidden animate-in fade-in slide-in-from-top-4">
+                  <div className="p-4 border-b border-slate-700/80 flex justify-between items-center bg-[#1e293b]/95 backdrop-blur-sm">
+                    <h3 className="font-bold text-white text-sm">Dashboard Alerts</h3>
+                    <span className="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-bold">1 New</span>
                   </div>
-                  <div className="p-4 hover:bg-slate-800/80 transition-colors cursor-pointer opacity-70">
-                    <p className="text-sm text-slate-300 font-medium mb-1">Backup Complete</p>
-                    <p className="text-xs text-slate-400">Daily database snapshot taken securely.</p>
-                    <p className="text-[10px] text-slate-500 mt-2 font-medium">3 hours ago</p>
+                  <div className="max-h-[60vh] overflow-y-auto custom-scrollbar bg-[#1e293b]/90 backdrop-blur-sm">
+                    <div className="p-4 hover:bg-slate-800/80 transition-colors border-l-2 border-emerald-500 cursor-pointer">
+                      <p className="text-sm text-slate-200 font-medium mb-1 capitalize">Welcome back, {userDetails.username}!</p>
+                      <p className="text-xs text-slate-400">Admin session started successfully.</p>
+                      <p className="text-[10px] text-slate-500 mt-2 font-medium">Just now</p>
+                    </div>
+                    <div className="p-4 hover:bg-slate-800/80 transition-colors cursor-pointer opacity-70">
+                      <p className="text-sm text-slate-300 font-medium mb-1">Backup Complete</p>
+                      <p className="text-xs text-slate-400">Daily database snapshot taken securely.</p>
+                      <p className="text-[10px] text-slate-500 mt-2 font-medium">3 hours ago</p>
+                    </div>
+                  </div>
+                  <div className="p-3 border-t border-slate-700/80 bg-[#1e293b]/95 backdrop-blur-sm">
+                    <button
+                      onClick={() => setIsNotificationOpen(false)}
+                      className="w-full py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer"
+                    >
+                      Clear all alerts
+                    </button>
                   </div>
                 </div>
-                <div className="p-3 border-t border-slate-700/80 bg-[#1e293b]/95 backdrop-blur-sm">
-                  <button 
-                    onClick={() => setIsNotificationOpen(false)}
-                    className="w-full py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer"
-                  >
-                    Clear all alerts
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
+              </>
+            )}
+          </div>
           <div className="text-right hidden sm:block">
             <p className="text-xs font-bold text-white capitalize">{userDetails.username}</p>
             <p className="text-[10px] text-emerald-400 uppercase tracking-wider">{userDetails.role}</p>

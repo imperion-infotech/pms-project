@@ -1,6 +1,4 @@
 // Common UI elements - Pagination component
-import React from 'react';
-
 const Pagination = ({ activeItem, floors, roomTypes, rooms, isLoading }) => {
   return (
     <div className="bg-white dark:bg-[#1e293b] text-slate-800 dark:text-white p-4 px-8 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md dark:shadow-xl mt-4 min-h-[72px] border border-slate-200 dark:border-slate-800 transition-colors duration-300">

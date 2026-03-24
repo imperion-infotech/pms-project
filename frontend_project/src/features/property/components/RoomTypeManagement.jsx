@@ -1,5 +1,4 @@
 // "Property" feature ke components - RoomTypeManagement
-import React from 'react';
 import { PlusCircle, Search, CheckSquare, X, Plus, Pencil, Trash2 } from 'lucide-react';
 
 const RoomTypeManagement = ({ roomTypes, setIsRoomTypeModalOpen }) => {

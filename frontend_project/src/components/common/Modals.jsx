@@ -1,5 +1,4 @@
 // Common UI elements - Saare modals ab yaha hain
-import React from 'react';
 import { PlusCircle, X, LayoutDashboard, DoorOpen, Cigarette, Accessibility, Ban, CheckCircle2 } from 'lucide-react';
 
 export const FloorModal = ({ isFloorModalOpen, setIsFloorModalOpen, newFloor, setNewFloor, handleAddFloor }) => {

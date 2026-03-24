@@ -1,10 +1,8 @@
-import React from 'react';
 import {
   Home, RefreshCw, Sun, Moon, Search,
   BedDouble, Layers, CalendarRange
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-
 /**
  * UserPageHeader component - Professional industrial-level secondary header.
  * Contains purely breadcrumbs, segmented floor navigation, real-time stats, and contextual actions.

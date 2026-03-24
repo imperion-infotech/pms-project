@@ -1,5 +1,4 @@
 // Page layout structures - Sidebar
-import React from 'react';
 import { Menu, Building, ChevronDown, ChevronUp, Layers, LayoutDashboard, DoorOpen, CheckSquare } from 'lucide-react';
 
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem }) => {
@@ -21,9 +20,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isPropertyOpen, setIsPropert
       )}
 
       <aside
-        className={`bg-[#1e293b] text-white flex flex-col shrink-0 shadow-xl z-30 transition-all duration-300 ease-in-out w-64 fixed lg:static h-full lg:h-auto ${
-          isSidebarOpen ? 'ml-0' : '-ml-64'
-        }`}
+        className={`bg-[#1e293b] text-white flex flex-col shrink-0 shadow-xl z-30 transition-all duration-300 ease-in-out w-64 fixed lg:static h-full lg:h-auto ${isSidebarOpen ? 'ml-0' : '-ml-64'
+          }`}
       >
         <div className="p-4 flex items-center justify-between border-b border-slate-700/50">
           <div className="flex items-center gap-3 overflow-hidden">
@@ -58,11 +56,10 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isPropertyOpen, setIsPropert
                       // Close sidebar on mobile after selection
                       if (window.innerWidth < 1024) setIsSidebarOpen(false);
                     }}
-                    className={`w-full flex items-center px-6 py-2.5 text-xs font-medium transition-all relative ${
-                      activeItem === item.name
-                        ? 'text-white bg-slate-800/50'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-800/30'
-                    }`}
+                    className={`w-full flex items-center px-6 py-2.5 text-xs font-medium transition-all relative ${activeItem === item.name
+                      ? 'text-white bg-slate-800/50'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/30'
+                      }`}
                   >
                     {activeItem === item.name && (
                       <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></div>

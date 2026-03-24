@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, Building2, UserCircle, Bell } from 'lucide-react';
-
 /**
  * UserNavbar component - Global dark header for User Hub.
  * Features an industrial, highly professional design with sleek gradients and spacing.

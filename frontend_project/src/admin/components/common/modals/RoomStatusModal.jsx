@@ -1,4 +1,3 @@
-import React from 'react';
 import { LayoutDashboard, X } from 'lucide-react';
 
 export const RoomStatusModal = ({ isOpen, setIsOpen, newRoomStatus, setNewRoomStatus, handleAddRoomStatus, roomStatuses = [] }) => {
