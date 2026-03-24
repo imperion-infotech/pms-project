@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   CheckCircle2, Layers, Menu, LogOut, ChevronDown, ChevronUp
 } from 'lucide-react';

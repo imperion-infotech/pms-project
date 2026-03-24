@@ -27,13 +27,13 @@ const getRoleFromToken = () => {
     if (payload.role) return payload.role;
     if (payload.roles) return Array.isArray(payload.roles) ? payload.roles[0] : payload.roles;
     if (payload.authorities) return Array.isArray(payload.authorities) ? payload.authorities[0]?.authority || payload.authorities[0] : payload.authorities;
-    
+
     // Check locally cached role (for demo purposes since JWT lacks it right now)
     const localRole = localStorage.getItem('user_role');
     if (localRole) return localRole;
 
     // Default fallback if role isn't explicitly found
-    return 'ROLE_USER'; 
+    return 'ROLE_USER';
   } catch {
     const localRole = localStorage.getItem('user_role');
     if (localRole) return localRole;
@@ -50,11 +50,11 @@ const AdminRoute = ({ children }) => {
 
   const role = getRoleFromToken() || '';
   const isAdminOrManager = ['ROLE_ADMIN', 'ADMIN', 'ROLE_MANAGER', 'MANAGER'].includes(role.toUpperCase());
-  
+
   if (isAdminOrManager) {
     return children;
   }
-  
+
   // Unauthorized for admin -> drop to home
   return <Navigate to="/home" replace />;
 };
@@ -70,14 +70,14 @@ const UserRoute = ({ children }) => {
 const RootRoute = () => {
   const token = localStorage.getItem('access_token');
   if (!token) return <Navigate to="/login" replace />;
-  
+
   const role = getRoleFromToken() || '';
   const isAdminOrManager = ['ROLE_ADMIN', 'ADMIN', 'ROLE_MANAGER', 'MANAGER'].includes(role.toUpperCase());
-  
+
   if (isAdminOrManager) {
     return <PmsDashboard />;
   }
-  
+
   return <Navigate to="/home" replace />;
 };
 
@@ -93,7 +93,7 @@ function App() {
 
           {/* Root decides where to send the user based on role */}
           <Route path="/" element={<RootRoute />} />
-          
+
           {/* Admin Dashboard */}
           <Route path="/dashboard" element={
             <AdminRoute>
