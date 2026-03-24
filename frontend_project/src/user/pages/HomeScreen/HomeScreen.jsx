@@ -44,66 +44,89 @@ const HomeScreen = () => {
   const fetchRooms = useCallback(async () => {
     setIsLoading(true);
     setError(null);
+    console.log('HomeScreen: Fetching room data...');
     try {
-      const [roomsRes, floorsRes, typesRes, statusRes, personalRes] = await Promise.all([
-        api.get('/auth/getroommasters').catch(() => ({ data: [] })),
-        api.get('/auth/getfloors').catch(() => ({ data: [] })),
-        api.get('/auth/getroomtypes').catch(() => ({ data: [] })),
-        api.get('/auth/getroomstatuses').catch(() => ({ data: [] })),
-        api.get('/auth/getpersonaldetails').catch(() => ({ data: [] })),
+      const results = await Promise.allSettled([
+        api.get('/user/getroommasters'),
+        api.get('/user/getfloors'),
+        api.get('/user/getroomtypes'),
+        api.get('/user/getroomstatuses'),
+        api.get('/user/getpersonaldetails'),
       ]);
-      const floors = floorsRes.data || [];
-      const types = typesRes.data || [];
-      const statuses = statusRes.data || [];
-      const rawRooms = roomsRes.data || [];
-      const profiles = personalRes.data || [];
+
+      const [roomsRes, floorsRes, typesRes, statusRes, personalRes] = results.map(r => r.status === 'fulfilled' ? r.value : { data: [] });
+
+      const extractArray = (data) => {
+        if (Array.isArray(data)) return data;
+        if (data && Array.isArray(data.content)) return data.content;
+        if (data && typeof data === 'object') {
+          const arrayProp = Object.values(data).find(val => Array.isArray(val));
+          if (arrayProp) return arrayProp;
+        }
+        return [];
+      };
+
+      const floors = extractArray(floorsRes.data);
+      const types = extractArray(typesRes.data);
+      const statuses = extractArray(statusRes.data);
+      const rawRooms = extractArray(roomsRes.data);
+      const profiles = extractArray(personalRes.data);
+
+      console.log('HomeScreen Sync Status:', {
+        floors: floors.length,
+        rooms: rawRooms.length,
+        types: types.length
+      });
+
       setAllFloors(floors);
       setRoomTypes(types);
       setRoomStatuses(statuses);
       setPersonalDetails(profiles);
 
-
       // Map API data to component structure
       const mappedRooms = rawRooms.map((r, idx) => {
-        const floorObj = floors.find(f => f.id == r.floorId);
-        const typeObj = types.find(t => t.id == r.roomTypeId);
-        const statusObj = statuses.find(s => s.id == r.roomStatusId) || statuses[idx % statuses.length];
+        // Handle varying ID naming conventions (id, floorId, etc)
+        const getFloorId = (room) => room.floorId || room.floor_id || room.floor?.id;
+        const getTypeId = (room) => room.roomTypeId || room.room_type_id || room.roomType?.id;
+        const getStatusId = (room) => room.roomStatusId || room.room_status_id || room.roomStatus?.id;
 
-        // Mock data for visual completeness (Matching the provided image)
-        const mockGuests = ['Abhishek', 'Test Guest', 'Asi Test', 'Vivek Singh', 'Juliez Gerry', 'Mustafa Shaikhah'];
-        const mockPrices = ['1,509.00', '1,403.50', '1,505.00', '0.00', '4,505.00'];
-        const hasGuest = idx % 3 === 0 || idx === 1;
+        const fId = getFloorId(r);
+        const tId = getTypeId(r);
+        const sId = getStatusId(r);
+
+        const floorObj = floors.find(f => (f.id || f.floorId) == fId);
+        const typeObj = types.find(t => (t.id || t.roomTypeId) == tId);
+        const statusObj = statuses.find(s => (s.id || s.roomStatusId) == sId) || statuses[idx % statuses.length];
 
         return {
-          id: r.id,
-          roomName: r.roomName,
-          shortName: typeObj ? typeObj.shortName : 'STD',
-          roomTypeName: typeObj ? typeObj.roomTypeName : 'Standard',
-          floorName: floorObj ? floorObj.name : 'Unknown',
-          smoking: r.smoking,
-          handicap: r.handicap,
-          isNonRoom: r.nonRoom,
+          id: r.id || r.roomMasterId || idx,
+          roomName: r.roomName || r.name || `Room ${idx}`,
+          shortName: typeObj ? (typeObj.shortName || typeObj.name) : 'STD',
+          roomTypeName: typeObj ? (typeObj.roomTypeName || typeObj.name) : 'Standard',
+          floorName: floorObj ? (floorObj.name || floorObj.floorName) : 'Unknown',
+          smoking: r.smoking || false,
+          handicap: r.handicap || false,
+          isNonRoom: r.nonRoom || false,
           statusDetails: statusObj,
-          guestName: hasGuest ? mockGuests[idx % mockGuests.length] : null,
+          guestName: null, // Resetting guests for now to avoid mock confusion
           buildingName: 'Main Wing'
         };
       });
 
-      // Extra occupied room calculation for stats
-      const occupiedRoomsCount = mappedRooms.filter(r => r.guestName).length;
       setAllRooms(mappedRooms);
+
+      const occupiedRoomsCount = mappedRooms.filter(r => r.statusDetails?.roomStatusName === 'Occupied').length;
       setOccupiedRooms(occupiedRoomsCount);
       setAvailableRooms(mappedRooms.length - occupiedRoomsCount - mappedRooms.filter(r => r.isNonRoom).length);
 
       const grouped = {};
       floors.forEach(floor => {
-        grouped[floor.name] = mappedRooms.filter(r => r.floorName === floor.name);
+        const floorName = floor.name || floor.floorName;
+        grouped[floorName] = mappedRooms.filter(r => r.floorName === floorName);
       });
-      // Fallback for rooms without a matched floor
+
       const unknownRooms = mappedRooms.filter(r => r.floorName === 'Unknown');
-      if (unknownRooms.length > 0) {
-        grouped['Unknown'] = unknownRooms;
-      }
+      if (unknownRooms.length > 0) grouped['Unknown'] = unknownRooms;
 
       setRoomsByFloor(grouped);
     } catch (err) {

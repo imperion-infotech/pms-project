@@ -7,10 +7,18 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
-      // All /auth/* requests are forwarded to Spring Boot backend
-      // This bypasses CORS since the request comes from Node.js server, not the browser
+      '/user': {
+        target: 'http://192.168.1.3:9091',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/admin': {
+        target: 'http://192.168.1.3:9091',
+        changeOrigin: true,
+        secure: false,
+      },
       '/auth': {
-        target: 'http://localhost:9090' || 'http://192.168.1.3:9091',
+        target: 'http://192.168.1.3:9091',
         changeOrigin: true,
         secure: false,
       },

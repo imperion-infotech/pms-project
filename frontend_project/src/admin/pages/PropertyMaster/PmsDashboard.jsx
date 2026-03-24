@@ -210,7 +210,7 @@ const PmsDashboard = () => {
   // ─── ROOM MASTER CRUD ───────────────────────────────────────────
   const handleAddRoom = useCallback(async (e) => {
     e.preventDefault();
-    if (!newRoom.roomName || !newRoom.roomTypeId || !newRoom.floorId) return;
+    if (!newRoom.roomName || (!newRoom.nonRoom && !newRoom.roomTypeId) || !newRoom.floorId) return;
     try {
       await addRoom({
         roomName: newRoom.roomName,
@@ -243,7 +243,7 @@ const PmsDashboard = () => {
 
   const handleUpdateRoom = useCallback(async (e) => {
     e.preventDefault();
-    if (!editRoom.roomName || !editRoom.roomTypeId || !editRoom.floorId) return;
+    if (!editRoom.roomName || (!editRoom.nonRoom && !editRoom.roomTypeId) || !editRoom.floorId) return;
     try {
       await updateRoom(editRoom.id, {
         roomName: editRoom.roomName,
