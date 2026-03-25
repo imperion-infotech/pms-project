@@ -10,6 +10,7 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoadingProcess from './components/common/LoadingProcess';
+import { CloudCog } from 'lucide-react';
 
 // Lazy load components for better performance
 const PmsDashboard = lazy(() => import('./admin/pages/PropertyMaster/PmsDashboard'));
@@ -19,8 +20,12 @@ const Register = lazy(() => import('./user/pages/Auth/Register'));
 
 // Helper to decode JWT and get role securely
 const getRoleFromToken = () => {
-  const token = localStorage.getItem('access_token');
+  let token = localStorage.getItem('access_token');
   if (!token) return null;
+
+  // Clean token
+  token = token.trim().replace(/^"|"$/g, '');
+
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
     // Check various common claims configurations
@@ -46,6 +51,7 @@ const getRoleFromToken = () => {
 // Admin Protection (Managers & Admins only)
 const AdminRoute = ({ children }) => {
   const token = localStorage.getItem('access_token');
+  console.log("Access Token...!", token)
   if (!token) return <Navigate to="/login" replace />;
 
   const role = getRoleFromToken() || '';

@@ -35,6 +35,8 @@ const Register = () => {
         body: JSON.stringify(formData),
       });
 
+      console.log("Response...", response)
+
       if (!response.ok) {
         throw new Error('Registration failed. Username might already exist.');
       }
@@ -103,9 +105,9 @@ const Register = () => {
                 className="w-full bg-slate-900/60 border border-slate-700 rounded-xl py-3.5 pr-4 pl-11 text-white text-sm outline-none transition-all duration-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 box-border appearance-none cursor-pointer"
               >
                 <option value="" disabled>Select Role...</option>
-                <option value="USER">User</option>
-                <option value="ADMIN">Admin</option>
-                <option value="MANAGER">Manager</option>
+                <option value="ROLE_USER">User</option>
+                <option value="ROLE_ADMIN">Admin</option>
+                <option value="ROLE_MANAGER">Manager</option>
               </select>
             </div>
           </div>

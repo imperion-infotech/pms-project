@@ -43,24 +43,34 @@ const Login = () => {
       }
 
       const rawText = await response.text();
+      // alert("Raw Text...", rawText)
 
       try {
         // Attempt to parse as JSON if the backend wrapped it
         const data = JSON.parse(rawText);
+        
+        // Extract token from multiple possible keys, including nested 'data'
+        const token = data.access_token || data.accessToken || data.token || data.jwt || 
+                      (data.data && typeof data.data === 'string' ? data.data : null) ||
+                      (data.data && (data.data.token || data.data.accessToken || data.data.access_token));
+                      
+        const refreshToken = data.refresh_token || data.refreshToken || (data.data && data.data.refreshToken);
 
+        if (token) {
+          localStorage.setItem('access_token', token);
+        } else {
+          // If JSON but no token key found, only fallback if rawText looks like a token
+          if (rawText.length > 50 && rawText.includes('.')) {
+             localStorage.setItem('access_token', rawText);
+          }
+        }
 
-
-        if (data.access_token) localStorage.setItem('access_token', data.access_token);
-        if (data.accessToken) localStorage.setItem('access_token', data.accessToken);
-
-        if (data.refresh_token) localStorage.setItem('refresh_token', data.refresh_token);
-        if (data.refreshToken) localStorage.setItem('refresh_token', data.refreshToken);
-
-        if (data.token) localStorage.setItem('access_token', data.token);
+        if (refreshToken) {
+          localStorage.setItem('refresh_token', refreshToken);
+        }
       } catch (e) {
-        // If it fails, the response is a raw JWT string (e.g. "eyJ...")
-        localStorage.setItem('access_token', rawText);
-
+        // If parsing fails, the response is likely a raw JWT string (e.g. "eyJ...")
+        localStorage.setItem('access_token', rawText.trim());
       }
 
       // --- DEMO LOGIC MATCHING ---

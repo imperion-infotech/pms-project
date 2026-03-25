@@ -9,46 +9,35 @@ const usePmsData = () => {
   const [floors, setFloors] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
   const [roomStatuses, setRoomStatuses] = useState([]);
+  const [error, setError] = useState(null);
   const [rooms, setRooms] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // ─── GET: Fetch all data ─────────────
   const fetchData = useCallback(async () => {
     setIsLoading(true);
-    console.log('Fetching PMS data...');
+    setError(null);
     try {
-      const results = await Promise.allSettled([
-        api.get('/user/getfloors'),
-        api.get('/user/getroomtypes'),
-        api.get('/user/getroomstatuses'),
-        api.get('/user/getroommasters'),
+      // Use individual try-catch logic or allSettled to ensure failure of one doesn't break all
+      const [floorsRes, roomTypesRes, roomStatusesRes, roomsRes] = await Promise.all([
+        api.get('/user/getfloors').catch(() => ({ data: [] })),
+        api.get('/user/getroomtypes').catch(() => ({ data: [] })),
+        api.get('/user/getroomstatuses').catch(() => ({ data: [] })),
+        api.get('/user/getroommasters').catch(() => ({ data: [] })),
       ]);
 
-      const [floorsRes, roomTypesRes, roomStatusesRes, roomsRes] = results.map(r => r.status === 'fulfilled' ? r.value : { data: [] });
+      setFloors(floorsRes.data || []);
+      setRoomTypes(roomTypesRes.data || []);
+      setRoomStatuses(roomStatusesRes.data || []);
+      setRooms(roomsRes.data || []);
 
-      // Log for debugging (helps user see what comes from backend)
-      console.log('Floors Raw:', floorsRes.data);
-      console.log('Room Types Raw:', roomTypesRes.data);
-
-      // Handle both pure arrays and Spring-style wrapped arrays { content: [] }
-      const extractArray = (data) => {
-        if (Array.isArray(data)) return data;
-        if (data && Array.isArray(data.content)) return data.content;
-        if (data && typeof data === 'object') {
-          // Try to find any property that is an array
-          const arrayProp = Object.values(data).find(val => Array.isArray(val));
-          if (arrayProp) return arrayProp;
-        }
-        return [];
-      };
-
-      setFloors(extractArray(floorsRes.data));
-      setRoomTypes(extractArray(roomTypesRes.data));
-      setRoomStatuses(extractArray(roomStatusesRes.data));
-      setRooms(extractArray(roomsRes.data));
-
-    } catch (error) {
-      console.error('Error fetching data:', error);
+      if (floorsRes.data?.length === 0 && roomTypesRes.data?.length === 0) {
+        // Log if everything is empty - might be a sign of a global issue
+        console.warn("Fetched data successfully but all lists are empty. This might be a permission issue or the database is blank.");
+      }
+    } catch (err) {
+      console.error('Error fetching data:', err);
+      setError('Failed to synchronize data.');
     } finally {
       // Small timeout for smooth UI transition
       setTimeout(() => setIsLoading(false), 500);
@@ -58,39 +47,6 @@ const usePmsData = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  // ─── GET: Fetch a single floor ────────
-  const getFloorById = async (id) => {
-    try {
-      const response = await api.get(`/user/getfloor/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching floor ${id}:`, error);
-      throw error;
-    }
-  };
-
-  // ─── GET: Fetch a single Room Type ────────
-  const getRoomTypeById = async (id) => {
-    try {
-      const response = await api.get(`/user/getroomtype/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching room type ${id}:`, error);
-      throw error;
-    }
-  };
-
-  // ─── GET: Fetch a single Room Master ───────
-  const getRoomMasterById = async (id) => {
-    try {
-      const response = await api.get(`/user/getroommaster/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching room master ${id}:`, error);
-      throw error;
-    }
-  };
 
   // ─── POST: Create a new floor ────────
   const addFloor = async (floorData) => {
@@ -229,13 +185,12 @@ const usePmsData = () => {
     roomTypes,
     roomStatuses,
     isLoading,
+    error,
     fetchData,
     addFloor,
-    getFloorById,
     updateFloor,
     deleteFloor,
     addRoomType,
-    getRoomTypeById,
     updateRoomType,
     deleteRoomType,
     addRoomStatus,
@@ -243,7 +198,6 @@ const usePmsData = () => {
     deleteRoomStatus,
     rooms,
     addRoom,
-    getRoomMasterById,
     updateRoom,
     deleteRoom
   };

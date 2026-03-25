@@ -18,15 +18,13 @@ const api = axios.create({
   timeout: 10000, // 10 seconds timeout
 });
 
+// Request Interceptor - runs before every request
 api.interceptors.request.use(
   (config) => {
-    // Add JWT token to headers if needed
-    const token = localStorage.getItem('access_token');
+    let token = localStorage.getItem('access_token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-      console.log(`[API Request] ${config.method.toUpperCase()} ${config.url} - Token sent: Yes (${token.substring(0, 10)}...)`);
-    } else {
-      console.warn(`[API Request] ${config.method.toUpperCase()} ${config.url} - Token sent: NO (User might be logged out)`);
+      token = token.trim().replace(/^"|"$/g, '');
+      config.headers.Authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
     }
     return config;
   },
@@ -37,7 +35,6 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('API Error:', error?.response?.data || error.message);
     return Promise.reject(error);
   }
 );
