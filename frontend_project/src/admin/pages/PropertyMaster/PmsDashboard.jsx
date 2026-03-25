@@ -1,275 +1,137 @@
-/**
- * PmsDashboard.jsx (Admin Domain)
- * 
- * Main wrapper/layout for the Admin interface.
- * Holds state for sidebar visibility, active view (Floor, Room, Room Type), and themes (Light/Dark).
- * Handles API calls to fetch overarching data like floors, room types, and rooms to distribute 
- * to the sub-components respectively.
- */
-// Main Dashboard file - Page-level components
-import React, { useState, useEffect, useCallback } from 'react';
-import { Layers } from 'lucide-react';
+import React, { useState } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
 import Navbar from '../../components/layout/Navbar';
 import PageHeader from '../../components/layout/PageHeader';
-import FloorManagement from '../../features/property/components/FloorManagement';
-import RoomTypeManagement from '../../features/property/components/RoomTypeManagement';
-import RoomManagement from '../../features/property/components/RoomManagement';
-import RoomStatusManagement from '../../features/property/components/RoomStatusManagement';
-
-import usePmsData from '../../../hooks/usePmsData';
 import Pagination from '../../components/common/Pagination';
 import LoadingProcess from '../../../components/common/LoadingProcess';
 
+// Contexts & Hooks
+import usePmsData from '../../../hooks/usePmsData';
+import { useTheme } from '../../../context/ThemeContext';
+import { useSidebar } from '../../../context/SidebarContext';
 
-import { FloorModal, FloorEditModal, RoomTypeModal, RoomTypeEditModal, RoomStatusModal, RoomStatusEditModal, RoomModal, RoomEditModal } from '../../components/common/Modals';
-// Spring Boot API instance not used directly here anymore
+// Sub-components (Refactored for maintainability)
+import DashboardRouter from './components/DashboardRouter';
+import DashboardModals from './components/DashboardModals';
 
+/**
+ * PmsDashboard (Admin Module Root)
+ * 
+ * This is the central control panel for the Property Management System (PMS).
+ * Features:
+ * - Layout: Sidebar, Top Navbar, Breadcrumb PageHeader.
+ * - Dynamic Content: Routes between Floor, Room Type, Room, and Room Status management.
+ * - CRUD Logic: Uses the centralized usePmsData hook to interact with backend services.
+ * - State: Manages UI states like active navigation items and modal visibility.
+ */
 const PmsDashboard = () => {
+  const { isDark, toggleTheme } = useTheme();
+  const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
 
+  // Centralized data fetching hook
   const {
-    floors,
-    roomTypes,
-    roomStatuses,
-    isLoading,
-    fetchData,
-    addFloor,
-    updateFloor,
-    deleteFloor,
-    addRoomType,
-    updateRoomType,
-    deleteRoomType,
-    addRoomStatus,
-    updateRoomStatus,
-    deleteRoomStatus,
-    rooms,
-    addRoom,
-    updateRoom,
-    deleteRoom
+    floors, roomTypes, roomStatuses, rooms, isLoading, fetchData,
+    addFloor, updateFloor, deleteFloor,
+    addRoomType, updateRoomType, deleteRoomType,
+    addRoomStatus, updateRoomStatus, deleteRoomStatus,
+    addRoom, updateRoom, deleteRoom
   } = usePmsData();
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isPropertyOpen, setIsPropertyOpen] = useState(true);
+  // Dashboard navigation state
   const [activeItem, setActiveItem] = useState('Floor');
-  const [darkMode, setDarkMode] = useState(false);
+  const [isPropertyOpen, setIsPropertyOpen] = useState(true);
 
-  // Grouped modal states
+  // Grouped modal visibility states
   const [modals, setModals] = useState({
-    floor: false,
-    floorEdit: false,
-    roomType: false,
-    roomTypeEdit: false,
-    roomStatus: false,
-    roomStatusEdit: false,
-    room: false
+    floor: false, floorEdit: false,
+    roomType: false, roomTypeEdit: false,
+    roomStatus: false, roomStatusEdit: false,
+    room: false, roomEdit: false
   });
 
-  // Helper to toggle modals
   const toggleModal = (modalName, isOpen) => {
     setModals(prev => ({ ...prev, [modalName]: isOpen }));
   };
 
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
-
+  /**
+   * Data Persistence States (Forms)
+   * We maintain separate state for Create (newX) and Edit (editX) scenarios.
+   */
   const [newFloor, setNewFloor] = useState({ name: '', description: '' });
   const [editFloor, setEditFloor] = useState({ id: null, name: '', description: '' });
-
   const [newRoomType, setNewRoomType] = useState({ shortName: '', roomTypeName: '' });
   const [editRoomType, setEditRoomType] = useState({ id: null, shortName: '', roomTypeName: '' });
-
   const [newRoomStatus, setNewRoomStatus] = useState({ roomStatusName: '', roomStatusTitle: '', roomStatusColor: '#2798e8' });
   const [editRoomStatus, setEditRoomStatus] = useState({ id: null, roomStatusName: '', roomStatusTitle: '', roomStatusColor: '#2798e8' });
+  const [newRoom, setNewRoom] = useState({ roomName: '', roomTypeId: '', floorId: '', smoking: false, handicap: false, nonRoom: false });
+  const [editRoom, setEditRoom] = useState({ id: null, roomName: '', roomTypeId: '', floorId: '', smoking: false, handicap: false, nonRoom: false });
 
-  const [newRoom, setNewRoom] = useState({
-    roomName: '',
-    roomTypeId: '',
-    floorId: '',
-    smoking: false,
-    handicap: false,
-    nonRoom: false
-  });
-
-  const [editRoom, setEditRoom] = useState({
-    id: null,
-    roomName: '',
-    roomTypeId: '',
-    floorId: '',
-    smoking: false,
-    handicap: false,
-    nonRoom: false
-  });
-
-  // ─── POST: Create a new floor ───────────
-  const handleAddFloor = useCallback(async (e) => {
+  /**
+   * EVENT HANDLERS - Property Management Actions
+   */
+  const handleAddFloor = async (e) => {
     e.preventDefault();
     if (!newFloor.name) return;
-    try {
-      await addFloor(newFloor);
-      setNewFloor({ name: '', description: '' });
-      toggleModal('floor', false);
-    } catch (error) {
-      console.error('Failed to create floor.', error);
-    }
-  }, [newFloor, addFloor]);
+    await addFloor(newFloor);
+    setNewFloor({ name: '', description: '' });
+    toggleModal('floor', false);
+  };
 
-  // ─── PUT: Edit / Update a floor ──────────
-  const handleEditFloor = useCallback((floor) => {
-    setEditFloor({ id: floor.id, name: floor.name, description: floor.description || '' });
-    toggleModal('floorEdit', true);
-  }, []);
-
-  const handleUpdateFloor = useCallback(async (e) => {
+  const handleUpdateFloor = async (e) => {
     e.preventDefault();
     if (!editFloor.name) return;
-    try {
-      await updateFloor(editFloor.id, { name: editFloor.name, description: editFloor.description });
-      toggleModal('floorEdit', false);
-    } catch (error) {
-      console.error('Failed to update floor.', error);
-    }
-  }, [editFloor, updateFloor]);
+    await updateFloor(editFloor.id, { name: editFloor.name, description: editFloor.description });
+    toggleModal('floorEdit', false);
+  };
 
-  const handleDeleteFloor = useCallback(async (id) => {
-    try { await deleteFloor(id); } catch (e) { console.error('Failed to delete floor.', e); }
-  }, [deleteFloor]);
-
-  // ─── POST: Create a new Room Type ───────
-  const handleAddRoomType = useCallback(async (e) => {
+  const handleAddRoomType = async (e) => {
     e.preventDefault();
     if (!newRoomType.roomTypeName) return;
-    try {
-      await addRoomType(newRoomType);
-      setNewRoomType({ shortName: '', roomTypeName: '' });
-      toggleModal('roomType', false);
-    } catch (error) {
-      console.error('Failed to create room type.', error);
-    }
-  }, [newRoomType, addRoomType]);
+    await addRoomType(newRoomType);
+    setNewRoomType({ shortName: '', roomTypeName: '' });
+    toggleModal('roomType', false);
+  };
 
-  // ─── PUT: Edit / Update a Room Type ──────────
-  const handleEditRoomType = useCallback((roomType) => {
-    setEditRoomType({ id: roomType.id, shortName: roomType.shortName || '', roomTypeName: roomType.roomTypeName || '' });
-    toggleModal('roomTypeEdit', true);
-  }, []);
-
-  const handleUpdateRoomType = useCallback(async (e) => {
+  const handleUpdateRoomType = async (e) => {
     e.preventDefault();
     if (!editRoomType.roomTypeName) return;
-    try {
-      await updateRoomType(editRoomType.id, { shortName: editRoomType.shortName, roomTypeName: editRoomType.roomTypeName });
-      toggleModal('roomTypeEdit', false);
-    } catch (error) {
-      console.error('Failed to update room type.', error);
-    }
-  }, [editRoomType, updateRoomType]);
+    await updateRoomType(editRoomType.id, { shortName: editRoomType.shortName, roomTypeName: editRoomType.roomTypeName });
+    toggleModal('roomTypeEdit', false);
+  };
 
-  const handleDeleteRoomType = useCallback(async (id) => {
-    try { await deleteRoomType(id); } catch (e) { console.error('Failed to delete room type.', e); }
-  }, [deleteRoomType]);
-
-  // ─── POST: Create a new Room Status ────────
-  const handleAddRoomStatus = useCallback(async (e) => {
+  const handleAddRoomStatus = async (e) => {
     e.preventDefault();
     if (!newRoomStatus.roomStatusName) return;
-    try {
-      await addRoomStatus({ ...newRoomStatus, roomStatusTextColor: '#000000' });
-      setNewRoomStatus({ roomStatusName: '', roomStatusTitle: '', roomStatusColor: '#2798e8' });
-      toggleModal('roomStatus', false);
-    } catch (error) {
-      console.error('Failed to create room status.', error);
-    }
-  }, [newRoomStatus, addRoomStatus]);
+    await addRoomStatus({ ...newRoomStatus, roomStatusTextColor: '#000000' });
+    setNewRoomStatus({ roomStatusName: '', roomStatusTitle: '', roomStatusColor: '#2798e8' });
+    toggleModal('roomStatus', false);
+  };
 
-  // ─── PUT: Edit / Update a Room Status ────
-  const handleEditRoomStatus = useCallback((status) => {
-    setEditRoomStatus({ id: status.id, roomStatusName: status.roomStatusName || '', roomStatusTitle: status.roomStatusTitle || '', roomStatusColor: status.roomStatusColor || '#2798e8' });
-    toggleModal('roomStatusEdit', true);
-  }, []);
-
-  const handleUpdateRoomStatus = useCallback(async (e) => {
+  const handleUpdateRoomStatus = async (e) => {
     e.preventDefault();
     if (!editRoomStatus.roomStatusName) return;
-    try {
-      await updateRoomStatus(editRoomStatus.id, { ...editRoomStatus, roomStatusTextColor: '#000000' });
-      toggleModal('roomStatusEdit', false);
-    } catch (error) {
-      console.error('Failed to update room status.', error);
-    }
-  }, [editRoomStatus, updateRoomStatus]);
+    await updateRoomStatus(editRoomStatus.id, { ...editRoomStatus, roomStatusTextColor: '#000000' });
+    toggleModal('roomStatusEdit', false);
+  };
 
-  const handleDeleteRoomStatus = useCallback(async (id) => {
-    try { await deleteRoomStatus(id); } catch (e) { console.error('Failed to delete room status.', e); }
-  }, [deleteRoomStatus]);
-
-  // ─── ROOM MASTER CRUD ───────────────────────────────────────────
-  const handleAddRoom = useCallback(async (e) => {
+  const handleAddRoom = async (e) => {
     e.preventDefault();
     if (!newRoom.roomName || (!newRoom.nonRoom && !newRoom.roomTypeId) || !newRoom.floorId) return;
-    try {
-      await addRoom({
-        roomName: newRoom.roomName,
-        roomShortName: newRoom.roomName,
-        roomTypeId: newRoom.roomTypeId,
-        floorId: newRoom.floorId,
-        smoking: newRoom.smoking,
-        handicap: newRoom.handicap,
-        nonRoom: newRoom.nonRoom
-      });
-      setNewRoom({ roomName: '', roomTypeId: '', floorId: '', smoking: false, handicap: false, nonRoom: false });
-      toggleModal('room', false);
-    } catch (error) {
-      console.error('Failed to create room.', error);
-    }
-  }, [newRoom, addRoom]);
+    await addRoom({ ...newRoom, roomShortName: newRoom.roomName });
+    setNewRoom({ roomName: '', roomTypeId: '', floorId: '', smoking: false, handicap: false, nonRoom: false });
+    toggleModal('room', false);
+  };
 
-  const handleEditRoom = useCallback((room) => {
-    setEditRoom({
-      id: room.id,
-      roomName: room.roomName || '',
-      roomTypeId: room.roomTypeId || '',
-      floorId: room.floorId || '',
-      smoking: room.smoking || false,
-      handicap: room.handicap || false,
-      nonRoom: room.nonRoom || false
-    });
-    toggleModal('roomEdit', true);
-  }, []);
-
-  const handleUpdateRoom = useCallback(async (e) => {
+  const handleUpdateRoom = async (e) => {
     e.preventDefault();
     if (!editRoom.roomName || (!editRoom.nonRoom && !editRoom.roomTypeId) || !editRoom.floorId) return;
-    try {
-      await updateRoom(editRoom.id, {
-        roomName: editRoom.roomName,
-        roomShortName: editRoom.roomName,
-        roomTypeId: editRoom.roomTypeId,
-        floorId: editRoom.floorId,
-        smoking: editRoom.smoking,
-        handicap: editRoom.handicap,
-        nonRoom: editRoom.nonRoom
-      });
-      toggleModal('roomEdit', false);
-    } catch (error) {
-      console.error('Failed to update room.', error);
-    }
-  }, [editRoom, updateRoom]);
-
-  const handleDeleteRoom = useCallback(async (roomId) => {
-    try {
-      await deleteRoom(roomId);
-    } catch (error) {
-      console.error('Failed to delete room.', error);
-    }
-  }, [deleteRoom]);
+    await updateRoom(editRoom.id, { ...editRoom, roomShortName: editRoom.roomName });
+    toggleModal('roomEdit', false);
+  };
 
   return (
-    <div className={`flex h-screen ${darkMode ? 'bg-[#0f172a] text-slate-100' : 'bg-[#f4f7fa] text-slate-800'} font-sans overflow-hidden transition-colors duration-300`}>
+    <div className={`flex h-screen ${isDark ? 'bg-[#0f172a] text-slate-100' : 'bg-[#f4f7fa] text-slate-800'} font-sans overflow-hidden transition-colors duration-300`}>
+      {/* 1. Global Navigation Sidebar */}
       <Sidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
@@ -279,163 +141,75 @@ const PmsDashboard = () => {
         setActiveItem={setActiveItem}
       />
 
-      {/* GLOBAL LOADING PROGRESS (TOP BAR) */}
+      {/* 2. Full-Page Loading State Overlays */}
       <LoadingProcess isLoading={isLoading} barOnly={true} />
 
-
       <div className="flex-1 flex flex-col overflow-hidden relative min-w-0 h-full">
-        <Navbar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
+        {/* 3. Top Header Layer (Global) */}
+        <Navbar />
 
+        {/* 4. Page Specific Title/Breadcrumb Layer */}
         <PageHeader
           activeItem={activeItem}
           onRefresh={fetchData}
           isLoading={isLoading}
-          isDarkMode={darkMode}
-          toggleTheme={() => setDarkMode(!darkMode)}
         />
 
-        <main className={`flex-1 overflow-auto ${darkMode ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'} custom-scrollbar p-3 md:p-6 lg:p-8 transition-colors duration-300`}>
-          <div className="max-w-[1600px] mx-auto space-y-4 md:y-6">
-            {activeItem === 'Floor' ? (
-              <FloorManagement
-                floors={floors}
-                setIsFloorModalOpen={(isOpen) => toggleModal('floor', isOpen)}
-                onEdit={handleEditFloor}
-                onDelete={handleDeleteFloor}
-              />
-            ) : activeItem === 'Room Type' ? (
-              <RoomTypeManagement
-                roomTypes={roomTypes}
-                setIsRoomTypeModalOpen={(isOpen) => toggleModal('roomType', isOpen)}
-                onEdit={handleEditRoomType}
-                onDelete={handleDeleteRoomType}
-              />
-            ) : activeItem === 'Room Status' ? (
-              <RoomStatusManagement
-                roomStatuses={roomStatuses}
-                setIsRoomStatusModalOpen={(isOpen) => toggleModal('roomStatus', isOpen)}
-                onEdit={handleEditRoomStatus}
-                onDelete={handleDeleteRoomStatus}
-              />
-            ) : activeItem === 'Room' ? (
-              <RoomManagement
-                rooms={rooms}
-                roomTypes={roomTypes}
-                floors={floors}
-                setIsRoomModalOpen={(isOpen) => toggleModal('room', isOpen)}
-                onEdit={handleEditRoom}
-                onDelete={handleDeleteRoom}
-              />
-            ) : (
-              <div className="flex flex-col items-center justify-center min-h-[300px] md:min-h-[500px] bg-white rounded-2xl border border-dashed border-slate-300 animate-pulse p-4 text-center">
-                <Layers className="w-12 h-12 md:w-20 md:h-20 mb-4 text-slate-200" />
-                <h3 className="text-lg md:text-xl font-extrabold text-slate-400 uppercase tracking-widest leading-tight">Master Module Pending</h3>
-                <p className="text-xs md:text-sm text-slate-300 mt-2">Working on bringing the {activeItem} screen online.</p>
-              </div>
-            )}
+        {/* 5. Main Content Area - Scrollable */}
+        <main className={`flex-1 overflow-auto ${isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'} custom-scrollbar p-3 md:p-6 lg:p-8 transition-colors duration-300`}>
+          <div className="max-w-[1600px] mx-auto space-y-4 md:y-6 h-full flex flex-col">
 
+            {/* Dynamic Dashboard Module Rendering */}
+            <DashboardRouter
+              activeItem={activeItem}
+              floors={floors}
+              roomTypes={roomTypes}
+              roomStatuses={roomStatuses}
+              rooms={rooms}
+              toggleModal={toggleModal}
+              setEditFloor={setEditFloor}
+              setEditRoomType={setEditRoomType}
+              setEditRoomStatus={setEditRoomStatus}
+              setEditRoom={setEditRoom}
+              deleteFloor={deleteFloor}
+              deleteRoomType={deleteRoomType}
+              deleteRoomStatus={deleteRoomStatus}
+              deleteRoom={deleteRoom}
+            />
+
+            {/* Pagination Controls */}
             {(activeItem === 'Floor' || activeItem === 'Room Type' || activeItem === 'Room') && (
-              <Pagination activeItem={activeItem} floors={floors} roomTypes={roomTypes} rooms={rooms} isLoading={isLoading} />
+              <div className="mt-8">
+                <Pagination activeItem={activeItem} floors={floors} roomTypes={roomTypes} rooms={rooms} isLoading={isLoading} />
+              </div>
             )}
           </div>
         </main>
       </div>
 
-      {/* Add Floor Modal */}
-      <FloorModal
-        isFloorModalOpen={modals.floor}
-        setIsFloorModalOpen={(isOpen) => toggleModal('floor', isOpen)}
-        newFloor={newFloor}
-        setNewFloor={setNewFloor}
-        handleAddFloor={handleAddFloor}
+      {/* 6. Centered Property Management Modals */}
+      <DashboardModals
+        modals={modals}
+        toggleModal={toggleModal}
+        newFloor={newFloor} setNewFloor={setNewFloor} handleAddFloor={handleAddFloor}
+        editFloor={editFloor} setEditFloor={setEditFloor} handleUpdateFloor={handleUpdateFloor}
         floors={floors}
-      />
-
-      {/* Edit Floor Modal */}
-      <FloorEditModal
-        isOpen={modals.floorEdit}
-        setIsOpen={(isOpen) => toggleModal('floorEdit', isOpen)}
-        editFloor={editFloor}
-        setEditFloor={setEditFloor}
-        handleUpdateFloor={handleUpdateFloor}
-        floors={floors}
-      />
-
-      <RoomTypeModal
-        isRoomTypeModalOpen={modals.roomType}
-        setIsRoomTypeModalOpen={(isOpen) => toggleModal('roomType', isOpen)}
-        newRoomType={newRoomType}
-        setNewRoomType={setNewRoomType}
-        handleAddRoomType={handleAddRoomType}
+        newRoomType={newRoomType} setNewRoomType={setNewRoomType} handleAddRoomType={handleAddRoomType}
+        editRoomType={editRoomType} setEditRoomType={setEditRoomType} handleUpdateRoomType={handleUpdateRoomType}
         roomTypes={roomTypes}
-      />
-
-      {/* Edit Room Type Modal */}
-      <RoomTypeEditModal
-        isOpen={modals.roomTypeEdit}
-        setIsOpen={(isOpen) => toggleModal('roomTypeEdit', isOpen)}
-        editRoomType={editRoomType}
-        setEditRoomType={setEditRoomType}
-        handleUpdateRoomType={handleUpdateRoomType}
-        roomTypes={roomTypes}
-      />
-
-      {/* Add Room Status Modal */}
-      <RoomStatusModal
-        isOpen={modals.roomStatus}
-        setIsOpen={(isOpen) => toggleModal('roomStatus', isOpen)}
-        newRoomStatus={newRoomStatus}
-        setNewRoomStatus={setNewRoomStatus}
-        handleAddRoomStatus={handleAddRoomStatus}
+        newRoomStatus={newRoomStatus} setNewRoomStatus={setNewRoomStatus} handleAddRoomStatus={handleAddRoomStatus}
+        editRoomStatus={editRoomStatus} setEditRoomStatus={setEditRoomStatus} handleUpdateRoomStatus={handleUpdateRoomStatus}
         roomStatuses={roomStatuses}
-      />
-
-      {/* Edit Room Status Modal */}
-      <RoomStatusEditModal
-        isOpen={modals.roomStatusEdit}
-        setIsOpen={(isOpen) => toggleModal('roomStatusEdit', isOpen)}
-        editRoomStatus={editRoomStatus}
-        setEditRoomStatus={setEditRoomStatus}
-        handleUpdateRoomStatus={handleUpdateRoomStatus}
-        roomStatuses={roomStatuses}
-      />
-
-      <RoomModal
-        isRoomModalOpen={modals.room}
-        setIsRoomModalOpen={(isOpen) => toggleModal('room', isOpen)}
-        newRoom={newRoom}
-        setNewRoom={setNewRoom}
-        handleAddRoom={handleAddRoom}
-        roomTypes={roomTypes}
-        floors={floors}
-        rooms={rooms}
-      />
-
-      <RoomEditModal
-        isOpen={modals.roomEdit}
-        setIsOpen={(isOpen) => toggleModal('roomEdit', isOpen)}
-        editRoom={editRoom}
-        setEditRoom={setEditRoom}
-        handleUpdateRoom={handleUpdateRoom}
-        roomTypes={roomTypes}
-        floors={floors}
+        newRoom={newRoom} setNewRoom={setNewRoom} handleAddRoom={handleAddRoom}
+        editRoom={editRoom} setEditRoom={setEditRoom} handleUpdateRoom={handleUpdateRoom}
         rooms={rooms}
       />
 
       <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #334155;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #475569;
-        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
       `}</style>
     </div>
   );

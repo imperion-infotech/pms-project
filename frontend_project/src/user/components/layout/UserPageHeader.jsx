@@ -3,6 +3,8 @@ import {
   BedDouble, Layers, CalendarRange
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTheme } from '../../../context/ThemeContext';
+
 /**
  * UserPageHeader component - Professional industrial-level secondary header.
  * Contains purely breadcrumbs, segmented floor navigation, real-time stats, and contextual actions.
@@ -15,11 +17,11 @@ const UserPageHeader = ({
   totalFloors,
   availableRooms,
   occupiedRooms,
-  isDark,
-  setIsDark,
   onRefresh,
   isLoading
 }) => {
+  const { isDark, toggleTheme } = useTheme();
+
   return (
     <div className={`flex flex-col w-full shrink-0 z-10 transition-colors duration-300 ${isDark ? 'bg-[#1e293b]' : 'bg-white'}`}>
 
@@ -92,12 +94,12 @@ const UserPageHeader = ({
             </button>
 
             <button
-              onClick={() => setIsDark(!isDark)}
+              onClick={toggleTheme}
               className={`p-2 rounded-xl border transition-all flex items-center justify-center w-9 h-9 active:scale-95 ${isDark
                 ? 'bg-slate-800/80 border-slate-700 hover:bg-slate-700 hover:border-slate-600'
                 : 'bg-white border-slate-200 hover:bg-slate-50'
                 }`}
-              title="Toggle Protocol Interface"
+              title="Toggle Theme"
             >
               {isDark ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-slate-600" />}
             </button>

@@ -1,16 +1,11 @@
-/**
- * Sidebar.jsx (Admin Domain -> Layout component)
- * 
- * Renders the sliding sidebar/navigation for the Admin Dashboard.
- * Includes links to toggle the views (Floor, Room Type, Room) and a 'Go to Home' button to route 
- * to the standalone User HomeScreen page.
- */
-// Page layout structures - Sidebar
 import { Menu, Building, ChevronDown, ChevronUp, Layers, LayoutDashboard, DoorOpen, CheckSquare, Home, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useSidebar } from '../../../context/SidebarContext';
 
-const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem }) => {
+const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem }) => {
   const navigate = useNavigate();
+  const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
+  
   const propertyItems = [
     { name: 'Floor', icon: Layers },
     { name: 'Room Type', icon: LayoutDashboard },
@@ -38,7 +33,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isPropertyOpen, setIsPropert
               className="w-5 h-5 cursor-pointer text-slate-400 hover:text-white transition-colors"
               onClick={() => setIsSidebarOpen(false)}
             />
-            <span className="font-semibold text-sm tracking-wide whitespace-nowrap">IMPERION MENU</span>
+            <span className="font-semibold text-sm tracking-wide whitespace-nowrap uppercase tracking-widest">Imperion Engine</span>
           </div>
         </div>
 

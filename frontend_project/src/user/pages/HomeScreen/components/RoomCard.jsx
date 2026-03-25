@@ -2,31 +2,42 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import {
   Cigarette, CigaretteOff, Accessibility, Ban,
-  AlertTriangle
+  AlertTriangle, User
 } from 'lucide-react';
 
 // ─── Room Status Palette ───
-export const STATUS_PALETTE = {
-  VACANT: { color: '#22c55e', bg: '#f0fdf4', label: 'Ready' },
-  OCCUPIED: { color: '#eab308', bg: '#fefce8', label: 'Staying' },
-  DIRTY: { color: '#ef4444', bg: '#fef2f2', label: 'Cleaning' },
-  MAINTENANCE: { color: '#3b82f6', bg: '#eff6ff', label: 'Repairs' },
-  RESERVED: { color: '#6366f1', bg: '#eef2ff', label: 'Incoming' }
-};
+// export const STATUS_PALETTE = {
+//   VACANT: { color: '#22c55e', bg: '#f0fdf4', label: 'Ready' },
+//   OCCUPIED: { color: '#eab308', bg: '#fefce8', label: 'Staying' },
+//   DIRTY: { color: '#ef4444', bg: '#fef2f2', label: 'Cleaning' },
+//   MAINTENANCE: { color: '#3b82f6', bg: '#eff6ff', label: 'Repairs' },
+//   RESERVED: { color: '#6366f1', bg: '#eef2ff', label: 'Incoming' }
+// };
 
-export const getStatusTheme = (statusName = '') => {
-  const name = statusName.toUpperCase();
-  if (name.includes('VAC') || name.includes('READY') || name.includes('CLEAN')) return STATUS_PALETTE.VACANT;
-  if (name.includes('OCC') || name.includes('STAY')) return STATUS_PALETTE.OCCUPIED;
-  if (name.includes('DIRT') || name.includes('CLEAN')) return STATUS_PALETTE.DIRTY;
-  if (name.includes('MAINT') || name.includes('OUT')) return STATUS_PALETTE.MAINTENANCE;
-  if (name.includes('RES') || name.includes('EXP')) return STATUS_PALETTE.RESERVED;
-  return { color: '#94a3b8', bg: '#f8fafc', label: statusName };
-};
+// export const getStatusTheme = (statusName = '') => {
+//   const name = statusName.toUpperCase();
+//   if (name.includes('VAC') || name.includes('READY') || name.includes('CLEAN')) return STATUS_PALETTE.VACANT;
+//   if (name.includes('OCC') || name.includes('STAY')) return STATUS_PALETTE.OCCUPIED;
+//   if (name.includes('DIRT') || name.includes('CLEAN')) return STATUS_PALETTE.DIRTY;
+//   if (name.includes('MAINT') || name.includes('OUT')) return STATUS_PALETTE.MAINTENANCE;
+//   if (name.includes('RES') || name.includes('EXP')) return STATUS_PALETTE.RESERVED;
+//   return { color: '#94a3b8', bg: '#f8fafc', label: statusName };
+// };
 
 const RoomCard = ({ room, onClick }) => {
-  const theme = getStatusTheme(room.statusDetails?.roomStatusName || 'Unknown');
-  const statusColor = room.statusDetails?.roomStatusColor || theme.color;
+  // Use status details directly from API
+  const statusDetails = room.statusDetails || {};
+
+  // Extract color from API (trying common field names)
+  const statusColor = statusDetails.roomStatusColor ||
+    statusDetails.statusColor ||
+    statusDetails.color ||
+    '#94a3b8'; // Fallback to slate if none found
+
+  const statusName = statusDetails.roomStatusName ||
+    statusDetails.statusName ||
+    statusDetails.name ||
+    'Unknown';
 
   return (
     <motion.div
@@ -55,12 +66,20 @@ const RoomCard = ({ room, onClick }) => {
             </span>
             {room.isNonRoom ? (
               <span className="text-[9px] font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest mt-1">Utility Space</span>
+            ) : room.firstName || room.lastName ? (
+              <span className="text-[11px] font-extrabold text-slate-800 dark:text-slate-100 uppercase tracking-tight truncate max-w-[140px] block">
+                {room.firstName} {room.lastName}
+              </span>
             ) : room.guestName ? (
-              <span className="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-tight truncate max-w-[85px]">
+              <span className="text-[11px] font-extrabold text-slate-800 dark:text-slate-100 uppercase tracking-tight truncate max-w-[140px] block">
                 {room.guestName}
               </span>
-            ) : (
-              <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">Vacant</span>
+            ) : null}
+
+            {!room.isNonRoom && (
+              <span className="text-[9px] font-bold uppercase tracking-widest mt-1 block" style={{ color: statusColor }}>
+                {room.guestName ? 'Occupied' : (statusName.toLowerCase().includes('reserved') ? '' : 'Vacant')} {statusName}
+              </span>
             )}
           </div>
 
@@ -75,6 +94,16 @@ const RoomCard = ({ room, onClick }) => {
         <div className="flex justify-between items-center pt-2 mt-4 border-t border-slate-50 dark:border-slate-700/50">
 
           <div className="flex gap-1">
+            <div
+              title="Guest Profile"
+              className="p-1 bg-slate-50 dark:bg-slate-700/40 rounded transition-transform hover:bg-emerald-500/10 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClick(room);
+              }}
+            >
+              <User className="w-3 h-3 text-emerald-500" />
+            </div>
             {room.smoking && (
               <div title="Smoking Allowed" className="p-1 bg-slate-50 dark:bg-slate-700/40 rounded transition-transform">
                 <Cigarette className="w-3 h-3 text-orange-500 opacity-60 group-hover:opacity-100" />

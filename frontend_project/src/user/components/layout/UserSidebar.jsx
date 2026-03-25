@@ -1,21 +1,21 @@
 import React from 'react';
 import {
-  CheckCircle2, Layers, Menu, LogOut, ChevronDown, ChevronUp
+  CheckCircle2, Layers, Menu, LogOut, ChevronDown, ChevronUp, LayoutDashboard
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard } from 'lucide-react';
+import { useSidebar } from '../../../context/SidebarContext';
+
 /**
  * UserSidebar component - Matches exactly with the Admin Dashboard Sidebar.
  * Displays fetched room types and room statuses as nested accordion lists.
  */
 const UserSidebar = ({
-  isSidebarOpen,
-  setIsSidebarOpen,
   roomTypes = [],
   roomStatuses = [],
   onGoToPms
 }) => {
+  const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
   const [isTypeMenuOpen, setIsTypeMenuOpen] = React.useState(true);
   const [isStatusMenuOpen, setIsStatusMenuOpen] = React.useState(true);
   const navigate = useNavigate();
@@ -40,7 +40,7 @@ const UserSidebar = ({
               className="w-5 h-5 cursor-pointer text-slate-400 hover:text-white transition-colors"
               onClick={() => setIsSidebarOpen(false)}
             />
-            <span className="font-semibold text-sm tracking-wide whitespace-nowrap">IMPERION MENU</span>
+            <span className="font-semibold text-sm tracking-wide whitespace-nowrap uppercase tracking-widest">Imperion Engine</span>
           </div>
         </div>
 

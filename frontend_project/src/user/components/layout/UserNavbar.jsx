@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, Building2, UserCircle, Bell } from 'lucide-react';
+import { useSidebar } from '../../../context/SidebarContext';
+
 /**
  * UserNavbar component - Global dark header for User Hub.
  * Features an industrial, highly professional design with sleek gradients and spacing.
  */
-const UserNavbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
+const UserNavbar = () => {
+  const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
   const [userDetails, setUserDetails] = useState({ username: 'Loading...', role: '...' });
   const [showNotification, setShowNotification] = useState(true);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
@@ -57,7 +60,6 @@ const UserNavbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-3">
         <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-[0_0_20px_rgba(16,185,129,0.25)] border border-emerald-400/20">
           <Building2 className="w-[1.125rem] h-[1.125rem] text-white absolute z-10" />
-          {/* Gleam effect */}
           <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/30 to-transparent opacity-80 rounded-xl mix-blend-overlay"></div>
         </div>
         <div className="hidden sm:flex flex-col">
@@ -69,7 +71,6 @@ const UserNavbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       {/* RIGHT SECTION: Quick Tools & Auth */}
       <div className="flex items-center gap-3 sm:gap-4">
 
-        {/* Alerts / Activity */}
         <div className="relative">
           <button
             onClick={() => {
@@ -82,10 +83,8 @@ const UserNavbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             {showNotification && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 border-2 border-[#0f172a] rounded-full"></span>}
           </button>
 
-          {/* Right Side Notification Dropdown */}
           {isNotificationOpen && (
             <>
-              {/* Overlay for clicking outside */}
               <div
                 className="fixed inset-0 z-40"
                 onClick={() => setIsNotificationOpen(false)}
@@ -102,18 +101,14 @@ const UserNavbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     <p className="text-xs text-slate-400">Your role has been verified as <span className="text-emerald-400 font-semibold">{userDetails.role}</span>.</p>
                     <p className="text-[10px] text-slate-500 mt-2 font-medium">Just now</p>
                   </div>
-
                 </div>
-
               </div>
             </>
           )}
         </div>
 
-        {/* Divider */}
         <div className="w-px h-6 bg-white/10 hidden sm:block mx-1"></div>
 
-        {/* Profile Bug */}
         <div className="flex items-center gap-3 p-1 pr-3 rounded-full hover:bg-white/5 border border-transparent hover:border-white/10 cursor-pointer transition-all group">
           <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center group-hover:border-emerald-500 transition-colors overflow-hidden relative shadow-inner">
             <UserCircle className="w-full h-full text-slate-400 group-hover:text-emerald-400 absolute scale-110 transition-colors" />
@@ -123,7 +118,6 @@ const UserNavbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             <p className="text-[9px] text-emerald-500/80 uppercase font-bold tracking-widest leading-none">{userDetails.role}</p>
           </div>
         </div>
-
       </div>
     </header>
   );

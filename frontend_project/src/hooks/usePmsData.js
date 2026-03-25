@@ -1,206 +1,126 @@
-import { useState, useEffect, useCallback } from 'react';
-import api from '../services/api';
-
 /**
- * Custom hook for managing Property Management System data.
- * Handles fetching and CRUD operations for Floors, Room Types, and Room Statuses.
+ * usePmsData.js - Custom React Hook for Property Data
+ * 
+ * Purpose:
+ * This hook acts as a "single source of truth" for all property-related data
+ * (Floors, Room Types, Statuses, and Rooms). It manages the state and 
+ * provides CRUD (Create, Read, Update, Delete) functions to the components.
+ * 
+ * Benefits:
+ * 1. Logic Reuse: Any component can access the same property data easily.
+ * 2. Auto-Sync: Every time a record is added or updated, the fetch logic 
+ *    automatically refreshes the list from the server.
  */
-const usePmsData = () => {
-  const [floors, setFloors] = useState([]);
-  const [roomTypes, setRoomTypes] = useState([]);
-  const [roomStatuses, setRoomStatuses] = useState([]);
-  const [error, setError] = useState(null);
-  const [rooms, setRooms] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+import { useState, useEffect, useCallback } from 'react';
+import { propertyService } from '../services/propertyService';
 
-  // ─── GET: Fetch all data ─────────────
+const usePmsData = () => {
+  // --- MODULE STATES ---
+  const [floors, setFloors] = useState([]);           // List of all floors
+  const [roomTypes, setRoomTypes] = useState([]);     // List of room categories (Standard, Deluxe, etc.)
+  const [roomStatuses, setRoomStatuses] = useState([]); // List of statuses (Clean, Dirty, maintenance, etc.)
+  const [rooms, setRooms] = useState([]);             // List of physical rooms
+
+  const [isLoading, setIsLoading] = useState(false);  // Global loading state for calculations
+  const [error, setError] = useState(null);           // Error message storage
+
+  /**
+   * fetchData()
+   * Downloads all property master data from the backend concurrently.
+   * Uses Promise.allSettled to ensure that even if one API call fails,
+   * others can still complete and show data.
+   */
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      // Use individual try-catch logic or allSettled to ensure failure of one doesn't break all
-      const [floorsRes, roomTypesRes, roomStatusesRes, roomsRes] = await Promise.all([
-        api.get('/user/getfloors').catch(() => ({ data: [] })),
-        api.get('/user/getroomtypes').catch(() => ({ data: [] })),
-        api.get('/user/getroomstatuses').catch(() => ({ data: [] })),
-        api.get('/user/getroommasters').catch(() => ({ data: [] })),
+      const results = await Promise.allSettled([
+        propertyService.getFloors(),
+        propertyService.getRoomTypes(),
+        propertyService.getRoomStatuses(),
+        propertyService.getRooms(),
       ]);
+
+      // Distribute the results into their respective states
+      const [floorsRes, roomTypesRes, roomStatusesRes, roomsRes] = results.map(
+        (res) => (res.status === 'fulfilled' ? res.value : { data: [] })
+      );
 
       setFloors(floorsRes.data || []);
       setRoomTypes(roomTypesRes.data || []);
       setRoomStatuses(roomStatusesRes.data || []);
       setRooms(roomsRes.data || []);
 
-      if (floorsRes.data?.length === 0 && roomTypesRes.data?.length === 0) {
-        // Log if everything is empty - might be a sign of a global issue
-        console.warn("Fetched data successfully but all lists are empty. This might be a permission issue or the database is blank.");
+      if (results.some(r => r.status === 'rejected')) {
+        console.warn("One or more fetch requests failed, some data may be missing.");
       }
     } catch (err) {
       console.error('Error fetching data:', err);
       setError('Failed to synchronize data.');
     } finally {
-      // Small timeout for smooth UI transition
+      // Small artificial delay to prevent UI flickering on fast networks
       setTimeout(() => setIsLoading(false), 500);
     }
   }, []);
 
+  // Fetch initial data when the hook is first mounted
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  // ─── POST: Create a new floor ────────
-  const addFloor = async (floorData) => {
+  /**
+   * executeAction()
+   * Generic helper that runs a service function and then re-triggers 
+   * the data fetch to keep the UI in sync with the database.
+   */
+  const executeAction = async (action, ...args) => {
     try {
-      await api.post('/admin/createfloor', floorData);
-      await fetchData();
-    } catch (error) {
-      console.error('Error creating floor:', error);
-      throw error;
+      const result = await action(...args);
+      await fetchData(); // Refresh all data after any write operation
+      return result;
+    } catch (err) {
+      console.error('Action failed:', err);
+      throw err;
     }
   };
 
-  // ─── PUT: Update a floor ────────────
-  const updateFloor = async (id, floorData) => {
-    try {
-      await api.put(`/admin/updatefloor/${id}`, floorData);
-      await fetchData();
-    } catch (error) {
-      console.error('Error updating floor:', error);
-      throw error;
-    }
-  };
+  // --- EXPORTED CRUD OPERATIONS ---
 
-  // ─── DELETE: Delete a floor ─────────
-  const deleteFloor = async (id) => {
-    try {
-      await api.delete(`/admin/deletefloor/${id}`);
-      await fetchData();
-    } catch (error) {
-      console.error('Error deleting floor:', error);
-      throw error;
-    }
-  };
+  // Floor Operations
+  const addFloor = (data) => executeAction(propertyService.createFloor, data);
+  const updateFloor = (id, data) => executeAction(propertyService.updateFloor, id, data);
+  const deleteFloor = (id) => executeAction(propertyService.deleteFloor, id);
 
-  // ─── POST: Create a new Room Type ────────
-  const addRoomType = async (typeData) => {
-    try {
-      await api.post('/admin/createroomtype', typeData);
-      await fetchData();
-    } catch (error) {
-      console.error('Error creating room type:', error);
-      throw error;
-    }
-  };
+  // Room Type Operations
+  const addRoomType = (data) => executeAction(propertyService.createRoomType, data);
+  const updateRoomType = (id, data) => executeAction(propertyService.updateRoomType, id, data);
+  const deleteRoomType = (id) => executeAction(propertyService.deleteRoomType, id);
 
-  // ─── PUT: Update a Room Type ────────
-  const updateRoomType = async (id, typeData) => {
-    try {
-      await api.put(`/admin/updateroomtype/${id}`, typeData);
-      await fetchData();
-    } catch (error) {
-      console.error('Error updating room type:', error);
-      throw error;
-    }
-  };
+  // Room Status Operations
+  const addRoomStatus = (data) => executeAction(propertyService.createRoomStatus, data);
+  const updateRoomStatus = (id, data) => executeAction(propertyService.updateRoomStatus, id, data);
+  const deleteRoomStatus = (id) => executeAction(propertyService.deleteRoomStatus, id);
 
-  // ─── DELETE: Delete a Room Type ────────
-  const deleteRoomType = async (id) => {
-    try {
-      await api.delete(`/admin/deleteroomtype/${id}`);
-      await fetchData();
-    } catch (error) {
-      console.error('Error deleting room type:', error);
-      throw error;
-    }
-  };
-
-  // ─── POST: Create a new Room Status ────────
-  const addRoomStatus = async (statusData) => {
-    try {
-      await api.post('/admin/createroomstatus', statusData);
-      await fetchData();
-    } catch (error) {
-      console.error('Error creating room status:', error);
-      throw error;
-    }
-  };
-
-  // ─── PUT: Update a Room Status ───────────
-  const updateRoomStatus = async (id, statusData) => {
-    try {
-      await api.put(`/admin/updateroomstatus/${id}`, statusData);
-      await fetchData();
-    } catch (error) {
-      console.error('Error updating room status:', error);
-      throw error;
-    }
-  };
-
-  // ─── DELETE: Delete a Room Status ────────
-  const deleteRoomStatus = async (id) => {
-    try {
-      await api.delete(`/admin/deleteroomstatus/${id}`);
-      await fetchData();
-    } catch (error) {
-      console.error('Error deleting room status:', error);
-      throw error;
-    }
-  };
-
-  // ─── POST: Create a new Room ────────
-  const addRoom = async (roomData) => {
-    try {
-      await api.post('/admin/createroommaster', roomData);
-      await fetchData();
-    } catch (error) {
-      console.error('Error creating room master:', error);
-      throw error;
-    }
-  };
-
-  // ─── PUT: Update a Room ───────────
-  const updateRoom = async (id, roomData) => {
-    try {
-      await api.put(`/admin/updateroommaster/${id}`, roomData);
-      await fetchData();
-    } catch (error) {
-      console.error('Error updating room master:', error);
-      throw error;
-    }
-  };
-
-  // ─── DELETE: Delete a Room ────────
-  const deleteRoom = async (id) => {
-    try {
-      await api.delete(`/admin/deleteroommaster/${id}`);
-      await fetchData();
-    } catch (error) {
-      console.error('Error deleting room master:', error);
-      throw error;
-    }
-  };
+  // Room Operations
+  const addRoom = (data) => executeAction(propertyService.createRoom, data);
+  const updateRoom = (id, data) => executeAction(propertyService.updateRoom, id, data);
+  const deleteRoom = (id) => executeAction(propertyService.deleteRoom, id);
 
   return {
     floors,
     roomTypes,
     roomStatuses,
+    rooms,
     isLoading,
     error,
     fetchData,
-    addFloor,
-    updateFloor,
-    deleteFloor,
-    addRoomType,
-    updateRoomType,
-    deleteRoomType,
-    addRoomStatus,
-    updateRoomStatus,
-    deleteRoomStatus,
-    rooms,
-    addRoom,
-    updateRoom,
-    deleteRoom
+    addFloor, updateFloor, deleteFloor,
+    addRoomType, updateRoomType, deleteRoomType,
+    addRoomStatus, updateRoomStatus, deleteRoomStatus,
+    addRoom, updateRoom, deleteRoom
   };
 };
 
 export default usePmsData;
+
+

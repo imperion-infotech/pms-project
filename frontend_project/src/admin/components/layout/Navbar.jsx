@@ -1,14 +1,9 @@
-/**
- * Navbar.jsx (Admin Domain -> Layout component)
- * 
- * Top Navigation Bar for the Admin Dashboard showing user profile, notifications, and settings.
- * Includes a hamburger menu icon to toggle the Sidebar on mobile vs desktop layout.
- */
-// Page layout structures - Navbar
 import React, { useState, useEffect } from 'react';
 import { Menu, Building2, UserCircle, Bell } from 'lucide-react';
+import { useSidebar } from '../../../context/SidebarContext';
 
-const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
+const Navbar = () => {
+  const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
   const [userDetails, setUserDetails] = useState({ username: 'Loading...', role: '...' });
   const [showNotification, setShowNotification] = useState(true);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
@@ -40,7 +35,7 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   }, []);
 
   return (
-    <header className="h-16 bg-[#1e293b] text-white flex items-center justify-between px-4 md:px-6 shrink-0 shadow-lg z-10">
+    <header className="h-16 bg-[#1e293b] text-white flex items-center justify-between px-4 md:px-6 shrink-0 shadow-lg z-10 transition-colors duration-300">
       <div className="flex items-center gap-2 md:gap-6 min-w-0">
         <div className={`transition-all duration-300 overflow-hidden flex items-center justify-center ${!isSidebarOpen ? "w-10 opacity-100" : "w-0 opacity-0 pointer-events-none"}`}>
           <button
@@ -56,11 +51,10 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             <Building2 className="w-5 h-5 md:w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="font-bold text-lg md:text-xl leading-none tracking-tight">IMPERION</h1>
-            <p className="text-[8px] md:text-[10px] text-emerald-400 font-bold tracking-[0.2em] mt-1">Infotech</p>
+            <h1 className="font-bold text-lg md:text-xl leading-none tracking-tight leading-none">IMPERION</h1>
+            <p className="text-[8px] md:text-[10px] text-emerald-400 font-bold tracking-[0.2em] mt-1 uppercase">Infotech</p>
           </div>
         </div>
-
         <div className="h-8 w-px bg-slate-700 mx-2"></div>
       </div>
 
@@ -78,10 +72,8 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
               {showNotification && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 border-2 border-[#1e293b] rounded-full"></span>}
             </button>
 
-            {/* Right Side Notification Dropdown */}
             {isNotificationOpen && (
               <>
-                {/* Overlay for clicking outside */}
                 <div
                   className="fixed inset-0 z-40"
                   onClick={() => setIsNotificationOpen(false)}
@@ -97,11 +89,6 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                       <p className="text-sm text-slate-200 font-medium mb-1 capitalize">Welcome back, {userDetails.username}!</p>
                       <p className="text-xs text-slate-400">Admin session started successfully.</p>
                       <p className="text-[10px] text-slate-500 mt-2 font-medium">Just now</p>
-                    </div>
-                    <div className="p-4 hover:bg-slate-800/80 transition-colors cursor-pointer opacity-70">
-                      <p className="text-sm text-slate-300 font-medium mb-1">Backup Complete</p>
-                      <p className="text-xs text-slate-400">Daily database snapshot taken securely.</p>
-                      <p className="text-[10px] text-slate-500 mt-2 font-medium">3 hours ago</p>
                     </div>
                   </div>
                   <div className="p-3 border-t border-slate-700/80 bg-[#1e293b]/95 backdrop-blur-sm">
