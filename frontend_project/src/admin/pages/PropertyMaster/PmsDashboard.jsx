@@ -15,7 +15,7 @@ import DashboardRouter from './components/DashboardRouter';
 import DashboardModals from './components/DashboardModals';
 
 /**
- * PmsDashboard (Admin Module Root)
+ * PmsDashboard (Admin Dashboard Module Root)
  * 
  * This is the central control panel for the Property Management System (PMS).
  * Features:
@@ -129,6 +129,45 @@ const PmsDashboard = () => {
     toggleModal('roomEdit', false);
   };
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Reset page when switching tabs or searching
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [activeItem, searchTerm]);
+
+  // Search logic across different modules
+  const filterData = (data) => {
+    if (!searchTerm) return data;
+    const lowerSearch = searchTerm.toLowerCase();
+    return data.filter(item => {
+      if (item.roomName) return item.roomName.toLowerCase().includes(lowerSearch);
+      if (item.name) return item.name.toLowerCase().includes(lowerSearch);
+      if (item.roomTypeName) return item.roomTypeName.toLowerCase().includes(lowerSearch);
+      if (item.roomStatusName) return item.roomStatusName.toLowerCase().includes(lowerSearch);
+      return false;
+    });
+  };
+
+  const filteredFloors = filterData(floors);
+  const filteredRoomTypes = filterData(roomTypes);
+  const filteredRooms = filterData(rooms);
+  const filteredRoomStatuses = filterData(roomStatuses);
+
+  // Helper to slice data based on current page
+  const getPaginatedData = (data) => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return data.slice(startIndex, startIndex + itemsPerPage);
+  };
+
+  const paginatedFloors = getPaginatedData(filteredFloors);
+  const paginatedRoomTypes = getPaginatedData(filteredRoomTypes);
+  const paginatedRooms = getPaginatedData(filteredRooms);
+  const paginatedRoomStatuses = getPaginatedData(filteredRoomStatuses);
+
   return (
     <div className={`flex h-screen ${isDark ? 'bg-[#0f172a] text-slate-100' : 'bg-[#f4f7fa] text-slate-800'} font-sans overflow-hidden transition-colors duration-300`}>
       {/* 1. Global Navigation Sidebar */}
@@ -157,15 +196,19 @@ const PmsDashboard = () => {
 
         {/* 5. Main Content Area - Scrollable */}
         <main className={`flex-1 overflow-auto ${isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'} custom-scrollbar p-3 md:p-6 lg:p-8 transition-colors duration-300`}>
-          <div className="max-w-[1600px] mx-auto space-y-4 md:y-6 h-full flex flex-col">
+          <div className="max-w-[1600px] mx-auto space-y-4 md:y-6 flex flex-col">
 
             {/* Dynamic Dashboard Module Rendering */}
             <DashboardRouter
               activeItem={activeItem}
-              floors={floors}
-              roomTypes={roomTypes}
-              roomStatuses={roomStatuses}
-              rooms={rooms}
+              floors={paginatedFloors}
+              roomTypes={paginatedRoomTypes}
+              roomStatuses={paginatedRoomStatuses}
+              rooms={paginatedRooms}
+              allFloors={floors}
+              allRoomTypes={roomTypes}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
               toggleModal={toggleModal}
               setEditFloor={setEditFloor}
               setEditRoomType={setEditRoomType}
@@ -178,9 +221,19 @@ const PmsDashboard = () => {
             />
 
             {/* Pagination Controls */}
-            {(activeItem === 'Floor' || activeItem === 'Room Type' || activeItem === 'Room') && (
+            {(activeItem === 'Floor' || activeItem === 'Room Type' || activeItem === 'Room' || activeItem === 'Room Status') && (
               <div className="mt-8">
-                <Pagination activeItem={activeItem} floors={floors} roomTypes={roomTypes} rooms={rooms} isLoading={isLoading} />
+                <Pagination
+                  activeItem={activeItem}
+                  floors={filteredFloors}
+                  roomTypes={filteredRoomTypes}
+                  rooms={filteredRooms}
+                  roomStatuses={filteredRoomStatuses}
+                  isLoading={isLoading}
+                  currentPage={currentPage}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={setCurrentPage}
+                />
               </div>
             )}
           </div>

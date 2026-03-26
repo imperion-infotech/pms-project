@@ -6,9 +6,9 @@
  * Renders a list/table of active floors, triggering options to edit or delete floors via API.
  */
 import React, { useState } from 'react';
-import { PlusCircle, Pencil, Trash2, AlertTriangle, X } from 'lucide-react';
+import { PlusCircle, Pencil, Trash2, AlertTriangle, X, Search } from 'lucide-react';
 
-const FloorManagement = ({ floors, setIsFloorModalOpen, onEdit, onDelete }) => {
+const FloorManagement = ({ floors, searchTerm, setSearchTerm, setIsFloorModalOpen, onEdit, onDelete }) => {
   // Confirmation state for delete
   const [deleteTarget, setDeleteTarget] = useState(null); // stores { id, name }
 
@@ -28,7 +28,7 @@ const FloorManagement = ({ floors, setIsFloorModalOpen, onEdit, onDelete }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-[#1e293b] rounded-xl shadow-md border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors duration-300">
+    <div className="bg-white dark:bg-[#1e293b] rounded-xl shadow-md border border-slate-200 dark:border-slate-800 transition-colors duration-300">
       {/* Floor Action Bar */}
       <div className="p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-center border-b border-slate-100 dark:border-slate-800 gap-4">
         <div className="text-center sm:text-left">
@@ -45,10 +45,10 @@ const FloorManagement = ({ floors, setIsFloorModalOpen, onEdit, onDelete }) => {
       </div>
 
       {/* Floor Table */}
-      <div className="w-full overflow-x-auto">
+      <div className="w-full overflow-auto custom-scrollbar max-h-[600px]">
         <table className="w-full text-left border-collapse min-w-[600px]">
-          <thead>
-            <tr className="bg-slate-50/80 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-[11px] font-bold uppercase tracking-[0.1em] border-b border-slate-200 dark:border-slate-800">
+          <thead className="sticky top-0 z-10">
+            <tr className="bg-slate-50/80 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[11px] font-bold uppercase tracking-[0.1em] border-b border-slate-200 dark:border-slate-800">
               <th className="px-8 py-4 w-20 text-center border-r border-slate-100 dark:border-slate-800">No.</th>
               <th className="px-8 py-4 border-r border-slate-100 dark:border-slate-800">Floor Name</th>
               <th className="px-8 py-4 border-r border-slate-100 dark:border-slate-800">Description</th>
@@ -59,7 +59,7 @@ const FloorManagement = ({ floors, setIsFloorModalOpen, onEdit, onDelete }) => {
             {floors.length === 0 ? (
               <tr>
                 <td colSpan="4" className="px-8 py-10 text-center text-slate-400 dark:text-slate-500 text-sm italic">
-                  No floors found. Please create your first floor.
+                  {searchTerm ? 'No floors match your search.' : 'No floors found. Please create your first floor.'}
                 </td>
               </tr>
             ) : (

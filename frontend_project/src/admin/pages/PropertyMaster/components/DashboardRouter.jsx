@@ -17,6 +17,10 @@ const DashboardRouter = ({
   roomTypes,
   roomStatuses,
   rooms,
+  allFloors,
+  allRoomTypes,
+  searchTerm,
+  setSearchTerm,
   toggleModal,
   setEditFloor,
   setEditRoomType,
@@ -33,6 +37,8 @@ const DashboardRouter = ({
       return (
         <FloorManagement
           floors={floors}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
           setIsFloorModalOpen={(isOpen) => toggleModal('floor', isOpen)}
           onEdit={(f) => { setEditFloor(f); toggleModal('floorEdit', true); }}
           onDelete={deleteFloor}
@@ -60,8 +66,10 @@ const DashboardRouter = ({
       return (
         <RoomManagement
           rooms={rooms}
-          roomTypes={roomTypes}
-          floors={floors}
+          roomTypes={allRoomTypes}
+          floors={allFloors}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
           setIsRoomModalOpen={(isOpen) => toggleModal('room', isOpen)}
           onEdit={(r) => { setEditRoom(r); toggleModal('roomEdit', true); }}
           onDelete={deleteRoom}
