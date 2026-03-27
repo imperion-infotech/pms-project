@@ -94,13 +94,13 @@ const TaxManagement = ({ taxes, setIsTaxModalOpen, onEdit, onDelete }) => {
                   </td>
                   {/* Per Day */}
                   <td className="px-6 py-3 border-r border-slate-100 dark:border-slate-800 text-center">
-                    <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black ${tax.perDayTax ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20' : 'bg-slate-100 text-slate-500 dark:bg-slate-800'}`}>
+                    <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black ${tax.perDayTax ? 'bg-emerald-100 text-emerald-500 dark:bg-emerald-500/20' : 'bg-red-100 text-red-500 dark:bg-red-400/20'}`}>
                       {tax.perDayTax ? 'True' : 'False'}
                     </span>
                   </td>
                   {/* Per Stay */}
                   <td className="px-6 py-3 border-r border-slate-100 dark:border-slate-800 text-center">
-                    <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black ${tax.perStayTax ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/20' : 'bg-slate-100 text-slate-500 dark:bg-slate-800'}`}>
+                    <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black ${tax.perStayTax ? 'bg-emerald-100 text-emerald-500 dark:bg-emerald-500/20' : 'bg-red-100 text-red-500 dark:bg-red-400/20'}`}>
                       {tax.perStayTax ? 'True' : 'False'}
                     </span>
                   </td>
