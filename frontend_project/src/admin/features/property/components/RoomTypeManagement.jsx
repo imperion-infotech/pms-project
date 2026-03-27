@@ -8,8 +8,10 @@
 import React, { useState } from 'react';
 import { PlusCircle, Pencil, Trash2, AlertTriangle, X } from 'lucide-react';
 
-const RoomTypeManagement = ({ roomTypes, setIsRoomTypeModalOpen, onEdit, onDelete }) => {
+const RoomTypeManagement = ({ roomTypes, setIsRoomTypeModalOpen, onEdit, onDelete, userRole }) => {
   const [deleteTarget, setDeleteTarget] = useState(null);
+
+  const isAdmin = ['ROLE_ADMIN', 'ADMIN'].includes(userRole?.toUpperCase());
 
   const handleDeleteClick = (roomType) => {
     setDeleteTarget({ id: roomType.id, name: roomType.roomTypeName });
@@ -42,13 +44,15 @@ const RoomTypeManagement = ({ roomTypes, setIsRoomTypeModalOpen, onEdit, onDelet
           <h2 className="text-xl font-bold text-[#1a2b4b] dark:text-slate-100 font-heading tracking-tight">Room Types</h2>
           <p className="text-sm text-slate-400 font-medium">Manage and categorize room configurations</p>
         </div>
-        <button
-          onClick={() => setIsRoomTypeModalOpen(true)}
-          className="w-full lg:w-auto flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all shadow-lg shadow-emerald-500/10"
-        >
-          <PlusCircle className="w-5 h-5" />
-          ADD NEW ROOM TYPE
-        </button>
+        {isAdmin && (
+          <button
+            onClick={() => setIsRoomTypeModalOpen(true)}
+            className="w-full lg:w-auto flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all shadow-lg shadow-emerald-500/10"
+          >
+            <PlusCircle className="w-5 h-5" />
+            ADD NEW ROOM TYPE
+          </button>
+        )}
       </div>
 
       {/* Table */}
@@ -59,6 +63,7 @@ const RoomTypeManagement = ({ roomTypes, setIsRoomTypeModalOpen, onEdit, onDelet
               <th className="px-4 py-4 text-center border-r border-slate-200 dark:border-slate-800 w-20">ID</th>
               <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 w-40">Short Name</th>
               <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800">Room Type Name</th>
+              <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 w-32">Price</th>
               <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 w-44">Created On</th>
               <th className="px-4 py-4 text-center w-32">Actions</th>
             </tr>
@@ -87,28 +92,36 @@ const RoomTypeManagement = ({ roomTypes, setIsRoomTypeModalOpen, onEdit, onDelet
                   <td className="px-6 py-3 border-r border-slate-100 dark:border-slate-800 font-extrabold text-slate-800 dark:text-slate-200">
                     {room.roomTypeName || '—'}
                   </td>
+                  {/* Price */}
+                  <td className="px-6 py-3 border-r border-slate-100 dark:border-slate-800 font-bold text-emerald-600 dark:text-emerald-400">
+                    {room.price ? `$USD ${room.price}` : '—'}
+                  </td>
                   {/* Created On */}
                   <td className="px-6 py-3 border-r border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 text-xs font-medium">
                     {formatDate(room.createdOn)}
                   </td>
                   {/* Actions */}
                   <td className="px-4 py-3">
-                    <div className="flex items-center justify-center gap-3">
-                      <button
-                        onClick={() => onEdit(room)}
-                        className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg text-blue-500 transition-colors"
-                        title="Edit Room Type"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(room)}
-                        className="p-1.5 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg text-red-500 transition-colors"
-                        title="Delete Room Type"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                    {isAdmin ? (
+                      <div className="flex items-center justify-center gap-3">
+                        <button
+                          onClick={() => onEdit(room)}
+                          className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg text-blue-500 transition-colors"
+                          title="Edit Room Type"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(room)}
+                          className="p-1.5 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg text-red-500 transition-colors"
+                          title="Delete Room Type"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="text-center text-slate-400 italic text-xs">Read Only</div>
+                    )}
                   </td>
                 </tr>
               ))

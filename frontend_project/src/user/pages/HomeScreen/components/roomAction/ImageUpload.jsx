@@ -15,20 +15,32 @@ const ImageUpload = ({ label, value, onUpload, icon: Icon, isDark, aspect = "asp
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => onUpload(reader.result);
-      reader.readAsDataURL(file);
+      onUpload(file);
     }
+  };
+
+  const getImageUrl = (path) => {
+    if (!path) return '';
+    if (String(path).startsWith('data:') || String(path).startsWith('blob:')) return path;
+    
+    // Industrial cleanup: Extract only filename if backend returns local path
+    const filename = String(path).split('/').pop().split('\\').pop();
+    return `/user/${filename}`;
   };
 
   return (
     <div className={containerClass}>
-      <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-emerald-500 mb-6 font-bold leading-none">
-        <Icon size={16} /> {label}
+      <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-emerald-500 mb-6 leading-none">
+        {Icon && <Icon size={16} />} {label}
       </h4>
       <div className={uploadAreaClass}>
         {value ? (
-          <img src={value} alt={label} className="w-full h-full object-cover" />
+          <img 
+             src={getImageUrl(value)} 
+             alt={label} 
+             className="w-full h-full object-cover" 
+             onError={(e) => { e.target.style.display = 'none'; }}
+          />
         ) : (
           <>
             <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${isDark ? 'bg-slate-800' : 'bg-slate-100'}`}>

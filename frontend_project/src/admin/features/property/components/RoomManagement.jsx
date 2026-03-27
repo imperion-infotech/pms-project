@@ -6,9 +6,9 @@
  * Contains the table to view room attributes (smoking, handicap, type, etc.) and binds action icons for editing.
  */
 import React, { useState } from 'react';
-import { PlusCircle, Search, X, Cigarette, CigaretteOff, Accessibility, Check, Minus, Ban, Pencil, Trash2, AlertTriangle } from 'lucide-react';
+import { PlusCircle, X, Cigarette, CigaretteOff, Accessibility, Check, Minus, Ban, Pencil, Trash2, AlertTriangle, CloudCog } from 'lucide-react';
 
-const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], searchTerm, setSearchTerm, setIsRoomModalOpen, onEdit, onDelete }) => {
+const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], buildings = [], searchTerm, setIsRoomModalOpen, onEdit, onDelete }) => {
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   const handleDeleteClick = (room) => {
@@ -35,27 +35,13 @@ const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], searchTerm, s
           <p className="text-xs md:text-sm text-slate-400 font-medium">Manage and organize physical property rooms</p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
-          {/* Search Input */}
-          <div className="relative w-full sm:w-64 group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
-            <input
-              type="text"
-              placeholder="Search rooms..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all dark:text-slate-200"
-            />
-          </div>
-
-          <button
-            onClick={() => setIsRoomModalOpen(true)}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white px-5 md:px-6 py-2.5 rounded-xl text-[11px] md:text-xs font-black tracking-wider transition-all shadow-lg shadow-emerald-500/20"
-          >
-            <PlusCircle className="w-5 h-5" />
-            ADD NEW ROOM
-          </button>
-        </div>
+        <button
+          onClick={() => setIsRoomModalOpen(true)}
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white px-5 md:px-6 py-2.5 rounded-xl text-[11px] md:text-xs font-black tracking-wider transition-all shadow-lg shadow-emerald-500/20"
+        >
+          <PlusCircle className="w-5 h-5" />
+          ADD NEW ROOM
+        </button>
       </div>
 
       {/* Room Table */}
@@ -64,6 +50,7 @@ const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], searchTerm, s
           <thead className="sticky top-0 z-10">
             <tr className="bg-[#f8fafc] dark:bg-slate-800 text-[#64748b] dark:text-slate-400 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
               <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 w-32">Room Name</th>
+              <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 w-44">Building Name</th>
               <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 w-44">Room Type Name</th>
               <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 w-40">Floor Name</th>
               <th className="px-4 py-4 text-center border-r border-slate-200 dark:border-slate-800 w-28 text-orange-600">Smoking</th>
@@ -80,14 +67,33 @@ const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], searchTerm, s
                 </td>
               </tr>
             ) : rooms.map((room) => {
-              const matchedType = roomTypes.find(rt => rt.id == room.roomTypeId);
-              const matchedFloor = floors.find(f => f.id == room.floorId);
-              const typeName = matchedType ? matchedType.roomTypeName : 'Unknown';
-              const floorName = matchedFloor ? matchedFloor.name : 'Unknown';
+              // Robust lookup: support both flat IDs, nested objects, and various backend naming conventions (buildingId, building_id, etc.)
+              const roomTypeId = room.roomTypeId || room.room_type_id || room.roomType?.id || room.roomType;
+              console.log("Room Type ID", roomTypeId);
+              const floorId = room.floorId || room.floor_id || room.floor?.id || room.floor;
+              console.log("Floor ID", floorId);
+              const buildingId = room.buildingId || room.building_id || room.building?.id || room.building || room.buildings;
+              console.log("Building ID", buildingId);
+
+              const matchedType = roomTypes.find(rt => String(rt.id) === String(roomTypeId));
+              console.log("Matched Type", matchedType);
+              const matchedFloor = floors.find(f => String(f.id) === String(floorId));
+              console.log("Matched Floor", matchedFloor);
+              const matchedBuilding = buildings.find(b => String(b.id) === String(buildingId));
+              console.log("Matched Building", matchedBuilding);
+
+              // Support direct name fields if backend provides them, or fallback to lookup result
+              const typeName = room.roomTypeName || room.room_type?.roomTypeName || (matchedType ? matchedType.roomTypeName : 'Unknown');
+              console.log("Type Name", typeName);
+              const floorName = room.floorName || room.floor?.name || (matchedFloor ? matchedFloor.name : 'Unknown');
+              console.log("Floor Name", floorName);
+              const buildingName = room.buildingName || room.building?.name || (matchedBuilding ? matchedBuilding.name : 'Unknown');
+              console.log("Building Name", buildingName);
 
               return (
                 <tr key={room.id} className="hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5 transition-all h-14 group">
                   <td className="px-6 py-2 border-r border-slate-100 dark:border-slate-800 font-bold text-slate-800 dark:text-slate-200">{room.roomName}</td>
+                  <td className="px-6 py-2 border-r border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">{buildingName}</td>
                   <td className="px-6 py-2 border-r border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">{typeName}</td>
                   <td className="px-6 py-2 border-r border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-500">{floorName}</td>
                   <td className="px-4 py-2 text-center border-r border-slate-100 dark:border-slate-800 bg-orange-50/10">

@@ -1,16 +1,15 @@
-import { Pencil, X } from 'lucide-react';
+import { Pencil, X, Building } from 'lucide-react';
 
-export const FloorEditModal = ({ isOpen, setIsOpen, editFloor, setEditFloor, handleUpdateFloor, floors = [] }) => {
+export const BuildingEditModal = ({ isOpen, setIsOpen, editBuilding, setEditBuilding, handleUpdateBuilding, buildings = [] }) => {
   if (!isOpen) return null;
 
-  const isDuplicate = floors.some(f => String(f.name).toLowerCase() === String(editFloor.name).toLowerCase() && String(f.id) !== String(editFloor.id));
+  const isDuplicate = buildings.some(b => String(b.name).toLowerCase() === String(editBuilding.name).toLowerCase() && String(b.id) !== String(editBuilding.id));
 
   const onSubmit = (e) => {
     e.preventDefault();
     if (isDuplicate) return;
-    handleUpdateFloor(e);
+    handleUpdateBuilding(e);
   };
-  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -23,8 +22,8 @@ export const FloorEditModal = ({ isOpen, setIsOpen, editFloor, setEditFloor, han
           <div className="flex items-center gap-3">
             <Pencil className="w-6 h-6 text-blue-400" />
             <div>
-              <h3 className="font-bold text-lg">Edit Floor</h3>
-              <p className="text-[10px] text-slate-400 uppercase tracking-widest">Update Floor Details</p>
+              <h3 className="font-bold text-lg">Edit Building</h3>
+              <p className="text-[10px] text-slate-400 uppercase tracking-widest">Update Building Details</p>
             </div>
           </div>
           <button
@@ -36,25 +35,25 @@ export const FloorEditModal = ({ isOpen, setIsOpen, editFloor, setEditFloor, han
         </div>
         <form onSubmit={onSubmit} className="p-6 space-y-5">
           <div>
-            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Floor Name</label>
+            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Building Name</label>
             <input
               autoFocus
               required
               type="text"
-              value={editFloor.name}
-              onChange={(e) => setEditFloor({ ...editFloor, name: e.target.value })}
-              placeholder="e.g. 6th Floor"
+              value={editBuilding.name}
+              onChange={(e) => setEditBuilding({ ...editBuilding, name: e.target.value })}
+              placeholder="e.g. Tower B"
               className={`w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border ${isDuplicate ? 'border-red-500 ring-2 ring-red-500/20 text-red-500' : 'border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-inner`}
             />
-            {isDuplicate && <p className="text-red-500 text-[10px] sm:text-xs mt-1.5 font-bold animate-in slide-in-from-top-1">Floor Name already exists!</p>}
+            {isDuplicate && <p className="text-red-500 text-[10px] sm:text-xs mt-1.5 font-bold animate-in slide-in-from-top-1">Building Name already exists!</p>}
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Description</label>
             <textarea
               rows="3"
-              value={editFloor.description || ''}
-              onChange={(e) => setEditFloor({ ...editFloor, description: e.target.value })}
-              placeholder="Enter details about this floor..."
+              value={editBuilding.description || ''}
+              onChange={(e) => setEditBuilding({ ...editBuilding, description: e.target.value })}
+              placeholder="Building details (address, wing, etc.)"
               className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-inner resize-none"
             ></textarea>
           </div>
@@ -68,10 +67,10 @@ export const FloorEditModal = ({ isOpen, setIsOpen, editFloor, setEditFloor, han
             </button>
             <button
               type="submit"
-              disabled={isDuplicate || !editFloor.name}
-              className={`flex-[2] py-3 text-white rounded-xl text-sm font-bold shadow-lg transition-all ${isDuplicate || !editFloor.name ? 'bg-slate-400 cursor-not-allowed shadow-none opacity-70' : 'bg-blue-500 hover:bg-blue-600 shadow-blue-500/20 active:scale-95'}`}
+              disabled={isDuplicate || !editBuilding.name}
+              className={`flex-[2] py-3 text-white rounded-xl text-sm font-bold shadow-lg transition-all ${isDuplicate || !editBuilding.name ? 'bg-slate-400 cursor-not-allowed shadow-none opacity-70' : 'bg-blue-500 hover:bg-blue-600 shadow-blue-500/20 active:scale-95'}`}
             >
-              {isDuplicate ? 'FLOOR EXISTS' : 'UPDATE FLOOR'}
+              {isDuplicate ? 'BUILDING EXISTS' : 'UPDATE BUILDING'}
             </button>
           </div>
         </form>

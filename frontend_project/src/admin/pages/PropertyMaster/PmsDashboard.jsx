@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
 import Navbar from '../../components/layout/Navbar';
+import { propertyService } from '../../../services/propertyService';
 import PageHeader from '../../components/layout/PageHeader';
 import Pagination from '../../components/common/Pagination';
 import LoadingProcess from '../../../components/common/LoadingProcess';
@@ -25,28 +26,50 @@ import DashboardModals from './components/DashboardModals';
  * - State: Manages UI states like active navigation items and modal visibility.
  */
 const PmsDashboard = () => {
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark } = useTheme();
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
+
+  // User Role Detection for permissions
+  const [userRole, setUserRole] = useState(() => {
+    const token = localStorage.getItem('access_token');
+    if (!token) return 'ROLE_USER';
+    try {
+      const payload = JSON.parse(atob(token.trim().replace(/^"|"$/g, '').split('.')[1]));
+      return payload.role || (Array.isArray(payload.roles) ? payload.roles[0] : payload.roles) ||
+        (Array.isArray(payload.authorities) ? payload.authorities[0]?.authority || payload.authorities[0] : payload.authorities) ||
+        localStorage.getItem('user_role') || 'ROLE_USER';
+    } catch {
+      return localStorage.getItem('user_role') || 'ROLE_ADMIN';
+    }
+  });
 
   // Centralized data fetching hook
   const {
-    floors, roomTypes, roomStatuses, rooms, isLoading, fetchData,
+    floors, buildings, roomTypes, roomStatuses, rooms, isLoading, fetchData,
     addFloor, updateFloor, deleteFloor,
+    addBuilding, updateBuilding, deleteBuilding,
     addRoomType, updateRoomType, deleteRoomType,
-    addRoomStatus, updateRoomStatus, deleteRoomStatus,
-    addRoom, updateRoom, deleteRoom
+    addRoomStatus, updateRoomStatus: hookUpdateRoomStatus, deleteRoomStatus,
+    addRoom, updateRoom: hookUpdateRoom, deleteRoom,
+    taxes, addTax, updateTax, deleteTax,
+    personalDetails, addPersonalDetail, updatePersonalDetail, deletePersonalDetail,
+    searchRooms, searchFloors, searchBuildings, searchRoomTypes, searchRoomStatuses,
   } = usePmsData();
 
   // Dashboard navigation state
-  const [activeItem, setActiveItem] = useState('Floor');
+  const [activeItem, setActiveItem] = useState('Building');
   const [isPropertyOpen, setIsPropertyOpen] = useState(true);
 
   // Grouped modal visibility states
   const [modals, setModals] = useState({
     floor: false, floorEdit: false,
+    building: false, buildingEdit: false,
     roomType: false, roomTypeEdit: false,
     roomStatus: false, roomStatusEdit: false,
-    room: false, roomEdit: false
+    room: false, roomEdit: false,
+    personalDetail: false,
+    personalDetailEdit: false,
+    tax: false, taxEdit: false,
   });
 
   const toggleModal = (modalName, isOpen) => {
@@ -59,12 +82,20 @@ const PmsDashboard = () => {
    */
   const [newFloor, setNewFloor] = useState({ name: '', description: '' });
   const [editFloor, setEditFloor] = useState({ id: null, name: '', description: '' });
-  const [newRoomType, setNewRoomType] = useState({ shortName: '', roomTypeName: '' });
-  const [editRoomType, setEditRoomType] = useState({ id: null, shortName: '', roomTypeName: '' });
+  const [newBuilding, setNewBuilding] = useState({ name: '', description: '' });
+  const [editBuilding, setEditBuilding] = useState({ id: null, name: '', description: '' });
+  const [newRoomType, setNewRoomType] = useState({ shortName: '', roomTypeName: '', price: '' });
+  const [editRoomType, setEditRoomType] = useState({ id: null, shortName: '', roomTypeName: '', price: '' });
   const [newRoomStatus, setNewRoomStatus] = useState({ roomStatusName: '', roomStatusTitle: '', roomStatusColor: '#2798e8' });
   const [editRoomStatus, setEditRoomStatus] = useState({ id: null, roomStatusName: '', roomStatusTitle: '', roomStatusColor: '#2798e8' });
-  const [newRoom, setNewRoom] = useState({ roomName: '', roomTypeId: '', floorId: '', smoking: false, handicap: false, nonRoom: false });
-  const [editRoom, setEditRoom] = useState({ id: null, roomName: '', roomTypeId: '', floorId: '', smoking: false, handicap: false, nonRoom: false });
+  const [newRoom, setNewRoom] = useState({ roomName: '', roomShortName: '', roomTypeId: '', floorId: '', buildingId: '', smoking: false, handicap: false, nonRoom: false });
+  const [editRoom, setEditRoom] = useState({ id: null, roomName: '', roomShortName: '', roomTypeId: '', floorId: '', buildingId: '', smoking: false, handicap: false, nonRoom: false });
+  const [newTax, setNewTax] = useState({ taxMasterName: '', taxTypeEnum: 'Occupancy_tax', perDayTax: false, perStayTax: false });
+  const [editTax, setEditTax] = useState({ id: null, taxMasterName: '', taxTypeEnum: 'Occupancy_tax', perDayTax: false, perStayTax: false });
+
+  // Personal Detail State
+  const [personalFormData, setPersonalFormData] = useState({ firstName: '', lastName: '', companyName: '', phone: '', email: '', address: '', profilePhoto: '', signature: '' });
+  const [uploadingType, setUploadingType] = useState(null);
 
   /**
    * EVENT HANDLERS - Property Management Actions
@@ -80,22 +111,54 @@ const PmsDashboard = () => {
   const handleUpdateFloor = async (e) => {
     e.preventDefault();
     if (!editFloor.name) return;
-    await updateFloor(editFloor.id, { name: editFloor.name, description: editFloor.description });
+    await updateFloor(editFloor.id, editFloor);
     toggleModal('floorEdit', false);
+  };
+
+  const handleAddBuilding = async (e) => {
+    e.preventDefault();
+    if (!newBuilding.name) return;
+    try {
+      await addBuilding(newBuilding);
+      setNewBuilding({ name: '', description: '' });
+      toggleModal('building', false);
+    } catch (err) {
+      alert('Failed to add building. Please try again.');
+    }
+  };
+
+  const handleUpdateBuilding = async (e) => {
+    e.preventDefault();
+    if (!editBuilding.name) return;
+    try {
+      // Send id in body to ensure entire object is updated correctly by backend
+      await updateBuilding(editBuilding.id, {
+        id: editBuilding.id,
+        name: editBuilding.name,
+        description: editBuilding.description || ''
+      });
+      toggleModal('buildingEdit', false);
+    } catch (err) {
+      alert('Failed to update building. Please check your data.');
+    }
   };
 
   const handleAddRoomType = async (e) => {
     e.preventDefault();
     if (!newRoomType.roomTypeName) return;
     await addRoomType(newRoomType);
-    setNewRoomType({ shortName: '', roomTypeName: '' });
+    setNewRoomType({ shortName: '', roomTypeName: '', price: '' });
     toggleModal('roomType', false);
   };
 
   const handleUpdateRoomType = async (e) => {
     e.preventDefault();
     if (!editRoomType.roomTypeName) return;
-    await updateRoomType(editRoomType.id, { shortName: editRoomType.shortName, roomTypeName: editRoomType.roomTypeName });
+    await updateRoomType(editRoomType.id, {
+      shortName: editRoomType.shortName,
+      roomTypeName: editRoomType.roomTypeName,
+      price: editRoomType.price
+    });
     toggleModal('roomTypeEdit', false);
   };
 
@@ -110,23 +173,110 @@ const PmsDashboard = () => {
   const handleUpdateRoomStatus = async (e) => {
     e.preventDefault();
     if (!editRoomStatus.roomStatusName) return;
-    await updateRoomStatus(editRoomStatus.id, { ...editRoomStatus, roomStatusTextColor: '#000000' });
+    await hookUpdateRoomStatus(editRoomStatus.id, { ...editRoomStatus, roomStatusTextColor: '#000000' });
     toggleModal('roomStatusEdit', false);
   };
 
   const handleAddRoom = async (e) => {
     e.preventDefault();
-    if (!newRoom.roomName || (!newRoom.nonRoom && !newRoom.roomTypeId) || !newRoom.floorId) return;
-    await addRoom({ ...newRoom, roomShortName: newRoom.roomName });
-    setNewRoom({ roomName: '', roomTypeId: '', floorId: '', smoking: false, handicap: false, nonRoom: false });
+    if (!newRoom.roomName || (!newRoom.nonRoom && !newRoom.roomTypeId) || !newRoom.floorId || !newRoom.buildingId) return;
+
+    // Prepare payload: ensure roomTypeId is null if empty or nonRoom
+    const payload = {
+      ...newRoom,
+      roomShortName: newRoom.roomShortName || newRoom.roomName,
+      roomTypeId: newRoom.nonRoom ? null : (newRoom.roomTypeId || null),
+      floorId: newRoom.floorId,
+      buildingId: newRoom.buildingId
+    };
+
+    await addRoom(payload);
+    setNewRoom({ roomName: '', roomShortName: '', roomTypeId: '', floorId: '', buildingId: '', smoking: false, handicap: false, nonRoom: false });
     toggleModal('room', false);
   };
 
   const handleUpdateRoom = async (e) => {
     e.preventDefault();
-    if (!editRoom.roomName || (!editRoom.nonRoom && !editRoom.roomTypeId) || !editRoom.floorId) return;
-    await updateRoom(editRoom.id, { ...editRoom, roomShortName: editRoom.roomName });
+    if (!editRoom.roomName || (!editRoom.nonRoom && !editRoom.roomTypeId) || !editRoom.floorId || !editRoom.buildingId) return;
+
+    // Prepare payload
+    const payload = {
+      ...editRoom,
+      roomShortName: editRoom.roomShortName || editRoom.roomName,
+      roomTypeId: editRoom.nonRoom ? null : (editRoom.roomTypeId || null)
+    };
+
+    await hookUpdateRoom(editRoom.id, payload);
     toggleModal('roomEdit', false);
+  };
+
+  const handleAddTax = async (e) => {
+    e.preventDefault();
+    if (!newTax.taxMasterName) return;
+    await addTax(newTax);
+    setNewTax({ taxMasterName: '', taxTypeEnum: 'Occupancy_tax', perDayTax: false, perStayTax: false });
+    toggleModal('tax', false);
+  };
+
+  const handleUpdateTax = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = {
+        id: editTax.id,
+        taxMasterName: editTax.taxMasterName,
+        taxTypeEnum: editTax.taxTypeEnum,
+        perDayTax: Boolean(editTax.perDayTax),
+        perStayTax: Boolean(editTax.perStayTax),
+        createdOn: editTax.createdOn
+      };
+      await updateTax(editTax.id, payload);
+      console.log("Payload--------------------------->", payload)
+      toggleModal('taxEdit', false);
+    } catch (err) {
+      alert('Update failed. Ensure that Tax Type Enum is a valid value recognised by the backend.');
+    }
+  };
+
+  const handlePersonalSubmit = async (e) => {
+    e.preventDefault();
+    if (!personalFormData.firstName) return;
+    if (personalFormData.id) {
+      await updatePersonalDetail(personalFormData.id, personalFormData);
+    } else {
+      await addPersonalDetail(personalFormData);
+    }
+    setPersonalFormData({ firstName: '', lastName: '', companyName: '', phone: '', email: '', address: '', profilePhoto: '', signature: '' });
+    toggleModal('personalDetail', false);
+    toggleModal('personalDetailEdit', false); // Close edit modal too
+  };
+
+  const handlePersonalFileUpload = async (e, type) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingType(type);
+    const uploadFormData = new FormData();
+    uploadFormData.append('file', file);
+
+    try {
+      const response = await propertyService.uploadImage(uploadFormData);
+      const responseData = response.data.fileName || response.data;
+
+      // Industrial cleanup: Extract only the path/filename if the response includes a success message
+      let fileName = responseData;
+      if (typeof responseData === 'string' && responseData.includes(': ')) {
+        fileName = responseData.split(': ')[1].trim();
+      }
+
+      setPersonalFormData(prev => ({
+        ...prev,
+        [type === 'photo' ? 'profilePhoto' : 'signature']: fileName
+      }));
+    } catch (err) {
+      console.error('Upload failed:', err);
+    } finally {
+      setUploadingType(null);
+    }
   };
 
   // Pagination state
@@ -139,34 +289,64 @@ const PmsDashboard = () => {
     setCurrentPage(1);
   }, [activeItem, searchTerm]);
 
-  // Search logic across different modules
-  const filterData = (data) => {
-    if (!searchTerm) return data;
-    const lowerSearch = searchTerm.toLowerCase();
-    return data.filter(item => {
-      if (item.roomName) return item.roomName.toLowerCase().includes(lowerSearch);
-      if (item.name) return item.name.toLowerCase().includes(lowerSearch);
-      if (item.roomTypeName) return item.roomTypeName.toLowerCase().includes(lowerSearch);
-      if (item.roomStatusName) return item.roomStatusName.toLowerCase().includes(lowerSearch);
-      return false;
-    });
-  };
+  // Global Server-side Search implementation
+  React.useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (searchTerm.trim()) {
+        switch (activeItem) {
+          case 'Room': searchRooms(searchTerm); break;
+          case 'Floor': searchFloors(searchTerm); break;
+          case 'Building': searchBuildings(searchTerm); break;
+          case 'Room Type': searchRoomTypes(searchTerm); break;
+          case 'Room Status': searchRoomStatuses(searchTerm); break;
+          default: break;
+        }
+      } else {
+        // Reset to full list if search is cleared
+        fetchData();
+      }
+    }, 600); // 600ms debounce
 
-  const filteredFloors = filterData(floors);
-  const filteredRoomTypes = filterData(roomTypes);
-  const filteredRooms = filterData(rooms);
-  const filteredRoomStatuses = filterData(roomStatuses);
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm, activeItem]);
 
-  // Helper to slice data based on current page
-  const getPaginatedData = (data) => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return data.slice(startIndex, startIndex + itemsPerPage);
-  };
+  // Industrial Standard Performance Optimization: UseMemo for filtering
+  const filteredData = React.useMemo(() => {
+    const filter = (data) => {
+      if (!Array.isArray(data)) return [];
+      if (!searchTerm) return data;
+      const lowerSearch = searchTerm.toLowerCase();
+      return data.filter(item => {
+        const m = (val) => val && String(val).toLowerCase().includes(lowerSearch);
+        return m(item.roomName) || m(item.name) || m(item.roomTypeName) || m(item.roomStatusName) ||
+          m(item.firstName) || m(item.lastName) || m(item.email) || m(item.phone) || m(item.companyName) ||
+          m(item.taxMasterName) || m(item.taxTypeEnum);
+      });
+    };
+    return {
+      floors: filter(floors), buildings: filter(buildings), roomTypes: filter(roomTypes),
+      rooms: filter(rooms), roomStatuses: filter(roomStatuses), personalDetails: filter(personalDetails),
+      taxes: filter(taxes)
+    };
+  }, [searchTerm, floors, buildings, roomTypes, roomStatuses, rooms, personalDetails]);
 
-  const paginatedFloors = getPaginatedData(filteredFloors);
-  const paginatedRoomTypes = getPaginatedData(filteredRoomTypes);
-  const paginatedRooms = getPaginatedData(filteredRooms);
-  const paginatedRoomStatuses = getPaginatedData(filteredRoomStatuses);
+  // ✅ Industrial Standard Performance Optimization: UseMemo for pagination
+  const paginatedData = React.useMemo(() => {
+    const paginate = (data) => {
+      if (!Array.isArray(data)) return [];
+      const start = (currentPage - 1) * itemsPerPage;
+      return data.slice(start, start + itemsPerPage);
+    };
+    return {
+      floors: paginate(filteredData.floors),
+      buildings: paginate(filteredData.buildings),
+      roomTypes: paginate(filteredData.roomTypes),
+      rooms: paginate(filteredData.rooms),
+      roomStatuses: paginate(filteredData.roomStatuses),
+      personalDetails: paginate(filteredData.personalDetails),
+      taxes: paginate(filteredData.taxes)
+    };
+  }, [currentPage, itemsPerPage, filteredData]);
 
   return (
     <div className={`flex h-screen ${isDark ? 'bg-[#0f172a] text-slate-100' : 'bg-[#f4f7fa] text-slate-800'} font-sans overflow-hidden transition-colors duration-300`}>
@@ -192,6 +372,8 @@ const PmsDashboard = () => {
           activeItem={activeItem}
           onRefresh={fetchData}
           isLoading={isLoading}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
         />
 
         {/* 5. Main Content Area - Scrollable */}
@@ -201,34 +383,57 @@ const PmsDashboard = () => {
             {/* Dynamic Dashboard Module Rendering */}
             <DashboardRouter
               activeItem={activeItem}
-              floors={paginatedFloors}
-              roomTypes={paginatedRoomTypes}
-              roomStatuses={paginatedRoomStatuses}
-              rooms={paginatedRooms}
+              floors={paginatedData.floors}
+              buildings={paginatedData.buildings}
+              roomTypes={paginatedData.roomTypes}
+              roomStatuses={paginatedData.roomStatuses}
+              rooms={paginatedData.rooms}
               allFloors={floors}
+              allBuildings={buildings}
               allRoomTypes={roomTypes}
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               toggleModal={toggleModal}
               setEditFloor={setEditFloor}
+              setEditBuilding={setEditBuilding}
               setEditRoomType={setEditRoomType}
               setEditRoomStatus={setEditRoomStatus}
               setEditRoom={setEditRoom}
               deleteFloor={deleteFloor}
+              deleteBuilding={deleteBuilding}
               deleteRoomType={deleteRoomType}
               deleteRoomStatus={deleteRoomStatus}
               deleteRoom={deleteRoom}
+              setEditTax={setEditTax}
+              deleteTax={deleteTax}
+              taxes={paginatedData.taxes}
+              personalDetails={paginatedData.personalDetails}
+              onAddPersonalDetail={() => {
+                setPersonalFormData({ firstName: '', lastName: '', companyName: '', phone: '', email: '', address: '', profilePhoto: '', signature: '' });
+                toggleModal('personalDetail', true);
+              }}
+              onEditPersonalDetail={(item) => {
+                setPersonalFormData(item);
+                toggleModal('personalDetailEdit', true);
+              }}
+              onDeletePersonalDetail={deletePersonalDetail}
+              currentPage={currentPage}
+              itemsPerPage={itemsPerPage}
+              userRole={userRole}
             />
 
             {/* Pagination Controls */}
-            {(activeItem === 'Floor' || activeItem === 'Room Type' || activeItem === 'Room' || activeItem === 'Room Status') && (
+            {(activeItem === 'Floor' || activeItem === 'Building' || activeItem === 'Room Type' || activeItem === 'Room' || activeItem === 'Room Status' || activeItem === 'Personal Detail' || activeItem === 'Tax') && (
               <div className="mt-8">
                 <Pagination
                   activeItem={activeItem}
-                  floors={filteredFloors}
-                  roomTypes={filteredRoomTypes}
-                  rooms={filteredRooms}
-                  roomStatuses={filteredRoomStatuses}
+                  floors={filteredData.floors}
+                  buildings={filteredData.buildings}
+                  roomTypes={filteredData.roomTypes}
+                  rooms={filteredData.rooms}
+                  roomStatuses={filteredData.roomStatuses}
+                  taxes={filteredData.taxes}
+                  personalDetails={filteredData.personalDetails}
                   isLoading={isLoading}
                   currentPage={currentPage}
                   itemsPerPage={itemsPerPage}
@@ -247,6 +452,9 @@ const PmsDashboard = () => {
         newFloor={newFloor} setNewFloor={setNewFloor} handleAddFloor={handleAddFloor}
         editFloor={editFloor} setEditFloor={setEditFloor} handleUpdateFloor={handleUpdateFloor}
         floors={floors}
+        newBuilding={newBuilding} setNewBuilding={setNewBuilding} handleAddBuilding={handleAddBuilding}
+        editBuilding={editBuilding} setEditBuilding={setEditBuilding} handleUpdateBuilding={handleUpdateBuilding}
+        buildings={buildings}
         newRoomType={newRoomType} setNewRoomType={setNewRoomType} handleAddRoomType={handleAddRoomType}
         editRoomType={editRoomType} setEditRoomType={setEditRoomType} handleUpdateRoomType={handleUpdateRoomType}
         roomTypes={roomTypes}
@@ -256,6 +464,15 @@ const PmsDashboard = () => {
         newRoom={newRoom} setNewRoom={setNewRoom} handleAddRoom={handleAddRoom}
         editRoom={editRoom} setEditRoom={setEditRoom} handleUpdateRoom={handleUpdateRoom}
         rooms={rooms}
+        newTax={newTax} setNewTax={setNewTax} handleAddTax={handleAddTax}
+        editTax={editTax} setEditTax={setEditTax} handleUpdateTax={handleUpdateTax}
+        taxes={taxes}
+        personalFormData={personalFormData}
+        setPersonalFormData={setPersonalFormData}
+        handlePersonalSubmit={handlePersonalSubmit}
+        handlePersonalFileUpload={handlePersonalFileUpload}
+        uploadingType={uploadingType}
+        isLoading={isLoading}
       />
 
       <style>{`

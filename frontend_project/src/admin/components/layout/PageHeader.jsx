@@ -1,7 +1,7 @@
 import { Layers, Search, RotateCw, Sun, Moon, Home } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
 
-const PageHeader = ({ activeItem, onRefresh, isLoading }) => {
+const PageHeader = ({ activeItem, onRefresh, isLoading, searchTerm, setSearchTerm }) => {
   const { isDark, toggleTheme } = useTheme();
 
   return (
@@ -51,6 +51,8 @@ const PageHeader = ({ activeItem, onRefresh, isLoading }) => {
             <input
               type="text"
               placeholder={`Search ${activeItem.toLowerCase()}s...`}
+              value={searchTerm || ''}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className={`pl-9 pr-4 py-1.5 ${isDark ? 'bg-slate-800 border-slate-700 text-slate-200 placeholder:text-slate-500' : 'bg-slate-50 border-slate-200 text-slate-800'} border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all w-full sm:w-48 md:w-64`}
             />
           </div>

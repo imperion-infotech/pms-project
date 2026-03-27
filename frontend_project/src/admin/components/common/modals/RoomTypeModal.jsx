@@ -57,6 +57,20 @@ export const RoomTypeModal = ({ isRoomTypeModalOpen, setIsRoomTypeModalOpen, new
             />
             {isDuplicate && <p className="text-red-500 text-[10px] sm:text-xs mt-1.5 font-bold animate-in slide-in-from-top-1">Room Type Name already exists!</p>}
           </div>
+          {/* Price */}
+          <div>
+            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1.5">Base Price (Per Night)</label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
+              <input
+                type="number"
+                value={newRoomType.price || ''}
+                onChange={(e) => setNewRoomType({ ...newRoomType, price: e.target.value })}
+                placeholder="0.00"
+                className="w-full pl-8 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-mono"
+              />
+            </div>
+          </div>
           <div className="flex gap-3 pt-2">
             <button
               type="button"

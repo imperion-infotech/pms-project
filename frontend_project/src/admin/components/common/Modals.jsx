@@ -1,8 +1,14 @@
 export { FloorModal } from './modals/FloorModal';
 export { FloorEditModal } from './modals/FloorEditModal';
+export { BuildingModal } from './modals/BuildingModal';
+export { BuildingEditModal } from './modals/BuildingEditModal';
 export { RoomTypeModal } from './modals/RoomTypeModal';
 export { RoomTypeEditModal } from './modals/RoomTypeEditModal';
 export { RoomStatusModal } from './modals/RoomStatusModal';
 export { RoomStatusEditModal } from './modals/RoomStatusEditModal';
 export { RoomModal } from './modals/RoomModal';
 export { RoomEditModal } from './modals/RoomEditModal';
+export { TaxModal } from './modals/TaxModal';
+export { TaxEditModal } from './modals/TaxEditModal';
+export { PersonalDetailsModal } from './modals/PersonalDetailsModal';
+export { PersonalDetailsEditModal } from './modals/PersonalDetailsEditModal';

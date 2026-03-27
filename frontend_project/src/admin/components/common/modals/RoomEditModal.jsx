@@ -1,6 +1,6 @@
 import { Pencil, X, Cigarette, Accessibility, Ban } from 'lucide-react';
 
-export const RoomEditModal = ({ isOpen, setIsOpen, editRoom, setEditRoom, handleUpdateRoom, roomTypes, floors, rooms = [] }) => {
+export const RoomEditModal = ({ isOpen, setIsOpen, editRoom, setEditRoom, handleUpdateRoom, roomTypes, floors, buildings = [], rooms = [] }) => {
   if (!isOpen) return null;
 
   const isDuplicate = rooms.some(r => String(r.roomName) === String(editRoom.roomName) && r.id !== editRoom.id);
@@ -25,6 +25,7 @@ export const RoomEditModal = ({ isOpen, setIsOpen, editRoom, setEditRoom, handle
               <h3 className="font-bold text-lg font-heading tracking-tight">Edit Room</h3>
               <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Update Property Mapping</p>
             </div>
+
           </div>
           <button
             onClick={() => setIsOpen(false)}
@@ -36,6 +37,18 @@ export const RoomEditModal = ({ isOpen, setIsOpen, editRoom, setEditRoom, handle
         </div>
         <form onSubmit={onSubmit} className="p-8 space-y-6">
           <div className="grid grid-cols-2 gap-6">
+            <div>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Building</label>
+              <select
+                required
+                value={editRoom.buildingId}
+                onChange={(e) => setEditRoom({ ...editRoom, buildingId: e.target.value })}
+                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all appearance-none"
+              >
+                <option value="" disabled>Select Building</option>
+                {buildings.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+              </select>
+            </div>
             <div>
               <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Floor</label>
               <select
@@ -49,13 +62,13 @@ export const RoomEditModal = ({ isOpen, setIsOpen, editRoom, setEditRoom, handle
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Room Type</label>
+              <label className={`block text-xs font-bold uppercase tracking-wider mb-2 transition-colors ${editRoom.nonRoom ? 'text-slate-300 dark:text-slate-600' : 'text-slate-500 dark:text-slate-400'}`}>Room Type</label>
               <select
                 required={!editRoom.nonRoom}
                 disabled={editRoom.nonRoom}
-                value={editRoom.roomTypeId}
+                value={editRoom.roomTypeId || ''}
                 onChange={(e) => setEditRoom({ ...editRoom, roomTypeId: e.target.value })}
-                className={`w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all appearance-none ${editRoom.nonRoom ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+                className={`w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all appearance-none ${editRoom.nonRoom ? 'opacity-40 cursor-not-allowed grayscale' : ''}`}
               >
                 <option value="" disabled>Select Room Type</option>
                 {roomTypes.map(rt => <option key={rt.id} value={rt.id}>{rt.roomTypeName}</option>)}

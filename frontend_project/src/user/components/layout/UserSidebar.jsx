@@ -125,6 +125,10 @@ const UserSidebar = ({
                 )}
               </AnimatePresence>
             </div>
+
+            <div className="border-t border-slate-700/40 my-2"></div>
+
+
           </div>
 
           <div className="mt-auto p-4 border-t border-slate-700/50">

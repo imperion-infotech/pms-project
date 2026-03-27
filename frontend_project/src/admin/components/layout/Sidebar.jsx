@@ -1,17 +1,26 @@
-import { Menu, Building, ChevronDown, ChevronUp, Layers, LayoutDashboard, DoorOpen, CheckSquare, Home, LogOut } from 'lucide-react';
+import React, { useState } from 'react';
+import { Menu, Building, ChevronDown, ChevronUp, Layers, LayoutDashboard, DoorOpen, CheckSquare, Home, LogOut, User, Receipt } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSidebar } from '../../../context/SidebarContext';
 
 const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem }) => {
   const navigate = useNavigate();
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
-  
+
   const propertyItems = [
+    { name: 'Building', icon: Building },
     { name: 'Floor', icon: Layers },
     { name: 'Room Type', icon: LayoutDashboard },
     { name: 'Room', icon: DoorOpen },
     { name: 'Room Status', icon: CheckSquare },
+    { name: 'Tax', icon: Receipt },
   ];
+
+  const profileItems = [
+    { name: 'Personal Detail', icon: User },
+  ];
+
+  const [isProfileOpen, setIsProfileOpen] = React.useState(true);
 
   return (
     <>
@@ -89,6 +98,45 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
                     >
                       {activeItem === item.name && (
                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></div>
+                      )}
+                      <span className="capitalize">{item.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="border-t border-slate-700/40 my-2"></div>
+
+            {/* Profile Settings Section */}
+            <div>
+              <button
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-800 transition-colors group"
+              >
+                <div className="flex items-center gap-3">
+                  <User className="w-5 h-5 text-blue-400" />
+                  <span className="text-sm font-medium text-slate-200">Profile Setting</span>
+                </div>
+                {isProfileOpen ? <ChevronUp className="w-4 h-4 opacity-50" /> : <ChevronDown className="w-4 h-4 opacity-50" />}
+              </button>
+
+              {isProfileOpen && (
+                <div className="bg-[#111827] py-1 border-y border-slate-800/50">
+                  {profileItems.map((item) => (
+                    <button
+                      key={item.name}
+                      onClick={() => {
+                        setActiveItem(item.name);
+                        if (window.innerWidth < 1024) setIsSidebarOpen(false);
+                      }}
+                      className={`w-full flex items-center px-6 py-2.5 text-xs font-medium transition-all relative ${activeItem === item.name
+                        ? 'text-white bg-slate-800/50'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-800/30'
+                        }`}
+                    >
+                      {activeItem === item.name && (
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.5)]"></div>
                       )}
                       <span className="capitalize">{item.name}</span>
                     </button>

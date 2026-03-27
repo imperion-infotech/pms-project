@@ -3,6 +3,7 @@ import { Menu, Building, ChevronDown, ChevronUp, Layers, LayoutDashboard, DoorOp
 
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem }) => {
   const propertyItems = [
+    { name: 'Building', icon: Building },
     { name: 'Floor', icon: Layers },
     { name: 'Room Type', icon: LayoutDashboard },
     { name: 'Room', icon: DoorOpen },

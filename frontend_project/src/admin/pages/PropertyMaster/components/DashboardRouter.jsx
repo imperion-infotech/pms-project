@@ -1,9 +1,12 @@
 import React from 'react';
 import { Layers } from 'lucide-react';
 import FloorManagement from '../../../features/property/components/FloorManagement';
+import BuildingManagement from '../../../features/property/components/BuildingManagement';
 import RoomTypeManagement from '../../../features/property/components/RoomTypeManagement';
 import RoomManagement from '../../../features/property/components/RoomManagement';
 import RoomStatusManagement from '../../../features/property/components/RoomStatusManagement';
+import PersonalDetailManagement from '../../../features/property/components/PersonalDetailManagement';
+import TaxManagement from '../../../features/property/components/TaxManagement';
 
 /**
  * DashboardRouter Component
@@ -14,22 +17,36 @@ import RoomStatusManagement from '../../../features/property/components/RoomStat
 const DashboardRouter = ({
   activeItem,
   floors,
+  buildings,
   roomTypes,
   roomStatuses,
   rooms,
   allFloors,
+  allBuildings,
   allRoomTypes,
   searchTerm,
   setSearchTerm,
   toggleModal,
   setEditFloor,
+  setEditBuilding,
   setEditRoomType,
   setEditRoomStatus,
   setEditRoom,
   deleteFloor,
+  deleteBuilding,
   deleteRoomType,
   deleteRoomStatus,
-  deleteRoom
+  deleteRoom,
+  personalDetails,
+  onAddPersonalDetail,
+  onEditPersonalDetail,
+  onDeletePersonalDetail,
+  taxes,
+  setEditTax,
+  deleteTax,
+  currentPage,
+  itemsPerPage,
+  userRole
 }) => {
 
   switch (activeItem) {
@@ -38,10 +55,23 @@ const DashboardRouter = ({
         <FloorManagement
           floors={floors}
           searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
           setIsFloorModalOpen={(isOpen) => toggleModal('floor', isOpen)}
           onEdit={(f) => { setEditFloor(f); toggleModal('floorEdit', true); }}
           onDelete={deleteFloor}
+          currentPage={currentPage}
+          itemsPerPage={itemsPerPage}
+        />
+      );
+    case 'Building':
+      return (
+        <BuildingManagement
+          buildings={buildings}
+          searchTerm={searchTerm}
+          setIsBuildingModalOpen={(isOpen) => toggleModal('building', isOpen)}
+          onEdit={(b) => { setEditBuilding(b); toggleModal('buildingEdit', true); }}
+          onDelete={deleteBuilding}
+          currentPage={currentPage}
+          itemsPerPage={itemsPerPage}
         />
       );
     case 'Room Type':
@@ -51,6 +81,9 @@ const DashboardRouter = ({
           setIsRoomTypeModalOpen={(isOpen) => toggleModal('roomType', isOpen)}
           onEdit={(rt) => { setEditRoomType(rt); toggleModal('roomTypeEdit', true); }}
           onDelete={deleteRoomType}
+          currentPage={currentPage}
+          itemsPerPage={itemsPerPage}
+          userRole={userRole}
         />
       );
     case 'Room Status':
@@ -60,6 +93,8 @@ const DashboardRouter = ({
           setIsRoomStatusModalOpen={(isOpen) => toggleModal('roomStatus', isOpen)}
           onEdit={(rs) => { setEditRoomStatus(rs); toggleModal('roomStatusEdit', true); }}
           onDelete={deleteRoomStatus}
+          currentPage={currentPage}
+          itemsPerPage={itemsPerPage}
         />
       );
     case 'Room':
@@ -68,11 +103,36 @@ const DashboardRouter = ({
           rooms={rooms}
           roomTypes={allRoomTypes}
           floors={allFloors}
+          buildings={allBuildings}
           searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
           setIsRoomModalOpen={(isOpen) => toggleModal('room', isOpen)}
           onEdit={(r) => { setEditRoom(r); toggleModal('roomEdit', true); }}
           onDelete={deleteRoom}
+          currentPage={currentPage}
+          itemsPerPage={itemsPerPage}
+        />
+      );
+    case 'Tax':
+      return (
+        <TaxManagement
+          taxes={taxes}
+          setIsTaxModalOpen={(isOpen) => toggleModal('tax', isOpen)}
+          onEdit={(t) => { setEditTax(t); toggleModal('taxEdit', true); }}
+          onDelete={deleteTax}
+          currentPage={currentPage}
+          itemsPerPage={itemsPerPage}
+        />
+      );
+    case 'Personal Detail':
+      return (
+        <PersonalDetailManagement
+          details={personalDetails}
+          searchTerm={searchTerm}
+          onAdd={onAddPersonalDetail}
+          onEdit={onEditPersonalDetail}
+          onDelete={onDeletePersonalDetail}
+          currentPage={currentPage}
+          itemsPerPage={itemsPerPage}
         />
       );
     default:

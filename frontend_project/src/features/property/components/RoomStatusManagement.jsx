@@ -1,7 +1,14 @@
 // RoomStatusManagement.jsx
 import { PlusCircle, Pencil, Trash2 } from 'lucide-react';
 
-const RoomStatusManagement = ({ roomStatuses = [], setIsRoomStatusModalOpen, onEdit, onDelete }) => {
+const RoomStatusManagement = ({ 
+  roomStatuses = [], 
+  setIsRoomStatusModalOpen, 
+  onEdit, 
+  onDelete,
+  currentPage = 1,
+  itemsPerPage = 8
+}) => {
   return (
     <div className="bg-white dark:bg-[#1e293b] rounded-xl shadow-md border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors duration-300">
       {/* Header */}
@@ -41,7 +48,9 @@ const RoomStatusManagement = ({ roomStatuses = [], setIsRoomStatusModalOpen, onE
             ) : (
               roomStatuses.map((status, idx) => (
                 <tr key={status.id || idx} className="group hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5 transition-all duration-200">
-                  <td className="px-8 py-5 text-center font-bold text-slate-300 dark:text-slate-600 group-hover:text-emerald-500 font-mono text-xs border-r border-slate-50 dark:border-slate-800/50">{idx + 1}</td>
+                  <td className="px-8 py-5 text-center font-bold text-slate-300 dark:text-slate-600 group-hover:text-emerald-500 font-mono text-xs border-r border-slate-50 dark:border-slate-800/50">
+                    {((currentPage - 1) * itemsPerPage) + idx + 1}
+                  </td>
                   <td className="px-8 py-5 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-50 dark:border-slate-800/50">
                     {status.roomStatusName || status.name || '—'}
                   </td>

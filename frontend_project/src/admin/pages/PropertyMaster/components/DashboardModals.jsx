@@ -1,9 +1,14 @@
 import React from 'react';
 import {
   FloorModal, FloorEditModal,
+  BuildingModal, BuildingEditModal,
   RoomTypeModal, RoomTypeEditModal,
   RoomStatusModal, RoomStatusEditModal,
-  RoomModal, RoomEditModal
+  RoomModal, RoomEditModal,
+  PersonalDetailsModal,
+  PersonalDetailsEditModal,
+  TaxModal,
+  TaxEditModal
 } from '../../../components/common/Modals';
 
 /**
@@ -19,6 +24,10 @@ const DashboardModals = ({
   newFloor, setNewFloor, handleAddFloor,
   editFloor, setEditFloor, handleUpdateFloor,
   floors,
+  // Building
+  newBuilding, setNewBuilding, handleAddBuilding,
+  editBuilding, setEditBuilding, handleUpdateBuilding,
+  buildings,
   // Room Type
   newRoomType, setNewRoomType, handleAddRoomType,
   editRoomType, setEditRoomType, handleUpdateRoomType,
@@ -30,7 +39,14 @@ const DashboardModals = ({
   // Room
   newRoom, setNewRoom, handleAddRoom,
   editRoom, setEditRoom, handleUpdateRoom,
-  rooms
+  rooms,
+  // Personal Detail
+  personalFormData, setPersonalFormData, handlePersonalSubmit,
+  handlePersonalFileUpload, uploadingType,
+  // Tax
+  newTax, setNewTax, handleAddTax,
+  editTax, setEditTax, handleUpdateTax,
+  taxes, isLoading
 }) => {
   return (
     <>
@@ -46,6 +62,20 @@ const DashboardModals = ({
         setIsOpen={(isOpen) => toggleModal('floorEdit', isOpen)}
         editFloor={editFloor} setEditFloor={setEditFloor}
         handleUpdateFloor={handleUpdateFloor} floors={floors}
+      />
+
+      {/* Building Modals */}
+      <BuildingModal
+        isBuildingModalOpen={modals.building}
+        setIsBuildingModalOpen={(isOpen) => toggleModal('building', isOpen)}
+        newBuilding={newBuilding} setNewBuilding={setNewBuilding}
+        handleAddBuilding={handleAddBuilding} buildings={buildings}
+      />
+      <BuildingEditModal
+        isOpen={modals.buildingEdit}
+        setIsOpen={(isOpen) => toggleModal('buildingEdit', isOpen)}
+        editBuilding={editBuilding} setEditBuilding={setEditBuilding}
+        handleUpdateBuilding={handleUpdateBuilding} buildings={buildings}
       />
 
       {/* Room Type Modals */}
@@ -81,14 +111,56 @@ const DashboardModals = ({
         isRoomModalOpen={modals.room}
         setIsRoomModalOpen={(isOpen) => toggleModal('room', isOpen)}
         newRoom={newRoom} setNewRoom={setNewRoom}
-        handleAddRoom={handleAddRoom} roomTypes={roomTypes} floors={floors} rooms={rooms}
+        handleAddRoom={handleAddRoom} roomTypes={roomTypes} floors={floors} buildings={buildings} rooms={rooms}
       />
       <RoomEditModal
         isOpen={modals.roomEdit}
         setIsOpen={(isOpen) => toggleModal('roomEdit', isOpen)}
         editRoom={editRoom} setEditRoom={setEditRoom}
-        handleUpdateRoom={handleUpdateRoom} roomTypes={roomTypes} floors={floors} rooms={rooms}
+        handleUpdateRoom={handleUpdateRoom} roomTypes={roomTypes} floors={floors} buildings={buildings} rooms={rooms}
       />
+
+      {/* Tax Modals */}
+      <TaxModal
+        isOpen={modals.tax}
+        setIsOpen={(isOpen) => toggleModal('tax', isOpen)}
+        newTax={newTax}
+        setNewTax={setNewTax}
+        handleAddTax={handleAddTax}
+        taxes={taxes}
+      />
+      <TaxEditModal
+        isOpen={modals.taxEdit}
+        setIsOpen={(isOpen) => toggleModal('taxEdit', isOpen)}
+        editTax={editTax}
+        setEditTax={setEditTax}
+        handleUpdateTax={handleUpdateTax}
+        taxes={taxes}
+      />
+
+      {/* Personal Detail Modals */}
+      <PersonalDetailsModal
+        isOpen={modals.personalDetail}
+        setIsOpen={(isOpen) => toggleModal('personalDetail', isOpen)}
+        formData={personalFormData}
+        setFormData={setPersonalFormData}
+        handleSubmit={handlePersonalSubmit}
+        handleFileUpload={handlePersonalFileUpload}
+        uploadingType={uploadingType}
+        loading={isLoading}
+      />
+
+      <PersonalDetailsEditModal
+        isOpen={modals.personalDetailEdit}
+        setIsOpen={(isOpen) => toggleModal('personalDetailEdit', isOpen)}
+        formData={personalFormData}
+        setFormData={setPersonalFormData}
+        handleSubmit={handlePersonalSubmit}
+        handleFileUpload={handlePersonalFileUpload}
+        uploadingType={uploadingType}
+        loading={isLoading}
+      />
+
     </>
   );
 };

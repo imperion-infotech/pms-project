@@ -1,5 +1,5 @@
 // Common UI elements - Saare modals ab yaha hain
-import { PlusCircle, X, LayoutDashboard, DoorOpen, Cigarette, Accessibility, Ban, CheckCircle2 } from 'lucide-react';
+import { PlusCircle, X, LayoutDashboard, DoorOpen, Cigarette, Accessibility, Ban, CheckCircle2, User, Building, Phone, Mail, MapPin, Camera, Image as ImageIcon, Pen as SignatureIcon, Loader2, Save } from 'lucide-react';
 
 export const FloorModal = ({ isFloorModalOpen, setIsFloorModalOpen, newFloor, setNewFloor, handleAddFloor }) => {
   if (!isFloorModalOpen) return null;
@@ -318,4 +318,6 @@ export const RoomModal = ({ isRoomModalOpen, setIsRoomModalOpen, newRoom, setNew
     </div>
   );
 };
+
+
 

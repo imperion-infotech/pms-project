@@ -1,6 +1,6 @@
 import { DoorOpen, X, Cigarette, Accessibility, Ban } from 'lucide-react';
 
-export const RoomModal = ({ isRoomModalOpen, setIsRoomModalOpen, newRoom, setNewRoom, handleAddRoom, roomTypes, floors, rooms = [] }) => {
+export const RoomModal = ({ isRoomModalOpen, setIsRoomModalOpen, newRoom, setNewRoom, handleAddRoom, roomTypes, floors, buildings = [], rooms = [] }) => {
   if (!isRoomModalOpen) return null;
 
   const isDuplicate = rooms.some(r => String(r.roomName) === String(newRoom.roomName));
@@ -37,6 +37,18 @@ export const RoomModal = ({ isRoomModalOpen, setIsRoomModalOpen, newRoom, setNew
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
             <div>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Building</label>
+              <select
+                required
+                value={newRoom.buildingId}
+                onChange={(e) => setNewRoom({ ...newRoom, buildingId: e.target.value })}
+                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all appearance-none"
+              >
+                <option value="" disabled>Select Building</option>
+                {buildings.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+              </select>
+            </div>
+            <div>
               <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Floor</label>
               <select
                 required
@@ -49,13 +61,13 @@ export const RoomModal = ({ isRoomModalOpen, setIsRoomModalOpen, newRoom, setNew
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Room Type</label>
+              <label className={`block text-xs font-bold uppercase tracking-wider mb-2 transition-colors ${newRoom.nonRoom ? 'text-slate-300 dark:text-slate-600' : 'text-slate-500 dark:text-slate-400'}`}>Room Type</label>
               <select
                 required={!newRoom.nonRoom}
                 disabled={newRoom.nonRoom}
-                value={newRoom.roomTypeId}
+                value={newRoom.roomTypeId || ''}
                 onChange={(e) => setNewRoom({ ...newRoom, roomTypeId: e.target.value })}
-                className={`w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all appearance-none ${newRoom.nonRoom ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+                className={`w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all appearance-none ${newRoom.nonRoom ? 'opacity-40 cursor-not-allowed grayscale' : ''}`}
               >
                 <option value="" disabled>Select Room Type</option>
                 {roomTypes.map(rt => <option key={rt.id} value={rt.id}>{rt.roomTypeName}</option>)}

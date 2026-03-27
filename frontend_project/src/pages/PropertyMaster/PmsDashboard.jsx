@@ -16,13 +16,14 @@ import FloorManagement from '../../features/property/components/FloorManagement'
 import RoomTypeManagement from '../../features/property/components/RoomTypeManagement';
 import RoomManagement from '../../features/property/components/RoomManagement';
 import RoomStatusManagement from '../../features/property/components/RoomStatusManagement';
+import BuildingManagement from '../../features/property/components/BuildingManagement';
 
 import usePmsData from '../../../hooks/usePmsData';
 import Pagination from '../../components/common/Pagination';
 import LoadingProcess from '../../../components/common/LoadingProcess';
 
 
-import { FloorModal, FloorEditModal, RoomTypeModal, RoomTypeEditModal, RoomStatusModal, RoomStatusEditModal, RoomModal, RoomEditModal } from '../../components/common/Modals';
+import { FloorModal, FloorEditModal, BuildingModal, BuildingEditModal, RoomTypeModal, RoomTypeEditModal, RoomStatusModal, RoomStatusEditModal, RoomModal, RoomEditModal } from '../../components/common/Modals';
 // Spring Boot API instance not used directly here anymore
 
 const PmsDashboard = () => {
@@ -45,7 +46,11 @@ const PmsDashboard = () => {
     rooms,
     addRoom,
     updateRoom,
-    deleteRoom
+    deleteRoom,
+    buildings,
+    addBuilding,
+    updateBuilding,
+    deleteBuilding
   } = usePmsData();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -61,7 +66,10 @@ const PmsDashboard = () => {
     roomTypeEdit: false,
     roomStatus: false,
     roomStatusEdit: false,
-    room: false
+    room: false,
+    roomEdit: false,
+    building: false,
+    buildingEdit: false
   });
 
   // Helper to toggle modals
@@ -90,6 +98,7 @@ const PmsDashboard = () => {
     roomName: '',
     roomTypeId: '',
     floorId: '',
+    buildingId: '',
     smoking: false,
     handicap: false,
     nonRoom: false
@@ -100,6 +109,7 @@ const PmsDashboard = () => {
     roomName: '',
     roomTypeId: '',
     floorId: '',
+    buildingId: '',
     smoking: false,
     handicap: false,
     nonRoom: false
@@ -138,6 +148,42 @@ const PmsDashboard = () => {
   const handleDeleteFloor = useCallback(async (id) => {
     try { await deleteFloor(id); } catch (e) { console.error('Failed to delete floor.', e); }
   }, [deleteFloor]);
+
+  // ─── BUILDING CRUD ─────────────────────
+  const [newBuilding, setNewBuilding] = useState({ name: '', description: '' });
+  const [editBuilding, setEditBuilding] = useState({ id: null, name: '', description: '' });
+
+  const handleAddBuilding = useCallback(async (e) => {
+    e.preventDefault();
+    if (!newBuilding.name) return;
+    try {
+      await addBuilding(newBuilding);
+      setNewBuilding({ name: '', description: '' });
+      toggleModal('building', false);
+    } catch (error) {
+      console.error('Failed to create building.', error);
+    }
+  }, [newBuilding, addBuilding]);
+
+  const handleEditBuilding = useCallback((building) => {
+    setEditBuilding({ id: building.id, name: building.name, description: building.description || '' });
+    toggleModal('buildingEdit', true);
+  }, []);
+
+  const handleUpdateBuilding = useCallback(async (e) => {
+    e.preventDefault();
+    if (!editBuilding.name) return;
+    try {
+      await updateBuilding(editBuilding.id, { id: editBuilding.id, name: editBuilding.name, description: editBuilding.description || '' });
+      toggleModal('buildingEdit', false);
+    } catch (error) {
+      console.error('Failed to update building.', error);
+    }
+  }, [editBuilding, updateBuilding]);
+
+  const handleDeleteBuilding = useCallback(async (id) => {
+    try { await deleteBuilding(id); } catch (e) { console.error('Failed to delete building.', e); }
+  }, [deleteBuilding]);
 
   // ─── POST: Create a new Room Type ───────
   const handleAddRoomType = useCallback(async (e) => {
@@ -210,18 +256,22 @@ const PmsDashboard = () => {
   // ─── ROOM MASTER CRUD ───────────────────────────────────────────
   const handleAddRoom = useCallback(async (e) => {
     e.preventDefault();
-    if (!newRoom.roomName || (!newRoom.nonRoom && !newRoom.roomTypeId) || !newRoom.floorId) return;
+    if (!newRoom.roomName || (!newRoom.nonRoom && !newRoom.roomTypeId) || !newRoom.floorId || !newRoom.buildingId) return;
     try {
-      await addRoom({
+      const roomData = {
         roomName: newRoom.roomName,
         roomShortName: newRoom.roomName,
-        roomTypeId: newRoom.roomTypeId,
-        floorId: newRoom.floorId,
-        smoking: newRoom.smoking,
-        handicap: newRoom.handicap,
-        nonRoom: newRoom.nonRoom
-      });
-      setNewRoom({ roomName: '', roomTypeId: '', floorId: '', smoking: false, handicap: false, nonRoom: false });
+        floorId: Number(newRoom.floorId),
+        buildingId: Number(newRoom.buildingId),
+        smoking: newRoom.nonRoom ? false : newRoom.smoking,
+        handicap: newRoom.nonRoom ? false : newRoom.handicap,
+        nonRoom: newRoom.nonRoom ? false : newRoom.nonRoom
+      };
+      if (!newRoom.nonRoom && newRoom.roomTypeId) {
+        roomData.roomTypeId = Number(newRoom.roomTypeId);
+      }
+      await addRoom(roomData);
+      setNewRoom({ roomName: '', roomTypeId: '', floorId: '', buildingId: '', smoking: false, handicap: false, nonRoom: false });
       toggleModal('room', false);
     } catch (error) {
       console.error('Failed to create room.', error);
@@ -232,8 +282,9 @@ const PmsDashboard = () => {
     setEditRoom({
       id: room.id,
       roomName: room.roomName || '',
-      roomTypeId: room.roomTypeId || '',
-      floorId: room.floorId || '',
+      roomTypeId: room.roomTypeId || room.roomType?.id || '',
+      floorId: room.floorId || room.floor?.id || '',
+      buildingId: room.buildingId || room.building?.id || '',
       smoking: room.smoking || false,
       handicap: room.handicap || false,
       nonRoom: room.nonRoom || false
@@ -243,17 +294,21 @@ const PmsDashboard = () => {
 
   const handleUpdateRoom = useCallback(async (e) => {
     e.preventDefault();
-    if (!editRoom.roomName || (!editRoom.nonRoom && !editRoom.roomTypeId) || !editRoom.floorId) return;
+    if (!editRoom.roomName || (!editRoom.nonRoom && !editRoom.roomTypeId) || !editRoom.floorId || !editRoom.buildingId) return;
     try {
-      await updateRoom(editRoom.id, {
+      const roomData = {
         roomName: editRoom.roomName,
         roomShortName: editRoom.roomName,
-        roomTypeId: editRoom.roomTypeId,
-        floorId: editRoom.floorId,
-        smoking: editRoom.smoking,
-        handicap: editRoom.handicap,
+        floorId: Number(editRoom.floorId),
+        buildingId: Number(editRoom.buildingId),
+        smoking: editRoom.nonRoom ? false : editRoom.smoking,
+        handicap: editRoom.nonRoom ? false : editRoom.handicap,
         nonRoom: editRoom.nonRoom
-      });
+      };
+      if (!editRoom.nonRoom && editRoom.roomTypeId) {
+        roomData.roomTypeId = Number(editRoom.roomTypeId);
+      }
+      await updateRoom(editRoom.id, roomData);
       toggleModal('roomEdit', false);
     } catch (error) {
       console.error('Failed to update room.', error);
@@ -296,7 +351,14 @@ const PmsDashboard = () => {
 
         <main className={`flex-1 overflow-auto ${darkMode ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'} custom-scrollbar p-3 md:p-6 lg:p-8 transition-colors duration-300`}>
           <div className="max-w-[1600px] mx-auto space-y-4 md:y-6">
-            {activeItem === 'Floor' ? (
+            {activeItem === 'Building' ? (
+              <BuildingManagement
+                buildings={buildings}
+                setIsBuildingModalOpen={(isOpen) => toggleModal('building', isOpen)}
+                onEdit={handleEditBuilding}
+                onDelete={handleDeleteBuilding}
+              />
+            ) : activeItem === 'Floor' ? (
               <FloorManagement
                 floors={floors}
                 setIsFloorModalOpen={(isOpen) => toggleModal('floor', isOpen)}
@@ -322,6 +384,7 @@ const PmsDashboard = () => {
                 rooms={rooms}
                 roomTypes={roomTypes}
                 floors={floors}
+                buildings={buildings}
                 setIsRoomModalOpen={(isOpen) => toggleModal('room', isOpen)}
                 onEdit={handleEditRoom}
                 onDelete={handleDeleteRoom}
@@ -334,8 +397,8 @@ const PmsDashboard = () => {
               </div>
             )}
 
-            {(activeItem === 'Floor' || activeItem === 'Room Type' || activeItem === 'Room') && (
-              <Pagination activeItem={activeItem} floors={floors} roomTypes={roomTypes} rooms={rooms} isLoading={isLoading} />
+            {(activeItem === 'Floor' || activeItem === 'Room Type' || activeItem === 'Room' || activeItem === 'Building') && (
+              <Pagination activeItem={activeItem} floors={floors} buildings={buildings} roomTypes={roomTypes} rooms={rooms} isLoading={isLoading} />
             )}
           </div>
         </main>
@@ -359,6 +422,23 @@ const PmsDashboard = () => {
         setEditFloor={setEditFloor}
         handleUpdateFloor={handleUpdateFloor}
         floors={floors}
+      />
+
+      {/* Building Modals */}
+      <BuildingModal
+        isOpen={modals.building}
+        setIsOpen={(isOpen) => toggleModal('building', isOpen)}
+        newBuilding={newBuilding}
+        setNewBuilding={setNewBuilding}
+        handleAddBuilding={handleAddBuilding}
+      />
+
+      <BuildingEditModal
+        isOpen={modals.buildingEdit}
+        setIsOpen={(isOpen) => toggleModal('buildingEdit', isOpen)}
+        editBuilding={editBuilding}
+        setEditBuilding={setEditBuilding}
+        handleUpdateBuilding={handleUpdateBuilding}
       />
 
       <RoomTypeModal
@@ -408,6 +488,7 @@ const PmsDashboard = () => {
         handleAddRoom={handleAddRoom}
         roomTypes={roomTypes}
         floors={floors}
+        buildings={buildings}
         rooms={rooms}
       />
 
@@ -419,6 +500,7 @@ const PmsDashboard = () => {
         handleUpdateRoom={handleUpdateRoom}
         roomTypes={roomTypes}
         floors={floors}
+        buildings={buildings}
         rooms={rooms}
       />
 
