@@ -46,7 +46,7 @@ export const PersonalDetailsEditModal = ({
   const signatureSrc = localPreviews.signature || (cleanImageUrl(formData.signature) ? `http://192.168.1.5:9091/user/${cleanImageUrl(formData.signature)}` : null);
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in" onClick={() => setIsOpen(false)}></div>
       <div className="bg-white dark:bg-slate-900 rounded-[40px] shadow-2xl w-full max-w-4xl relative z-10 overflow-hidden flex flex-col md:flex-row max-h-[90vh] animate-in zoom-in-95">
         {/* Media Side */}
@@ -126,7 +126,7 @@ export const PersonalDetailsEditModal = ({
             </div>
             <div className="flex gap-4 pt-4 border-t border-slate-50 dark:border-slate-800">
               <button type="button" onClick={() => setIsOpen(false)} className="flex-1 py-4 text-xs font-black text-slate-400 uppercase tracking-widest transition-colors">Abort</button>
-              <button type="submit" disabled={loading} className="flex-[2] py-4 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all hover:bg-blue-700">
+              <button type="submit" disabled={loading} className="flex-2 py-4 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all hover:bg-blue-700">
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}<span>Update Guest Profile</span>
               </button>
             </div>

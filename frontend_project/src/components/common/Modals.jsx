@@ -5,7 +5,7 @@ export const FloorModal = ({ isFloorModalOpen, setIsFloorModalOpen, newFloor, se
   if (!isFloorModalOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={() => setIsFloorModalOpen(false)}
@@ -59,7 +59,7 @@ export const FloorModal = ({ isFloorModalOpen, setIsFloorModalOpen, newFloor, se
             </button>
             <button
               type="submit"
-              className="flex-[2] py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
+              className="flex-2 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
             >
               ADD FLOOR
             </button>
@@ -74,7 +74,7 @@ export const RoomTypeModal = ({ isRoomTypeModalOpen, setIsRoomTypeModalOpen, new
   if (!isRoomTypeModalOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={() => setIsRoomTypeModalOpen(false)}
@@ -157,7 +157,7 @@ export const RoomTypeModal = ({ isRoomTypeModalOpen, setIsRoomTypeModalOpen, new
             </button>
             <button
               type="submit"
-              className="flex-[2] py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-bold shadow-lg shadow-emerald-500/10 transition-all active:scale-95"
+              className="flex-2 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-bold shadow-lg shadow-emerald-500/10 transition-all active:scale-95"
             >
               SAVE ROOM TYPE
             </button>
@@ -172,7 +172,7 @@ export const RoomModal = ({ isRoomModalOpen, setIsRoomModalOpen, newRoom, setNew
   if (!isRoomModalOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={() => setIsRoomModalOpen(false)}
@@ -308,7 +308,7 @@ export const RoomModal = ({ isRoomModalOpen, setIsRoomModalOpen, newRoom, setNew
             </button>
             <button
               type="submit"
-              className="flex-[2] py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
+              className="flex-2 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
             >
               CREATE ROOM
             </button>

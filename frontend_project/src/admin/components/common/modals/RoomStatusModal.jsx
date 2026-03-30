@@ -13,7 +13,7 @@ export const RoomStatusModal = ({ isOpen, setIsOpen, newRoomStatus, setNewRoomSt
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={() => setIsOpen(false)}
@@ -84,7 +84,7 @@ export const RoomStatusModal = ({ isOpen, setIsOpen, newRoomStatus, setNewRoomSt
             <button
               type="submit"
               disabled={isDuplicate || !newRoomStatus.roomStatusName}
-              className={`flex-[2] py-2.5 text-white rounded-xl text-sm font-bold shadow-lg transition-all ${isDuplicate || !newRoomStatus.roomStatusName ? 'bg-slate-400 cursor-not-allowed shadow-none opacity-70' : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/10 active:scale-95'}`}
+              className={`flex-2 py-2.5 text-white rounded-xl text-sm font-bold shadow-lg transition-all ${isDuplicate || !newRoomStatus.roomStatusName ? 'bg-slate-400 cursor-not-allowed shadow-none opacity-70' : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/10 active:scale-95'}`}
             >
               {isDuplicate ? 'STATUS EXISTS' : 'SAVE STATUS'}
             </button>

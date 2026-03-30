@@ -13,7 +13,7 @@ export const FloorModal = ({ isFloorModalOpen, setIsFloorModalOpen, newFloor, se
   if (!isFloorModalOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={() => setIsFloorModalOpen(false)}
@@ -69,7 +69,7 @@ export const FloorModal = ({ isFloorModalOpen, setIsFloorModalOpen, newFloor, se
             <button
               type="submit"
               disabled={isDuplicate || !newFloor.name}
-              className={`flex-[2] py-3 text-white rounded-xl text-sm font-bold shadow-lg transition-all ${isDuplicate || !newFloor.name ? 'bg-slate-400 cursor-not-allowed shadow-none opacity-70' : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20 active:scale-95'}`}
+              className={`flex-2 py-3 text-white rounded-xl text-sm font-bold shadow-lg transition-all ${isDuplicate || !newFloor.name ? 'bg-slate-400 cursor-not-allowed shadow-none opacity-70' : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20 active:scale-95'}`}
             >
               {isDuplicate ? 'FLOOR EXISTS' : 'ADD FLOOR'}
             </button>

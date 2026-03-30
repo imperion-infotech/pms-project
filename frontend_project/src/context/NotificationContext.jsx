@@ -32,7 +32,7 @@ export const NotificationProvider = ({ children }) => {
   return (
     <NotificationContext.Provider value={{ success, error, info, warn, removeNotification }}>
       {children}
-      <div className="fixed bottom-4 right-4 z-[9999] flex flex-col gap-3 min-w-[320px] max-w-[420px]">
+      <div className="fixed bottom-4 right-4 z-9999 flex flex-col gap-3 min-w-[320px] max-w-[420px]">
         <AnimatePresence>
           {notifications.map((n) => (
             <NotificationItem key={n.id} notification={n} onDismiss={() => removeNotification(n.id)} />
@@ -65,14 +65,14 @@ const NotificationItem = ({ notification, onDismiss }) => {
       exit={{ opacity: 0, x: 20, scale: 0.95 }}
       className={`p-4 rounded-xl border ${bgStyles[notification.type]} backdrop-blur-md flex gap-3 shadow-2xl overflow-hidden relative group`}
     >
-      <div className="flex-shrink-0 mt-0.5">{icons[notification.type]}</div>
-      <div className="flex-grow">
+      <div className="shrink-0 mt-0.5">{icons[notification.type]}</div>
+      <div className="grow">
         <h4 className="font-semibold text-sm text-slate-100">{notification.title}</h4>
         <p className="text-xs text-slate-400 mt-1 leading-relaxed">{notification.message}</p>
       </div>
       <button 
         onClick={onDismiss}
-        className="flex-shrink-0 text-slate-500 hover:text-white transition-colors p-1"
+        className="shrink-0 text-slate-500 hover:text-white transition-colors p-1"
       >
         <X className="w-4 h-4" />
       </button>

@@ -13,7 +13,7 @@ export const TaxModal = ({ isOpen, setIsOpen, newTax, setNewTax, handleAddTax, t
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={() => setIsOpen(false)}
@@ -91,7 +91,7 @@ export const TaxModal = ({ isOpen, setIsOpen, newTax, setNewTax, handleAddTax, t
             <button
               type="submit"
               disabled={isDuplicate || !newTax.taxMasterName}
-              className={`flex-[2] py-3 text-white rounded-xl text-sm font-bold shadow-lg transition-all ${isDuplicate || !newTax.taxMasterName ? 'bg-slate-400 cursor-not-allowed' : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20 active:scale-95'}`}
+              className={`flex-2 py-3 text-white rounded-xl text-sm font-bold shadow-lg transition-all ${isDuplicate || !newTax.taxMasterName ? 'bg-slate-400 cursor-not-allowed' : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20 active:scale-95'}`}
             >
               {isDuplicate ? 'EXISTS' : 'ADD TAX'}
             </button>

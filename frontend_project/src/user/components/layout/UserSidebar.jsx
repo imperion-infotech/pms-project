@@ -116,7 +116,7 @@ const UserSidebar = ({
                   >
                     {roomStatuses.map(status => (
                       <div key={status.id} className={`w-full flex items-center gap-3 px-6 py-2.5 text-xs font-medium transition-all relative text-slate-400 hover:text-white hover:bg-slate-800/30 group`}>
-                        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: status.roomStatusColor || '#ef4444' }}></div>
+                        <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: status.roomStatusColor || '#ef4444' }}></div>
                         <span className="capitalize truncate w-full">{status.roomStatusName}</span>
                       </div>
                     ))}

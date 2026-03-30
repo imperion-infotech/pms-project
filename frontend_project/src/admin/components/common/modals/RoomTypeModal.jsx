@@ -13,7 +13,7 @@ export const RoomTypeModal = ({ isRoomTypeModalOpen, setIsRoomTypeModalOpen, new
   if (!isRoomTypeModalOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={() => setIsRoomTypeModalOpen(false)}
@@ -82,7 +82,7 @@ export const RoomTypeModal = ({ isRoomTypeModalOpen, setIsRoomTypeModalOpen, new
             <button
               type="submit"
               disabled={isDuplicate || !newRoomType.roomTypeName}
-              className={`flex-[2] py-2.5 text-white rounded-xl text-sm font-bold shadow-lg transition-all ${isDuplicate || !newRoomType.roomTypeName ? 'bg-slate-400 cursor-not-allowed shadow-none opacity-70' : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/10 active:scale-95'}`}
+              className={`flex-2 py-2.5 text-white rounded-xl text-sm font-bold shadow-lg transition-all ${isDuplicate || !newRoomType.roomTypeName ? 'bg-slate-400 cursor-not-allowed shadow-none opacity-70' : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/10 active:scale-95'}`}
             >
               {isDuplicate ? 'TYPE EXISTS' : 'SAVE ROOM TYPE'}
             </button>

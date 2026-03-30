@@ -12,7 +12,7 @@ export const BuildingModal = ({ isBuildingModalOpen, setIsBuildingModalOpen, new
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={() => setIsBuildingModalOpen(false)}
@@ -69,7 +69,7 @@ export const BuildingModal = ({ isBuildingModalOpen, setIsBuildingModalOpen, new
             <button
               type="submit"
               disabled={isDuplicate || !newBuilding.name}
-              className={`flex-[2] py-3 text-white rounded-xl text-sm font-bold shadow-lg transition-all ${isDuplicate || !newBuilding.name ? 'bg-slate-400 cursor-not-allowed shadow-none opacity-70' : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20 active:scale-95'}`}
+              className={`flex-2 py-3 text-white rounded-xl text-sm font-bold shadow-lg transition-all ${isDuplicate || !newBuilding.name ? 'bg-slate-400 cursor-not-allowed shadow-none opacity-70' : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20 active:scale-95'}`}
             >
               {isDuplicate ? 'BUILDING EXISTS' : 'ADD BUILDING'}
             </button>

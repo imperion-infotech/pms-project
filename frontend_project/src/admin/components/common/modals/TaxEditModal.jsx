@@ -16,7 +16,7 @@ export const TaxEditModal = ({ isOpen, setIsOpen, editTax, setEditTax, handleUpd
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={() => setIsOpen(false)}
@@ -95,7 +95,7 @@ export const TaxEditModal = ({ isOpen, setIsOpen, editTax, setEditTax, handleUpd
             <button
               type="submit"
               disabled={isDuplicate || !editTax.taxMasterName}
-              className={`flex-[2] flex items-center justify-center gap-2 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-500/20 transition-all active:scale-95 disabled:bg-slate-400 disabled:cursor-not-allowed`}
+              className={`flex-2 flex items-center justify-center gap-2 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-500/20 transition-all active:scale-95 disabled:bg-slate-400 disabled:cursor-not-allowed`}
             >
               <Save className="w-4 h-4" />
               {isDuplicate ? 'EXISTS' : 'UPDATE TAX'}

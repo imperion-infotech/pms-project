@@ -34,7 +34,7 @@ export const LoadingBar = ({ isLoading }) => (
  * LoadingSpinner - A circular spinner with optional message.
  */
 export const LoadingSpinner = ({ fullScreen = true, message }) => (
-  <div className={`flex flex-col items-center justify-center ${fullScreen ? 'h-screen w-screen bg-slate-50 dark:bg-slate-900 fixed inset-0 z-[9999]' : 'py-12 w-full'} transition-colors duration-300`}>
+  <div className={`flex flex-col items-center justify-center ${fullScreen ? 'h-screen w-screen bg-slate-50 dark:bg-slate-900 fixed inset-0 z-9999' : 'py-12 w-full'} transition-colors duration-300`}>
     <div className="relative mb-4">
       <div className={`${fullScreen ? 'h-16 w-16' : 'h-12 w-12'} rounded-full border-t-4 border-b-4 border-blue-500 animate-spin`}></div>
       <div className={`absolute top-0 left-0 ${fullScreen ? 'h-16 w-16' : 'h-12 w-12'} rounded-full border-t-4 border-b-4 border-blue-200 opacity-20`}></div>
