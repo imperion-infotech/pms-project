@@ -339,7 +339,7 @@ const PmsDashboard = () => {
       return
     }
 
-    const selectedFloor = floors.find((f) => String(f.id) === String(editRoom.floorId))
+
     const selectedStatus = roomStatuses.find(
       (rs) => String(rs.id) === String(editRoom.roomStatusTableId),
     )
@@ -352,13 +352,16 @@ const PmsDashboard = () => {
       roomTypeId: isNonRoom ? null : Number(editRoom.roomTypeId),
       floorId: Number(editRoom.floorId),
       buildingId: Number(editRoom.buildingId),
-      roomStatusTableId: isNonRoom ? null : Number(editRoom.roomStatusTableId),
-      roomStatus: isNonRoom ? null : selectedStatus ? selectedStatus.roomStatusName : null,
-      name: selectedFloor ? selectedFloor.name : '',
+      roomStatusTableId: isNonRoom ? null : (editRoom.roomStatusTableId ? Number(editRoom.roomStatusTableId) : null),
+      roomStatus: isNonRoom ? null : (selectedStatus ? selectedStatus.roomStatusName : editRoom.roomStatus),
+      name: editRoom.roomName, // Fixed: Previous version used floor name here
       smoking: Boolean(editRoom.smoking),
       handicap: Boolean(editRoom.handicap),
       nonRoom: isNonRoom,
     }
+
+    console.log('--- Room Update Payload ---', payload);
+
     try {
       await hookUpdateRoom(editRoom.id, payload)
       toggleModal('roomEdit', false)
