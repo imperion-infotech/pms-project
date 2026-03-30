@@ -1,3 +1,10 @@
+/**
+ * usePmsData.js - Ye file poore project ka 'Brain' hai.
+ * 
+ * Iska kaam hai backend se data (Rooms, Floors, Buildings) fetch karna,
+ * unhe global state mein save karna, aur CRUD (Add, Update, Delete)
+ * operations ko handle karna. Ye hook baaki saare components ko data supply karta hai.
+ */
 import { useState, useEffect, useCallback } from 'react';
 import { propertyService } from '../services/propertyService';
 import { useToast } from '../context/NotificationContext';
@@ -101,51 +108,27 @@ const usePmsData = () => {
     }
   };
 
+  /**
+   * Internal search helper
+   */
+  const executeSearch = useCallback(async (searchFn, key) => {
+    setIsLoading(true);
+    try {
+      const res = await searchFn();
+      setData(prev => ({ ...prev, [key]: extractData(res) }));
+    } catch {
+      toast.error(`Search for ${key} failed`);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
+
   // Memoized Search Operations (replaces state with results)
-  const searchRooms = useCallback(async (query) => {
-    setIsLoading(true);
-    try {
-      const res = await propertyService.searchRooms(query);
-      setData(prev => ({ ...prev, rooms: extractData(res) }));
-    } catch { toast.error("Search failed"); }
-    finally { setIsLoading(false); }
-  }, [toast]);
-
-  const searchFloors = useCallback(async (query) => {
-    setIsLoading(true);
-    try {
-      const res = await propertyService.searchFloors(query);
-      setData(prev => ({ ...prev, floors: extractData(res) }));
-    } catch { toast.error("Search failed"); }
-    finally { setIsLoading(false); }
-  }, [toast]);
-
-  const searchBuildings = useCallback(async (query) => {
-    setIsLoading(true);
-    try {
-      const res = await propertyService.searchBuildings(query);
-      setData(prev => ({ ...prev, buildings: extractData(res) }));
-    } catch { toast.error("Search failed"); }
-    finally { setIsLoading(false); }
-  }, [toast]);
-
-  const searchRoomTypes = useCallback(async (query) => {
-    setIsLoading(true);
-    try {
-      const res = await propertyService.searchRoomTypes(query);
-      setData(prev => ({ ...prev, roomTypes: extractData(res) }));
-    } catch { toast.error("Search failed"); }
-    finally { setIsLoading(false); }
-  }, [toast]);
-
-  const searchRoomStatuses = useCallback(async (query) => {
-    setIsLoading(true);
-    try {
-      const res = await propertyService.searchRoomStatuses(query);
-      setData(prev => ({ ...prev, roomStatuses: extractData(res) }));
-    } catch { toast.error("Search failed"); }
-    finally { setIsLoading(false); }
-  }, [toast]);
+  const searchRooms = useCallback((query) => executeSearch(() => propertyService.searchRooms(query), 'rooms'), [executeSearch]);
+  const searchFloors = useCallback((query) => executeSearch(() => propertyService.searchFloors(query), 'floors'), [executeSearch]);
+  const searchBuildings = useCallback((query) => executeSearch(() => propertyService.searchBuildings(query), 'buildings'), [executeSearch]);
+  const searchRoomTypes = useCallback((query) => executeSearch(() => propertyService.searchRoomTypes(query), 'roomTypes'), [executeSearch]);
+  const searchRoomStatuses = useCallback((query) => executeSearch(() => propertyService.searchRoomStatuses(query), 'roomStatuses'), [executeSearch]);
 
   return {
     ...data,

@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  CheckCircle2, Layers, Menu, LogOut, ChevronDown, ChevronUp, LayoutDashboard
+  CheckCircle2, Layers, Menu, LogOut, ChevronDown, ChevronUp, LayoutDashboard, Building
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -11,11 +11,13 @@ import { useSidebar } from '../../../context/SidebarContext';
  * Displays fetched room types and room statuses as nested accordion lists.
  */
 const UserSidebar = ({
+  buildings = [],
   roomTypes = [],
   roomStatuses = [],
   onGoToPms
 }) => {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
+  const [isBuildingMenuOpen, setIsBuildingMenuOpen] = React.useState(true);
   const [isTypeMenuOpen, setIsTypeMenuOpen] = React.useState(true);
   const [isStatusMenuOpen, setIsStatusMenuOpen] = React.useState(true);
   const navigate = useNavigate();
@@ -57,6 +59,41 @@ const UserSidebar = ({
             </button>
 
             <div className="border-t border-slate-700/40 my-2"></div>
+
+            {/* BUILDINGS ACCORDION */}
+            <div>
+              <button
+                onClick={() => setIsBuildingMenuOpen(!isBuildingMenuOpen)}
+                className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-800 transition-colors group"
+              >
+                <div className="flex items-center gap-3">
+                  <Building className="w-5 h-5 text-emerald-400" />
+                  <span className="text-sm font-medium text-slate-300 group-hover:text-white">Buildings</span>
+                </div>
+                {isBuildingMenuOpen ? <ChevronUp className="w-4 h-4 opacity-50 text-slate-400 group-hover:text-white" /> : <ChevronDown className="w-4 h-4 opacity-50 text-slate-400 group-hover:text-white" />}
+              </button>
+
+              <AnimatePresence>
+                {isBuildingMenuOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden bg-[#111827] py-1 border-y border-slate-800/50"
+                  >
+                    {buildings.map(building => (
+                      <div key={building.id} className={`w-full flex items-center justify-between px-6 py-2.5 text-xs font-medium transition-all relative text-slate-400 hover:text-white hover:bg-slate-800/30 group`}>
+                        <span className="capitalize">{building.name}</span>
+                        <span className="text-[10px] font-bold bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase">
+                          {building.location || 'Main'}
+                        </span>
+                      </div>
+                    ))}
+                    {buildings.length === 0 && <span className="block px-6 py-3 text-[11px] text-slate-600 italic font-medium">No buildings found.</span>}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* ROOM TYPES ACCORDION */}
             <div>

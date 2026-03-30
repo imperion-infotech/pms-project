@@ -21,8 +21,8 @@ const FloorSection = ({ floorName, rooms = [], isDark, onRoomClick }) => {
       <div
         onClick={() => setExpanded(e => !e)}
         className={`p-4 sm:p-5 flex items-center justify-between transition-all cursor-pointer select-none ${isDark
-          ? 'bg-gradient-to-r from-slate-900/80 to-slate-900/40'
-          : 'bg-gradient-to-r from-slate-50/80 to-white'
+          ? 'bg-linear-to-r from-slate-900/80 to-slate-900/40'
+          : 'bg-linear-to-r from-slate-50/80 to-white'
           } ${expanded ? (isDark ? 'border-b border-slate-800' : 'border-b border-slate-100') : ''}`}
       >
         <div className="flex items-center gap-6 flex-1 min-w-0">
@@ -77,7 +77,7 @@ const FloorSection = ({ floorName, rooms = [], isDark, onRoomClick }) => {
             <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5 px-6 py-8 relative ${isDark ? 'bg-slate-900/20' : 'bg-slate-50/30'
               }`}>
               {/* Background Accent Gleam */}
-              <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-emerald-500/10 to-transparent" />
+              <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-emerald-500/10 to-transparent" />
 
               {rooms.length === 0 ? (
                 <div className="col-span-full flex flex-col items-center justify-center py-10 opacity-60">

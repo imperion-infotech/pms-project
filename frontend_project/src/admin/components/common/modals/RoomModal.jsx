@@ -1,172 +1,293 @@
-import { DoorOpen, X, Cigarette, Accessibility, Ban } from 'lucide-react';
+/**
+ * RoomModal - Naya Room banane ka form.
+ *
+ * Is file mein form layout hai jo 'Add New Room' par click karne pe khulta hai.
+ */
+import { DoorOpen, X, Cigarette, Accessibility, Ban } from 'lucide-react'
 
-export const RoomModal = ({ isRoomModalOpen, setIsRoomModalOpen, newRoom, setNewRoom, handleAddRoom, roomTypes, floors, buildings = [], rooms = [] }) => {
-  if (!isRoomModalOpen) return null;
+export const RoomModal = ({
+  isRoomModalOpen,
+  setIsRoomModalOpen,
+  newRoom,
+  setNewRoom,
+  handleAddRoom,
+  roomTypes,
+  floors,
+  buildings = [],
+  roomStatuses = [],
+  rooms = [],
+}) => {
+  if (!isRoomModalOpen) return null
 
-  const isDuplicate = rooms.some(r => String(r.roomName) === String(newRoom.roomName));
+  const isDuplicate = rooms.some((r) => String(r.roomName) === String(newRoom.roomName))
 
   const onSubmit = (e) => {
-    e.preventDefault();
-    if (isDuplicate) return;
-    handleAddRoom(e);
-  };
+    e.preventDefault()
+    if (isDuplicate) return
+    handleAddRoom(e)
+  }
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
+        className="animate-in fade-in absolute inset-0 bg-slate-900/60 backdrop-blur-sm duration-300"
         onClick={() => setIsRoomModalOpen(false)}
       ></div>
-      <div className="bg-white dark:bg-surface-100 rounded-2xl shadow-2xl w-full max-w-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-300 transition-colors duration-300 flex flex-col max-h-[90vh]">
-        <div className="p-5 sm:p-6 bg-surface-100 dark:bg-surface-100 text-white flex justify-between items-center shrink-0">
+      <div className="dark:bg-surface-100 animate-in zoom-in-95 relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl transition-colors duration-300">
+        <div className="bg-surface-100 dark:bg-surface-100 flex shrink-0 items-center justify-between p-5 text-white sm:p-6">
           <div className="flex items-center gap-3">
-            <DoorOpen className="w-6 h-6 text-emerald-400" />
+            <DoorOpen className="h-6 w-6 text-emerald-400" />
             <div>
-              <h3 className="font-bold text-lg font-heading tracking-tight leading-tight">Add New Room</h3>
-              <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Physical Property Mapping</p>
+              <h3 className="font-heading text-lg leading-tight font-bold tracking-tight">
+                Add New Room
+              </h3>
+              <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+                Physical Property Mapping
+              </p>
             </div>
           </div>
           <button
             onClick={() => setIsRoomModalOpen(false)}
-            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+            className="rounded-lg p-1.5 transition-colors hover:bg-white/10"
           >
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" />
           </button>
         </div>
-        <form onSubmit={onSubmit} className="p-5 sm:p-8 space-y-6 overflow-y-auto custom-scrollbar">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-
+        <form onSubmit={onSubmit} className="custom-scrollbar space-y-6 overflow-y-auto p-5 sm:p-8">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Building</label>
+              <label className="mb-2 block text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+                Building
+              </label>
               <select
                 required
                 value={newRoom.buildingId}
                 onChange={(e) => setNewRoom({ ...newRoom, buildingId: e.target.value })}
-                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all appearance-none"
+                className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm transition-all outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200"
               >
-                <option value="" disabled>Select Building</option>
-                {buildings.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                <option value="" disabled>
+                  Select Building
+                </option>
+                {buildings.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Floor</label>
+              <label className="mb-2 block text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+                Floor
+              </label>
               <select
                 required
                 value={newRoom.floorId}
                 onChange={(e) => setNewRoom({ ...newRoom, floorId: e.target.value })}
-                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all appearance-none"
+                className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm transition-all outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200"
               >
-                <option value="" disabled>Select Floor</option>
-                {floors.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
+                <option value="" disabled>
+                  Select Floor
+                </option>
+                {floors.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.name}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
-              <label className={`block text-xs font-bold uppercase tracking-wider mb-2 transition-colors ${newRoom.nonRoom ? 'text-slate-300 dark:text-slate-600' : 'text-slate-500 dark:text-slate-400'}`}>Room Type</label>
+              <label className="mb-2 block text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+                Room Type
+              </label>
               <select
                 required={!newRoom.nonRoom}
                 disabled={newRoom.nonRoom}
                 value={newRoom.roomTypeId || ''}
-                onChange={(e) => setNewRoom({ ...newRoom, roomTypeId: e.target.value })}
-                className={`w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all appearance-none ${newRoom.nonRoom ? 'opacity-40 cursor-not-allowed grayscale' : ''}`}
+                onChange={(e) => {
+                  const newTypeId = e.target.value
+                  // Jab room type update ho, tab agar status selected nahi hai
+                  // toh pehla available status select kar lo (e.g. Available/Dirty)
+                  const updateObj = { ...newRoom, roomTypeId: newTypeId }
+                  if (!newRoom.roomStatusTableId && roomStatuses.length > 0) {
+                    updateObj.roomStatusTableId = roomStatuses[0].id
+                  }
+                  setNewRoom(updateObj)
+                }}
+                className={`w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm transition-all outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200 ${newRoom.nonRoom ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
               >
-                <option value="" disabled>Select Room Type</option>
-                {roomTypes.map(rt => <option key={rt.id} value={rt.id}>{rt.roomTypeName}</option>)}
+                <option value="" disabled>
+                  {newRoom.nonRoom ? 'N/A (Utility)' : 'Select Room Type'}
+                </option>
+                {roomTypes.map((rt) => (
+                  <option key={rt.id} value={rt.id}>
+                    {rt.roomTypeName}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Room Name</label>
+              <label className="mb-2 block text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+                Room Status
+              </label>
+              <select
+                required={!newRoom.nonRoom}
+                disabled={newRoom.nonRoom}
+                value={newRoom.roomStatusTableId || ''}
+                onChange={(e) => setNewRoom({ ...newRoom, roomStatusTableId: e.target.value })}
+                className={`w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm transition-all outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200 ${newRoom.nonRoom ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+              >
+                <option value="" disabled>
+                  {newRoom.nonRoom ? 'N/A' : 'Select Initial Status'}
+                </option>
+                {roomStatuses.map((rs) => (
+                  <option key={rs.id} value={rs.id}>
+                    {rs.roomStatusName}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="mb-2 block text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+                Room Name
+              </label>
               <input
                 required
                 type="text"
-                value={newRoom.roomName}
+                value={newRoom.roomName || ''}
                 onChange={(e) => setNewRoom({ ...newRoom, roomName: e.target.value })}
                 placeholder="e.g. 101"
-                className={`w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border ${isDuplicate ? 'border-red-500 ring-2 ring-red-500/20 text-red-500' : 'border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'} rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all`}
+                className={`w-full border bg-slate-50 px-4 py-2.5 dark:bg-slate-800/50 ${isDuplicate ? 'border-red-500 text-red-500 ring-2 ring-red-500/20' : 'border-slate-200 text-slate-800 dark:border-slate-700 dark:text-slate-200'} rounded-xl text-sm transition-all outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20`}
               />
-              {isDuplicate && <p className="text-red-500 text-[10px] sm:text-xs mt-1.5 font-bold animate-in slide-in-from-top-1">Room Name already exists!</p>}
+              {isDuplicate && (
+                <p className="animate-in slide-in-from-top-1 mt-1.5 text-[10px] font-bold text-red-500 sm:text-xs">
+                  Room Name already exists!
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="mb-2 block text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+                Room Short Name
+              </label>
+              <input
+                type="text"
+                value={newRoom.roomShortName || ''}
+                onChange={(e) => setNewRoom({ ...newRoom, roomShortName: e.target.value })}
+                placeholder="e.g. 101"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 transition-all outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200"
+              />
             </div>
           </div>
 
           <div className="space-y-4">
-            <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800 pb-2">Room Features</label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <label className={`flex items-center gap-3 p-4 rounded-xl transition-all border-2 group ${newRoom.smoking ? 'bg-orange-50 dark:bg-orange-500/5 border-orange-200 dark:border-orange-500/20 ring-2 ring-orange-500/10' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600'} ${newRoom.nonRoom ? 'opacity-50 cursor-not-allowed pointer-events-none grayscale' : 'cursor-pointer'}`}>
+            <label className="block border-b border-slate-100 pb-2 text-xs font-bold tracking-widest text-slate-400 uppercase dark:border-slate-800 dark:text-slate-500">
+              Room Features
+            </label>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <label
+                className={`group flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition-all ${newRoom.smoking ? 'border-orange-200 bg-orange-50 ring-2 ring-orange-500/10 dark:border-orange-500/20 dark:bg-orange-500/5' : 'border-slate-100 bg-slate-50 hover:border-slate-200 dark:border-slate-700 dark:bg-slate-800/50 dark:hover:border-slate-600'}`}
+              >
                 <div className="relative">
                   <input
                     type="checkbox"
-                    disabled={newRoom.nonRoom}
                     checked={newRoom.smoking}
                     onChange={(e) => setNewRoom({ ...newRoom, smoking: e.target.checked })}
-                    className="w-5 h-5 accent-orange-500 rounded-md cursor-pointer transition-transform group-active:scale-90 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="h-5 w-5 cursor-pointer rounded-md accent-orange-500 transition-transform group-active:scale-90"
                   />
                 </div>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
-                    <Cigarette className={`w-4 h-4 ${newRoom.smoking ? 'text-orange-500' : 'text-slate-400 font-bold dark:text-slate-500'}`} />
-                    <span className={`text-sm font-bold ${newRoom.smoking ? 'text-orange-700 dark:text-orange-400' : 'text-slate-600 dark:text-slate-400'}`}>Smoking</span>
+                    <Cigarette
+                      className={`h-4 w-4 ${newRoom.smoking ? 'text-orange-500' : 'font-bold text-slate-400 dark:text-slate-500'}`}
+                    />
+                    <span
+                      className={`text-sm font-bold ${newRoom.smoking ? 'text-orange-700 dark:text-orange-400' : 'text-slate-600 dark:text-slate-400'}`}
+                    >
+                      Smoking
+                    </span>
                   </div>
-                  <span className="text-[10px] text-slate-400 font-medium">Guest can smoke in room</span>
+                  <span className="text-[10px] font-medium text-slate-400">
+                    Guest can smoke in room
+                  </span>
                 </div>
               </label>
 
-              <label className={`flex items-center gap-3 p-4 rounded-xl transition-all border-2 group ${newRoom.handicap ? 'bg-blue-50 dark:bg-blue-500/5 border-blue-200 dark:border-blue-500/20 ring-2 ring-blue-500/10' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600'} ${newRoom.nonRoom ? 'opacity-50 cursor-not-allowed pointer-events-none grayscale' : 'cursor-pointer'}`}>
+              <label
+                className={`group flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition-all ${newRoom.handicap ? 'border-blue-200 bg-blue-50 ring-2 ring-blue-500/10 dark:border-blue-500/20 dark:bg-blue-500/5' : 'border-slate-100 bg-slate-50 hover:border-slate-200 dark:border-slate-700 dark:bg-slate-800/50 dark:hover:border-slate-600'}`}
+              >
                 <div className="relative">
                   <input
                     type="checkbox"
-                    disabled={newRoom.nonRoom}
                     checked={newRoom.handicap}
                     onChange={(e) => setNewRoom({ ...newRoom, handicap: e.target.checked })}
-                    className="w-5 h-5 accent-blue-500 rounded-md cursor-pointer transition-transform group-active:scale-90 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="h-5 w-5 cursor-pointer rounded-md accent-blue-500 transition-transform group-active:scale-90"
                   />
                 </div>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
-                    <Accessibility className={`w-4 h-4 ${newRoom.handicap ? 'text-blue-500' : 'text-slate-400 font-bold dark:text-slate-500'}`} />
-                    <span className={`text-sm font-bold ${newRoom.handicap ? 'text-blue-700 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400'}`}>Handicap</span>
+                    <Accessibility
+                      className={`h-4 w-4 ${newRoom.handicap ? 'text-blue-500' : 'font-bold text-slate-400 dark:text-slate-500'}`}
+                    />
+                    <span
+                      className={`text-sm font-bold ${newRoom.handicap ? 'text-blue-700 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400'}`}
+                    >
+                      Handicap
+                    </span>
                   </div>
-                  <span className="text-[10px] text-slate-400 font-medium">Specially designed for access</span>
+                  <span className="text-[10px] font-medium text-slate-400">
+                    Specially designed for access
+                  </span>
                 </div>
               </label>
 
-              <label className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all border-2 group ${newRoom.nonRoom ? 'bg-red-50 dark:bg-red-500/5 border-red-200 dark:border-red-500/20 ring-2 ring-red-500/10' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600'} sm:col-span-2`}>
+              <label
+                className={`group flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition-all ${newRoom.nonRoom ? 'border-red-200 bg-red-50 ring-2 ring-red-500/10 dark:border-red-500/20 dark:bg-red-500/5' : 'border-slate-100 bg-slate-50 hover:border-slate-200 dark:border-slate-700 dark:bg-slate-800/50 dark:hover:border-slate-600'} sm:col-span-2`}
+              >
                 <div className="relative">
                   <input
                     type="checkbox"
                     checked={newRoom.nonRoom}
                     onChange={(e) => {
-                      const isNonRoom = e.target.checked;
+                      const isNonRoom = e.target.checked
                       setNewRoom({
                         ...newRoom,
                         nonRoom: isNonRoom,
-                        ...(isNonRoom ? { smoking: false, handicap: false, roomTypeId: '' } : {})
-                      });
+                        ...(isNonRoom ? { roomTypeId: '', roomStatusTableId: '' } : {}),
+                      })
                     }}
-                    className="w-5 h-5 accent-red-500 rounded-md cursor-pointer transition-transform group-active:scale-90"
+                    className="h-5 w-5 cursor-pointer rounded-md accent-red-500 transition-transform group-active:scale-90"
                   />
                 </div>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
-                    <Ban className={`w-4 h-4 ${newRoom.nonRoom ? 'text-red-500' : 'text-slate-400 font-bold dark:text-slate-500'}`} />
-                    <span className={`text-sm font-bold ${newRoom.nonRoom ? 'text-red-700 dark:text-red-400' : 'text-slate-600 dark:text-slate-400'}`}>Non-Room</span>
+                    <Ban
+                      className={`h-4 w-4 ${newRoom.nonRoom ? 'text-red-500' : 'font-bold text-slate-400 dark:text-slate-500'}`}
+                    />
+                    <span
+                      className={`text-sm font-bold ${newRoom.nonRoom ? 'text-red-700 dark:text-red-400' : 'text-slate-600 dark:text-slate-400'}`}
+                    >
+                      Non-Room
+                    </span>
                   </div>
-                  <span className="text-[10px] text-slate-400 font-medium">Internal service/utility space</span>
+                  <span className="text-[10px] font-medium text-slate-400">
+                    Internal service/utility space
+                  </span>
                 </div>
               </label>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 pt-4 shrink-0">
+          <div className="flex shrink-0 flex-col gap-4 pt-4 sm:flex-row">
             <button
               type="button"
               onClick={() => setIsRoomModalOpen(false)}
-              className="px-6 py-3 text-sm font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors order-2 sm:order-1"
+              className="order-2 px-6 py-3 text-sm font-bold text-slate-400 transition-colors hover:text-slate-600 sm:order-1 dark:hover:text-slate-300"
             >
               DISCARD
             </button>
             <button
               type="submit"
               disabled={isDuplicate || !newRoom.roomName}
-              className={`flex-1 py-3 text-white rounded-xl text-sm font-bold shadow-lg transition-all order-1 sm:order-2 ${isDuplicate || !newRoom.roomName ? 'bg-slate-400 cursor-not-allowed shadow-none opacity-70' : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20 active:scale-95'}`}
+              className={`order-1 flex-1 rounded-xl py-3 text-sm font-bold text-white shadow-lg transition-all sm:order-2 ${isDuplicate || !newRoom.roomName ? 'cursor-not-allowed bg-slate-400 opacity-70 shadow-none' : 'bg-emerald-500 shadow-emerald-500/20 hover:bg-emerald-600 active:scale-95'}`}
             >
               {isDuplicate ? 'ROOM EXISTS' : 'CREATE ROOM'}
             </button>
@@ -174,5 +295,5 @@ export const RoomModal = ({ isRoomModalOpen, setIsRoomModalOpen, newRoom, setNew
         </form>
       </div>
     </div>
-  );
-};
+  )
+}

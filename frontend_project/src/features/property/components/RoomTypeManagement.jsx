@@ -1,7 +1,7 @@
 // "Property" feature ke components - RoomTypeManagement
 import { PlusCircle, Search, CheckSquare, X, Plus, Pencil, Trash2 } from 'lucide-react';
 
-const RoomTypeManagement = ({ roomTypes, setIsRoomTypeModalOpen }) => {
+const RoomTypeManagement = ({ roomTypes, setIsRoomTypeModalOpen, onEdit, onDelete }) => {
   return (
     <div className="bg-white dark:bg-surface-100 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors duration-300">
       {/* Room Type Action Bar */}
@@ -39,14 +39,14 @@ const RoomTypeManagement = ({ roomTypes, setIsRoomTypeModalOpen }) => {
               <tr key={room.id} className="hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5 transition-all h-16 group">
                 <td className="px-4 py-3 text-center border-r border-slate-100 dark:border-slate-800 font-bold text-slate-400 dark:text-slate-600 font-mono text-xs">{room.id}</td>
                 <td className="px-6 py-3 border-r border-slate-100 dark:border-slate-800 font-bold text-slate-600 dark:text-slate-400">{room.shortName}</td>
-                <td className="px-6 py-3 border-r border-slate-100 dark:border-slate-800 font-extrabold text-slate-800 dark:text-slate-200">{room.name}</td>
+                <td className="px-6 py-3 border-r border-slate-100 dark:border-slate-800 font-extrabold text-slate-800 dark:text-slate-200">{room.roomTypeName || room.name}</td>
                 <td className="px-6 py-3 border-r border-slate-100 dark:border-slate-800">
                   <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/80 p-1.5 rounded-lg border border-slate-100 dark:border-slate-700">
                     <div
                       className="w-8 h-5 rounded shadow-sm border border-slate-300 dark:border-slate-600"
-                      style={{ backgroundColor: room.color?.startsWith('#u') ? '#fff' : room.color }}
+                      style={{ backgroundColor: room.color?.startsWith('#u') ? '#fff' : (room.color || '#fff') }}
                     ></div>
-                    <span className="font-mono text-[10px] text-slate-400 dark:text-slate-500 tracking-tighter">{room.color}</span>
+                    <span className="font-mono text-[10px] text-slate-400 dark:text-slate-500 tracking-tighter">{room.color || '#FFF'}</span>
                   </div>
                 </td>
                 <td className="px-4 py-3 text-center border-r border-slate-100 dark:border-slate-800 font-bold text-slate-700 dark:text-slate-300">{room.overBooking}</td>
@@ -54,10 +54,20 @@ const RoomTypeManagement = ({ roomTypes, setIsRoomTypeModalOpen }) => {
                 <td className="px-6 py-3 border-r border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 italic text-xs leading-relaxed truncate max-w-[200px]">{room.description || "No info provided"}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center justify-center gap-3">
-                    <button className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg text-blue-500 transition-colors" title="Edit">
+                    <button 
+                      onClick={() => onEdit(room)}
+                      className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg text-blue-500 transition-colors" title="Edit"
+                    >
                       <Pencil className="w-4 h-4" />
                     </button>
-                    <button className="p-1.5 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg text-red-500 transition-colors" title="Delete">
+                    <button 
+                      onClick={() => {
+                        if (window.confirm(`Are you sure you want to delete ${room.roomTypeName || room.name}?`)) {
+                          onDelete(room.id);
+                        }
+                      }}
+                      className="p-1.5 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg text-red-500 transition-colors" title="Delete"
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>

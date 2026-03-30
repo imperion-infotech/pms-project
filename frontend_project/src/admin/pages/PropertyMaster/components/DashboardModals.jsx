@@ -12,10 +12,10 @@ import {
 } from '../../../components/common/Modals';
 
 /**
- * DashboardModals Component
+ * DashboardModals - Saare Pop-ups (Modals) ki central place.
  * 
- * Container for all property management modals in the PMS Dashboard.
- * Keeps the main PmsDashboard.jsx file clean.
+ * Is file mein saare 'Add' aur 'Edit' karne waale windows ko
+ * manage kiya gaya hai. Ye file decide karti hai ki kab kon sa form khulna hai.
  */
 const DashboardModals = ({
   modals,
@@ -111,13 +111,13 @@ const DashboardModals = ({
         isRoomModalOpen={modals.room}
         setIsRoomModalOpen={(isOpen) => toggleModal('room', isOpen)}
         newRoom={newRoom} setNewRoom={setNewRoom}
-        handleAddRoom={handleAddRoom} roomTypes={roomTypes} floors={floors} buildings={buildings} rooms={rooms}
+        handleAddRoom={handleAddRoom} roomTypes={roomTypes} floors={floors} buildings={buildings} roomStatuses={roomStatuses} rooms={rooms}
       />
       <RoomEditModal
         isOpen={modals.roomEdit}
         setIsOpen={(isOpen) => toggleModal('roomEdit', isOpen)}
         editRoom={editRoom} setEditRoom={setEditRoom}
-        handleUpdateRoom={handleUpdateRoom} roomTypes={roomTypes} floors={floors} buildings={buildings} rooms={rooms}
+        handleUpdateRoom={handleUpdateRoom} roomTypes={roomTypes} floors={floors} buildings={buildings} roomStatuses={roomStatuses} rooms={rooms}
       />
 
       {/* Tax Modals */}

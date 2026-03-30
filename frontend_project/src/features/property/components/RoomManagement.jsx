@@ -1,3 +1,9 @@
+/**
+ * RoomManagement (Live Inventory View)
+ * 
+ * Ye project ki main 'Room Inventory' table hai jisme Framer Motion 
+ * lagaya gaya hai. Iska design premium (indigo/glass effect) hai.
+ */
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -22,6 +28,7 @@ const RoomManagement = ({
   roomTypes = [],
   floors = [],
   buildings = [],
+  roomStatuses = [],
   setIsRoomModalOpen = () => {},
   onEdit = () => {},
   onDelete = () => {},
@@ -35,6 +42,7 @@ const RoomManagement = ({
     roomTypes,
     floors,
     buildings,
+    roomStatuses,
     currentPage,
     itemsPerPage,
   })
@@ -46,7 +54,7 @@ const RoomManagement = ({
       className="bg-glass overflow-hidden rounded-3xl border border-white/5 shadow-2xl transition-all duration-500"
     >
       {/* Header Section */}
-      <div className="flex flex-col justify-between gap-6 border-b border-white/5 bg-gradient-to-br from-indigo-500/5 to-transparent p-6 md:p-8 lg:flex-row lg:items-center">
+      <div className="flex flex-col justify-between gap-6 border-b border-white/5 bg-linear-to-br from-indigo-500/5 to-transparent p-6 md:p-8 lg:flex-row lg:items-center">
         <div className="flex items-start gap-4">
           <div className="bg-brand/10 border-brand/20 rounded-2xl border p-3">
             <LayoutGrid className="text-brand h-6 w-6" />
@@ -58,7 +66,7 @@ const RoomManagement = ({
                 Live
               </span>
             </h2>
-            <p className="mt-1 text-sm font-medium tracking-[0.1em] text-slate-400 uppercase opacity-80">
+            <p className="mt-1 text-sm font-medium tracking-widest text-slate-400 uppercase opacity-80">
               PHYSICAL ASSETS MONITORING
             </p>
           </div>
@@ -82,6 +90,7 @@ const RoomManagement = ({
               <th className="w-20 px-6 py-4">Index</th>
               <th className="px-6 py-4">Room & Building</th>
               <th className="px-6 py-4">Room Type & Floor</th>
+              <th className="px-6 py-4 text-center">Status</th>
               <th className="px-4 py-4 text-center">Amenities</th>
               <th className="px-4 py-4 text-right">Actions</th>
             </tr>
@@ -93,7 +102,7 @@ const RoomManagement = ({
                   .fill(0)
                   .map((_, i) => (
                     <tr key={`skeleton-${i}`}>
-                      <td colSpan="5" className="px-8 py-6">
+                      <td colSpan="6" className="px-8 py-6">
                         <div className="skeleton h-14 w-full rounded-2xl" />
                       </td>
                     </tr>
@@ -106,7 +115,7 @@ const RoomManagement = ({
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     key={room.id}
-                    className="group transition-colors hover:bg-white/[0.02]"
+                    className="group transition-colors hover:bg-white/2"
                   >
                     <td className="px-6 py-6">
                       <span className="rounded bg-white/5 px-2 py-1 font-mono text-xs font-bold text-slate-500">
@@ -117,6 +126,9 @@ const RoomManagement = ({
                       <div className="flex flex-col">
                         <span className="group-hover:text-brand text-lg font-bold text-slate-200 transition-colors">
                           {room.roomName}
+                          {room.roomShortName && room.roomShortName !== room.roomName && (
+                            <span className="ml-2 text-sm text-slate-400 font-medium">({room.roomShortName})</span>
+                          )}
                         </span>
                         <div className="mt-1 flex items-center gap-2">
                           <span className="rounded bg-white/5 px-2 font-mono text-[11px] tracking-wider text-slate-500">
@@ -137,6 +149,11 @@ const RoomManagement = ({
                           📍 {room.displayFloor}
                         </span>
                       </div>
+                    </td>
+                    <td className="px-6 py-6 text-center">
+                      <span className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] font-bold tracking-wider text-slate-300 uppercase shadow-inner">
+                        {room.displayStatus}
+                      </span>
                     </td>
                     <td className="px-4 py-6">
                       <div className="flex items-center justify-center gap-2">
@@ -180,7 +197,7 @@ const RoomManagement = ({
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="px-8 py-24 text-center">
+                  <td colSpan="6" className="px-8 py-24 text-center">
                     <motion.div
                       initial={{ scale: 0.9, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}

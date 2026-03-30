@@ -1,14 +1,14 @@
-// "Property" feature ke components - RoomManagement
 /**
- * RoomManagement.jsx (Admin Domain -> Features: Property)
+ * RoomManagement.jsx (Admin Domain)
  * 
- * Feature component handling individual Rooms. 
- * Contains the table to view room attributes (smoking, handicap, type, etc.) and binds action icons for editing.
+ * Ye file Rooms ko table format mein dikhati hai. 
+ * Iska kaam hai Room ka inventory dikhana, details populate karna, 
+ * aur edit/delete buttons ko actions se connect karna.
  */
 import React, { useState } from 'react';
 import { PlusCircle, X, Cigarette, CigaretteOff, Accessibility, Check, Minus, Ban, Pencil, Trash2, AlertTriangle, CloudCog } from 'lucide-react';
 
-const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], buildings = [], searchTerm, setIsRoomModalOpen, onEdit, onDelete }) => {
+const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], buildings = [], roomStatuses = [], searchTerm, setIsRoomModalOpen, onEdit, onDelete }) => {
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   const handleDeleteClick = (room) => {
@@ -50,13 +50,14 @@ const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], buildings = [
           <thead className="sticky top-0 z-10">
             <tr className="bg-[#f8fafc] dark:bg-slate-800 text-[#64748b] dark:text-slate-400 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
               <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 w-32">Room Name</th>
-              <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 w-44">Building Name</th>
-              <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 w-44">Room Type Name</th>
-              <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 w-40">Floor Name</th>
-              <th className="px-4 py-4 text-center border-r border-slate-200 dark:border-slate-800 w-28 text-orange-600">Smoking</th>
-              <th className="px-4 py-4 text-center border-r border-slate-200 dark:border-slate-800 w-28 text-blue-600">Handicap</th>
-              <th className="px-4 py-4 text-center border-r border-slate-200 dark:border-slate-800 w-28 text-red-600">Non-room</th>
-              <th className="px-4 py-4 text-center w-32">Action</th>
+              <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 w-36">Building Name</th>
+              <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 w-36">Room Type Name</th>
+              <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 w-36">Floor Name</th>
+              <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 w-32 text-center">Status</th>
+              <th className="px-4 py-4 text-center border-r border-slate-200 dark:border-slate-800 w-24 text-orange-600">Smoking</th>
+              <th className="px-4 py-4 text-center border-r border-slate-200 dark:border-slate-800 w-24 text-blue-600">Handicap</th>
+              <th className="px-4 py-4 text-center border-r border-slate-200 dark:border-slate-800 w-24 text-red-600">Non-room</th>
+              <th className="px-4 py-4 text-center w-28">Action</th>
             </tr>
           </thead>
           <tbody className="text-[13px] divide-y divide-slate-100 dark:divide-slate-800">
@@ -69,30 +70,29 @@ const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], buildings = [
             ) : rooms.map((room) => {
               // Robust lookup: support both flat IDs, nested objects, and various backend naming conventions (buildingId, building_id, etc.)
               const roomTypeId = room.roomTypeId || room.room_type_id || room.roomType?.id || room.roomType;
-              console.log("Room Type ID", roomTypeId);
               const floorId = room.floorId || room.floor_id || room.floor?.id || room.floor;
-              console.log("Floor ID", floorId);
               const buildingId = room.buildingId || room.building_id || room.building?.id || room.building || room.buildings;
-              console.log("Building ID", buildingId);
 
               const matchedType = roomTypes.find(rt => String(rt.id) === String(roomTypeId));
-              console.log("Matched Type", matchedType);
               const matchedFloor = floors.find(f => String(f.id) === String(floorId));
-              console.log("Matched Floor", matchedFloor);
               const matchedBuilding = buildings.find(b => String(b.id) === String(buildingId));
-              console.log("Matched Building", matchedBuilding);
 
-              // Support direct name fields if backend provides them, or fallback to lookup result
-              const typeName = room.roomTypeName || room.room_type?.roomTypeName || (matchedType ? matchedType.roomTypeName : (nonRoom ? 'Non-Room Utility' : 'Unknown'));
-              console.log("Type Name", typeName);
-              const floorName = room.floorName || room.floor?.name || (matchedFloor ? matchedFloor.name : 'Unknown');
-              console.log("Floor Name", floorName);
-              const buildingName = room.buildingName || room.building?.name || (matchedBuilding ? matchedBuilding.name : 'Unknown');
-              console.log("Building Name", buildingName);
+              const roomStatusId = room.roomStatusTableId || room.room_status_table_id || room.roomStatusTable?.id || room.room_status_table?.id || (roomStatuses.find(rs => (rs.roomStatusName || rs.roomStatusTitle) === room.roomStatus)?.id);
+              const matchedStatus = roomStatuses.find(rs => String(rs.id) === String(roomStatusId));
 
               const smoking = room.smoking || room.is_smoking || room.isSmoking;
               const handicap = room.handicap || room.is_handicap || room.isHandicap;
-              const nonRoom = room.nonRoom || room.non_room || room.isNonRoom;
+              const isNonRoomFlag = room.nonRoom || room.non_room || room.isNonRoom;
+
+              // Support direct name fields if backend provides them, or fallback to lookup result
+              const typeName = room.roomTypeName || room.room_type?.roomTypeName || (matchedType ? matchedType.roomTypeName : (isNonRoomFlag ? 'Non-Room Utility' : 'Unknown'));
+              const floorName = room.floorName || room.floor?.name || (matchedFloor ? matchedFloor.name : 'Unknown');
+              const buildingName = room.buildingName || room.building?.name || (matchedBuilding ? matchedBuilding.name : 'Unknown');
+              
+              const statusName = isNonRoomFlag ? '-' : (matchedStatus ? matchedStatus.roomStatusName : (room.roomStatus || room.roomStatusTable?.roomStatusName || 'Unknown'));
+              const statusColor = matchedStatus?.roomStatusColor || '#64748b';
+              // console.log("---------------------Status Name-----------------", statusName);
+              // console.log("---------------------Status Color-----------------", statusColor);
 
               return (
                 <tr key={room.id} className="hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5 transition-all h-14 group">
@@ -100,6 +100,18 @@ const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], buildings = [
                   <td className="px-6 py-2 border-r border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">{buildingName}</td>
                   <td className="px-6 py-2 border-r border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">{typeName}</td>
                   <td className="px-6 py-2 border-r border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-500">{floorName}</td>
+                  <td className="px-6 py-2 border-r border-slate-100 dark:border-slate-800 text-center">
+                    <span 
+                      className="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border shadow-sm transition-all duration-300 inline-block min-w-[90px]"
+                      style={{ 
+                        backgroundColor: matchedStatus?.roomStatusColor ? `${matchedStatus.roomStatusColor}15` : '#f1f5f9',
+                        color: statusColor,
+                        borderColor: matchedStatus?.roomStatusColor ? `${matchedStatus.roomStatusColor}30` : '#e2e8f0'
+                      }}
+                    >
+                      {statusName}
+                    </span>
+                  </td>
                   <td className="px-4 py-2 text-center border-r border-slate-100 dark:border-slate-800 bg-orange-50/10">
                     <div className="flex justify-center transition-transform hover:scale-110">
                       {smoking ? <Cigarette className="w-4.5 h-4.5 text-orange-500 drop-shadow-sm" /> : <Minus className="w-3 h-3 text-slate-300 dark:text-slate-700 opacity-30" />}
@@ -112,7 +124,7 @@ const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], buildings = [
                   </td>
                   <td className="px-4 py-2 text-center border-r border-slate-100 dark:border-slate-800 bg-red-50/10">
                     <div className="flex justify-center transition-transform hover:scale-110">
-                      {nonRoom ? <Ban className="w-4.5 h-4.5 text-red-500 drop-shadow-sm" /> : <Minus className="w-3 h-3 text-slate-300 dark:text-slate-700 opacity-30" />}
+                      {isNonRoomFlag ? <Ban className="w-4.5 h-4.5 text-red-500 drop-shadow-sm" /> : <Minus className="w-3 h-3 text-slate-300 dark:text-slate-700 opacity-30" />}
                     </div>
                   </td>
                   <td className="px-4 py-3">
@@ -140,7 +152,7 @@ const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], buildings = [
 
       {/* Custom Delete Confirmation Modal */}
       {deleteTarget && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-200 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={handleCancelDelete} />
           <div className="relative z-10 bg-white dark:bg-surface-100 rounded-2xl shadow-2xl w-full max-w-sm p-6 border border-red-100 dark:border-red-900/30">
             <div className="flex items-center gap-3 mb-4">

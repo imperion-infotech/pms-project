@@ -16,6 +16,13 @@
   --color-surface-100: #1e293b;
   --color-surface-200: #334155;
   
+  /* Z-Index Scale */
+  --z-100: 100;
+  --z-110: 110;
+  --z-200: 200;
+  --z-9999: 9999;
+  --z-99999: 99999;
+
   --shadow-premium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
@@ -75,6 +82,7 @@ body {
 .text-gradient {
   background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

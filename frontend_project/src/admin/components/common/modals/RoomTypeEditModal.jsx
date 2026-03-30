@@ -10,7 +10,6 @@ export const RoomTypeEditModal = ({ isOpen, setIsOpen, editRoomType, setEditRoom
     if (isDuplicate) return;
     handleUpdateRoomType(e);
   };
-  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
@@ -38,7 +37,7 @@ export const RoomTypeEditModal = ({ isOpen, setIsOpen, editRoomType, setEditRoom
             <input
               required
               type="text"
-              value={editRoomType.shortName}
+              value={editRoomType.shortName || ''}
               onChange={(e) => setEditRoomType({ ...editRoomType, shortName: e.target.value })}
               placeholder="e.g. DXL"
               className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
@@ -50,7 +49,7 @@ export const RoomTypeEditModal = ({ isOpen, setIsOpen, editRoomType, setEditRoom
             <input
               required
               type="text"
-              value={editRoomType.roomTypeName}
+              value={editRoomType.roomTypeName || ''}
               onChange={(e) => setEditRoomType({ ...editRoomType, roomTypeName: e.target.value })}
               placeholder="e.g. Deluxe Room"
               className={`w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border ${isDuplicate ? 'border-red-500 ring-2 ring-red-500/20 text-red-500' : 'border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all`}

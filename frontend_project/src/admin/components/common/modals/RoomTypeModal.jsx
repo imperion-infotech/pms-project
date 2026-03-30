@@ -10,7 +10,6 @@ export const RoomTypeModal = ({ isRoomTypeModalOpen, setIsRoomTypeModalOpen, new
     if (isDuplicate) return;
     handleAddRoomType(e);
   };
-  if (!isRoomTypeModalOpen) return null;
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4">

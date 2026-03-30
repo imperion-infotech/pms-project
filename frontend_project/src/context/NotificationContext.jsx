@@ -36,7 +36,7 @@ export const NotificationProvider = ({ children }) => {
   return (
     <NotificationContext.Provider value={{ success, error, info, warn, removeNotification }}>
       {children}
-      <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-4 min-w-[340px] max-w-[420px] pointer-events-none">
+      <div className="fixed bottom-6 right-6 z-9999 flex flex-col gap-4 min-w-[340px] max-w-[420px] pointer-events-none">
         <AnimatePresence mode="popLayout">
           {notifications.map((n) => (
             <NotificationItem key={n.id} notification={n} onDismiss={() => removeNotification(n.id)} />
@@ -101,7 +101,7 @@ const NotificationItem = ({ notification, onDismiss }) => {
       </div>
       
       <div className="flex-1 pr-6 flex flex-col justify-center">
-        <h4 className="font-extrabold text-[13px] tracking-wide text-slate-800 dark:text-slate-100 uppercase mb-1">{title}</h4>
+        <h4 className="font-extrabold text-[13px] text-slate-800 dark:text-slate-100 uppercase mb-1">{title}</h4>
         <p className="text-[13px] font-medium text-slate-600 dark:text-slate-400 leading-relaxed">{message}</p>
       </div>
       

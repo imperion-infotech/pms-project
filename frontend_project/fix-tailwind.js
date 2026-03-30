@@ -11,6 +11,7 @@ function walkDir(dir, callback) {
 
 const replacements = [
   { search: /z-\[100\]/g, replace: 'z-100' },
+  { search: /z-\[110\]/g, replace: 'z-110' },
   { search: /z-\[9999\]/g, replace: 'z-9999' },
   { search: /flex-\[2\]/g, replace: 'flex-2' },
   { search: /flex-shrink-0/g, replace: 'shrink-0' },

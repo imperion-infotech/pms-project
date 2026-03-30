@@ -30,9 +30,13 @@ const usePersonalDetailController = ({ details, onDelete }) => {
     setDeleteTarget({ id: guest.id, name: `${guest.firstName} ${guest.lastName}` });
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (deleteTarget?.id) {
-      onDelete(deleteTarget.id);
+      try {
+        await onDelete(deleteTarget.id);
+      } catch (err) {
+        console.error('Delete failed:', err);
+      }
     }
     setDeleteTarget(null);
   };

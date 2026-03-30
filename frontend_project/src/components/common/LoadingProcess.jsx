@@ -23,7 +23,7 @@ export const LoadingBar = ({ isLoading }) => (
           repeat: Infinity,
           repeatType: "loop"
         }}
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 via-sky-500 to-emerald-500 z-[99999] shadow-[0_0_15px_rgba(16,185,129,0.4)]"
+        className="fixed top-0 left-0 right-0 h-1 bg-linear-to-r from-emerald-400 via-sky-500 to-emerald-500 z-99999 shadow-[0_0_15px_rgba(16,185,129,0.4)]"
         style={{ transformOrigin: 'left' }}
       />
     )}

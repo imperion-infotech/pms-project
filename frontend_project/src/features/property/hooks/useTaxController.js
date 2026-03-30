@@ -1,37 +1,48 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react'
 
 /**
  * Controller: useTaxController
  */
 const useTaxController = ({ taxes, onDelete }) => {
-  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null)
 
   const processedTaxes = useMemo(() => {
-    return [...taxes].sort((a, b) => b.id - a.id);
-  }, [taxes]);
+    if (!Array.isArray(taxes)) return [];
+    return [...taxes].sort((a, b) => {
+      const idA = Number(a.id);
+      const idB = Number(b.id);
+      return idB - idA;
+    });
+  }, [taxes])
 
   const handleDeleteClick = (tax) => {
-    setDeleteTarget({ id: tax.id, name: tax.taxMasterName });
-  };
-
-  const handleConfirmDelete = () => {
-    if (deleteTarget?.id) {
-      onDelete(deleteTarget.id);
+    if (tax && tax.id) {
+      setDeleteTarget({ id: tax.id, name: tax.taxMasterName })
     }
-    setDeleteTarget(null);
-  };
+  }
+
+  const handleConfirmDelete = async () => {
+    if (deleteTarget?.id) {
+      try {
+        await onDelete(deleteTarget.id)
+      } catch (err) {
+        console.error('Delete failed:', err);
+      }
+    }
+    setDeleteTarget(null)
+  }
 
   const handleCancelDelete = () => {
-    setDeleteTarget(null);
-  };
+    setDeleteTarget(null)
+  }
 
   return {
     processedTaxes,
     deleteTarget,
     handleDeleteClick,
     handleConfirmDelete,
-    handleCancelDelete
-  };
-};
+    handleCancelDelete,
+  }
+}
 
-export default useTaxController;
+export default useTaxController

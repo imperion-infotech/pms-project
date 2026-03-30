@@ -62,7 +62,7 @@ const Register = () => {
       {/* Register Card */}
       <div className="relative w-full max-w-[440px] bg-slate-800/85 backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-10 shadow-2xl text-white m-4 sm:m-5 box-border overflow-y-auto max-h-[95vh] custom-scrollbar">
         <div className="text-center mb-9">
-          <div className="w-13 h-13 mx-auto mb-5 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+          <div className="w-13 h-13 mx-auto mb-5 bg-linear-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
             <BedDouble size={28} className="text-white" />
           </div>
           <h1 className="text-2xl font-extrabold m-0 mb-2 tracking-tight">Create Account</h1>
@@ -112,7 +112,7 @@ const Register = () => {
             </div>
           </div>
 
-          <button type="submit" disabled={loading} className="mt-3 bg-gradient-to-br from-emerald-500 to-emerald-700 text-white border-none rounded-xl p-4 text-[15px] font-bold cursor-pointer flex justify-center items-center gap-2 shadow-lg shadow-emerald-500/40 transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-wait">
+          <button type="submit" disabled={loading} className="mt-3 bg-linear-to-br from-emerald-500 to-emerald-700 text-white border-none rounded-xl p-4 text-[15px] font-bold cursor-pointer flex justify-center items-center gap-2 shadow-lg shadow-emerald-500/40 transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-wait">
             {loading ? <Loader2 size={18} className="animate-spin" /> : 'Create Account'}
             {!loading && <ArrowRight size={18} />}
           </button>

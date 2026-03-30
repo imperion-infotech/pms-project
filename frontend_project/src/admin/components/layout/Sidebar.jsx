@@ -55,7 +55,7 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
               onClick={() => setIsSidebarOpen(false)}
             />
             <span className="text-sm font-semibold tracking-widest whitespace-nowrap uppercase">
-              Imperion Engine
+              Imperion
             </span>
           </div>
         </div>

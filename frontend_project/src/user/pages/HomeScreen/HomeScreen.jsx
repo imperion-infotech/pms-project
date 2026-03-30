@@ -39,6 +39,7 @@ const HomeScreen = () => {
   const {
     rooms: rawRooms,
     floors: allFloors,
+    buildings,
     roomTypes,
     roomStatuses,
     isLoading,
@@ -103,6 +104,7 @@ const HomeScreen = () => {
         allFloors={allFloors}
         selectedFloor={selectedFloor}
         setSelectedFloor={setSelectedFloor}
+        buildings={buildings}
         roomTypes={roomTypes}
         roomStatuses={roomStatuses}
         onGoToPms={() => navigate('/')}

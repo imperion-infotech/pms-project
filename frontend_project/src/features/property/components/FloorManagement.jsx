@@ -77,7 +77,7 @@ const FloorManagement = ({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="group transition-colors hover:bg-white/[0.02]"
+                    className="group transition-colors hover:bg-white/2"
                   >
                     <td className="px-8 py-6">
                       <span className="rounded bg-white/5 px-2 py-1 font-mono text-xs font-bold text-slate-500">

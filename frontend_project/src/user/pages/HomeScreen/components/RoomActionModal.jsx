@@ -168,7 +168,7 @@ const RoomActionModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
             <div className="absolute -top-24 -right-24 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full"></div>
 
             <div className="flex items-center gap-5 relative z-10">
-              <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-xl shadow-emerald-500/30 transform -rotate-3 hover:rotate-0 transition-transform duration-500">
+              <div className="w-16 h-16 rounded-3xl bg-linear-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-xl shadow-emerald-500/30 transform -rotate-3 hover:rotate-0 transition-transform duration-500">
                 <User className="text-white w-8 h-8" />
               </div>
               <div>

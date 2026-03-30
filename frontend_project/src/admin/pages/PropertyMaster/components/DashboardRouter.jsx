@@ -9,10 +9,10 @@ import PersonalDetailManagement from '../../../features/property/components/Pers
 import TaxManagement from '../../../features/property/components/TaxManagement';
 
 /**
- * DashboardRouter Component
+ * DashboardRouter - Ye file 'Traffic Inspector' ka kaam karti hai.
  * 
- * Determines which management module to display based on the active sidebar item.
- * Supports: Floor, Room Type, Room, Room Status.
+ * Sidebar se jo bhi select hota hai (Room, Floor, etc.), ye file 
+ * decide karti hai ki screen par kon sa table ya management module dikhana hai.
  */
 const DashboardRouter = ({
   activeItem,
@@ -104,6 +104,7 @@ const DashboardRouter = ({
           roomTypes={allRoomTypes}
           floors={allFloors}
           buildings={allBuildings}
+          roomStatuses={roomStatuses}
           searchTerm={searchTerm}
           setIsRoomModalOpen={(isOpen) => toggleModal('room', isOpen)}
           onEdit={(r) => {
@@ -111,7 +112,8 @@ const DashboardRouter = ({
               ...r,
               buildingId: r.buildingId || r.building_id || r.building?.id || r.building || r.buildings,
               floorId: r.floorId || r.floor_id || r.floor?.id || r.floor,
-              roomTypeId: r.roomTypeId || r.room_type_id || r.roomType?.id || r.roomType,
+              roomTypeId: r.roomTypeId || r.room_type_id || r.roomType?.id || r.roomType || (allRoomTypes.find(rt => (rt.roomTypeName || rt.shortName) === r.roomType)?.id),
+              roomStatusTableId: r.roomStatusTableId || r.room_status_table_id || r.roomStatusTable?.id || r.room_status_table?.id || (roomStatuses.find(rs => (rs.roomStatusName || rs.roomStatusTitle) === r.roomStatus)?.id),
               smoking: Boolean(r.smoking || r.is_smoking || r.isSmoking),
               handicap: Boolean(r.handicap || r.is_handicap || r.isHandicap),
               nonRoom: Boolean(r.nonRoom || r.non_room || r.isNonRoom)
