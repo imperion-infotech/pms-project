@@ -10,7 +10,7 @@ const RoomStatusManagement = ({
   itemsPerPage = 8,
 }) => {
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-md transition-colors duration-300 dark:border-slate-800 dark:bg-surface-100">
+    <div className="dark:bg-surface-100 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-md transition-colors duration-300 dark:border-slate-800">
       {/* Header */}
       <div className="flex flex-col items-center justify-between gap-4 border-b border-slate-100 p-4 sm:flex-row sm:p-6 dark:border-slate-800">
         <div className="text-center sm:text-left">
@@ -34,7 +34,7 @@ const RoomStatusManagement = ({
       <div className="w-full overflow-x-auto">
         <table className="w-full min-w-[600px] border-collapse text-left">
           <thead>
-            <tr className="border-b border-slate-200 bg-slate-50/80 text-[11px] font-bold tracking-[0.1em] text-slate-500 uppercase dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400">
+            <tr className="border-b border-slate-200 bg-slate-50/80 text-[11px] font-bold tracking-widest text-slate-500 uppercase dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400">
               <th className="w-20 border-r border-slate-100 px-8 py-4 text-center dark:border-slate-800">
                 No.
               </th>

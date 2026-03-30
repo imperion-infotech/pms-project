@@ -42,7 +42,7 @@ const UserSidebar = ({
               className="w-5 h-5 cursor-pointer text-slate-400 hover:text-white transition-colors"
               onClick={() => setIsSidebarOpen(false)}
             />
-            <span className="font-semibold text-sm tracking-wide whitespace-nowrap uppercase tracking-widest">Imperion Engine</span>
+            <span className="font-semibold text-sm whitespace-nowrap uppercase tracking-widest">Imperion Engine</span>
           </div>
         </div>
 

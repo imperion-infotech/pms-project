@@ -37,7 +37,7 @@ export const RoomEditModal = ({
         onClick={() => setIsOpen(false)}
       ></div>
       <div className="dark:bg-surface-100 animate-in zoom-in-95 relative z-10 w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl transition-colors duration-300">
-        <div className="bg-surface-100 dark:bg-surface-100 flex items-center justify-between p-6 text-white">
+        <div className="bg-surface-100 flex items-center justify-between p-6 text-white">
           <div className="flex items-center gap-3">
             <Pencil className="h-6 w-6 text-blue-400" />
             <div>

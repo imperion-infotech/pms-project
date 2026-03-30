@@ -28,7 +28,7 @@ const FloorManagement = ({
       className="bg-glass overflow-hidden rounded-3xl border border-white/5 shadow-2xl transition-all duration-500"
     >
       {/* Header Section */}
-      <div className="flex flex-col justify-between gap-6 border-b border-white/5 bg-gradient-to-br from-indigo-500/5 to-transparent p-6 md:p-8 lg:flex-row lg:items-center">
+      <div className="flex flex-col justify-between gap-6 border-b border-white/5 bg-linear-to-br from-indigo-500/5 to-transparent p-6 md:p-8 lg:flex-row lg:items-center">
         <div className="flex items-start gap-4">
           <div className="bg-brand/10 border-brand/20 rounded-2xl border p-3">
             <Layers className="text-brand h-6 w-6" />
@@ -40,7 +40,7 @@ const FloorManagement = ({
                 Active
               </span>
             </h2>
-            <p className="mt-1 text-sm font-medium tracking-[0.1em] text-slate-400 uppercase opacity-80">
+            <p className="mt-1 text-sm font-medium tracking-widest text-slate-400 uppercase opacity-80">
               PHYSICAL LEVEL ORGANIZATION
             </p>
           </div>
