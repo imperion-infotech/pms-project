@@ -1,11 +1,24 @@
-import React, { useState } from 'react';
-import { Menu, Building, ChevronDown, ChevronUp, Layers, LayoutDashboard, DoorOpen, CheckSquare, Home, LogOut, User, Receipt } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useSidebar } from '../../../context/SidebarContext';
+import React, { useState } from 'react'
+import {
+  Menu,
+  Building,
+  ChevronDown,
+  ChevronUp,
+  Layers,
+  LayoutDashboard,
+  DoorOpen,
+  CheckSquare,
+  Home,
+  LogOut,
+  User,
+  Receipt,
+} from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { useSidebar } from '../../../context/SidebarContext'
 
 const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem }) => {
-  const navigate = useNavigate();
-  const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
+  const navigate = useNavigate()
+  const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
 
   const propertyItems = [
     { name: 'Building', icon: Building },
@@ -14,90 +27,99 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
     { name: 'Room', icon: DoorOpen },
     { name: 'Room Status', icon: CheckSquare },
     { name: 'Tax', icon: Receipt },
-  ];
+  ]
 
-  const profileItems = [
-    { name: 'Personal Detail', icon: User },
-  ];
+  const profileItems = [{ name: 'Personal Detail', icon: User }]
 
-  const [isProfileOpen, setIsProfileOpen] = useState(true);
+  const [isProfileOpen, setIsProfileOpen] = useState(true)
 
   return (
     <>
       {/* Mobile Overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-20 lg:hidden transition-opacity duration-300"
+          className="fixed inset-0 z-20 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         ></div>
       )}
 
       <aside
-        className={`bg-surface-100 text-white flex flex-col shrink-0 shadow-xl z-30 transition-all duration-300 ease-in-out w-64 fixed lg:static h-full lg:h-auto ${isSidebarOpen ? 'ml-0' : '-ml-64'
-          }`}
+        className={`bg-surface-100 fixed z-30 flex h-full w-64 shrink-0 flex-col text-white shadow-xl transition-all duration-300 ease-in-out lg:static lg:h-auto ${
+          isSidebarOpen ? 'ml-0' : '-ml-64'
+        }`}
       >
-        <div className="p-4 flex items-center justify-between border-b border-slate-700/50">
+        <div className="flex items-center justify-between border-b border-slate-700/50 p-4">
           <div className="flex items-center gap-3 overflow-hidden">
             <Menu
-              className="w-5 h-5 cursor-pointer text-slate-400 hover:text-white transition-colors"
+              className="h-5 w-5 cursor-pointer text-slate-400 transition-colors hover:text-white"
               onClick={() => setIsSidebarOpen(false)}
             />
-            <span className="font-semibold text-sm tracking-wide whitespace-nowrap uppercase tracking-widest">Imperion Engine</span>
+            <span className="text-sm font-semibold tracking-widest whitespace-nowrap uppercase">
+              Imperion Engine
+            </span>
           </div>
         </div>
 
-        <nav className="flex-1 flex flex-col py-0 overflow-hidden">
-          <div className="flex-1 overflow-y-auto custom-scrollbar py-4">
+        <nav className="flex flex-1 flex-col overflow-hidden py-0">
+          <div className="custom-scrollbar flex-1 overflow-y-auto py-4">
             {/* Go to Home Button */}
             <button
               onClick={() => {
-                navigate('/home', { state: { initialFloor: 'All' } });
-                if (window.innerWidth < 1024) setIsSidebarOpen(false);
+                navigate('/home', { state: { initialFloor: 'All' } })
+                if (window.innerWidth < 1024) setIsSidebarOpen(false)
               }}
-              className={`w-full flex items-center gap-3 px-4 py-3 mb-1 transition-all font-semibold text-sm relative ${activeItem === 'Home'
-                ? 'bg-emerald-600 text-white shadow-lg'
-                : 'text-slate-300 hover:bg-slate-700/60 hover:text-white'
-                }`}
+              className={`relative mb-1 flex w-full items-center gap-3 px-4 py-3 text-sm font-semibold transition-all ${
+                activeItem === 'Home'
+                  ? 'bg-emerald-600 text-white shadow-lg'
+                  : 'text-slate-300 hover:bg-slate-700/60 hover:text-white'
+              }`}
               style={{ borderRadius: '0' }}
             >
               {activeItem === 'Home' && (
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-300 shadow-[0_0_8px_rgba(110,231,183,0.7)]"></div>
+                <div className="absolute top-0 bottom-0 left-0 w-1 bg-emerald-300 shadow-[0_0_8px_rgba(110,231,183,0.7)]"></div>
               )}
-              <Home className={`w-5 h-5 ${activeItem === 'Home' ? 'text-white' : 'text-emerald-400'}`} />
+              <Home
+                className={`h-5 w-5 ${activeItem === 'Home' ? 'text-white' : 'text-emerald-400'}`}
+              />
               <span>Go to Home</span>
             </button>
 
-            <div className="border-t border-slate-700/40 my-2"></div>
+            <div className="my-2 border-t border-slate-700/40"></div>
 
             <div>
               <button
                 onClick={() => setIsPropertyOpen(!isPropertyOpen)}
-                className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-800 transition-colors group"
+                className="group flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-slate-800"
               >
                 <div className="flex items-center gap-3">
-                  <Building className="w-5 h-5 text-emerald-400" />
+                  <Building className="h-5 w-5 text-emerald-400" />
                   <span className="text-sm font-medium">Room Settings</span>
                 </div>
-                {isPropertyOpen ? <ChevronUp className="w-4 h-4 opacity-50" /> : <ChevronDown className="w-4 h-4 opacity-50" />}
+                {isPropertyOpen ? (
+                  <ChevronUp className="h-4 w-4 opacity-50" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 opacity-50" />
+                )}
               </button>
 
               {isPropertyOpen && (
-                <div className="bg-[#111827] py-1 border-y border-slate-800/50">
+                <div className="border-y border-slate-800/50 bg-[#111827] py-1">
                   {propertyItems.map((item) => (
                     <button
                       key={item.name}
                       onClick={() => {
-                        setActiveItem(item.name);
+                        setActiveItem(item.name)
                         // Close sidebar on mobile after selection
-                        if (window.innerWidth < 1024) setIsSidebarOpen(false);
+                        if (window.innerWidth < 1024) setIsSidebarOpen(false)
                       }}
-                      className={`w-full flex items-center px-6 py-2.5 text-xs font-medium transition-all relative ${activeItem === item.name
-                        ? 'text-white bg-slate-800/50'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-800/30'
-                        }`}
+                      className={`relative flex w-full items-center px-6 py-2.5 text-xs font-medium transition-all ${
+                        activeItem === item.name
+                          ? 'bg-slate-800/50 text-white'
+                          : 'text-slate-400 hover:bg-slate-800/30 hover:text-white'
+                      }`}
                     >
                       {activeItem === item.name && (
-                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></div>
+                        <div className="absolute top-0 bottom-0 left-0 w-1 bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></div>
                       )}
                       <span className="capitalize">{item.name}</span>
                     </button>
@@ -106,37 +128,42 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
               )}
             </div>
 
-            <div className="border-t border-slate-700/40 my-2"></div>
+            <div className="my-2 border-t border-slate-700/40"></div>
 
             {/* Profile Settings Section */}
             <div>
               <button
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-800 transition-colors group"
+                className="group flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-slate-800"
               >
                 <div className="flex items-center gap-3">
-                  <User className="w-5 h-5 text-blue-400" />
+                  <User className="h-5 w-5 text-blue-400" />
                   <span className="text-sm font-medium text-slate-200">Profile Setting</span>
                 </div>
-                {isProfileOpen ? <ChevronUp className="w-4 h-4 opacity-50" /> : <ChevronDown className="w-4 h-4 opacity-50" />}
+                {isProfileOpen ? (
+                  <ChevronUp className="h-4 w-4 opacity-50" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 opacity-50" />
+                )}
               </button>
 
               {isProfileOpen && (
-                <div className="bg-[#111827] py-1 border-y border-slate-800/50">
+                <div className="border-y border-slate-800/50 bg-[#111827] py-1">
                   {profileItems.map((item) => (
                     <button
                       key={item.name}
                       onClick={() => {
-                        setActiveItem(item.name);
-                        if (window.innerWidth < 1024) setIsSidebarOpen(false);
+                        setActiveItem(item.name)
+                        if (window.innerWidth < 1024) setIsSidebarOpen(false)
                       }}
-                      className={`w-full flex items-center px-6 py-2.5 text-xs font-medium transition-all relative ${activeItem === item.name
-                        ? 'text-white bg-slate-800/50'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-800/30'
-                        }`}
+                      className={`relative flex w-full items-center px-6 py-2.5 text-xs font-medium transition-all ${
+                        activeItem === item.name
+                          ? 'bg-slate-800/50 text-white'
+                          : 'text-slate-400 hover:bg-slate-800/30 hover:text-white'
+                      }`}
                     >
                       {activeItem === item.name && (
-                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.5)]"></div>
+                        <div className="absolute top-0 bottom-0 left-0 w-1 bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.5)]"></div>
                       )}
                       <span className="capitalize">{item.name}</span>
                     </button>
@@ -146,23 +173,23 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
             </div>
           </div>
 
-          <div className="mt-auto p-4 border-t border-slate-700/50">
+          <div className="mt-auto border-t border-slate-700/50 p-4">
             <button
               onClick={() => {
-                localStorage.removeItem('access_token');
-                localStorage.removeItem('refresh_token');
-                navigate('/login');
+                localStorage.removeItem('access_token')
+                localStorage.removeItem('refresh_token')
+                navigate('/login')
               }}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/10 text-slate-300 hover:text-red-400 transition-colors group"
+              className="group flex w-full items-center gap-3 rounded-xl px-4 py-3 text-slate-300 transition-colors hover:bg-red-500/10 hover:text-red-400"
             >
-              <LogOut className="w-5 h-5 text-slate-400 group-hover:text-red-400 transition-colors" />
-              <span className="font-semibold text-sm">Log Out</span>
+              <LogOut className="h-5 w-5 text-slate-400 transition-colors group-hover:text-red-400" />
+              <span className="text-sm font-semibold">Log Out</span>
             </button>
           </div>
         </nav>
       </aside>
     </>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar

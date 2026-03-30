@@ -30,6 +30,8 @@ const usePmsData = () => {
    * @param {string[]} targets - Optional list of keys to refresh (e.g. ['rooms', 'floors'])
    */
   const fetchData = useCallback(async (targets = null) => {
+    // Prevent React synthetic event objects from breaking the targets logic
+    if (targets && !Array.isArray(targets)) targets = null;
     setIsLoading(true);
     setError(null);
     

@@ -11,12 +11,12 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             className="p-2 hover:bg-slate-800 rounded-lg transition-colors shrink-0"
             title="Open Sidebar"
           >
-            <Menu className="w-5 h-5 md:w-6 h-6 text-emerald-400" />
+            <Menu className="w-5 h-5 md:w-6 md:h-6 text-emerald-400" />
           </button>
         </div>
         <div className="flex items-center gap-2 md:gap-3 shrink-0">
           <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-            <Building2 className="w-5 h-5 md:w-6 h-6 text-white" />
+            <Building2 className="w-5 h-5 md:w-6 md:h-6 text-white" />
           </div>
           <div>
             <h1 className="font-bold text-lg md:text-xl leading-none tracking-tight">PMS</h1>

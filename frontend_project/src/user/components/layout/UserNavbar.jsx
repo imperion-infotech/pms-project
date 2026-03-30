@@ -57,9 +57,9 @@ const UserNavbar = () => {
 
       {/* CENTER SECTION: Identity */}
       <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-3">
-        <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-[0_0_20px_rgba(16,185,129,0.25)] border border-emerald-400/20">
-          <Building2 className="w-[1.125rem] h-[1.125rem] text-white absolute z-10" />
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/30 to-transparent opacity-80 rounded-xl mix-blend-overlay"></div>
+        <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-linear-to-br from-emerald-500 to-emerald-700 shadow-[0_0_20px_rgba(16,185,129,0.25)] border border-emerald-400/20">
+          <Building2 className="w-4.5 h-4.5 text-white absolute z-10" />
+          <div className="absolute inset-0 bg-linear-to-tr from-transparent via-white/30 to-transparent opacity-80 rounded-xl mix-blend-overlay"></div>
         </div>
         <div className="hidden sm:flex flex-col">
           <h1 className="font-black text-xl tracking-tight leading-none text-white drop-shadow-sm">IMPERION</h1>
