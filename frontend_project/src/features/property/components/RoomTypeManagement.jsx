@@ -3,7 +3,7 @@ import { PlusCircle, Search, CheckSquare, X, Plus, Pencil, Trash2 } from 'lucide
 
 const RoomTypeManagement = ({ roomTypes, setIsRoomTypeModalOpen }) => {
   return (
-    <div className="bg-white dark:bg-[#1e293b] rounded-xl shadow-md border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors duration-300">
+    <div className="bg-white dark:bg-surface-100 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors duration-300">
       {/* Room Type Action Bar */}
       <div className="p-6 flex flex-col lg:flex-row justify-between items-center border-b border-slate-100 dark:border-slate-800 gap-4">
         <div>

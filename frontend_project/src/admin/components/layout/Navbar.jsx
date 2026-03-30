@@ -1,14 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Menu, Building2, UserCircle, Bell } from 'lucide-react';
 import { useSidebar } from '../../../context/SidebarContext';
 
 const Navbar = () => {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
-  const [userDetails, setUserDetails] = useState({ username: 'Loading...', role: '...' });
-  const [showNotification, setShowNotification] = useState(true);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-
-  useEffect(() => {
+  const [userDetails] = useState(() => {
     const token = localStorage.getItem('access_token');
     if (token) {
       try {
@@ -27,15 +23,18 @@ const Navbar = () => {
         let cleanRole = typeof rawRole === 'string' ? rawRole.replace('ROLE_', '').toLowerCase() : 'user';
         const displayRole = cleanRole.charAt(0).toUpperCase() + cleanRole.slice(1);
 
-        setUserDetails({ username: name, role: displayRole });
-      } catch (err) {
-        setUserDetails({ username: 'Admin', role: 'Super User' });
+        return { username: name, role: displayRole };
+      } catch {
+        return { username: 'Admin', role: 'Super User' };
       }
     }
-  }, []);
+    return { username: 'Loading...', role: '...' };
+  });
+  const [showNotification, setShowNotification] = useState(true);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   return (
-    <header className="h-16 bg-[#1e293b] text-white flex items-center justify-between px-4 md:px-6 shrink-0 shadow-lg z-10 transition-colors duration-300">
+    <header className="h-16 bg-surface-100 text-white flex items-center justify-between px-4 md:px-6 shrink-0 shadow-lg z-10 transition-colors duration-300">
       <div className="flex items-center gap-2 md:gap-6 min-w-0">
         <div className={`transition-all duration-300 overflow-hidden flex items-center justify-center ${!isSidebarOpen ? "w-10 opacity-100" : "w-0 opacity-0 pointer-events-none"}`}>
           <button
@@ -69,7 +68,7 @@ const Navbar = () => {
               className="hidden sm:flex relative p-2 mr-2 text-slate-400 hover:text-emerald-400 hover:bg-slate-800 rounded-lg transition-colors group z-50"
             >
               <Bell className="w-5 h-5 transition-transform origin-top group-hover:rotate-12" />
-              {showNotification && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 border-2 border-[#1e293b] rounded-full"></span>}
+              {showNotification && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 border-2 border-surface-100 rounded-full"></span>}
             </button>
 
             {isNotificationOpen && (
@@ -79,19 +78,19 @@ const Navbar = () => {
                   onClick={() => setIsNotificationOpen(false)}
                 ></div>
 
-                <div className="absolute right-0 mt-3 w-80 bg-[#1e293b] border border-slate-700/80 rounded-2xl shadow-[0_10px_40px_-5px_rgba(0,0,0,0.6)] z-50 overflow-hidden animate-in fade-in slide-in-from-top-4">
-                  <div className="p-4 border-b border-slate-700/80 flex justify-between items-center bg-[#1e293b]/95 backdrop-blur-sm">
+                <div className="absolute right-0 mt-3 w-80 bg-surface-100 border border-slate-700/80 rounded-2xl shadow-[0_10px_40px_-5px_rgba(0,0,0,0.6)] z-50 overflow-hidden animate-in fade-in slide-in-from-top-4">
+                  <div className="p-4 border-b border-slate-700/80 flex justify-between items-center bg-surface-100/95 backdrop-blur-sm">
                     <h3 className="font-bold text-white text-sm">Dashboard Alerts</h3>
                     <span className="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-bold">1 New</span>
                   </div>
-                  <div className="max-h-[60vh] overflow-y-auto custom-scrollbar bg-[#1e293b]/90 backdrop-blur-sm">
+                  <div className="max-h-[60vh] overflow-y-auto custom-scrollbar bg-surface-100/90 backdrop-blur-sm">
                     <div className="p-4 hover:bg-slate-800/80 transition-colors border-l-2 border-emerald-500 cursor-pointer">
                       <p className="text-sm text-slate-200 font-medium mb-1 capitalize">Welcome back, {userDetails.username}!</p>
                       <p className="text-xs text-slate-400">Admin session started successfully.</p>
                       <p className="text-[10px] text-slate-500 mt-2 font-medium">Just now</p>
                     </div>
                   </div>
-                  <div className="p-3 border-t border-slate-700/80 bg-[#1e293b]/95 backdrop-blur-sm">
+                  <div className="p-3 border-t border-slate-700/80 bg-surface-100/95 backdrop-blur-sm">
                     <button
                       onClick={() => setIsNotificationOpen(false)}
                       className="w-full py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer"

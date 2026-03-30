@@ -30,7 +30,7 @@ const Pagination = ({ activeItem, floors, buildings, roomTypes, rooms, roomStatu
   };
 
   return (
-    <div className="bg-white dark:bg-[#1e293b] text-slate-800 dark:text-white p-4 px-8 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md dark:shadow-xl mt-4 min-h-[72px] border border-slate-200 dark:border-slate-800 transition-colors duration-300">
+    <div className="bg-white dark:bg-surface-100 text-slate-800 dark:text-white p-4 px-8 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md dark:shadow-xl mt-4 min-h-[72px] border border-slate-200 dark:border-slate-800 transition-colors duration-300">
       {isLoading ? (
         <div className="w-full flex items-center justify-between animate-pulse">
           <div className="flex items-center gap-3">

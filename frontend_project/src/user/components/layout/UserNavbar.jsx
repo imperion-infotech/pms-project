@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Menu, Building2, UserCircle, Bell } from 'lucide-react';
 import { useSidebar } from '../../../context/SidebarContext';
 
@@ -8,11 +8,7 @@ import { useSidebar } from '../../../context/SidebarContext';
  */
 const UserNavbar = () => {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
-  const [userDetails, setUserDetails] = useState({ username: 'Loading...', role: '...' });
-  const [showNotification, setShowNotification] = useState(true);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-
-  useEffect(() => {
+  const [userDetails] = useState(() => {
     const token = localStorage.getItem('access_token');
     if (token) {
       try {
@@ -31,15 +27,18 @@ const UserNavbar = () => {
         let cleanRole = typeof rawRole === 'string' ? rawRole.replace('ROLE_', '').toLowerCase() : 'user';
         const displayRole = cleanRole.charAt(0).toUpperCase() + cleanRole.slice(1);
 
-        setUserDetails({ username: name, role: displayRole });
-      } catch (err) {
-        setUserDetails({ username: 'User', role: 'Authorized' });
+        return { username: name, role: displayRole };
+      } catch {
+        return { username: 'User', role: 'Authorized' };
       }
     }
-  }, []);
+    return { username: 'Loading...', role: '...' };
+  });
+  const [showNotification, setShowNotification] = useState(true);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   return (
-    <header className="h-16 bg-[#0f172a] border-b border-white/5 text-slate-200 flex items-center justify-between px-4 md:px-6 shrink-0 z-50 transition-all duration-300 relative shadow-md">
+    <header className="h-16 bg-surface-50 border-b border-white/5 text-slate-200 flex items-center justify-between px-4 md:px-6 shrink-0 z-50 transition-all duration-300 relative shadow-md">
 
       {/* LEFT SECTION: Context & Sidebar Trigger */}
       <div className="flex items-center gap-4">
@@ -80,7 +79,7 @@ const UserNavbar = () => {
             className="relative p-2 text-slate-400 hover:text-emerald-400 hover:bg-white/5 rounded-lg transition-colors group z-50"
           >
             <Bell className="w-5 h-5 transition-transform origin-top group-hover:rotate-12" />
-            {showNotification && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 border-2 border-[#0f172a] rounded-full"></span>}
+            {showNotification && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 border-2 border-surface-50 rounded-full"></span>}
           </button>
 
           {isNotificationOpen && (

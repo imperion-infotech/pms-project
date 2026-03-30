@@ -324,7 +324,7 @@ const PmsDashboard = () => {
   }, [deleteRoom]);
 
   return (
-    <div className={`flex h-screen ${darkMode ? 'bg-[#0f172a] text-slate-100' : 'bg-[#f4f7fa] text-slate-800'} font-sans overflow-hidden transition-colors duration-300`}>
+    <div className={`flex h-screen ${darkMode ? 'bg-surface-50 text-slate-100' : 'bg-[#f4f7fa] text-slate-800'} font-sans overflow-hidden transition-colors duration-300`}>
       <Sidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
@@ -349,7 +349,7 @@ const PmsDashboard = () => {
           toggleTheme={() => setDarkMode(!darkMode)}
         />
 
-        <main className={`flex-1 overflow-auto ${darkMode ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'} custom-scrollbar p-3 md:p-6 lg:p-8 transition-colors duration-300`}>
+        <main className={`flex-1 overflow-auto ${darkMode ? 'bg-surface-50' : 'bg-[#f8fafc]'} custom-scrollbar p-3 md:p-6 lg:p-8 transition-colors duration-300`}>
           <div className="max-w-[1600px] mx-auto space-y-4 md:y-6">
             {activeItem === 'Building' ? (
               <BuildingManagement

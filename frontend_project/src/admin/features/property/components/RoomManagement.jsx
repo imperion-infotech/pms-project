@@ -27,7 +27,7 @@ const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], buildings = [
   };
 
   return (
-    <div className="bg-white dark:bg-[#1e293b] rounded-xl shadow-md border border-slate-200 dark:border-slate-800 transition-colors duration-300">
+    <div className="bg-white dark:bg-surface-100 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 transition-colors duration-300">
       {/* Room Type Action Bar */}
       <div className="p-4 sm:p-6 flex flex-col lg:flex-row justify-between items-center border-b border-slate-100 dark:border-slate-800 gap-4">
         <div className="text-center sm:text-left">
@@ -83,12 +83,16 @@ const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], buildings = [
               console.log("Matched Building", matchedBuilding);
 
               // Support direct name fields if backend provides them, or fallback to lookup result
-              const typeName = room.roomTypeName || room.room_type?.roomTypeName || (matchedType ? matchedType.roomTypeName : 'Unknown');
+              const typeName = room.roomTypeName || room.room_type?.roomTypeName || (matchedType ? matchedType.roomTypeName : (nonRoom ? 'Non-Room Utility' : 'Unknown'));
               console.log("Type Name", typeName);
               const floorName = room.floorName || room.floor?.name || (matchedFloor ? matchedFloor.name : 'Unknown');
               console.log("Floor Name", floorName);
               const buildingName = room.buildingName || room.building?.name || (matchedBuilding ? matchedBuilding.name : 'Unknown');
               console.log("Building Name", buildingName);
+
+              const smoking = room.smoking || room.is_smoking || room.isSmoking;
+              const handicap = room.handicap || room.is_handicap || room.isHandicap;
+              const nonRoom = room.nonRoom || room.non_room || room.isNonRoom;
 
               return (
                 <tr key={room.id} className="hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5 transition-all h-14 group">
@@ -98,17 +102,17 @@ const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], buildings = [
                   <td className="px-6 py-2 border-r border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-500">{floorName}</td>
                   <td className="px-4 py-2 text-center border-r border-slate-100 dark:border-slate-800 bg-orange-50/10">
                     <div className="flex justify-center transition-transform hover:scale-110">
-                      {room.smoking ? <Cigarette className="w-4.5 h-4.5 text-orange-500 drop-shadow-sm" /> : <Minus className="w-3 h-3 text-slate-300 dark:text-slate-700 opacity-30" />}
+                      {smoking ? <Cigarette className="w-4.5 h-4.5 text-orange-500 drop-shadow-sm" /> : <Minus className="w-3 h-3 text-slate-300 dark:text-slate-700 opacity-30" />}
                     </div>
                   </td>
                   <td className="px-4 py-2 text-center border-r border-slate-100 dark:border-slate-800 bg-blue-50/10">
                     <div className="flex justify-center transition-transform hover:scale-110">
-                      {room.handicap ? <Accessibility className="w-4.5 h-4.5 text-blue-500 drop-shadow-sm" /> : <Minus className="w-3 h-3 text-slate-300 dark:text-slate-700 opacity-30" />}
+                      {handicap ? <Accessibility className="w-4.5 h-4.5 text-blue-500 drop-shadow-sm" /> : <Minus className="w-3 h-3 text-slate-300 dark:text-slate-700 opacity-30" />}
                     </div>
                   </td>
                   <td className="px-4 py-2 text-center border-r border-slate-100 dark:border-slate-800 bg-red-50/10">
                     <div className="flex justify-center transition-transform hover:scale-110">
-                      {room.nonRoom ? <Ban className="w-4.5 h-4.5 text-red-500 drop-shadow-sm" /> : <Minus className="w-3 h-3 text-slate-300 dark:text-slate-700 opacity-30" />}
+                      {nonRoom ? <Ban className="w-4.5 h-4.5 text-red-500 drop-shadow-sm" /> : <Minus className="w-3 h-3 text-slate-300 dark:text-slate-700 opacity-30" />}
                     </div>
                   </td>
                   <td className="px-4 py-3">
@@ -138,7 +142,7 @@ const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], buildings = [
       {deleteTarget && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={handleCancelDelete} />
-          <div className="relative z-10 bg-white dark:bg-[#1e293b] rounded-2xl shadow-2xl w-full max-w-sm p-6 border border-red-100 dark:border-red-900/30">
+          <div className="relative z-10 bg-white dark:bg-surface-100 rounded-2xl shadow-2xl w-full max-w-sm p-6 border border-red-100 dark:border-red-900/30">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/10 flex items-center justify-center flex-shrink-0">
                 <AlertTriangle className="w-5 h-5 text-red-500" />

@@ -12,7 +12,7 @@
  * 3. Grouped room viewing (Rooms are automatically sorted into their respective Floors).
  * 4. Guest Action Modal: Allows adding/editing guest details directly from the room view.
  */
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   BedDouble, AlertCircle

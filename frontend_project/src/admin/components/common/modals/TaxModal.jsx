@@ -18,8 +18,8 @@ export const TaxModal = ({ isOpen, setIsOpen, newTax, setNewTax, handleAddTax, t
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={() => setIsOpen(false)}
       ></div>
-      <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-2xl w-full max-w-md relative z-10 overflow-hidden animate-in zoom-in-95 duration-300">
-        <div className="p-6 bg-[#1a2b4b] dark:bg-[#0f172a] text-white flex justify-between items-center">
+      <div className="bg-white dark:bg-surface-100 rounded-2xl shadow-2xl w-full max-w-md relative z-10 overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="p-6 bg-[#1a2b4b] dark:bg-surface-50 text-white flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Receipt className="w-6 h-6 text-emerald-400" />
             <div>

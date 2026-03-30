@@ -15,6 +15,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoadingProcess from './components/common/LoadingProcess';
 import { ThemeProvider } from './context/ThemeContext';
 import { SidebarProvider } from './context/SidebarContext';
+import { NotificationProvider } from './context/NotificationContext';
 
 // Components are lazy-loaded to optimize the initial bundle size
 const PmsDashboard = lazy(() => import('./admin/pages/PropertyMaster/PmsDashboard'));
@@ -100,42 +101,44 @@ const RootRoute = () => {
 
 function App() {
   return (
-    <ThemeProvider>
-      <SidebarProvider>
-        <BrowserRouter>
-          {/* Suspense handles the "Loading..." state while lazy-loaded components are being fetched */}
-          <Suspense fallback={<LoadingProcess isLoading={true} spinnerOnly={true} fullScreen={true} />}>
-            <Routes>
-              {/* PUBLIC ROUTES */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              
-              {/* SMART ROOT ROUTE */}
-              <Route path="/" element={<RootRoute />} />
-              
-              {/* PROTECTED ADMIN ROUTES */}
-              <Route path="/dashboard" element={
-                <AdminRoute>
-                  <PmsDashboard />
-                </AdminRoute>
-              } />
-              
-              {/* PROTECTED USER ROUTES */}
-              <Route path="/home" element={
-                <UserRoute>
-                  <HomeScreen />
-                </UserRoute>
-              } />
+    <NotificationProvider>
+      <ThemeProvider>
+        <SidebarProvider>
+          <BrowserRouter>
+            {/* Suspense handles the "Loading..." state while lazy-loaded components are being fetched */}
+            <Suspense fallback={<LoadingProcess isLoading={true} spinnerOnly={true} fullScreen={true} />}>
+              <Routes>
+                {/* PUBLIC ROUTES */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+
+                {/* SMART ROOT ROUTE */}
+                <Route path="/" element={<RootRoute />} />
+
+                {/* PROTECTED ADMIN ROUTES */}
+                <Route path="/dashboard" element={
+                  <AdminRoute>
+                    <PmsDashboard />
+                  </AdminRoute>
+                } />
+
+                {/* PROTECTED USER ROUTES */}
+                <Route path="/home" element={
+                  <UserRoute>
+                    <HomeScreen />
+                  </UserRoute>
+                } />
 
 
-              
-              {/* 404 FALLBACK */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-      </SidebarProvider>
-    </ThemeProvider>
+
+                {/* 404 FALLBACK */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
+          </BrowserRouter>
+        </SidebarProvider>
+      </ThemeProvider>
+    </NotificationProvider>
   );
 }
 

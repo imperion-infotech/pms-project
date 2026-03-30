@@ -1,10 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, User, Building, Phone, Mail, Camera, Pen as SignatureIcon, Loader2, Save } from 'lucide-react';
 
 export const PersonalDetailsModal = ({
   isOpen, setIsOpen, formData, setFormData, handleSubmit,
   handleFileUpload, uploadingType, loading
 }) => {
+  const [localPreviews, setLocalPreviews] = useState({ photo: null, signature: null });
+
+  // Sync / Reset local previews when modal opens
+  useEffect(() => {
+    if (!isOpen) {
+      if (localPreviews.photo) URL.revokeObjectURL(localPreviews.photo);
+      if (localPreviews.signature) URL.revokeObjectURL(localPreviews.signature);
+      setTimeout(() => setLocalPreviews({ photo: null, signature: null }), 0);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
   const cleanImageUrl = (path) => {
     if (!path || path === 'photo' || path === 'sign') return null;
     let cleanPath = String(path);
@@ -14,7 +26,24 @@ export const PersonalDetailsModal = ({
     return parts[parts.length - 1]; // Only the filename
   };
 
+  const handlePreviewUpload = (e, type) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Create local preview immediately
+      const url = URL.createObjectURL(file);
+      setLocalPreviews(prev => {
+        if (prev[type]) URL.revokeObjectURL(prev[type]);
+        return { ...prev, [type]: url };
+      });
+    }
+    handleFileUpload(e, type);
+  };
+
   if (!isOpen) return null;
+
+  // Determine source: Local preview takes precedence during upload/session
+  const photoSrc = localPreviews.photo || (cleanImageUrl(formData.profilePhoto) ? `http://192.168.1.5:9091/user/${cleanImageUrl(formData.profilePhoto)}` : null);
+  const signatureSrc = localPreviews.signature || (cleanImageUrl(formData.signature) ? `http://192.168.1.5:9091/user/${cleanImageUrl(formData.signature)}` : null);
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -28,8 +57,8 @@ export const PersonalDetailsModal = ({
           </div>
           <div className="relative group mb-8">
             <div className="w-32 h-32 rounded-[32px] bg-white dark:bg-slate-800 shadow-xl overflow-hidden border-4 border-white dark:border-slate-700">
-              {cleanImageUrl(formData.profilePhoto) ? (
-                <img src={`http://192.168.1.3:9091/user/${cleanImageUrl(formData.profilePhoto)}`} alt="Preview" className="w-full h-full object-cover" />
+              {photoSrc ? (
+                <img src={photoSrc} alt="Preview" className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-slate-300 bg-slate-100 dark:bg-slate-900/50">
                   <User size={40} />
@@ -38,22 +67,26 @@ export const PersonalDetailsModal = ({
               {uploadingType === 'photo' && <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center"><Loader2 className="text-white animate-spin" /></div>}
             </div>
             <label className="absolute -bottom-2 -right-2 w-10 h-10 bg-emerald-500 text-white rounded-2xl flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 transition-all">
-              <Camera size={18} /><input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'photo')} />
+              <Camera size={18} /><input type="file" className="hidden" accept="image/*" onChange={(e) => handlePreviewUpload(e, 'photo')} />
             </label>
           </div>
           <div className="w-full space-y-4">
             <div className="relative border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-4 bg-white dark:bg-slate-900/30 text-center">
-              {cleanImageUrl(formData.signature) ? (
+              {signatureSrc ? (
                 <div className="h-20 flex items-center justify-center">
-                  <img src={`http://192.168.1.3:9091/user/${cleanImageUrl(formData.signature)}`} alt="Signature" className="max-h-full" />
-                  <button type="button" onClick={() => setFormData({ ...formData, signature: '' })} className="absolute top-1 right-1 p-1 bg-red-100 text-red-500 rounded-md"><X size={12} /></button>
+                  <img src={signatureSrc} alt="Signature" className="max-h-full" />
+                  <button type="button" onClick={() => {
+                    setFormData({ ...formData, signature: '' });
+                    if (localPreviews.signature) URL.revokeObjectURL(localPreviews.signature);
+                    setLocalPreviews(prev => ({ ...prev, signature: null }));
+                  }} className="absolute top-1 right-1 p-1 bg-red-100 text-red-500 rounded-md"><X size={12} /></button>
                 </div>
               ) : (
                 <div className="py-2"><SignatureIcon size={24} className="mx-auto text-slate-300 mb-1" /><p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Signature</p></div>
               )}
               <label className="mt-2 block w-full py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-[10px] font-black uppercase text-slate-500 hover:bg-slate-200 cursor-pointer transition-all">
                 {uploadingType === 'signature' ? <Loader2 className="h-3 w-3 animate-spin mx-auto" /> : 'Upload Signature'}
-                <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'signature')} />
+                <input type="file" className="hidden" accept="image/*" onChange={(e) => handlePreviewUpload(e, 'signature')} />
               </label>
             </div>
           </div>
@@ -94,7 +127,7 @@ export const PersonalDetailsModal = ({
             <div className="flex gap-4 pt-4 border-t border-slate-50 dark:border-slate-800">
               <button type="button" onClick={() => setIsOpen(false)} className="flex-1 py-4 text-xs font-black text-slate-400 uppercase tracking-widest transition-colors">Discard</button>
               <button type="submit" disabled={loading} className="flex-[2] py-4 bg-emerald-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all">
-                {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}<span>Create Guest Profile</span>
+                {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}<span>Create Profile</span>
               </button>
             </div>
           </form>
@@ -103,3 +136,4 @@ export const PersonalDetailsModal = ({
     </div>
   );
 };
+

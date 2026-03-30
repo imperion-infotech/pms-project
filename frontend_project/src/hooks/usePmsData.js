@@ -1,216 +1,190 @@
-/**
- * usePmsData.js - Custom React Hook for Property Data
- * 
- * Purpose:
- * This hook acts as a "single source of truth" for all property-related data
- * (Floors, Room Types, Statuses, and Rooms). It manages the state and 
- * provides CRUD (Create, Read, Update, Delete) functions to the components.
- * 
- * Benefits:
- * 1. Logic Reuse: Any component can access the same property data easily.
- * 2. Auto-Sync: Every time a record is added or updated, the fetch logic 
- *    automatically refreshes the list from the server.
- */
 import { useState, useEffect, useCallback } from 'react';
 import { propertyService } from '../services/propertyService';
+import { useToast } from '../context/NotificationContext';
+
+/**
+ * Safe data extractor for Spring Boot paginated vs flat arrays
+ */
+const extractData = (res) => res.data?.content || (Array.isArray(res.data) ? res.data : []);
 
 const usePmsData = () => {
+  const toast = useToast();
+  
   // --- MODULE STATES ---
-  const [buildings, setBuildings] = useState([]);     // List of all buildings
-  const [floors, setFloors] = useState([]);           // List of all floors
-  const [roomTypes, setRoomTypes] = useState([]);     // List of room categories (Standard, Deluxe, etc.)
-  const [roomStatuses, setRoomStatuses] = useState([]); // List of statuses (Clean, Dirty, maintenance, etc.)
-  const [rooms, setRooms] = useState([]);             // List of physical rooms
-  const [taxes, setTaxes] = useState([]);             // List of tax masters
-  const [personalDetails, setPersonalDetails] = useState([]); // List of guest profiles
+  const [data, setData] = useState({
+    buildings: [],
+    floors: [],
+    roomTypes: [],
+    roomStatuses: [],
+    rooms: [],
+    taxes: [],
+    personalDetails: []
+  });
 
-
-  const [isLoading, setIsLoading] = useState(false);  // Global loading state for calculations
-  const [error, setError] = useState(null);           // Error message storage
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   /**
    * fetchData()
-   * Downloads all property master data from the backend concurrently.
-   * Uses Promise.allSettled to ensure that even if one API call fails,
-   * others can still complete and show data.
+   * Downloads all or specific property master data.
+   * @param {string[]} targets - Optional list of keys to refresh (e.g. ['rooms', 'floors'])
    */
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (targets = null) => {
     setIsLoading(true);
     setError(null);
+    
+    // Mapping of targets to service calls
+    const serviceMap = {
+      floors: propertyService.getFloors,
+      buildings: propertyService.getBuildings,
+      roomTypes: propertyService.getRoomTypes,
+      roomStatuses: propertyService.getRoomStatuses,
+      rooms: propertyService.getRooms,
+      taxes: propertyService.getTaxMasters,
+      personalDetails: propertyService.getPersonalDetails
+    };
+
+    const keysToFetch = targets || Object.keys(serviceMap);
+    
     try {
-      const results = await Promise.allSettled([
-        propertyService.getFloors(),
-        propertyService.getBuildings(),
-        propertyService.getRoomTypes(),
-        propertyService.getRoomStatuses(),
-        propertyService.getRooms(),
-        propertyService.getTaxMasters(),
-        propertyService.getPersonalDetails()
-
-      ]);
-
-      // Distribute the results into their respective states
-      const [floorsRes, buildingsRes, roomTypesRes, roomStatusesRes, roomsRes, taxesRes, personalRes] = results.map(
-        (res) => (res.status === 'fulfilled' ? res.value : { data: [] })
+      const results = await Promise.allSettled(
+        keysToFetch.map(key => serviceMap[key]())
       );
 
-      // Handle both plain array and Spring Boot paginated object (data.content)
-      setFloors(floorsRes.data?.content || (Array.isArray(floorsRes.data) ? floorsRes.data : []));
-      setBuildings(buildingsRes.data?.content || (Array.isArray(buildingsRes.data) ? buildingsRes.data : []));
-      setRoomTypes(roomTypesRes.data?.content || (Array.isArray(roomTypesRes.data) ? roomTypesRes.data : []));
-      setRoomStatuses(roomStatusesRes.data?.content || (Array.isArray(roomStatusesRes.data) ? roomStatusesRes.data : []));
-      setRooms(roomsRes.data?.content || (Array.isArray(roomsRes.data) ? roomsRes.data : []));
-      setTaxes(taxesRes.data?.content || (Array.isArray(taxesRes.data) ? taxesRes.data : []));
-      setPersonalDetails(personalRes.data?.content || (Array.isArray(personalRes.data) ? personalRes.data : []));
+      let hasFailures = false;
 
-
-      if (results.some(r => r.status === 'rejected')) {
-        console.warn("One or more fetch requests failed, some data may be missing.");
+      setData(prev => {
+        const newData = { ...prev };
+        results.forEach((res, index) => {
+          const key = keysToFetch[index];
+          if (res.status === 'fulfilled') {
+            newData[key] = extractData(res.value);
+          } else {
+            hasFailures = true;
+            console.error(`Failed to fetch ${key}:`, res.reason);
+          }
+        });
+        return newData;
+      });
+      
+      if (hasFailures) {
+        toast.warn("Some data could not be synchronized.", "Sync Warning");
       }
-    } catch (err) {
-      console.error('Error fetching data:', err);
-      setError('Failed to synchronize data.');
+    } catch {
+      setError('Critical: Failed to synchronize data hierarchy.');
+      toast.error("Failed to connect to the property server.", "Connection Error");
     } finally {
-      // Small artificial delay to prevent UI flickering on fast networks
-      setTimeout(() => setIsLoading(false), 500);
+      setIsLoading(false);
     }
-  }, []);
+  }, [toast]);
 
-  // Fetch initial data when the hook is first mounted
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   /**
    * executeAction()
-   * Generic helper that runs a service function and then re-triggers 
-   * the data fetch to keep the UI in sync with the database.
+   * Generic helper with automatic success/error notifications
    */
-  const executeAction = async (action, ...args) => {
+  const executeAction = async (action, successMsg, refreshTargets, ...args) => {
     try {
       const result = await action(...args);
-      await fetchData(); // Refresh all data after any write operation
+      toast.success(successMsg);
+      await fetchData(refreshTargets); 
       return result;
     } catch (err) {
-      console.error('Action failed:', err);
+      const errorMsg = err.response?.data?.message || err.message || "An unexpected error occurred.";
+      toast.error(errorMsg, "Action Failed");
       throw err;
     }
   };
 
-  // --- EXPORTED CRUD OPERATIONS ---
-
-  // Floor Operations
-  const addFloor = (data) => executeAction(propertyService.createFloor, data);
-  const updateFloor = (id, data) => executeAction(propertyService.updateFloor, id, data);
-  console.log("Update Floor", updateFloor);
-  const deleteFloor = (id) => executeAction(propertyService.deleteFloor, id);
-
-  // Building Operations
-  const addBuilding = (data) => executeAction(propertyService.createBuilding, data);
-  const updateBuilding = (id, data) => executeAction(propertyService.updateBuilding, id, data);
-  console.log("Update Building", updateBuilding);
-  const deleteBuilding = (id) => executeAction(propertyService.deleteBuilding, id);
-
-  // Room Type Operations
-  const addRoomType = (data) => executeAction(propertyService.createRoomType, data);
-  const updateRoomType = (id, data) => executeAction(propertyService.updateRoomType, id, data);
-  console.log("Update Room Type", updateRoomType);
-  const deleteRoomType = (id) => executeAction(propertyService.deleteRoomType, id);
-
-  // Room Status Operations
-  const addRoomStatus = (data) => executeAction(propertyService.createRoomStatus, data);
-  const updateRoomStatus = (id, data) => executeAction(propertyService.updateRoomStatus, id, data);
-  console.log("Update Room Status", updateRoomStatus);
-  const deleteRoomStatus = (id) => executeAction(propertyService.deleteRoomStatus, id);
-
-  // Room Operations
-  const addRoom = (data) => executeAction(propertyService.createRoom, data);
-  const updateRoom = (id, data) => executeAction(propertyService.updateRoom, id, data);
-  console.log("Update Room", updateRoom);
-  const deleteRoom = (id) => executeAction(propertyService.deleteRoom, id);
-
-  // Tax Operations
-  const addTax = (data) => executeAction(propertyService.createTaxMaster, data);
-  const updateTax = (id, data) => executeAction(propertyService.updateTaxMaster, id, data);
-  console.log("Update Tax", updateTax);
-  const deleteTax = (id) => executeAction(propertyService.deleteTaxMaster, id);
-
-  // Personal Detail Operations
-  const addPersonalDetail = (data) => executeAction(propertyService.createPersonalDetail, data);
-  const updatePersonalDetail = (id, data) => executeAction(propertyService.updatePersonalDetail, id, data);
-  console.log("Update Personal Detail", updatePersonalDetail);
-  const deletePersonalDetail = (id) => executeAction(propertyService.deletePersonalDetail, id);
-
-  // --- SEARCH OPERATIONS ---
-  const searchRooms = async (query) => {
+  // Memoized Search Operations (replaces state with results)
+  const searchRooms = useCallback(async (query) => {
     setIsLoading(true);
     try {
       const res = await propertyService.searchRooms(query);
-      setRooms(res.data?.content || (Array.isArray(res.data) ? res.data : []));
-    } catch (err) { console.error('Search rooms failed:', err); }
+      setData(prev => ({ ...prev, rooms: extractData(res) }));
+    } catch { toast.error("Search failed"); }
     finally { setIsLoading(false); }
-  };
+  }, [toast]);
 
-  const searchFloors = async (query) => {
+  const searchFloors = useCallback(async (query) => {
     setIsLoading(true);
     try {
       const res = await propertyService.searchFloors(query);
-      setFloors(res.data?.content || (Array.isArray(res.data) ? res.data : []));
-    } catch (err) { console.error('Search floors failed:', err); }
+      setData(prev => ({ ...prev, floors: extractData(res) }));
+    } catch { toast.error("Search failed"); }
     finally { setIsLoading(false); }
-  };
+  }, [toast]);
 
-  const searchBuildings = async (query) => {
+  const searchBuildings = useCallback(async (query) => {
     setIsLoading(true);
     try {
       const res = await propertyService.searchBuildings(query);
-      setBuildings(res.data?.content || (Array.isArray(res.data) ? res.data : []));
-    } catch (err) { console.error('Search buildings failed:', err); }
+      setData(prev => ({ ...prev, buildings: extractData(res) }));
+    } catch { toast.error("Search failed"); }
     finally { setIsLoading(false); }
-  };
+  }, [toast]);
 
-  const searchRoomTypes = async (query) => {
+  const searchRoomTypes = useCallback(async (query) => {
     setIsLoading(true);
     try {
       const res = await propertyService.searchRoomTypes(query);
-      setRoomTypes(res.data?.content || (Array.isArray(res.data) ? res.data : []));
-    } catch (err) { console.error('Search room types failed:', err); }
+      setData(prev => ({ ...prev, roomTypes: extractData(res) }));
+    } catch { toast.error("Search failed"); }
     finally { setIsLoading(false); }
-  };
+  }, [toast]);
 
-  const searchRoomStatuses = async (query) => {
+  const searchRoomStatuses = useCallback(async (query) => {
     setIsLoading(true);
     try {
       const res = await propertyService.searchRoomStatuses(query);
-      setRoomStatuses(res.data?.content || (Array.isArray(res.data) ? res.data : []));
-    } catch (err) { console.error('Search room statuses failed:', err); }
+      setData(prev => ({ ...prev, roomStatuses: extractData(res) }));
+    } catch { toast.error("Search failed"); }
     finally { setIsLoading(false); }
-  };
-
+  }, [toast]);
 
   return {
-    floors,
-    buildings,
-    roomTypes,
-    roomStatuses,
-    rooms,
-    personalDetails,
-    taxes,
+    ...data,
     isLoading,
     error,
     fetchData,
-    addFloor, updateFloor, deleteFloor,
-    addBuilding, updateBuilding, deleteBuilding,
-    addRoomType, updateRoomType, deleteRoomType,
-    addRoomStatus, updateRoomStatus, deleteRoomStatus,
-    addRoom, updateRoom, deleteRoom,
-    addTax, updateTax, deleteTax,
-    addPersonalDetail, updatePersonalDetail, deletePersonalDetail,
-    searchRooms, searchFloors, searchBuildings, searchRoomTypes, searchRoomStatuses,
+    searchRooms,
+    searchFloors,
+    searchBuildings,
+    searchRoomTypes,
+    searchRoomStatuses,
+    
+    // Optimized CRUD with selective refreshing
+    addFloor: (payload) => executeAction(propertyService.createFloor, "Floor created successfully", ['floors'], payload),
+    updateFloor: (id, payload) => executeAction(propertyService.updateFloor, "Floor updated successfully", ['floors'], id, payload),
+    deleteFloor: (id) => executeAction(propertyService.deleteFloor, "Floor deleted successfully", ['floors'], id),
 
+    addBuilding: (payload) => executeAction(propertyService.createBuilding, "Building created successfully", ['buildings'], payload),
+    updateBuilding: (id, payload) => executeAction(propertyService.updateBuilding, "Building updated successfully", ['buildings'], id, payload),
+    deleteBuilding: (id) => executeAction(propertyService.deleteBuilding, "Building deleted successfully", ['buildings'], id),
+
+    addRoomType: (payload) => executeAction(propertyService.createRoomType, "Room type created successfully", ['roomTypes'], payload),
+    updateRoomType: (id, payload) => executeAction(propertyService.updateRoomType, "Room type updated successfully", ['roomTypes'], id, payload),
+    deleteRoomType: (id) => executeAction(propertyService.deleteRoomType, "Room type deleted successfully", ['roomTypes'], id),
+
+    addRoomStatus: (payload) => executeAction(propertyService.createRoomStatus, "Room status created successfully", ['roomStatuses'], payload),
+    updateRoomStatus: (id, payload) => executeAction(propertyService.updateRoomStatus, "Room status updated successfully", ['roomStatuses'], id, payload),
+    deleteRoomStatus: (id) => executeAction(propertyService.deleteRoomStatus, "Room status deleted successfully", ['roomStatuses'], id),
+
+    addRoom: (payload) => executeAction(propertyService.createRoom, "Room created successfully", ['rooms'], payload),
+    updateRoom: (id, payload) => executeAction(propertyService.updateRoom, "Room updated successfully", ['rooms'], id, payload),
+    deleteRoom: (id) => executeAction(propertyService.deleteRoom, "Room deleted successfully", ['rooms'], id),
+
+    addTax: (payload) => executeAction(propertyService.createTaxMaster, "Tax record created successfully", ['taxes'], payload),
+    updateTax: (id, payload) => executeAction(propertyService.updateTaxMaster, "Tax record updated successfully", ['taxes'], id, payload),
+    deleteTax: (id) => executeAction(propertyService.deleteTaxMaster, "Tax record deleted successfully", ['taxes'], id),
+
+    addPersonalDetail: (payload) => executeAction(propertyService.createPersonalDetail, "Guest profile created", ['personalDetails'], payload),
+    updatePersonalDetail: (id, payload) => executeAction(propertyService.updatePersonalDetail, "Guest profile updated", ['personalDetails'], id, payload),
+    deletePersonalDetail: (id) => executeAction(propertyService.deletePersonalDetail, "Guest profile deleted", ['personalDetails'], id),
   };
 };
 
 export default usePmsData;
-
-

@@ -23,7 +23,7 @@ const UserPageHeader = ({
   const { isDark, toggleTheme } = useTheme();
 
   return (
-    <div className={`flex flex-col w-full shrink-0 z-10 transition-colors duration-300 ${isDark ? 'bg-[#1e293b]' : 'bg-white'}`}>
+    <div className={`flex flex-col w-full shrink-0 z-10 transition-colors duration-300 ${isDark ? 'bg-surface-100' : 'bg-white'}`}>
 
       {/* ─── TOP TIER: Context, Stats, Tools ─── */}
       <div className={`min-h-[4rem] border-b flex flex-col sm:flex-row items-center justify-between px-4 md:px-6 py-3 sm:py-0 gap-4 sm:gap-0 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>

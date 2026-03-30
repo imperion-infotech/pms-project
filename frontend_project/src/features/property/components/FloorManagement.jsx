@@ -1,65 +1,143 @@
-// "Property" feature ke components - FloorManagement
-import { PlusCircle, Search, X, Pencil, Trash2 } from 'lucide-react';
+import React from 'react'
+import { motion as Motion, AnimatePresence } from 'framer-motion'
+import { PlusCircle, Pencil, Trash2, Layers, Info } from 'lucide-react'
+import useFloorController from '../hooks/useFloorController'
 
-const FloorManagement = ({ 
-  floors, 
-  setIsFloorModalOpen, 
-  currentPage = 1, 
-  itemsPerPage = 8 
+/**
+ * View: FloorManagement
+ * Purely presentational component that renders the floor management table.
+ */
+const FloorManagement = ({
+  floors = [],
+  setIsFloorModalOpen,
+  onEdit,
+  onDelete,
+  currentPage = 1,
+  itemsPerPage = 8,
 }) => {
+  const { processedFloors, getIndex } = useFloorController({
+    floors,
+    currentPage,
+    itemsPerPage,
+  })
+
   return (
-    <div className="bg-white dark:bg-[#1e293b] rounded-xl shadow-md border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors duration-300">
-      {/* Floor Action Bar */}
-      <div className="p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-center border-b border-slate-100 dark:border-slate-800 gap-4">
-        <div className="text-center sm:text-left">
-          <h2 className="text-lg md:text-xl font-bold text-[#1a2b4b] dark:text-slate-100 font-heading tracking-tight">Floor Management</h2>
-          <p className="text-xs md:text-sm text-slate-400 font-medium">Configure and organize property levels</p>
+    <Motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-glass overflow-hidden rounded-3xl border border-white/5 shadow-2xl transition-all duration-500"
+    >
+      {/* Header Section */}
+      <div className="flex flex-col justify-between gap-6 border-b border-white/5 bg-gradient-to-br from-indigo-500/5 to-transparent p-6 md:p-8 lg:flex-row lg:items-center">
+        <div className="flex items-start gap-4">
+          <div className="bg-brand/10 border-brand/20 rounded-2xl border p-3">
+            <Layers className="text-brand h-6 w-6" />
+          </div>
+          <div>
+            <h2 className="flex items-center gap-3 text-2xl font-bold tracking-tight text-white">
+              Floor System
+              <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[10px] font-bold tracking-wider text-emerald-400 uppercase">
+                Active
+              </span>
+            </h2>
+            <p className="mt-1 text-sm font-medium tracking-[0.1em] text-slate-400 uppercase opacity-80">
+              PHYSICAL LEVEL ORGANIZATION
+            </p>
+          </div>
         </div>
+
         <button
           onClick={() => setIsFloorModalOpen(true)}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white px-5 md:px-6 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all shadow-lg shadow-emerald-500/20"
+          className="group bg-brand hover:bg-brand-hover shadow-brand/25 relative flex items-center justify-center gap-3 overflow-hidden rounded-2xl px-8 py-3.5 text-sm font-bold text-white shadow-xl transition-all active:scale-95"
         >
-          <PlusCircle className="w-5 h-5" />
+          <div className="absolute inset-0 bg-white/10 opacity-0 transition-opacity group-hover:opacity-100" />
+          <PlusCircle className="h-5 w-5 transition-transform duration-300 group-hover:rotate-90" />
           NEW FLOOR
         </button>
       </div>
 
-      {/* Floor Table */}
-      <div className="w-full overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-[600px]">
+      {/* Table Section */}
+      <div className="custom-scrollbar w-full overflow-x-auto">
+        <table className="w-full min-w-[800px] border-collapse text-left">
           <thead>
-            <tr className="bg-slate-50/80 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-[11px] font-bold uppercase tracking-[0.1em] border-b border-slate-200 dark:border-slate-800">
-              <th className="px-8 py-4 w-20 text-center border-r border-slate-100 dark:border-slate-800">No.</th>
-              <th className="px-8 py-4 border-r border-slate-100 dark:border-slate-800">Floor Name</th>
-              <th className="px-8 py-4 border-r border-slate-100 dark:border-slate-800">Description</th>
-              <th className="px-8 py-4 w-32 text-center">Actions</th>
+            <tr className="border-b border-white/5 bg-slate-900/40 text-[11px] font-bold tracking-widest text-slate-400 uppercase">
+              <th className="w-24 px-8 py-5">Index</th>
+              <th className="px-8 py-5">Floor Name</th>
+              <th className="px-8 py-5">Level Description</th>
+              <th className="w-32 px-8 py-5 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="text-sm divide-y divide-slate-100 dark:divide-slate-800">
-            {floors.map((floor, idx) => (
-              <tr key={idx} className="group hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5 transition-all duration-200">
-                <td className="px-8 py-5 text-center font-bold text-slate-300 dark:text-slate-600 group-hover:text-emerald-500 font-mono text-xs border-r border-slate-50 dark:border-slate-800/50">
-                  {((currentPage - 1) * itemsPerPage) + idx + 1}
-                </td>
-                <td className="px-8 py-5 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-50 dark:border-slate-800/50">{floor.name}</td>
-                <td className="px-8 py-5 text-slate-500 dark:text-slate-400 italic text-xs border-r border-slate-50 dark:border-slate-800/50">{floor.description || "—"}</td>
-                <td className="px-8 py-5">
-                  <div className="flex justify-center gap-2">
-                    <button className="p-2 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg text-blue-500 transition-all" title="Edit">
-                      <Pencil className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg text-red-500 transition-all" title="Delete">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+          <tbody className="divide-y divide-white/5">
+            <AnimatePresence mode="popLayout">
+              {processedFloors.length > 0 ? (
+                processedFloors.map((floor, idx) => (
+                  <Motion.tr
+                    key={floor.id}
+                    layout
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="group transition-colors hover:bg-white/[0.02]"
+                  >
+                    <td className="px-8 py-6">
+                      <span className="rounded bg-white/5 px-2 py-1 font-mono text-xs font-bold text-slate-500">
+                        #{getIndex(idx)}
+                      </span>
+                    </td>
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/5 text-slate-400 group-hover:text-brand transition-colors">
+                          {floor.name.charAt(0)}
+                        </div>
+                        <span className="text-base font-bold tracking-tight text-slate-200 group-hover:text-brand transition-colors">
+                          {floor.name}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-2">
+                        <Info className="h-4 w-4 text-slate-600 shrink-0" />
+                        <p className="line-clamp-1 max-w-xs text-xs font-medium text-slate-500 italic">
+                          {floor.description || 'No descriptive data available for this level'}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                      <div className="flex translate-x-4 items-center justify-end gap-3 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
+                        <button
+                          onClick={() => onEdit(floor)}
+                          className="rounded-xl border border-sky-500/20 bg-sky-500/10 p-3 text-sky-400 transition-all hover:bg-sky-500 hover:text-white active:scale-95"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => onDelete(floor.id)}
+                          className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-rose-400 transition-all hover:bg-rose-500 hover:text-white active:scale-95"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </Motion.tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="px-8 py-24 text-center">
+                    <div className="flex flex-col items-center justify-center gap-4 opacity-50">
+                      <Layers className="h-12 w-12 text-slate-600" />
+                      <p className="text-sm font-bold tracking-widest text-slate-500 uppercase">
+                        No levels generated yet
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </AnimatePresence>
           </tbody>
         </table>
       </div>
-    </div>
-  );
-};
+    </Motion.div>
+  )
+}
 
-export default FloorManagement;
+export default FloorManagement

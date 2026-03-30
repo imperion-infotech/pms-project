@@ -1,160 +1,186 @@
 import React from 'react';
-import {
-  Building, Mail, Phone, MapPin,
-  Edit, Trash2, Plus, User, CheckCircle,
-  Filter, Download, ChevronRight
+import { 
+  Building, Mail, Phone, MapPin, 
+  Trash2, Plus, User, AlertTriangle, X, 
+  Search, ShieldCheck, ChevronRight, UserCircle2, Edit3,
+  PlusCircle, Pencil
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import usePersonalDetailController from '../../../../features/property/hooks/usePersonalDetailController';
 
-const PersonalDetailManagement = ({ 
-  details = [], 
-  searchTerm, 
-  onAdd, 
-  onEdit, 
-  onDelete 
+/**
+ * View: PersonalDetailManagement
+ * Guest directory and profile management using MVC architecture.
+ */
+const PersonalDetailManagement = ({
+  details = [],
+  onAdd,
+  onEdit,
+  onDelete
 }) => {
-  const cleanImageUrl = (path) => {
-    if (!path || path === 'photo' || path === 'sign') return null;
-    let cleanPath = String(path);
-
-    // Fix 1: Handle legacy "Image uploaded successfully: " strings in database
-    if (cleanPath.includes(': ')) {
-      cleanPath = cleanPath.split(': ')[1].trim();
-    }
-
-    // Fix 2: Handle "uploads/pms/" or "/uploads/pms/" prefixes
-    // If the backend expects only the filename, we should extract the last part.
-    // However, if it expects the relative path without leading slash, we handle that.
-    if (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1);
-
-    // If the path still contains slashes, and we are getting 403, 
-    // it's possible the backend only wants the filename.
-    // Let's try to extract the filename for the URL but keep the full path as fallback.
-    const parts = cleanPath.split('/');
-    const fileNameOnly = parts[parts.length - 1];
-
-    return fileNameOnly;
-  };
+  
+  const {
+    stats,
+    cleanImageUrl,
+    deleteTarget,
+    handleDeleteClick,
+    handleConfirmDelete,
+    handleCancelDelete
+  } = usePersonalDetailController({
+    details,
+    onDelete
+  });
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      {/* Header & Search Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-[32px] shadow-sm border border-slate-100 dark:border-slate-800">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500">
-            <User size={24} />
-          </div>
-          <div>
-            <h2 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">Guest Database</h2>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Master record management</p>
-          </div>
+    <div className="space-y-6">
+      {/* Search and Action Bar */}
+      <div className="bg-white dark:bg-surface-100 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-center transition-colors duration-300 gap-4">
+        <div className="text-center sm:text-left">
+          <h2 className="text-lg md:text-xl font-bold text-[#1a2b4b] dark:text-slate-100 font-heading tracking-tight">Personal Details</h2>
+          <p className="text-xs md:text-sm text-slate-400 font-medium">Manage and organize guest profile information</p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onAdd}
-            className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-emerald-500/20 active:scale-95 transition-all shrink-0"
-          >
-            <Plus size={18} />
-            <span className="hidden sm:inline">ADD NEW</span>
-          </button>
-        </div>
+        <button
+          onClick={onAdd}
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white px-5 md:px-6 py-2.5 rounded-xl text-[11px] md:text-xs font-black tracking-wider transition-all shadow-lg shadow-emerald-500/20"
+        >
+          <PlusCircle size={18} />
+          ADD NEW PROFILE
+        </button>
       </div>
 
-      {/* Stats Quick View */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: 'Total Records', value: details.length, color: 'emerald' },
-          { label: 'With Photos', value: details.filter(d => d.profilePhoto).length, color: 'blue' },
-          { label: 'With Signatures', value: details.filter(d => d.signature).length, color: 'purple' },
-          { label: 'Corporate Accounts', value: details.filter(d => d.companyName).length, color: 'orange' },
-        ].map((stat, i) => (
-          <div key={i} className="bg-white dark:bg-slate-900 p-5 rounded-[28px] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
-            <div className="relative z-10">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
-              <h4 className="text-2xl font-black text-slate-800 dark:text-white">{stat.value}</h4>
+      {/* Stats Section */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map((stat, i) => (
+          <div 
+            key={i}
+            className="bg-white dark:bg-surface-100 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm group hover:border-emerald-500/30 transition-all"
+          >
+            <div className="flex flex-col">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{stat.label}</span>
+              <div className="flex items-end justify-between">
+                <h4 className="text-2xl font-bold text-[#1a2b4b] dark:text-slate-100">{stat.value}</h4>
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                  <ChevronRight size={16} />
+                </div>
+              </div>
             </div>
-            <div className={`absolute -right-4 -bottom-4 w-16 h-16 bg-${stat.color}-500/5 rounded-full group-hover:scale-150 transition-transform duration-500`}></div>
           </div>
         ))}
       </div>
 
-      {/* Directory Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <AnimatePresence>
-          {details.map((guest) => (
-            <motion.div
-              key={guest.id}
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="bg-white dark:bg-slate-900 rounded-[35px] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden flex flex-col"
-            >
-              {/* Profile Card Header */}
-              <div className="p-6 pb-4">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-16 h-16 rounded-[22px] bg-slate-100 dark:bg-slate-800 overflow-hidden border-2 border-white dark:border-slate-700 shadow-md group-hover:scale-110 transition-transform duration-500 flex-shrink-0">
-                    {cleanImageUrl(guest.profilePhoto) ? (
-                      <img
-                        src={`/user/${cleanImageUrl(guest.profilePhoto)}`}
-                        alt="Guest"
-                        className="w-full h-full object-cover"
-                        onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=' + guest.firstName }}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-slate-300"><User size={28} /></div>
-                    )}
-                  </div>
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => onEdit(guest)} className="p-2 bg-slate-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-500/10 text-slate-400 hover:text-blue-500 rounded-xl transition-colors"><Edit size={16} /></button>
-                    <button onClick={() => onDelete(guest.id)} className="p-2 bg-slate-50 dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-500/10 text-slate-400 hover:text-red-500 rounded-xl transition-colors"><Trash2 size={16} /></button>
-                  </div>
-                </div>
-
-                <h3 className="text-lg font-black text-slate-800 dark:text-white uppercase tracking-tight line-clamp-1">{guest.firstName} {guest.lastName}</h3>
-                <div className="flex items-center gap-2 text-emerald-500 mt-1">
-                  <Building size={12} />
-                  <span className="text-[10px] font-bold uppercase tracking-widest truncate">{guest.companyName || 'Individual'}</span>
-                </div>
-              </div>
-
-              {/* Contact Info */}
-              <div className="px-6 space-y-3 flex-1">
-                <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/10 rounded-2xl border border-slate-50 dark:border-slate-800/20">
-                  <Mail className="w-4 h-4 text-slate-400" />
-                  <span className="text-xs font-medium text-slate-500 truncate">{guest.email}</span>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/10 rounded-2xl border border-slate-50 dark:border-slate-800/20">
-                  <Phone className="w-4 h-4 text-slate-400" />
-                  <span className="text-xs font-medium text-slate-500">{guest.phone}</span>
-                </div>
-              </div>
-
-              {/* Footer Actions */}
-              <div className="p-6 mt-auto">
-                <button
-                  onClick={() => onEdit(guest)}
-                  className="w-full py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-200 text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-emerald-500 hover:text-white transition-all flex items-center justify-center gap-2 group/btn"
-                >
-                  <span>View Full Profile</span>
-                  <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-
-        {details.length === 0 && (
-          <div className="col-span-full py-20 bg-white dark:bg-slate-900 rounded-[40px] border-2 border-dashed border-slate-200 dark:border-slate-800 text-center">
-            <User size={48} className="mx-auto text-slate-200 mb-4" />
-            <h4 className="text-xl font-black text-slate-400 uppercase">Directory Empty</h4>
-            <p className="text-sm text-slate-300 mt-2">No guest records found matching your current search.</p>
-          </div>
-        )}
+      {/* Guest Table */}
+      <div className="bg-white dark:bg-surface-100 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 transition-colors duration-300 overflow-hidden">
+        <div className="w-full overflow-auto custom-scrollbar max-h-[600px]">
+          <table className="w-full text-left border-collapse min-w-[1100px]">
+            <thead className="sticky top-0 z-10">
+              <tr className="bg-[#f8fafc] dark:bg-slate-800 text-[#64748b] dark:text-slate-400 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+                <th className="px-8 py-4 w-24 text-center border-r border-slate-200 dark:border-slate-800">No.</th>
+                <th className="px-8 py-4 border-r border-slate-200 dark:border-slate-800">Guest Name</th>
+                <th className="px-8 py-4 border-r border-slate-200 dark:border-slate-800">Email Address</th>
+                <th className="px-8 py-4 border-r border-slate-200 dark:border-slate-800 text-center">Phone No.</th>
+                <th className="px-8 py-4 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="text-[13px] divide-y divide-slate-100 dark:divide-slate-800">
+              {details.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="px-8 py-20 text-center text-slate-400 dark:text-slate-500">
+                    <div className="flex flex-col items-center justify-center space-y-2">
+                      <AlertTriangle className="w-10 h-10 opacity-20" />
+                      <p className="font-medium uppercase tracking-widest text-[10px]">No guest profiles defined</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                details.map((guest, idx) => (
+                  <tr key={guest.id} className="group hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5 transition-all h-14">
+                    <td className="px-8 py-2 text-center font-bold text-slate-300 dark:text-slate-600 group-hover:text-emerald-500 font-mono text-[11px] border-r border-slate-100 dark:border-slate-800">
+                      {idx + 1}
+                    </td>
+                    <td className="px-8 py-2 border-r border-slate-100 dark:border-slate-800">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700">
+                          {cleanImageUrl(guest.profilePhoto) ? (
+                            <img
+                              src={`/user/${cleanImageUrl(guest.profilePhoto)}`}
+                              alt="Profile"
+                              className="w-full h-full object-cover"
+                              onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${guest.firstName}+${guest.lastName}&background=334155&color=fff&bold=true` }}
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-slate-400"><User size={14} /></div>
+                          )}
+                        </div>
+                        <span className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-tight">{guest.firstName} {guest.lastName}</span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-2 border-r border-slate-100 dark:border-slate-800 font-mono text-slate-500 dark:text-slate-400 lowercase">{guest.email || '—'}</td>
+                    <td className="px-8 py-2 border-r border-slate-100 dark:border-slate-800 text-center font-bold text-slate-600 dark:text-slate-400">{guest.phone || '—'}</td>
+                    <td className="px-8 py-2 text-center">
+                      <div className="flex items-center justify-center gap-3">
+                        <button
+                          onClick={() => onEdit(guest)}
+                          className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg text-blue-500 transition-colors" title="Edit Profile"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(guest)}
+                          className="p-1.5 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg text-red-500 transition-colors" title="Delete Profile"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
+
+      {/* Custom Delete Confirmation Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-200 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={handleCancelDelete} />
+          <div className="relative z-10 bg-white dark:bg-surface-100 rounded-2xl shadow-2xl w-full max-w-sm p-6 border border-red-100 dark:border-red-900/30">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/10 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-red-500" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base">Delete Profile</h3>
+                <p className="text-xs text-slate-400">This action cannot be undone.</p>
+              </div>
+              <button onClick={handleCancelDelete} className="ml-auto p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                <X className="w-4 h-4 text-slate-400" />
+              </button>
+            </div>
+            <p className="text-sm text-slate-600 dark:text-slate-300 mb-6 font-medium">
+              Are you sure you want to delete profile{' '}
+              <span className="font-bold text-red-500">"{deleteTarget.name}"</span>?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleCancelDelete}
+                className="flex-1 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl transition-all hover:bg-slate-50 dark:hover:bg-slate-800"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="flex-2 py-2.5 bg-red-500 hover:bg-red-600 active:scale-95 text-white rounded-xl text-sm font-bold shadow-lg shadow-red-500/20 transition-all"
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default PersonalDetailManagement;
+export default React.memo(PersonalDetailManagement);

@@ -68,7 +68,7 @@ const Login = () => {
         if (refreshToken) {
           localStorage.setItem('refresh_token', refreshToken);
         }
-      } catch (e) {
+      } catch {
         // If parsing fails, the response is likely a raw JWT string (e.g. "eyJ...")
         localStorage.setItem('access_token', rawText.trim());
       }

@@ -31,7 +31,7 @@ const UserSidebar = ({
       )}
 
       <aside
-        className={`bg-[#1e293b] text-white flex flex-col shrink-0 shadow-2xl z-50 transition-all duration-300 ease-in-out w-64 fixed lg:static h-full lg:h-auto ${isSidebarOpen ? 'ml-0' : '-ml-64'
+        className={`bg-surface-100 text-white flex flex-col shrink-0 shadow-2xl z-50 transition-all duration-300 ease-in-out w-64 fixed lg:static h-full lg:h-auto ${isSidebarOpen ? 'ml-0' : '-ml-64'
           }`}
       >
         <div className="p-4 flex items-center justify-between border-b border-slate-700/50">

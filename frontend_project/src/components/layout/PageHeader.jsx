@@ -3,7 +3,7 @@ import { Layers, Search, RotateCw, Sun, Moon } from 'lucide-react';
 
 const PageHeader = ({ activeItem, onRefresh, isLoading, isDarkMode, toggleTheme }) => {
   return (
-    <div className={`min-h-[3.5rem] ${isDarkMode ? 'bg-[#1e293b] border-slate-800' : 'bg-white border-slate-200'} border-b flex flex-col sm:flex-row items-center justify-between px-4 md:px-6 py-2 sm:py-0 shrink-0 gap-3 sm:gap-0 transition-colors duration-300`}>
+    <div className={`min-h-[3.5rem] ${isDarkMode ? 'bg-surface-100 border-slate-800' : 'bg-white border-slate-200'} border-b flex flex-col sm:flex-row items-center justify-between px-4 md:px-6 py-2 sm:py-0 shrink-0 gap-3 sm:gap-0 transition-colors duration-300`}>
       <div className="flex items-center gap-2 text-xs md:text-sm font-medium text-slate-500 w-full sm:w-auto">
         <Layers className="w-4 h-4 text-emerald-500 shrink-0" />
         <span className="truncate">Property Management</span>

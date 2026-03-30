@@ -159,7 +159,7 @@ const RoomActionModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
           initial={{ scale: 0.95, opacity: 0, y: 30 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0, y: 30 }}
-          className={`relative w-full max-w-4xl my-auto rounded-[40px] border shadow-2xl flex flex-col transition-colors duration-300 ${isDark ? 'bg-[#0f172a] border-slate-800' : 'bg-white border-slate-200'
+          className={`relative w-full max-w-4xl my-auto rounded-[40px] border shadow-2xl flex flex-col transition-colors duration-300 ${isDark ? 'bg-surface-50 border-slate-800' : 'bg-white border-slate-200'
             }`}
         >
           {/* Header Section */}

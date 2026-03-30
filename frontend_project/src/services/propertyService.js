@@ -49,10 +49,11 @@ export const propertyService = {
   searchRoomStatuses: (query) => handleResponse(() => api.get('/user/roomstatus/search', { params: { query } })),
 
   // --- ROOM MASTER (UNITS) ---
-  getRooms: () => handleResponse(() => api.get('/user/getroommasters')),
-  createRoom: (data) => handleResponse(() => api.post('/admin/createroommaster', data)),
-  updateRoom: (id, data) => handleResponse(() => api.put(`/admin/updateroommaster/${id}`, data)),
-  deleteRoom: (id) => handleResponse(() => api.delete(`/admin/deleteroommaster/${id}`)),
+  getRooms: () => handleResponse(() => api.get('/user/getroommasters', { params: { page: 0, size: 100, sortBy: 'id', sortDir: 'asc' } })),
+  getRoomById: (id) => handleResponse(() => api.get(`/user/getroommaster/${id}`)),
+  createRoom: (data) => handleResponse(() => api.post('/admin/roommaster/createroommaster', data)),
+  updateRoom: (id, data) => handleResponse(() => api.put(`/admin/roommaster/updateroommaster/${id}`, data)),
+  deleteRoom: (id) => handleResponse(() => api.delete(`/admin/roommaster/deleter/${id}`)),
   searchRooms: (query) => handleResponse(() => api.get('/user/roommaster/search', { params: { query } })),
 
 
@@ -67,9 +68,9 @@ export const propertyService = {
   // --- GUEST PERSONAL DETAILS ---
   getPersonalDetails: () => handleResponse(() => api.get('/user/getpersonaldetails')),
   getPersonalDetailById: (id) => handleResponse(() => api.get(`/user/getpersonaldetails/${id}`)),
-  createPersonalDetail: (data) => handleResponse(() => api.post('/admin/createpersonaldetail', data)),
-  updatePersonalDetail: (id, data) => handleResponse(() => api.put(`/admin/updatepersonaldetail/${id}`, data)),
-  deletePersonalDetail: (id) => handleResponse(() => api.delete(`/admin/deletepersonaldetail/${id}`)),
+  createPersonalDetail: (data) => handleResponse(() => api.post('/user/createpersonaldetail', data)),
+  updatePersonalDetail: (id, data) => handleResponse(() => api.put(`/user/updatepersonaldetail/${id}`, data)),
+  deletePersonalDetail: (id) => handleResponse(() => api.delete(`/user/deletepersonaldetail/${id}`)),
   searchPersonalDetails: (query) => handleResponse(() => api.get(`/user/personaldetails/search`, { params: { query } })),
 
   // --- IMAGE MANAGEMENT ---

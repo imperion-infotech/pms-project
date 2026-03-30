@@ -17,8 +17,8 @@ export const RoomModal = ({ isRoomModalOpen, setIsRoomModalOpen, newRoom, setNew
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={() => setIsRoomModalOpen(false)}
       ></div>
-      <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-2xl w-full max-w-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-300 transition-colors duration-300 flex flex-col max-h-[90vh]">
-        <div className="p-5 sm:p-6 bg-[#1e293b] dark:bg-[#1e293b] text-white flex justify-between items-center shrink-0">
+      <div className="bg-white dark:bg-surface-100 rounded-2xl shadow-2xl w-full max-w-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-300 transition-colors duration-300 flex flex-col max-h-[90vh]">
+        <div className="p-5 sm:p-6 bg-surface-100 dark:bg-surface-100 text-white flex justify-between items-center shrink-0">
           <div className="flex items-center gap-3">
             <DoorOpen className="w-6 h-6 text-emerald-400" />
             <div>

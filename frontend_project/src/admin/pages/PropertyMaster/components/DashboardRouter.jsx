@@ -25,7 +25,6 @@ const DashboardRouter = ({
   allBuildings,
   allRoomTypes,
   searchTerm,
-  setSearchTerm,
   toggleModal,
   setEditFloor,
   setEditBuilding,
@@ -46,7 +45,8 @@ const DashboardRouter = ({
   deleteTax,
   currentPage,
   itemsPerPage,
-  userRole
+  userRole,
+  isLoading
 }) => {
 
   switch (activeItem) {
@@ -106,10 +106,22 @@ const DashboardRouter = ({
           buildings={allBuildings}
           searchTerm={searchTerm}
           setIsRoomModalOpen={(isOpen) => toggleModal('room', isOpen)}
-          onEdit={(r) => { setEditRoom(r); toggleModal('roomEdit', true); }}
+          onEdit={(r) => {
+            setEditRoom({
+              ...r,
+              buildingId: r.buildingId || r.building_id || r.building?.id || r.building || r.buildings,
+              floorId: r.floorId || r.floor_id || r.floor?.id || r.floor,
+              roomTypeId: r.roomTypeId || r.room_type_id || r.roomType?.id || r.roomType,
+              smoking: Boolean(r.smoking || r.is_smoking || r.isSmoking),
+              handicap: Boolean(r.handicap || r.is_handicap || r.isHandicap),
+              nonRoom: Boolean(r.nonRoom || r.non_room || r.isNonRoom)
+            });
+            toggleModal('roomEdit', true);
+          }}
           onDelete={deleteRoom}
           currentPage={currentPage}
           itemsPerPage={itemsPerPage}
+          isLoading={isLoading}
         />
       );
     case 'Tax':

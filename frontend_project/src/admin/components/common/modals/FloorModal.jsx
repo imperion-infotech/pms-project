@@ -18,8 +18,8 @@ export const FloorModal = ({ isFloorModalOpen, setIsFloorModalOpen, newFloor, se
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={() => setIsFloorModalOpen(false)}
       ></div>
-      <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-2xl w-full max-w-md relative z-10 overflow-hidden animate-in zoom-in-95 duration-300 transition-colors duration-300">
-        <div className="p-6 bg-[#1e293b] dark:bg-[#0f172a] text-white flex justify-between items-center">
+      <div className="bg-white dark:bg-surface-100 rounded-2xl shadow-2xl w-full max-w-md relative z-10 overflow-hidden animate-in zoom-in-95 duration-300 transition-colors duration-300">
+        <div className="p-6 bg-surface-100 dark:bg-surface-50 text-white flex justify-between items-center">
           <div className="flex items-center gap-3">
             <PlusCircle className="w-6 h-6 text-emerald-400" />
             <div>

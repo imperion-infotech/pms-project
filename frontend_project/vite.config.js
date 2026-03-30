@@ -8,17 +8,17 @@ export default defineConfig({
   server: {
     proxy: {
       '/user': {
-        target: 'http://192.168.1.3:9091',
+        target: 'http://192.168.1.5:9091',
         changeOrigin: true,
         secure: false,
       },
       '/admin': {
-        target: 'http://192.168.1.3:9091',
+        target: 'http://192.168.1.5:9091',
         changeOrigin: true,
         secure: false,
       },
       '/auth': {
-        target: 'http://192.168.1.3:9091',
+        target: 'http://192.168.1.5:9091',
         changeOrigin: true,
         secure: false,
       },

@@ -20,7 +20,7 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
     { name: 'Personal Detail', icon: User },
   ];
 
-  const [isProfileOpen, setIsProfileOpen] = React.useState(true);
+  const [isProfileOpen, setIsProfileOpen] = useState(true);
 
   return (
     <>
@@ -33,7 +33,7 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
       )}
 
       <aside
-        className={`bg-[#1e293b] text-white flex flex-col shrink-0 shadow-xl z-30 transition-all duration-300 ease-in-out w-64 fixed lg:static h-full lg:h-auto ${isSidebarOpen ? 'ml-0' : '-ml-64'
+        className={`bg-surface-100 text-white flex flex-col shrink-0 shadow-xl z-30 transition-all duration-300 ease-in-out w-64 fixed lg:static h-full lg:h-auto ${isSidebarOpen ? 'ml-0' : '-ml-64'
           }`}
       >
         <div className="p-4 flex items-center justify-between border-b border-slate-700/50">

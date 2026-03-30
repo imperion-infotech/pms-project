@@ -3,7 +3,7 @@ import { Menu, Building2, Home, ChevronDown, UserCircle } from 'lucide-react';
 
 const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   return (
-    <header className="h-16 bg-[#1e293b] text-white flex items-center justify-between px-4 md:px-6 shrink-0 shadow-lg z-10">
+    <header className="h-16 bg-surface-100 text-white flex items-center justify-between px-4 md:px-6 shrink-0 shadow-lg z-10">
       <div className="flex items-center gap-2 md:gap-6 min-w-0">
         <div className={`transition-all duration-300 overflow-hidden flex items-center justify-center ${!isSidebarOpen ? "w-10 opacity-100" : "w-0 opacity-0 pointer-events-none"}`}>
           <button

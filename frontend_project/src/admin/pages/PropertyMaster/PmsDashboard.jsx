@@ -30,7 +30,7 @@ const PmsDashboard = () => {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
 
   // User Role Detection for permissions
-  const [userRole, setUserRole] = useState(() => {
+  const [userRole] = useState(() => {
     const token = localStorage.getItem('access_token');
     if (!token) return 'ROLE_USER';
     try {
@@ -96,6 +96,7 @@ const PmsDashboard = () => {
   // Personal Detail State
   const [personalFormData, setPersonalFormData] = useState({ firstName: '', lastName: '', companyName: '', phone: '', email: '', address: '', profilePhoto: '', signature: '' });
   const [uploadingType, setUploadingType] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   /**
    * EVENT HANDLERS - Property Management Actions
@@ -123,6 +124,7 @@ const PmsDashboard = () => {
       setNewBuilding({ name: '', description: '' });
       toggleModal('building', false);
     } catch (err) {
+      console.error('Add Building Error:', err);
       alert('Failed to add building. Please try again.');
     }
   };
@@ -139,6 +141,7 @@ const PmsDashboard = () => {
       });
       toggleModal('buildingEdit', false);
     } catch (err) {
+      console.error('Update Building Error:', err);
       alert('Failed to update building. Please check your data.');
     }
   };
@@ -179,15 +182,20 @@ const PmsDashboard = () => {
 
   const handleAddRoom = async (e) => {
     e.preventDefault();
-    if (!newRoom.roomName || (!newRoom.nonRoom && !newRoom.roomTypeId) || !newRoom.floorId || !newRoom.buildingId) return;
+    const isNonRoom = Boolean(newRoom.nonRoom || newRoom.non_room || newRoom.isNonRoom);
+    if (!newRoom.roomName || (!isNonRoom && !newRoom.roomTypeId) || !newRoom.floorId || !newRoom.buildingId) return;
 
-    // Prepare payload: ensure roomTypeId is null if empty or nonRoom
+    // Prepare payload matching the provided JSON schema
     const payload = {
-      ...newRoom,
+      roomName: newRoom.roomName,
+      name: newRoom.roomName, // Synchronized as per schema
       roomShortName: newRoom.roomShortName || newRoom.roomName,
-      roomTypeId: newRoom.nonRoom ? null : (newRoom.roomTypeId || null),
-      floorId: newRoom.floorId,
-      buildingId: newRoom.buildingId
+      roomTypeId: isNonRoom ? null : Number(newRoom.roomTypeId),
+      floorId: Number(newRoom.floorId),
+      buildingId: Number(newRoom.buildingId),
+      smoking: Boolean(newRoom.smoking),
+      handicap: Boolean(newRoom.handicap),
+      nonRoom: isNonRoom
     };
 
     await addRoom(payload);
@@ -197,13 +205,22 @@ const PmsDashboard = () => {
 
   const handleUpdateRoom = async (e) => {
     e.preventDefault();
-    if (!editRoom.roomName || (!editRoom.nonRoom && !editRoom.roomTypeId) || !editRoom.floorId || !editRoom.buildingId) return;
+    const isNonRoom = Boolean(editRoom.nonRoom || editRoom.non_room || editRoom.isNonRoom);
+    if (!editRoom.roomName || (!isNonRoom && !editRoom.roomTypeId) || !editRoom.floorId || !editRoom.buildingId) return;
 
-    // Prepare payload
+    // Prepare payload matching the provided JSON schema
     const payload = {
-      ...editRoom,
+      id: editRoom.id,
+      roomName: editRoom.roomName,
+      name: editRoom.roomName, // Synchronized
       roomShortName: editRoom.roomShortName || editRoom.roomName,
-      roomTypeId: editRoom.nonRoom ? null : (editRoom.roomTypeId || null)
+      roomTypeId: isNonRoom ? null : Number(editRoom.roomTypeId),
+      floorId: Number(editRoom.floorId),
+      buildingId: Number(editRoom.buildingId),
+      smoking: Boolean(editRoom.smoking),
+      handicap: Boolean(editRoom.handicap),
+      nonRoom: isNonRoom,
+      createdOn: editRoom.createdOn // Preserve metadata if present
     };
 
     await hookUpdateRoom(editRoom.id, payload);
@@ -233,6 +250,7 @@ const PmsDashboard = () => {
       console.log("Payload--------------------------->", payload)
       toggleModal('taxEdit', false);
     } catch (err) {
+      console.error('Update Tax Error:', err);
       alert('Update failed. Ensure that Tax Type Enum is a valid value recognised by the backend.');
     }
   };
@@ -240,14 +258,25 @@ const PmsDashboard = () => {
   const handlePersonalSubmit = async (e) => {
     e.preventDefault();
     if (!personalFormData.firstName) return;
-    if (personalFormData.id) {
-      await updatePersonalDetail(personalFormData.id, personalFormData);
-    } else {
-      await addPersonalDetail(personalFormData);
+
+    setIsSaving(true);
+    try {
+      if (personalFormData.id) {
+        await updatePersonalDetail(personalFormData.id, personalFormData);
+        alert('Profile updated successfully!');
+      } else {
+        await addPersonalDetail(personalFormData);
+        alert('Profile created successfully!');
+      }
+      setPersonalFormData({ firstName: '', lastName: '', companyName: '', phone: '', email: '', address: '', profilePhoto: '', signature: '' });
+      toggleModal('personalDetail', false);
+      toggleModal('personalDetailEdit', false);
+    } catch (err) {
+      console.error('Personal Detail Error:', err);
+      alert('Failed to save profile. Please check the console for details.');
+    } finally {
+      setIsSaving(false);
     }
-    setPersonalFormData({ firstName: '', lastName: '', companyName: '', phone: '', email: '', address: '', profilePhoto: '', signature: '' });
-    toggleModal('personalDetail', false);
-    toggleModal('personalDetailEdit', false); // Close edit modal too
   };
 
   const handlePersonalFileUpload = async (e, type) => {
@@ -294,10 +323,10 @@ const PmsDashboard = () => {
     const delayDebounce = setTimeout(() => {
       if (searchTerm.trim()) {
         switch (activeItem) {
-          case 'Room': searchRooms(searchTerm); break;
-          case 'Floor': searchFloors(searchTerm); break;
           case 'Building': searchBuildings(searchTerm); break;
+          case 'Floor': searchFloors(searchTerm); break;
           case 'Room Type': searchRoomTypes(searchTerm); break;
+          case 'Room': searchRooms(searchTerm); break;
           case 'Room Status': searchRoomStatuses(searchTerm); break;
           default: break;
         }
@@ -308,7 +337,7 @@ const PmsDashboard = () => {
     }, 600); // 600ms debounce
 
     return () => clearTimeout(delayDebounce);
-  }, [searchTerm, activeItem]);
+  }, [searchTerm, activeItem, fetchData, searchBuildings, searchFloors, searchRoomStatuses, searchRoomTypes, searchRooms]);
 
   // Industrial Standard Performance Optimization: UseMemo for filtering
   const filteredData = React.useMemo(() => {
@@ -328,7 +357,7 @@ const PmsDashboard = () => {
       rooms: filter(rooms), roomStatuses: filter(roomStatuses), personalDetails: filter(personalDetails),
       taxes: filter(taxes)
     };
-  }, [searchTerm, floors, buildings, roomTypes, roomStatuses, rooms, personalDetails]);
+  }, [searchTerm, floors, buildings, roomTypes, roomStatuses, rooms, personalDetails, taxes]);
 
   // ✅ Industrial Standard Performance Optimization: UseMemo for pagination
   const paginatedData = React.useMemo(() => {
@@ -349,7 +378,7 @@ const PmsDashboard = () => {
   }, [currentPage, itemsPerPage, filteredData]);
 
   return (
-    <div className={`flex h-screen ${isDark ? 'bg-[#0f172a] text-slate-100' : 'bg-[#f4f7fa] text-slate-800'} font-sans overflow-hidden transition-colors duration-300`}>
+    <div className={`flex h-screen ${isDark ? 'bg-surface-50 text-slate-100' : 'bg-[#f4f7fa] text-slate-800'} font-sans overflow-hidden transition-colors duration-300`}>
       {/* 1. Global Navigation Sidebar */}
       <Sidebar
         isSidebarOpen={isSidebarOpen}
@@ -377,7 +406,7 @@ const PmsDashboard = () => {
         />
 
         {/* 5. Main Content Area - Scrollable */}
-        <main className={`flex-1 overflow-auto ${isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'} custom-scrollbar p-3 md:p-6 lg:p-8 transition-colors duration-300`}>
+        <main className={`flex-1 overflow-auto ${isDark ? 'bg-surface-50' : 'bg-[#f8fafc]'} custom-scrollbar p-3 md:p-6 lg:p-8 transition-colors duration-300`}>
           <div className="max-w-[1600px] mx-auto space-y-4 md:y-6 flex flex-col">
 
             {/* Dynamic Dashboard Module Rendering */}
@@ -418,7 +447,7 @@ const PmsDashboard = () => {
               }}
               onDeletePersonalDetail={deletePersonalDetail}
               currentPage={currentPage}
-              itemsPerPage={itemsPerPage}
+              isLoading={isLoading}
               userRole={userRole}
             />
 
@@ -472,7 +501,7 @@ const PmsDashboard = () => {
         handlePersonalSubmit={handlePersonalSubmit}
         handlePersonalFileUpload={handlePersonalFileUpload}
         uploadingType={uploadingType}
-        isLoading={isLoading}
+        isLoading={isLoading || isSaving}
       />
 
       <style>{`
