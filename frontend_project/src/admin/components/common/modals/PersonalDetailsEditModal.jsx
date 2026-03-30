@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, User, Building, Phone, Mail, Camera, Pen as SignatureIcon, Loader2, Save } from 'lucide-react';
+import { AuthImage } from '../AuthImage';
 
 export const PersonalDetailsEditModal = ({ 
   isOpen, setIsOpen, formData, setFormData, handleSubmit, 
@@ -42,8 +43,8 @@ export const PersonalDetailsEditModal = ({
   if (!isOpen) return null;
 
   // Determine source: Local preview takes precedence during upload/session
-  const photoSrc = localPreviews.photo || (cleanImageUrl(formData.profilePhoto) ? `http://192.168.1.5:9091/user/${cleanImageUrl(formData.profilePhoto)}` : null);
-  const signatureSrc = localPreviews.signature || (cleanImageUrl(formData.signature) ? `http://192.168.1.5:9091/user/${cleanImageUrl(formData.signature)}` : null);
+  const photoSrc = localPreviews.photo || (cleanImageUrl(formData.profilePhoto) ? `/user/${cleanImageUrl(formData.profilePhoto)}` : null);
+  const signatureSrc = localPreviews.signature || (cleanImageUrl(formData.signature) ? `/user/${cleanImageUrl(formData.signature)}` : null);
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
@@ -58,7 +59,7 @@ export const PersonalDetailsEditModal = ({
            <div className="relative group mb-8">
               <div className="w-32 h-32 rounded-[32px] bg-white dark:bg-slate-800 shadow-xl overflow-hidden border-4 border-white dark:border-blue-500/20">
                 {photoSrc ? (
-                   <img src={photoSrc} alt="Preview" className="w-full h-full object-cover" />
+                   <AuthImage src={photoSrc} alt="Preview" className="w-full h-full object-cover" />
                 ) : (
                    <div className="w-full h-full flex items-center justify-center text-slate-300 bg-slate-100 dark:bg-slate-900/50">
                      <User size={40} />
@@ -73,8 +74,8 @@ export const PersonalDetailsEditModal = ({
            <div className="w-full space-y-4">
               <div className="relative border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-4 bg-white dark:bg-slate-900/30 text-center">
                   {signatureSrc ? (
-                     <div className="h-20 flex items-center justify-center">
-                        <img src={signatureSrc} alt="Signature" className="max-h-full" />
+                     <div className="h-20 flex items-center justify-center relative">
+                        <AuthImage src={signatureSrc} alt="Signature" className="max-h-full" />
                         <button type="button" onClick={() => {
                           setFormData({...formData, signature: ''});
                           if (localPreviews.signature) URL.revokeObjectURL(localPreviews.signature);

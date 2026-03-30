@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import usePersonalDetailController from '../../../../features/property/hooks/usePersonalDetailController';
+import { AuthImage } from '../../../components/common/AuthImage';
 
 /**
  * View: PersonalDetailManagement
@@ -102,11 +103,11 @@ const PersonalDetailManagement = ({
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700">
                           {cleanImageUrl(guest.profilePhoto) ? (
-                            <img
+                            <AuthImage
                               src={`/user/${cleanImageUrl(guest.profilePhoto)}`}
                               alt="Profile"
                               className="w-full h-full object-cover"
-                              onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${guest.firstName}+${guest.lastName}&background=334155&color=fff&bold=true` }}
+                              fallback={<img src={`https://ui-avatars.com/api/?name=${guest.firstName}+${guest.lastName}&background=334155&color=fff&bold=true`} alt="Profile" className="w-full h-full object-cover" />}
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-slate-400"><User size={14} /></div>

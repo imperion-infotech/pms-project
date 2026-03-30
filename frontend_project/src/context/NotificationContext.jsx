@@ -1,39 +1,43 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
+import { X, CheckCircle2, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 
 const NotificationContext = createContext(null);
 
 export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
 
-  const addNotification = useCallback((notification) => {
-    const id = Date.now();
-    setNotifications((prev) => [...prev, { ...notification, id }]);
-    
-    // Auto-remove after 5 seconds
-    if (notification.duration !== 0) {
-      setTimeout(() => {
-        setNotifications((prev) => prev.filter((n) => n.id !== id));
-      }, notification.duration || 5000);
-    }
-  }, []);
-
   const removeNotification = useCallback((id) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   }, []);
 
-  const success = (message, title = 'Success') => addNotification({ type: 'success', title, message });
-  const error = (message, title = 'Error') => addNotification({ type: 'error', title, message });
-  const info = (message, title = 'Info') => addNotification({ type: 'info', title, message });
-  const warn = (message, title = 'Warning') => addNotification({ type: 'warning', title, message });
+  const addNotification = useCallback((notification) => {
+    // Generate a unique identifier safely
+    const id = Date.now().toString() + Math.random().toString(36).substring(2, 9);
+    const duration = notification.duration !== undefined ? notification.duration : 5000;
+    
+    setNotifications((prev) => [...prev, { ...notification, id, duration }]);
+    
+    // Auto-remove after the defined duration
+    if (duration !== 0) {
+      setTimeout(() => {
+        removeNotification(id);
+      }, duration);
+    }
+  }, [removeNotification]);
+
+  // Context provider actions with default industrial-standard titles
+  const success = useCallback((message, title = 'Process Successful', duration) => addNotification({ type: 'success', title, message, duration }), [addNotification]);
+  const error = useCallback((message, title = 'Action Failed', duration) => addNotification({ type: 'error', title, message, duration }), [addNotification]);
+  const info = useCallback((message, title = 'Information', duration) => addNotification({ type: 'info', title, message, duration }), [addNotification]);
+  const warn = useCallback((message, title = 'Warning', duration) => addNotification({ type: 'warning', title, message, duration }), [addNotification]);
 
   return (
     <NotificationContext.Provider value={{ success, error, info, warn, removeNotification }}>
       {children}
-      <div className="fixed bottom-4 right-4 z-9999 flex flex-col gap-3 min-w-[320px] max-w-[420px]">
-        <AnimatePresence>
+      <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-4 min-w-[340px] max-w-[420px] pointer-events-none">
+        <AnimatePresence mode="popLayout">
           {notifications.map((n) => (
             <NotificationItem key={n.id} notification={n} onDismiss={() => removeNotification(n.id)} />
           ))}
@@ -44,50 +48,82 @@ export const NotificationProvider = ({ children }) => {
 };
 
 const NotificationItem = ({ notification, onDismiss }) => {
-  const icons = {
-    success: <CheckCircle className="w-5 h-5 text-emerald-400" />,
-    error: <AlertCircle className="w-5 h-5 text-rose-400" />,
-    info: <Info className="w-5 h-5 text-sky-400" />,
-    warning: <AlertTriangle className="w-5 h-5 text-amber-400" />,
-  };
+  const { type, title, message, duration } = notification;
 
-  const bgStyles = {
-    success: 'bg-emerald-500/10 border-emerald-500/20',
-    error: 'bg-rose-500/10 border-rose-500/20',
-    info: 'bg-sky-500/10 border-sky-500/20',
-    warning: 'bg-amber-500/10 border-amber-500/20',
-  };
+  // Premium, corporate-grade aesthetic styling for each notification type
+  const config = {
+    success: {
+      icon: <CheckCircle2 className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />,
+      accent: 'bg-emerald-500',
+      lightBg: 'bg-emerald-50/90 border-emerald-200/50',
+      darkBg: 'dark:bg-emerald-500/10 dark:border-emerald-500/30',
+      shadow: 'shadow-emerald-500/10',
+    },
+    error: {
+      icon: <AlertCircle className="w-5 h-5 text-rose-500 dark:text-rose-400" />,
+      accent: 'bg-rose-500',
+      lightBg: 'bg-rose-50/90 border-rose-200/50',
+      darkBg: 'dark:bg-rose-500/10 dark:border-rose-500/30',
+      shadow: 'shadow-rose-500/10',
+    },
+    info: {
+      icon: <Info className="w-5 h-5 text-blue-500 dark:text-blue-400" />,
+      accent: 'bg-blue-500',
+      lightBg: 'bg-blue-50/90 border-blue-200/50',
+      darkBg: 'dark:bg-blue-500/10 dark:border-blue-500/30',
+      shadow: 'shadow-blue-500/10',
+    },
+    warning: {
+      icon: <AlertTriangle className="w-5 h-5 text-amber-500 dark:text-amber-400" />,
+      accent: 'bg-amber-500',
+      lightBg: 'bg-amber-50/90 border-amber-200/50',
+      darkBg: 'dark:bg-amber-500/10 dark:border-amber-500/30',
+      shadow: 'shadow-amber-500/10',
+    },
+  }[type];
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 50, scale: 0.95 }}
-      animate={{ opacity: 1, x: 0, scale: 1 }}
-      exit={{ opacity: 0, x: 20, scale: 0.95 }}
-      className={`p-4 rounded-xl border ${bgStyles[notification.type]} backdrop-blur-md flex gap-3 shadow-2xl overflow-hidden relative group`}
+      layout
+      initial={{ opacity: 0, y: 50, scale: 0.9, filter: 'blur(8px)' }}
+      animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+      exit={{ opacity: 0, scale: 0.9, filter: 'blur(8px)', transition: { duration: 0.2 } }}
+      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+      className={`pointer-events-auto relative overflow-hidden flex gap-4 p-5 rounded-2xl border ${config.lightBg} ${config.darkBg} shadow-2xl ${config.shadow} backdrop-blur-2xl group hover:-translate-y-1 transition-transform duration-300 isolate`}
     >
-      <div className="shrink-0 mt-0.5">{icons[notification.type]}</div>
-      <div className="grow">
-        <h4 className="font-semibold text-sm text-slate-100">{notification.title}</h4>
-        <p className="text-xs text-slate-400 mt-1 leading-relaxed">{notification.message}</p>
+      {/* Accent Line Left for visual distinction */}
+      <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${config.accent} opacity-90`} />
+
+      <div className="shrink-0 pt-0.5 ml-1">
+        <div className="p-2.5 rounded-xl bg-white/60 dark:bg-slate-900/50 border border-white/40 dark:border-white/5 shadow-sm">
+          {config.icon}
+        </div>
       </div>
+      
+      <div className="flex-1 pr-6 flex flex-col justify-center">
+        <h4 className="font-extrabold text-[13px] tracking-wide text-slate-800 dark:text-slate-100 uppercase mb-1">{title}</h4>
+        <p className="text-[13px] font-medium text-slate-600 dark:text-slate-400 leading-relaxed">{message}</p>
+      </div>
+      
       <button 
         onClick={onDismiss}
-        className="shrink-0 text-slate-500 hover:text-white transition-colors p-1"
+        className="absolute top-4 right-4 text-slate-400 hover:text-slate-800 dark:hover:text-white transition-all p-1.5 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-800/60 active:scale-90"
+        title="Dismiss Notification"
       >
         <X className="w-4 h-4" />
       </button>
-      
-      {/* Progress Bar Animation */}
-      <motion.div 
-        initial={{ scaleX: 1 }}
-        animate={{ scaleX: 0 }}
-        transition={{ duration: 5, ease: "linear" }}
-        className={`absolute bottom-0 left-0 right-0 h-0.5 origin-left ${
-          notification.type === 'success' ? 'bg-emerald-500/50' : 
-          notification.type === 'error' ? 'bg-rose-500/50' : 
-          notification.type === 'info' ? 'bg-sky-500/50' : 'bg-amber-500/50'
-        }`}
-      />
+
+      {/* Dynamic Progress Bar Animation */}
+      {duration !== 0 && (
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/5 dark:bg-white/5">
+          <motion.div 
+            initial={{ scaleX: 1 }}
+            animate={{ scaleX: 0 }}
+            transition={{ duration: duration / 1000, ease: 'linear' }}
+            className={`h-full origin-left ${config.accent} opacity-80`}
+          />
+        </div>
+      )}
     </motion.div>
   );
 };
