@@ -3,21 +3,38 @@ import { useState, useCallback } from 'react'
 /**
  * usePersonalDetailManagement - Centralized hook for Guest Personal Detail CRUD operations.
  */
-export const usePersonalDetailManagement = ({ 
-  addPersonalDetail, 
-  updatePersonalDetail, 
-  toggleModal 
+export const usePersonalDetailManagement = ({
+  addPersonalDetail,
+  updatePersonalDetail,
+  toggleModal,
 }) => {
   const [personalFormData, setPersonalFormData] = useState({
     firstName: '',
     lastName: '',
     mobileNumber: '',
-    emailAddress: '',
+    email: '',
+    phone: '',
+    address: '',
     companyName: '',
     documentTypeId: '',
     documentNumber: '',
+    profilePhoto: '',
+    signature: '',
   })
-  const [editPersonalDetail, setEditPersonalDetail] = useState(null)
+  const [editPersonalFormData, setEditPersonalFormData] = useState({
+    id: null,
+    firstName: '',
+    lastName: '',
+    mobileNumber: '',
+    email: '',
+    phone: '',
+    address: '',
+    companyName: '',
+    documentTypeId: '',
+    documentNumber: '',
+    profilePhoto: '',
+    signature: '',
+  })
 
   const handleAddPersonalDetail = useCallback(async () => {
     if (!personalFormData.firstName.trim()) return
@@ -27,38 +44,45 @@ export const usePersonalDetailManagement = ({
         firstName: '',
         lastName: '',
         mobileNumber: '',
-        emailAddress: '',
+        email: '',
+        phone: '',
+        address: '',
         companyName: '',
         documentTypeId: '',
         documentNumber: '',
+        profilePhoto: '',
+        signature: '',
       })
-      toggleModal('PersonalDetail', false)
+      toggleModal('personalDetail', false)
     } catch (err) {
       console.error('Failed to create personal detail:', err)
     }
   }, [personalFormData, addPersonalDetail, toggleModal])
 
   const handleUpdatePersonalDetail = useCallback(async () => {
-    if (!editPersonalDetail?.id) return
+    if (!editPersonalFormData?.id) return
     try {
-      await updatePersonalDetail(editPersonalDetail.id, editPersonalDetail)
-      setEditPersonalDetail(null)
-      toggleModal('PersonalDetailEdit', false)
+      await updatePersonalDetail(editPersonalFormData.id, editPersonalFormData)
+      setEditPersonalFormData({ id: null })
+      toggleModal('personalDetailEdit', false)
     } catch (err) {
       console.error('Failed to update personal detail:', err)
     }
-  }, [editPersonalDetail, updatePersonalDetail, toggleModal])
+  }, [editPersonalFormData, updatePersonalDetail, toggleModal])
 
-  const handleEditPersonalDetail = useCallback((detail) => {
-    setEditPersonalDetail({ ...detail })
-    toggleModal('PersonalDetailEdit', true)
-  }, [toggleModal])
+  const handleEditPersonalDetail = useCallback(
+    (detail) => {
+      setEditPersonalFormData({ ...detail })
+      toggleModal('personalDetailEdit', true)
+    },
+    [toggleModal],
+  )
 
   return {
     personalFormData,
     setPersonalFormData,
-    editPersonalDetail,
-    setEditPersonalDetail,
+    editPersonalFormData,
+    setEditPersonalFormData,
     handleAddPersonalDetail,
     handleUpdatePersonalDetail,
     handleEditPersonalDetail,

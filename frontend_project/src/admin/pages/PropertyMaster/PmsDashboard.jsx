@@ -213,6 +213,8 @@ const PmsDashboard = () => {
   const {
     personalFormData,
     setPersonalFormData,
+    editPersonalFormData,
+    setEditPersonalFormData,
     handleAddPersonalDetail,
     handleUpdatePersonalDetail,
     handleEditPersonalDetail,
@@ -225,7 +227,8 @@ const PmsDashboard = () => {
    */
   const handlePersonalSubmit = async (e) => {
     e.preventDefault()
-    if (personalFormData.id) {
+    // Determine which action to take based on whether we have an ID in edit state
+    if (editPersonalFormData && editPersonalFormData.id) {
       handleUpdatePersonalDetail()
     } else {
       handleAddPersonalDetail()
@@ -515,6 +518,8 @@ const PmsDashboard = () => {
         // Personal Detail
         personalFormData={personalFormData}
         setPersonalFormData={setPersonalFormData}
+        editPersonalFormData={editPersonalFormData}
+        setEditPersonalFormData={setEditPersonalFormData}
         handlePersonalSubmit={handlePersonalSubmit}
         handleEditPersonalDetail={handleEditPersonalDetail}
         handlePersonalFileUpload={handlePersonalFileUpload}

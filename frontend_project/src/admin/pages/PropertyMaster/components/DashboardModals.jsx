@@ -70,6 +70,8 @@ const DashboardModals = ({
   // Personal Detail
   personalFormData,
   setPersonalFormData,
+  editPersonalFormData,
+  setEditPersonalFormData,
   handlePersonalSubmit,
   handlePersonalFileUpload,
   uploadingType,
@@ -208,7 +210,6 @@ const DashboardModals = ({
         handleUpdateTax={handleUpdateTax}
         taxes={taxes}
       />
-
       {/* Personal Detail Modals */}
       <PersonalDetailsModal
         isOpen={modals.personalDetail}
@@ -224,8 +225,8 @@ const DashboardModals = ({
       <PersonalDetailsEditModal
         isOpen={modals.personalDetailEdit}
         setIsOpen={(isOpen) => toggleModal('personalDetailEdit', isOpen)}
-        formData={personalFormData}
-        setFormData={setPersonalFormData}
+        formData={editPersonalFormData}
+        setFormData={setEditPersonalFormData}
         handleSubmit={handlePersonalSubmit}
         handleFileUpload={handlePersonalFileUpload}
         uploadingType={uploadingType}
