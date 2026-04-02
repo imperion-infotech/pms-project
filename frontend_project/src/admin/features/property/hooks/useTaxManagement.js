@@ -32,7 +32,7 @@ export const useTaxManagement = ({
         perDayTax: false,
         perStayTax: false,
       })
-      toggleModal('Tax', false)
+      toggleModal('tax', false)
     } catch (err) {
       console.error('Failed to create tax record:', err)
     }
@@ -49,7 +49,7 @@ export const useTaxManagement = ({
         perDayTax: false,
         perStayTax: false,
       })
-      toggleModal('TaxEdit', false)
+      toggleModal('taxEdit', false)
     } catch (err) {
       console.error('Failed to update tax record:', err)
     }
@@ -57,7 +57,7 @@ export const useTaxManagement = ({
 
   const handleEditTax = useCallback((tax) => {
     setEditTax({ ...tax })
-    toggleModal('TaxEdit', true)
+    toggleModal('taxEdit', true)
   }, [toggleModal])
 
   return {

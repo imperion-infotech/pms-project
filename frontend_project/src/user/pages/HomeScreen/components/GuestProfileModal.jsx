@@ -262,11 +262,16 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
         roomId: room.id,
         roomName: room.roomName,
       }
+
+      let finalProfileId = targetProfileId
       if (isExisting && targetProfileId) {
         await updatePersonalDetail(targetProfileId, payload)
       } else {
-        await addPersonalDetail(payload)
+        const result = await addPersonalDetail(payload)
+        // Link the newly created profile ID back to the room
+        finalProfileId = result?.data?.id || result?.data || finalProfileId
       }
+
       if (forcedStatusName) {
         const targetStatus = roomStatuses.find((s) => {
           const name = (s.roomStatusName || '').toLowerCase()
@@ -275,6 +280,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
           if (target === 'reservation') return name.includes('reserv') || short.includes('res')
           return name.includes(target) || short.includes(target)
         })
+
         if (targetStatus) {
           const originalRoom = rawRooms.find((r) => String(r.id) === String(room.id))
           if (originalRoom) {
@@ -282,6 +288,8 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
               ...originalRoom,
               roomStatusTableId: targetStatus.id,
               roomStatusId: targetStatus.id,
+              // ENHANCEMENT: Explicitly link guest to room for high-precision mapping
+              personalDetailId: finalProfileId,
             })
           }
         }

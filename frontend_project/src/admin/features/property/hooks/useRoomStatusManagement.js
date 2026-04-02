@@ -29,7 +29,7 @@ export const useRoomStatusManagement = ({
         roomStatusTitle: '',
         roomStatusColor: '#2798e8',
       })
-      toggleModal('RoomStatus', false)
+      toggleModal('roomStatus', false)
     } catch (err) {
       console.error('Failed to create room status:', err)
     }
@@ -49,7 +49,7 @@ export const useRoomStatusManagement = ({
         roomStatusTitle: '',
         roomStatusColor: '#2798e8',
       })
-      toggleModal('RoomStatusEdit', false)
+      toggleModal('roomStatusEdit', false)
     } catch (err) {
       console.error('Failed to update room status:', err)
     }
@@ -62,7 +62,7 @@ export const useRoomStatusManagement = ({
       roomStatusTitle: status.roomStatusTitle || '',
       roomStatusColor: status.roomStatusColor || '#2798e8',
     })
-    toggleModal('RoomStatusEdit', true)
+    toggleModal('roomStatusEdit', true)
   }, [toggleModal])
 
   return {

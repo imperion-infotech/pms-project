@@ -61,8 +61,7 @@ const usePmsData = () => {
       try {
         const results = await Promise.allSettled(keysToFetch.map((key) => serviceMap[key]()))
 
-        let hasFailures = false
-
+        const failures = []
         setData((prev) => {
           const newData = { ...prev }
           results.forEach((res, index) => {
@@ -70,15 +69,15 @@ const usePmsData = () => {
             if (res.status === 'fulfilled') {
               newData[key] = extractData(res.value)
             } else {
-              hasFailures = true
+              failures.push(key)
               console.error(`Failed to fetch ${key}:`, res.reason)
             }
           })
           return newData
         })
 
-        if (hasFailures) {
-          toast.warn('Some data could not be synchronized.', 'Sync Warning')
+        if (failures.length > 0) {
+          toast.warn(`Failed to sync: ${failures.join(', ')}`, 'Sync Warning')
         }
       } catch {
         setError('Critical: Failed to synchronize data hierarchy.')

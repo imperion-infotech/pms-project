@@ -1,121 +1,151 @@
-import React from 'react';
-import { PencilLine, X, FileText, CheckCircle2 } from 'lucide-react';
+import React from 'react'
+import { PencilLine, X, FileText, CheckCircle2 } from 'lucide-react'
 
-export const DocumentTypeEditModal = ({ 
-  isOpen, 
-  setIsOpen, 
-  editDocType, 
-  setEditDocType, 
-  handleUpdate, 
-  documentTypes = [] 
+export const DocumentTypeEditModal = ({
+  isOpen,
+  setIsOpen,
+  editDocType,
+  setEditDocType,
+  handleUpdate,
+  documentTypes = [],
 }) => {
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   const isDuplicate = documentTypes.some(
-    d => String(d.documentTypeName).toLowerCase() === String(editDocType.documentTypeName).toLowerCase() && d.id !== editDocType.id
-  );
+    (d) =>
+      String(d.documentTypeName).toLowerCase() ===
+        String(editDocType.documentTypeName).toLowerCase() && String(d.id) !== String(editDocType.id),
+  )
 
   const onSubmit = (e) => {
-    e.preventDefault();
-    if (isDuplicate) return;
-    handleUpdate(e);
-  };
+    e.preventDefault()
+    if (isDuplicate) return
+    handleUpdate()
+  }
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
+        className="animate-in fade-in absolute inset-0 bg-slate-900/60 backdrop-blur-sm duration-300"
         onClick={() => setIsOpen(false)}
       ></div>
-      <div className="bg-white dark:bg-surface-100 rounded-3xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden animate-in zoom-in-95 duration-300 border border-slate-200/50 dark:border-slate-800/50">
-        <div className="p-6 bg-slate-900 dark:bg-black text-white flex justify-between items-center relative overflow-hidden">
-             <div className="absolute -bottom-8 -right-8 p-4 opacity-5 pointer-events-none">
-                <PencilLine className="w-32 h-32" />
-             </div>
-          <div className="flex items-center gap-3 relative z-10">
-            <div className="p-2 bg-orange-600 rounded-xl">
-               <PencilLine className="w-6 h-6 text-white" />
+      <div className="dark:bg-surface-100 animate-in zoom-in-95 relative z-10 w-full max-w-lg overflow-hidden rounded-3xl border border-slate-200/50 bg-white shadow-2xl duration-300 dark:border-slate-800/50">
+        <div className="relative flex items-center justify-between overflow-hidden bg-slate-900 p-6 text-white dark:bg-black">
+          <div className="pointer-events-none absolute -right-8 -bottom-8 p-4 opacity-5">
+            <PencilLine className="h-32 w-32" />
+          </div>
+          <div className="relative z-10 flex items-center gap-3">
+            <div className="rounded-xl bg-orange-600 p-2">
+              <PencilLine className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h3 className="font-extrabold text-xl tracking-tight">Edit Document Type</h3>
-              <p className="text-[10px] text-slate-400 uppercase tracking-[0.2em] font-bold">Update Configuration</p>
+              <h3 className="text-xl font-extrabold tracking-tight">Edit Document Type</h3>
+              <p className="text-[10px] font-bold tracking-[0.2em] text-slate-400 uppercase">
+                Update Configuration
+              </p>
             </div>
           </div>
           <button
             onClick={() => setIsOpen(false)}
-            className="p-2 hover:bg-white/10 rounded-xl transition-colors relative z-10 active:scale-90"
+            className="relative z-10 rounded-xl p-2 transition-colors hover:bg-white/10 active:scale-90"
           >
-            <X className="w-5 h-5 text-slate-400" />
+            <X className="h-5 w-5 text-slate-400" />
           </button>
         </div>
-        <form onSubmit={onSubmit} className="p-8 space-y-6">
+        <form onSubmit={onSubmit} className="space-y-6 p-8">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-1">
-                <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-1">Short Name</label>
-                <input
+              <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+                Short Name
+              </label>
+              <input
                 required
                 type="text"
                 value={editDocType.documentTypeShortName}
-                onChange={(e) => setEditDocType({ ...editDocType, documentTypeShortName: e.target.value })}
-                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/20 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 transition-all font-medium"
-                />
+                onChange={(e) =>
+                  setEditDocType({ ...editDocType, documentTypeShortName: e.target.value })
+                }
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-800 transition-all focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 focus:outline-none dark:border-slate-800 dark:bg-slate-800/20 dark:text-slate-200"
+              />
             </div>
             <div className="col-span-1">
-                <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-1">Category</label>
-                <select
+              <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+                Category
+              </label>
+              <select
                 value={editDocType.documentTypeCategory}
-                onChange={(e) => setEditDocType({ ...editDocType, documentTypeCategory: e.target.value })}
-                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/20 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 transition-all font-medium appearance-none"
-                >
-                    <option value="">Select Category</option>
-                    <option value="ID Proof">ID Proof</option>
-                    <option value="Address Proof">Address Proof</option>
-                    <option value="Visa/Passport">Visa/Passport</option>
-                    <option value="Other">Other</option>
-                </select>
+                onChange={(e) =>
+                  setEditDocType({ ...editDocType, documentTypeCategory: e.target.value })
+                }
+                className="w-full appearance-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-800 transition-all focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 focus:outline-none dark:border-slate-800 dark:bg-slate-800/20 dark:text-slate-200"
+              >
+                <option value="">Select Category</option>
+                <option value="Driving License">Driving License</option>
+                <option value="Passport">Passport</option>
+                <option value="Identification Card">Identification Card</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Debit Card">Debit Card</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-1">Document Name</label>
+            <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+              Document Name
+            </label>
             <input
               required
               type="text"
               value={editDocType.documentTypeName}
               onChange={(e) => setEditDocType({ ...editDocType, documentTypeName: e.target.value })}
-              className={`w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/20 border ${isDuplicate ? 'border-red-500 ring-4 ring-red-500/10' : 'border-slate-200 dark:border-slate-800'} text-slate-800 dark:text-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 transition-all font-medium`}
+              className={`w-full border bg-slate-50 px-4 py-3 dark:bg-slate-800/20 ${isDuplicate ? 'border-red-500 ring-4 ring-red-500/10' : 'border-slate-200 dark:border-slate-800'} rounded-2xl text-sm font-medium text-slate-800 transition-all focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 focus:outline-none dark:text-slate-200`}
             />
-            {isDuplicate && <p className="text-red-500 text-[10px] mt-2 font-bold flex items-center gap-1"><X className="w-3 h-3" /> This document name already exists!</p>}
+            {isDuplicate && (
+              <p className="mt-2 flex items-center gap-1 text-[10px] font-bold text-red-500">
+                <X className="h-3 w-3" /> This document name already exists!
+              </p>
+            )}
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-1">Description</label>
+            <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+              Description
+            </label>
             <textarea
               rows="3"
               value={editDocType.documentTypeDescription}
-              onChange={(e) => setEditDocType({ ...editDocType, documentTypeDescription: e.target.value })}
-              className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/20 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 transition-all font-medium resize-none"
+              onChange={(e) =>
+                setEditDocType({ ...editDocType, documentTypeDescription: e.target.value })
+              }
+              className="w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-800 transition-all focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 focus:outline-none dark:border-slate-800 dark:bg-slate-800/20 dark:text-slate-200"
             ></textarea>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border border-slate-100 dark:border-slate-800">
-             <div className="flex items-center gap-3">
-                 <div className={`p-2 rounded-lg transition-colors ${editDocType.documentTypeDefault ? 'bg-emerald-500/10 text-emerald-600' : 'bg-slate-200 dark:bg-slate-700 text-slate-400'}`}>
-                    <CheckCircle2 className="w-5 h-5" />
-                 </div>
-                 <div>
-                    <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300">Set as Default</h4>
-                    <p className="text-[10px] text-slate-400">Mark this as the primary document type</p>
-                 </div>
-             </div>
-             <label className="relative inline-flex items-center cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  className="sr-only peer" 
-                  checked={editDocType.documentTypeDefault}
-                  onChange={(e) => setEditDocType({ ...editDocType, documentTypeDefault: e.target.checked })}
-                />
-                <div className="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+          <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/30">
+            <div className="flex items-center gap-3">
+              <div
+                className={`rounded-lg p-2 transition-colors ${editDocType.documentTypeDefault ? 'bg-emerald-500/10 text-emerald-600' : 'bg-slate-200 text-slate-400 dark:bg-slate-700'}`}
+              >
+                <CheckCircle2 className="h-5 w-5" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                  Set as Default
+                </h4>
+                <p className="text-[10px] text-slate-400">Mark this as the primary document type</p>
+              </div>
+            </div>
+            <label className="relative inline-flex cursor-pointer items-center">
+              <input
+                type="checkbox"
+                className="peer sr-only"
+                checked={editDocType.documentTypeDefault}
+                onChange={(e) =>
+                  setEditDocType({ ...editDocType, documentTypeDefault: e.target.checked })
+                }
+              />
+              <div className="peer h-6 w-11 rounded-full bg-slate-200 peer-checked:bg-orange-600 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white dark:bg-slate-700"></div>
             </label>
           </div>
 
@@ -123,14 +153,16 @@ export const DocumentTypeEditModal = ({
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="flex-1 py-3 text-xs font-extrabold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors tracking-widest"
+              className="flex-1 py-3 text-xs font-extrabold tracking-widest text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-300"
             >
               CANCEL
             </button>
             <button
               type="submit"
-              disabled={isDuplicate || !editDocType.documentTypeName || !editDocType.documentTypeShortName}
-              className={`flex-2 py-3.5 text-white rounded-2xl text-xs font-extrabold shadow-xl transition-all tracking-widest active:scale-95 ${isDuplicate || !editDocType.documentTypeName || !editDocType.documentTypeShortName ? 'bg-slate-300 dark:bg-slate-800 cursor-not-allowed shadow-none grayscale' : 'bg-orange-600 hover:bg-orange-700 shadow-orange-600/30'}`}
+              disabled={
+                isDuplicate || !editDocType.documentTypeName || !editDocType.documentTypeShortName
+              }
+              className={`flex-2 rounded-2xl py-3.5 text-xs font-extrabold tracking-widest text-white shadow-xl transition-all active:scale-95 ${isDuplicate || !editDocType.documentTypeName || !editDocType.documentTypeShortName ? 'cursor-not-allowed bg-slate-300 shadow-none grayscale dark:bg-slate-800' : 'bg-orange-600 shadow-orange-600/30 hover:bg-orange-700'}`}
             >
               {isDuplicate ? 'DOC EXISTS' : 'UPDATE DOCUMENT TYPE'}
             </button>
@@ -138,5 +170,5 @@ export const DocumentTypeEditModal = ({
         </form>
       </div>
     </div>
-  );
-};
+  )
+}

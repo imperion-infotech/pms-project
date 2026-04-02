@@ -16,7 +16,7 @@ export const useFloorManagement = ({
     try {
       await addFloor(newFloor)
       setNewFloor({ name: '', description: '' })
-      toggleModal('Floor', false)
+      toggleModal('floor', false)
     } catch (err) {
       console.error('Failed to create floor:', err)
     }
@@ -30,7 +30,7 @@ export const useFloorManagement = ({
         description: editFloor.description,
       })
       setEditFloor({ id: null, name: '', description: '' })
-      toggleModal('FloorEdit', false)
+      toggleModal('floorEdit', false)
     } catch (err) {
       console.error('Failed to update floor:', err)
     }
@@ -42,7 +42,7 @@ export const useFloorManagement = ({
       name: floor.name || '',
       description: floor.description || '',
     })
-    toggleModal('FloorEdit', true)
+    toggleModal('floorEdit', true)
   }, [toggleModal])
 
   return {

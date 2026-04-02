@@ -33,8 +33,13 @@ export const NotificationProvider = ({ children }) => {
   const info = useCallback((message, title = 'Information', duration) => addNotification({ type: 'info', title, message, duration }), [addNotification]);
   const warn = useCallback((message, title = 'Warning', duration) => addNotification({ type: 'warning', title, message, duration }), [addNotification]);
 
+  const contextValue = React.useMemo(
+    () => ({ success, error, info, warn, removeNotification }),
+    [success, error, info, warn, removeNotification],
+  );
+
   return (
-    <NotificationContext.Provider value={{ success, error, info, warn, removeNotification }}>
+    <NotificationContext.Provider value={contextValue}>
       {children}
       <div className="fixed bottom-6 right-6 z-9999 flex flex-col gap-4 min-w-[340px] max-w-[420px] pointer-events-none">
         <AnimatePresence mode="popLayout">

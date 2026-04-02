@@ -84,6 +84,8 @@ export const DocumentTypeModal = ({
                 <option value="Driving License">Driving License</option>
                 <option value="Passport">Passport</option>
                 <option value="Identification Card">Identification Card</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Debit Card">Debit Card</option>
                 <option value="Other">Other</option>
               </select>
             </div>

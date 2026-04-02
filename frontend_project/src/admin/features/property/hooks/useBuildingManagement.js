@@ -16,7 +16,7 @@ export const useBuildingManagement = ({
     try {
       await addBuilding(newBuilding)
       setNewBuilding({ name: '', description: '' })
-      toggleModal('Building', false)
+      toggleModal('building', false)
     } catch (err) {
       console.error('Failed to create building:', err)
     }
@@ -30,7 +30,7 @@ export const useBuildingManagement = ({
         description: editBuilding.description,
       })
       setEditBuilding({ id: null, name: '', description: '' })
-      toggleModal('BuildingEdit', false)
+      toggleModal('buildingEdit', false)
     } catch (err) {
       console.error('Failed to update building:', err)
     }
@@ -42,7 +42,7 @@ export const useBuildingManagement = ({
       name: building.name || '',
       description: building.description || '',
     })
-    toggleModal('BuildingEdit', true)
+    toggleModal('buildingEdit', true)
   }, [toggleModal])
 
   return {

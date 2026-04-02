@@ -33,14 +33,14 @@ export const useDocumentTypeManagement = ({ addDocumentType, updateDocumentType,
         documentTypeDescription: '',
         documentTypeDefault: false,
       })
-      toggleModal('DocumentType', false)
+      toggleModal('documentType', false)
     } catch (err) {
       console.error('Failed to create document type:', err)
     }
   }, [newDocumentType, addDocumentType, toggleModal])
 
   const handleUpdateDocumentType = useCallback(async () => {
-    if (!editDocumentType.id || !editDocumentType.documentTypeName.trim()) return
+    if (editDocumentType.id === null || !editDocumentType.documentTypeName?.trim()) return
     try {
       await updateDocumentType(editDocumentType.id, editDocumentType)
       setEditDocumentType({
@@ -51,7 +51,7 @@ export const useDocumentTypeManagement = ({ addDocumentType, updateDocumentType,
         documentTypeDescription: '',
         documentTypeDefault: false,
       })
-      toggleModal('DocumentTypeEdit', false)
+      toggleModal('documentTypeEdit', false)
     } catch (err) {
       console.error('Failed to update document type:', err)
     }
@@ -60,7 +60,7 @@ export const useDocumentTypeManagement = ({ addDocumentType, updateDocumentType,
   const handleEditDocumentType = useCallback(
     (doc) => {
       setEditDocumentType({ ...doc })
-      toggleModal('DocumentTypeEdit', true)
+      toggleModal('documentTypeEdit', true)
     },
     [toggleModal],
   )
