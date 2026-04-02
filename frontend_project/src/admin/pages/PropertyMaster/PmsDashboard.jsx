@@ -16,6 +16,9 @@ import { useToast } from '../../../context/NotificationContext'
 import DashboardRouter from './components/DashboardRouter'
 import DashboardModals from './components/DashboardModals'
 
+// Logic hooks (Encapsulated module-level state)
+import { useRoomManagement } from '../../features/property/hooks/useRoomManagement'
+
 /**
  * PmsDashboard (Admin Dashboard Root)
  *
@@ -146,30 +149,21 @@ const PmsDashboard = () => {
     roomStatusTitle: '',
     roomStatusColor: '#2798e8',
   })
-  const [newRoom, setNewRoom] = useState({
-    roomName: '',
-    roomShortName: '',
-    roomTypeId: '',
-    floorId: '',
-    buildingId: '',
-    roomStatusTableId: '',
-    roomStatus: '',
-    smoking: false,
-    handicap: false,
-    nonRoom: false,
-  })
-  const [editRoom, setEditRoom] = useState({
-    id: null,
-    roomName: '',
-    roomShortName: '',
-    roomTypeId: '',
-    floorId: '',
-    buildingId: '',
-    roomStatusTableId: '',
-    roomStatus: '',
-    smoking: false,
-    handicap: false,
-    nonRoom: false,
+  const {
+    newRoom,
+    setNewRoom,
+    editRoom,
+    setEditRoom,
+    handleAddRoom,
+    handleUpdateRoom,
+    handleEditRoom,
+  } = useRoomManagement({
+    floors,
+    roomTypes,
+    roomStatuses,
+    addRoom,
+    updateRoom: hookUpdateRoom,
+    toggleModal,
   })
   const [newTax, setNewTax] = useState({
     taxMasterName: '',
@@ -301,103 +295,6 @@ const PmsDashboard = () => {
     toggleModal('roomStatusEdit', false)
   }
 
-  const handleAddRoom = async (e) => {
-    e.preventDefault()
-    const isNonRoom = Boolean(newRoom.nonRoom)
-    if (
-      !newRoom.roomName ||
-      !newRoom.floorId ||
-      !newRoom.buildingId ||
-      (!isNonRoom && (!newRoom.roomTypeId || !newRoom.roomStatusTableId))
-    ) {
-      return
-    }
-
-    const selectedFloor = floors.find((f) => String(f.id) === String(newRoom.floorId))
-    const selectedStatus = roomStatuses.find(
-      (rs) => String(rs.id) === String(newRoom.roomStatusTableId),
-    )
-
-    // Prepare payload matching the provided JSON schema
-    const payload = {
-      roomName: newRoom.roomName,
-      roomShortName: newRoom.roomName, // Fallback to roomName since Short Name was removed from UI
-      roomTypeId: isNonRoom ? null : Number(newRoom.roomTypeId),
-      floorId: Number(newRoom.floorId),
-      buildingId: Number(newRoom.buildingId),
-      roomStatusId: isNonRoom ? null : Number(newRoom.roomStatusTableId),
-      roomStatus: isNonRoom
-        ? null
-        : newRoom.roomStatus || (selectedStatus ? selectedStatus.roomStatusName : 'Unknown'),
-      name: selectedFloor ? selectedFloor.name : '',
-      smoking: Boolean(newRoom.smoking),
-      handicap: Boolean(newRoom.handicap),
-      nonRoom: isNonRoom,
-    }
-
-    try {
-      await addRoom(payload)
-      setNewRoom({
-        roomName: '',
-        roomShortName: '',
-        roomTypeId: '',
-        floorId: '',
-        buildingId: '',
-        roomStatusTableId: '',
-        smoking: false,
-        handicap: false,
-        nonRoom: false,
-      })
-      toggleModal('room', false)
-    } catch (err) {
-      console.error('Failed to create room payload:', payload, err)
-    }
-  }
-
-  const handleUpdateRoom = async (e) => {
-    e.preventDefault()
-    const isNonRoom = Boolean(editRoom.nonRoom)
-    if (
-      !editRoom.roomName ||
-      !editRoom.floorId ||
-      !editRoom.buildingId ||
-      (!isNonRoom && (!editRoom.roomTypeId || !editRoom.roomStatusTableId))
-    ) {
-      toast.warn('Please ensure all required fields are filled.')
-      return
-    }
-
-    const selectedStatus = roomStatuses.find(
-      (rs) => String(rs.id) === String(editRoom.roomStatusTableId),
-    )
-
-    // Prepare payload matching the provided JSON schema
-    const payload = {
-      id: editRoom.id,
-      roomName: editRoom.roomName,
-      roomShortName: editRoom.roomName, // Fallback to roomName since Short Name was removed from UI
-      roomTypeId: isNonRoom ? null : Number(editRoom.roomTypeId),
-      floorId: Number(editRoom.floorId),
-      buildingId: Number(editRoom.buildingId),
-      roomStatusId: isNonRoom ? null : Number(editRoom.roomStatusTableId),
-      roomStatus: isNonRoom
-        ? null
-        : editRoom.roomStatus || (selectedStatus ? selectedStatus.roomStatusName : 'Unknown'),
-      name: editRoom.name || editRoom.roomName,
-      smoking: Boolean(editRoom.smoking),
-      handicap: Boolean(editRoom.handicap),
-      nonRoom: isNonRoom,
-    }
-
-    console.log('--- Room Update Payload ---', payload)
-
-    try {
-      await hookUpdateRoom(editRoom.id, payload)
-      toggleModal('roomEdit', false)
-    } catch (err) {
-      console.error('Failed to update room payload:', payload, err)
-    }
-  }
 
   const handleAddTax = async (e) => {
     e.preventDefault()
@@ -691,7 +588,7 @@ const PmsDashboard = () => {
               setEditBuilding={setEditBuilding}
               setEditRoomType={setEditRoomType}
               setEditRoomStatus={setEditRoomStatus}
-              setEditRoom={setEditRoom}
+              handleEditRoom={handleEditRoom}
               deleteFloor={deleteFloor}
               deleteBuilding={deleteBuilding}
               deleteRoomType={deleteRoomType}

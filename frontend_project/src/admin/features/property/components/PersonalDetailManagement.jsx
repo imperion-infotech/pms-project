@@ -18,7 +18,7 @@ import {
   Pencil,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import usePersonalDetailController from '../hooks/usePersonalDetailController'
+import usePersonalDetailController from '../controllers/usePersonalDetailController'
 import { AuthImage } from '../../../components/common/AuthImage'
 
 /**

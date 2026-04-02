@@ -5,26 +5,18 @@
  * Iska kaam hai Room ka inventory dikhana, details populate karna, 
  * aur edit/delete buttons ko actions se connect karna.
  */
-import React, { useState } from 'react';
+import React from 'react';
 import { PlusCircle, X, Cigarette, CigaretteOff, Accessibility, Check, Minus, Ban, Pencil, Trash2, AlertTriangle, CloudCog } from 'lucide-react';
+import useRoomController from '../controllers/useRoomController';
 
 const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], buildings = [], roomStatuses = [], searchTerm, setIsRoomModalOpen, onEdit, onDelete }) => {
-  const [deleteTarget, setDeleteTarget] = useState(null);
-
-  const handleDeleteClick = (room) => {
-    setDeleteTarget({ id: room.id, name: room.roomName });
-  };
-
-  const handleConfirmDelete = () => {
-    if (deleteTarget?.id) {
-      onDelete(deleteTarget.id);
-    }
-    setDeleteTarget(null);
-  };
-
-  const handleCancelDelete = () => {
-    setDeleteTarget(null);
-  };
+  const {
+    processedRooms,
+    deleteTarget,
+    handleDeleteClick,
+    handleConfirmDelete,
+    handleCancelDelete
+  } = useRoomController({ rooms, searchTerm, onDelete });
 
   return (
     <div className="bg-white dark:bg-surface-100 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 transition-colors duration-300">
@@ -62,13 +54,13 @@ const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], buildings = [
             </tr>
           </thead>
           <tbody className="text-[13px] divide-y divide-slate-100 dark:divide-slate-800">
-            {rooms.length === 0 ? (
+            {processedRooms.length === 0 ? (
               <tr>
                 <td colSpan="9" className="px-6 py-10 text-center text-slate-400 dark:text-slate-500 italic">
                   {searchTerm ? 'No rooms match your search.' : 'No rooms available. Add your first room.'}
                 </td>
               </tr>
-            ) : rooms.map((room) => {
+            ) : processedRooms.map((room) => {
               // Extract fields from room object
               const { 
                 roomName, 

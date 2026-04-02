@@ -32,7 +32,7 @@ const DashboardRouter = ({
   setEditBuilding,
   setEditRoomType,
   setEditRoomStatus,
-  setEditRoom,
+  handleEditRoom,
   deleteFloor,
   deleteBuilding,
   deleteRoomType,
@@ -123,44 +123,7 @@ const DashboardRouter = ({
           roomStatuses={allRoomStatuses}
           searchTerm={searchTerm}
           setIsRoomModalOpen={(isOpen) => toggleModal('room', isOpen)}
-          onEdit={(r) => {
-            // Robust lookup for IDs supporting multiple backend naming conventions
-            const rTypeId = r.roomTypeId || r.room_type_id || r.roomType?.id || r.roomType
-            const rStatusId =
-              r.roomStatusTableId ||
-              r.room_status_table_id ||
-              r.roomStatusTable?.id ||
-              r.room_status_table?.id
-
-            // If IDs are missing, attempt lookup by name strings
-            const finalTypeId =
-              rTypeId ||
-              allRoomTypes.find(
-                (rt) =>
-                  (rt.roomTypeName || rt.shortName) === r.roomType ||
-                  (rt.roomTypeName || rt.shortName) === r.roomTypeName,
-              )?.id
-            const finalStatusId =
-              rStatusId ||
-              allRoomStatuses.find(
-                (rs) =>
-                  (rs.roomStatusName || rs.roomStatusTitle) === r.roomStatus ||
-                  (rs.roomStatusName || rs.roomStatusTitle) === r.roomStatusName,
-              )?.id
-
-            setEditRoom({
-              ...r,
-              buildingId:
-                r.buildingId || r.building_id || r.building?.id || r.building || r.buildings || '',
-              floorId: r.floorId || r.floor_id || r.floor?.id || r.floor || '',
-              roomTypeId: finalTypeId || '',
-              roomStatusTableId: finalStatusId || '',
-              smoking: Boolean(r.smoking || r.is_smoking || r.isSmoking),
-              handicap: Boolean(r.handicap || r.is_handicap || r.isHandicap),
-              nonRoom: Boolean(r.nonRoom || r.non_room || r.isNonRoom),
-            })
-            toggleModal('roomEdit', true)
-          }}
+          onEdit={(r) => handleEditRoom(r, allRoomTypes, allRoomStatuses)}
           onDelete={deleteRoom}
           currentPage={currentPage}
           itemsPerPage={itemsPerPage}

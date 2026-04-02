@@ -5,8 +5,9 @@
  * Feature component to manage building Floors. 
  * Renders a list/table of active floors, triggering options to edit or delete floors via API.
  */
-import React, { useState } from 'react';
+import React from 'react';
 import { PlusCircle, Pencil, Trash2, AlertTriangle, X } from 'lucide-react';
+import useFloorController from '../controllers/useFloorController';
 
 const FloorManagement = ({ 
   floors = [], 
@@ -17,23 +18,13 @@ const FloorManagement = ({
   currentPage = 1,
   itemsPerPage = 8
 }) => {
-  // Confirmation state for delete
-  const [deleteTarget, setDeleteTarget] = useState(null); // stores { id, name }
-
-  const handleDeleteClick = (floor) => {
-    setDeleteTarget({ id: floor.id, name: floor.name });
-  };
-
-  const handleConfirmDelete = () => {
-    if (deleteTarget?.id) {
-      onDelete(deleteTarget.id);
-    }
-    setDeleteTarget(null);
-  };
-
-  const handleCancelDelete = () => {
-    setDeleteTarget(null);
-  };
+  const {
+    getIndex,
+    deleteTarget,
+    handleDeleteClick,
+    handleConfirmDelete,
+    handleCancelDelete
+  } = useFloorController({ floors, onDelete, currentPage, itemsPerPage });
 
   return (
     <div className="bg-white dark:bg-surface-100 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 transition-colors duration-300">
@@ -80,7 +71,7 @@ const FloorManagement = ({
               floors.map((floor, idx) => (
                 <tr key={floor.id ?? idx} className="group hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5 transition-all h-14">
                   <td className="px-8 py-2 text-center font-bold text-slate-300 dark:text-slate-600 group-hover:text-emerald-500 font-mono text-[11px] border-r border-slate-100 dark:border-slate-800">
-                    {((currentPage - 1) * itemsPerPage) + idx + 1}
+                    {getIndex(idx)}
                   </td>
                   <td className="px-8 py-2 font-bold text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800 uppercase tracking-tight">{floor.name}</td>
                   <td className="px-8 py-2 text-slate-500 dark:text-slate-400 border-r border-slate-100 dark:border-slate-800">{floor.description || '—'}</td>

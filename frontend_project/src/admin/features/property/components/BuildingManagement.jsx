@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PlusCircle, Pencil, Trash2, AlertTriangle, X, Building, Info, Calendar } from 'lucide-react';
-import useBuildingController from '../hooks/useBuildingController';
+import useBuildingController from '../controllers/useBuildingController';
 
 /**
  * View: BuildingManagement

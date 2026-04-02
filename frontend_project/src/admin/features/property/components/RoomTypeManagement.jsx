@@ -11,7 +11,7 @@ import {
   DollarSign,
   Tag,
 } from 'lucide-react'
-import useRoomTypeController from '../hooks/useRoomTypeController'
+import useRoomTypeController from '../controllers/useRoomTypeController'
 
 /**
  * View: RoomTypeManagement

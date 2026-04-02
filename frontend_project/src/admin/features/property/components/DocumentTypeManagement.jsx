@@ -1,5 +1,6 @@
 import React from 'react'
-import { Plus, Search, Edit3, Trash2, FileText, Check, X, ShieldCheck } from 'lucide-react'
+import { Plus, Search, Edit3, Trash2, FileText, Check, X, ShieldCheck, AlertTriangle } from 'lucide-react'
+import useDocumentTypeController from '../controllers/useDocumentTypeController'
 
 /**
  * DocumentTypeManagement component for managing various document types (ID proofs, etc.)
@@ -10,6 +11,15 @@ const DocumentTypeManagement = ({
   onEdit,
   onDelete,
 }) => {
+  const {
+    deleteTarget,
+    handleDeleteClick,
+    handleConfirmDelete,
+    handleCancelDelete,
+  } = useDocumentTypeController({
+    documentTypes,
+    onDelete,
+  })
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 space-y-6 duration-700">
       {/* Header & Search Bar Layer */}
@@ -119,7 +129,7 @@ const DocumentTypeManagement = ({
                           <Edit3 className="h-4 w-4" />
                         </button>
                         <button
-                          onClick={() => onDelete(doc.id)}
+                          onClick={() => handleDeleteClick(doc)}
                           className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-slate-400 shadow-sm border border-slate-200 transition-all hover:scale-110 hover:border-red-200 hover:text-red-500 hover:shadow-red-100 dark:bg-slate-900 dark:border-slate-800 dark:hover:border-red-900 dark:hover:shadow-none"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -150,6 +160,45 @@ const DocumentTypeManagement = ({
           </table>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-200 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-all"
+            onClick={handleCancelDelete}
+          />
+          <div className="relative z-10 w-full max-w-sm overflow-hidden rounded-3xl border border-red-100 bg-white p-6 shadow-2xl transition-all dark:border-red-900/30 dark:bg-slate-900 animate-in zoom-in-95">
+            <div className="mb-4 flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-red-500 dark:bg-red-500/10">
+                <AlertTriangle className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-800 dark:text-white">Delete Document Type</h3>
+                <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">Permanent Action</p>
+              </div>
+            </div>
+            <p className="mb-8 text-sm font-medium leading-relaxed text-slate-500 dark:text-slate-400">
+              Are you sure you want to delete <span className="font-bold text-slate-800 dark:text-slate-100">"{deleteTarget.name}"</span>? 
+              This will remove it from all future guest profile selections.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleCancelDelete}
+                className="flex-1 rounded-xl border border-slate-200 py-3 text-sm font-bold text-slate-400 transition-all hover:bg-slate-50 hover:text-slate-600 dark:border-slate-800 dark:hover:bg-slate-800"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="flex-1 rounded-xl bg-red-500 py-3 text-sm font-bold text-white shadow-lg shadow-red-500/20 transition-all hover:bg-red-600 active:scale-95"
+              >
+                Delete Now
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

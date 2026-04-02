@@ -10,7 +10,7 @@ import {
   XCircle,
   X,
 } from 'lucide-react'
-import useTaxController from '../hooks/useTaxController'
+import useTaxController from '../controllers/useTaxController'
 
 /**
  * View: TaxManagement

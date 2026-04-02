@@ -13,6 +13,12 @@ import {
   RefreshCw,
   ArrowLeftRight,
   CalendarCheck,
+  FileText,
+  Plus,
+  Trash2,
+  Edit,
+  Camera,
+  Paperclip,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import usePmsData from '../../../../hooks/usePmsData'
@@ -20,6 +26,7 @@ import { propertyService } from '../../../../services/propertyService'
 
 // Sub-components
 import ImageUpload from './roomAction/ImageUpload'
+import DocumentModal from './roomAction/DocumentModal'
 
 /**
  * GuestProfileModal Component
@@ -35,6 +42,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
     updateRoom,
     roomStatuses,
     rooms: rawRooms,
+    documentTypes,
   } = usePmsData()
   const [localPreviews, setLocalPreviews] = useState({ profilePhoto: null, signature: null })
 
@@ -48,10 +56,14 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
     address: '',
     profilePhoto: '',
     signature: '',
+    documents: [],
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [uploadingType, setUploadingType] = useState(null)
+
+  const [showDocForm, setShowDocForm] = useState(false)
+  const [editingDocIndex, setEditingDocIndex] = useState(-1)
 
   // Synchronize component state with room data when modal opens
   useEffect(() => {
@@ -90,6 +102,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
         address: '',
         profilePhoto: '',
         signature: '',
+        documents: [],
       })
     }
   }, [room, isOpen])
@@ -213,47 +226,55 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
     }
   }
 
+  const toggleDocForm = (index = -1) => {
+    setEditingDocIndex(index)
+    setShowDocForm(true)
+  }
+
+  const saveDocument = (docData) => {
+    const updatedDocs = [...(formData.documents || [])]
+    if (editingDocIndex >= 0) {
+      updatedDocs[editingDocIndex] = docData
+    } else {
+      updatedDocs.push(docData)
+    }
+    setFormData((prev) => ({ ...prev, documents: updatedDocs }))
+    setShowDocForm(false)
+  }
+
+  const deleteDocument = (index) => {
+    const updatedDocs = (formData.documents || []).filter((_, i) => i !== index)
+    setFormData((prev) => ({ ...prev, documents: updatedDocs }))
+  }
+
   const handleSubmit = async (e, forcedStatusName = null) => {
     if (e) e.preventDefault()
-
     if (!formData.firstName || !formData.lastName || !formData.phone || !formData.email) {
       alert('Missing required fields: Name, Phone, and Email are mandatory.')
       return
     }
-
     setIsSubmitting(true)
     try {
-      // Use profile.id if available, otherwise fallback to check if we can find it
       const targetProfileId = profile?.id || room?.personalDetailId
-
       const payload = {
         ...formData,
         id: isExisting ? targetProfileId : 0,
         roomId: room.id,
         roomName: room.roomName,
       }
-
       if (isExisting && targetProfileId) {
         await updatePersonalDetail(targetProfileId, payload)
       } else {
         await addPersonalDetail(payload)
       }
-
-      // Automatically transition room status if triggered from "Check In" or "Reservation"
       if (forcedStatusName) {
         const targetStatus = roomStatuses.find((s) => {
           const name = (s.roomStatusName || '').toLowerCase()
           const short = (s.shortName || '').toLowerCase()
           const target = forcedStatusName.toLowerCase()
-
-          // Special case: Reservation -> Reserved
-          if (target === 'reservation') {
-            return name.includes('reserv') || short.includes('res')
-          }
-
+          if (target === 'reservation') return name.includes('reserv') || short.includes('res')
           return name.includes(target) || short.includes(target)
         })
-
         if (targetStatus) {
           const originalRoom = rawRooms.find((r) => String(r.id) === String(room.id))
           if (originalRoom) {
@@ -265,7 +286,6 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
           }
         }
       }
-
       if (onRefresh) onRefresh()
       onClose()
     } catch (err) {
@@ -285,18 +305,15 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
           onClick={onClose}
           className="fixed inset-0 bg-slate-900/60 backdrop-blur-md"
         />
-
         <motion.div
           initial={{ scale: 0.95, opacity: 0, y: 30 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0, y: 30 }}
           className={`relative my-auto flex w-full max-w-5xl flex-col overflow-hidden rounded-[40px] border shadow-2xl transition-all duration-300 md:flex-row ${isDark ? 'bg-surface-50 border-slate-800' : 'border-slate-200 bg-white'}`}
         >
-          {/* LEFT SIDE: Media Sidebar (Verification & Identification) */}
           <div
             className={`flex w-full shrink-0 flex-col border-r p-6 md:w-[280px] ${isDark ? 'border-slate-800 bg-slate-900/50' : 'border-slate-100 bg-slate-50/50'}`}
           >
-            {/* Sidebar Header */}
             <div className="mb-6 pl-2">
               <h3 className="text-xs font-black tracking-[0.2em] text-emerald-500 uppercase">
                 Guest Assets
@@ -307,8 +324,6 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                 Verification Documents
               </p>
             </div>
-
-            {/* Asset Collection - Vertically Scalable */}
             <div className="flex w-full flex-col gap-4">
               <ImageUpload
                 label="Photo"
@@ -319,7 +334,6 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                 onUpload={(file) => handleImageSelect(file, 'profilePhoto')}
                 onClear={() => handleImageClear('profilePhoto')}
               />
-
               <ImageUpload
                 label="Signature"
                 value={localPreviews.signature || formData.signature}
@@ -331,20 +345,14 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
               />
             </div>
           </div>
-
-          {/* RIGHT SIDE: Guest Form Section */}
           <div className="flex min-w-0 flex-1 flex-col">
-            {/* Industrial Header Section */}
             <div
               className={`flex items-center justify-between border-b p-8 sm:px-12 sm:py-9 ${isDark ? 'border-slate-800 bg-slate-800/10' : 'border-slate-50 bg-white'}`}
             >
               <div className="flex items-center gap-6">
-                {/* Brand/Status Icon */}
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/20">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/20">
                   <User className="h-7 w-7 text-white" />
                 </div>
-
-                {/* Title & Context */}
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-3">
                     <h2
@@ -366,8 +374,6 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                   </p>
                 </div>
               </div>
-
-              {/* Close Action */}
               <button
                 onClick={onClose}
                 className={`group flex items-center justify-center rounded-2xl border p-3.5 transition-all active:scale-95 ${isDark ? 'border-slate-800 bg-slate-800/50 text-slate-400 hover:border-emerald-400/30 hover:text-emerald-400' : 'border-slate-100 bg-white text-slate-400 hover:text-emerald-500 hover:shadow-md'}`}
@@ -375,10 +381,8 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                 <X size={20} />
               </button>
             </div>
-
-            <div className="flex-1 p-8 sm:px-12 sm:pb-12">
+            <div className="flex-1 overflow-y-auto p-8 sm:px-12 sm:pb-12">
               <form id="guestProfileForm" onSubmit={handleSubmit} className="space-y-10">
-                {/* Header for Guest Info */}
                 <div className="flex items-center gap-3 border-l-4 border-emerald-500 pl-4">
                   <div>
                     <h3
@@ -391,10 +395,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                     </p>
                   </div>
                 </div>
-
-                {/* Integrated Form Fields */}
                 <div className="space-y-6">
-                  {/* Name Group */}
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                       <label className={labelClass}>First Name :</label>
@@ -427,8 +428,6 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                       </div>
                     </div>
                   </div>
-
-                  {/* Company */}
                   <div>
                     <label className={labelClass}>Company Name</label>
                     <div className={inputContainerClass}>
@@ -438,13 +437,11 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                         name="companyName"
                         value={formData.companyName}
                         onChange={handleChange}
-                        placeholder="Company or Business name"
+                        placeholder="Company name"
                         className={inputClass}
                       />
                     </div>
                   </div>
-
-                  {/* Contact Group */}
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                       <label className={labelClass}>Phone Number</label>
@@ -455,7 +452,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                           name="phone"
                           value={formData.phone}
                           onChange={handleChange}
-                          placeholder="Contact number"
+                          placeholder="Phone"
                           className={inputClass}
                           required
                         />
@@ -470,45 +467,118 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                           name="email"
                           value={formData.email}
                           onChange={handleChange}
-                          placeholder="Email for communications"
+                          placeholder="Email"
                           className={inputClass}
                           required
                         />
                       </div>
                     </div>
                   </div>
-
-                  {/* Address */}
                   <div>
                     <label className={labelClass}>Permanent Address</label>
-                    <div
-                      className={`flex items-start gap-4 rounded-2xl border px-5 py-4 transition-all ${
-                        isDark
-                          ? 'border-slate-700 bg-slate-800/30 focus-within:border-emerald-500/50'
-                          : 'border-slate-200 bg-slate-50 focus-within:border-emerald-500'
-                      }`}
-                    >
-                      <MapPin size={18} className="mt-1 text-slate-400" />
+                    <div className={inputContainerClass}>
+                      <MapPin size={18} className="text-slate-400" />
                       <textarea
                         name="address"
                         value={formData.address}
                         onChange={handleChange}
-                        placeholder="Full residential or business address"
-                        rows="3"
-                        className={`${inputClass} min-h-[90px] resize-none`}
+                        placeholder="Address"
+                        className={`${inputClass} min-h-[80px] resize-none`}
                         required
                       />
+                    </div>
+                  </div>
+                  <div className="mt-12 space-y-6">
+                    <div className="flex items-center justify-between gap-3 border-l-4 border-emerald-500 pl-4">
+                      <div>
+                        <h3
+                          className={`text-xs font-black tracking-[0.2em] uppercase ${isDark ? 'text-slate-200' : 'text-slate-800'}`}
+                        >
+                          Documentation
+                        </h3>
+                        <p className="mt-0.5 text-[9px] font-bold tracking-widest text-slate-400 uppercase">
+                          Identification cards
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => toggleDocForm()}
+                        className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-600 active:scale-95"
+                      >
+                        <Plus size={20} />
+                      </button>
+                    </div>
+                    <div
+                      className={`overflow-hidden rounded-2xl border ${isDark ? 'border-slate-800 bg-slate-900/30' : 'border-slate-100 bg-white'}`}
+                    >
+                      <table className="w-full text-left font-bold">
+                        <thead>
+                          <tr
+                            className={`text-[10px] font-black tracking-widest text-slate-400 uppercase ${isDark ? 'bg-slate-900/50' : 'bg-slate-50'}`}
+                          >
+                            <th className="px-6 py-4">Action</th>
+                            <th className="px-6 py-4">Doc Type</th>
+                            <th className="px-6 py-4">Doc Number</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                          {formData.documents?.length > 0 ? (
+                            formData.documents.map((doc, idx) => {
+                              const docType = documentTypes.find(
+                                (t) => String(t.id) === String(doc.documentTypeId),
+                              )
+                              return (
+                                <tr
+                                  key={idx}
+                                  className="group transition-colors hover:bg-emerald-50/10"
+                                >
+                                  <td className="px-6 py-4">
+                                    <div className="flex gap-4">
+                                      <button
+                                        type="button"
+                                        onClick={() => toggleDocForm(idx)}
+                                        className="text-slate-400 hover:text-emerald-500"
+                                      >
+                                        <Edit size={14} />
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => deleteDocument(idx)}
+                                        className="text-slate-400 hover:text-red-500"
+                                      >
+                                        <Trash2 size={14} />
+                                      </button>
+                                    </div>
+                                  </td>
+                                  <td className="px-6 py-4 text-xs font-black">
+                                    {docType?.documentTypeName || doc.documentTypeId}
+                                  </td>
+                                  <td className="px-6 py-4 font-mono text-xs">
+                                    {doc.documentNumber}
+                                  </td>
+                                </tr>
+                              )
+                            })
+                          ) : (
+                            <tr>
+                              <td
+                                colSpan="3"
+                                className="px-6 py-8 text-center text-[10px] font-black tracking-widest text-slate-400 uppercase"
+                              >
+                                No Documents
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 </div>
               </form>
             </div>
-
-            {/* Footer Buttons - Industrial Action Bar (Ordered Sequence) */}
             <div
               className={`flex items-center justify-end gap-4 border-t p-5 sm:px-8 ${isDark ? 'border-slate-800 bg-slate-900/50' : 'border-slate-50 bg-white'}`}
             >
-              {/* 1. Reservation Action */}
               <button
                 type="button"
                 onClick={(e) => handleSubmit(e, 'Reservation')}
@@ -519,7 +589,6 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                 <span>Reservation</span>
               </button>
 
-              {/* 2. Check In Action */}
               <button
                 type="button"
                 onClick={(e) => handleSubmit(e, 'Occupied')}
@@ -530,7 +599,6 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                 <span>Check In</span>
               </button>
 
-              {/* 3. Update Action */}
               <button
                 type="submit"
                 form="guestProfileForm"
@@ -541,7 +609,6 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                 <span>Update</span>
               </button>
 
-              {/* 4. Change Room Action */}
               <button
                 type="button"
                 className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-[9px] font-black tracking-widest uppercase transition-all active:scale-95 ${isDark ? 'border-slate-700 text-slate-400 hover:bg-slate-800' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
@@ -550,7 +617,6 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                 <span>Chg. Room</span>
               </button>
 
-              {/* 5. Print Action */}
               <button
                 type="button"
                 onClick={() => window.print()}
@@ -560,7 +626,6 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                 <span>Print</span>
               </button>
 
-              {/* 6. Close Action */}
               <button
                 type="button"
                 onClick={onClose}
@@ -570,6 +635,15 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
               </button>
             </div>
           </div>
+          <DocumentModal
+            isOpen={showDocForm}
+            onClose={() => setShowDocForm(false)}
+            onSave={saveDocument}
+            isDark={isDark}
+            documentTypes={documentTypes}
+            initialData={editingDocIndex >= 0 ? formData.documents[editingDocIndex] : null}
+            profileAddress={formData.address}
+          />
         </motion.div>
       </div>
     </AnimatePresence>
