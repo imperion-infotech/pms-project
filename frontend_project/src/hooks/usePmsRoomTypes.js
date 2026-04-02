@@ -15,7 +15,7 @@ export const usePmsRoomTypes = () => {
       const res = await propertyService.getRoomTypes()
       setRoomTypes(extractData(res))
     } catch (err) {
-      toast.error('Failed to fetch room types')
+      toast.error(err.response?.data?.message || 'Failed to fetch room types')
     } finally {
       setIsLoading(false)
     }
@@ -67,7 +67,7 @@ export const usePmsRoomTypes = () => {
       const res = await propertyService.searchRoomTypes(query)
       setRoomTypes(extractData(res))
     } catch (err) {
-      toast.error('Room type search failed')
+      toast.error(err.response?.data?.message || 'Room type search failed')
     } finally {
       setIsLoading(false)
     }

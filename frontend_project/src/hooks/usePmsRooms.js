@@ -15,7 +15,7 @@ export const usePmsRooms = () => {
       const res = await propertyService.getRooms()
       setRooms(extractData(res))
     } catch (err) {
-      toast.error('Failed to fetch rooms')
+      toast.error(err.response?.data?.message || 'Failed to fetch rooms')
     } finally {
       setIsLoading(false)
     }
@@ -71,7 +71,7 @@ export const usePmsRooms = () => {
       const res = await propertyService.searchRooms(query)
       setRooms(extractData(res))
     } catch (err) {
-      toast.error('Room search failed')
+      toast.error(err.response?.data?.message || 'Room search failed')
     } finally {
       setIsLoading(false)
     }

@@ -1,6 +1,6 @@
 /**
  * usePmsData.js - Aggregator Hook (Backward Compatible)
- * 
+ *
  * Ye hook ab modular hooks (usePmsFloors, usePmsBuildings, etc.)
  * ko combine karta hai taaki purana code na toote.
  */
@@ -24,26 +24,35 @@ const usePmsData = () => {
   const guestData = usePmsGuests()
   const docData = usePmsDocumentTypes()
 
+  const { fetchFloors } = floorsData
+  const { fetchBuildings } = buildingsData
+  const { fetchRoomTypes } = roomTypesData
+  const { fetchRoomStatuses } = roomStatusesData
+  const { fetchRooms } = roomsData
+  const { fetchTaxes } = taxesData
+  const { fetchPersonalDetails } = guestData
+  const { fetchDocumentTypes } = docData
+
   const fetchData = useCallback(async () => {
     await Promise.all([
-      floorsData.fetchFloors(),
-      buildingsData.fetchBuildings(),
-      roomTypesData.fetchRoomTypes(),
-      roomStatusesData.fetchRoomStatuses(),
-      roomsData.fetchRooms(),
-      taxesData.fetchTaxes(),
-      guestData.fetchPersonalDetails(),
-      docData.fetchDocumentTypes(),
+      fetchFloors(),
+      fetchBuildings(),
+      fetchRoomTypes(),
+      fetchRoomStatuses(),
+      fetchRooms(),
+      fetchTaxes(),
+      fetchPersonalDetails(),
+      fetchDocumentTypes(),
     ])
   }, [
-    floorsData.fetchFloors,
-    buildingsData.fetchBuildings,
-    roomTypesData.fetchRoomTypes,
-    roomStatusesData.fetchRoomStatuses,
-    roomsData.fetchRooms,
-    taxesData.fetchTaxes,
-    guestData.fetchPersonalDetails,
-    docData.fetchDocumentTypes,
+    fetchFloors,
+    fetchBuildings,
+    fetchRoomTypes,
+    fetchRoomStatuses,
+    fetchRooms,
+    fetchTaxes,
+    fetchPersonalDetails,
+    fetchDocumentTypes,
   ])
 
   return {

@@ -15,7 +15,7 @@ export const usePmsDocumentTypes = () => {
       const res = await propertyService.getDocumentTypes()
       setDocumentTypes(extractData(res))
     } catch (err) {
-      toast.error('Failed to fetch document types')
+      toast.error(err.response?.data?.message || 'Failed to fetch document types')
     } finally {
       setIsLoading(false)
     }

@@ -15,7 +15,7 @@ export const usePmsTaxes = () => {
       const res = await propertyService.getTaxMasters()
       setTaxes(extractData(res))
     } catch (err) {
-      toast.error('Failed to fetch taxes')
+      toast.error(err.response?.data?.message || 'Failed to fetch taxes')
     } finally {
       setIsLoading(false)
     }

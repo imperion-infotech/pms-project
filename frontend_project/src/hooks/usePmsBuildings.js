@@ -15,7 +15,7 @@ export const usePmsBuildings = () => {
       const res = await propertyService.getBuildings()
       setBuildings(extractData(res))
     } catch (err) {
-      toast.error('Failed to fetch buildings')
+      toast.error(err.response?.data?.message || 'Failed to fetch buildings')
     } finally {
       setIsLoading(false)
     }
@@ -25,53 +25,73 @@ export const usePmsBuildings = () => {
     fetchBuildings()
   }, [fetchBuildings])
 
-  const addBuilding = useCallback(async (payload) => {
-    try {
-      const res = await propertyService.createBuilding(payload)
-      toast.success('Building created successfully')
-      fetchBuildings()
-      return res
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to create building')
-      throw err
-    }
-  }, [fetchBuildings, toast])
+  const addBuilding = useCallback(
+    async (payload) => {
+      try {
+        const res = await propertyService.createBuilding(payload)
+        toast.success('Building created successfully')
+        fetchBuildings()
+        return res
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to create building')
+        throw err
+      }
+    },
+    [fetchBuildings, toast],
+  )
 
-  const updateBuilding = useCallback(async (id, payload) => {
-    try {
-      const res = await propertyService.updateBuilding(id, payload)
-      toast.success('Building updated successfully')
-      fetchBuildings()
-      return res
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to update building')
-      throw err
-    }
-  }, [fetchBuildings, toast])
+  const updateBuilding = useCallback(
+    async (id, payload) => {
+      try {
+        const res = await propertyService.updateBuilding(id, payload)
+        toast.success('Building updated successfully')
+        fetchBuildings()
+        return res
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to update building')
+        throw err
+      }
+    },
+    [fetchBuildings, toast],
+  )
 
-  const deleteBuilding = useCallback(async (id) => {
-    try {
-      const res = await propertyService.deleteBuilding(id)
-      toast.success('Building deleted successfully')
-      fetchBuildings()
-      return res
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to delete building')
-      throw err
-    }
-  }, [fetchBuildings, toast])
+  const deleteBuilding = useCallback(
+    async (id) => {
+      try {
+        const res = await propertyService.deleteBuilding(id)
+        toast.success('Building deleted successfully')
+        fetchBuildings()
+        return res
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to delete building')
+        throw err
+      }
+    },
+    [fetchBuildings, toast],
+  )
 
-  const searchBuildings = useCallback(async (query) => {
-    setIsLoading(true)
-    try {
-      const res = await propertyService.searchBuildings(query)
-      setBuildings(extractData(res))
-    } catch (err) {
-      toast.error('Building search failed')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [toast])
+  const searchBuildings = useCallback(
+    async (query) => {
+      setIsLoading(true)
+      try {
+        const res = await propertyService.searchBuildings(query)
+        setBuildings(extractData(res))
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Building search failed')
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [toast],
+  )
 
-  return { buildings, isLoading, fetchBuildings, addBuilding, updateBuilding, deleteBuilding, searchBuildings }
+  return {
+    buildings,
+    isLoading,
+    fetchBuildings,
+    addBuilding,
+    updateBuilding,
+    deleteBuilding,
+    searchBuildings,
+  }
 }

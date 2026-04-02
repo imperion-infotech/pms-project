@@ -15,7 +15,7 @@ export const usePmsGuests = () => {
       const res = await propertyService.getPersonalDetails()
       setPersonalDetails(extractData(res))
     } catch (err) {
-      toast.error('Failed to fetch guest details')
+      toast.error(err.response?.data?.message || 'Failed to fetch guest details')
     } finally {
       setIsLoading(false)
     }
@@ -67,7 +67,7 @@ export const usePmsGuests = () => {
       const res = await propertyService.searchPersonalDetails(query)
       setPersonalDetails(extractData(res))
     } catch (err) {
-      toast.error('Guest search failed')
+      toast.error(err.response?.data?.message || 'Guest search failed')
     } finally {
       setIsLoading(false)
     }
