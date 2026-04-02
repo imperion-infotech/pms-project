@@ -10,14 +10,20 @@ import LoadingProcess from '../../../components/common/LoadingProcess'
 import usePmsData from '../../../hooks/usePmsData'
 import { useTheme } from '../../../context/ThemeContext'
 import { useSidebar } from '../../../context/SidebarContext'
-import { useToast } from '../../../context/NotificationContext'
 
 // Sub-components (Refactored for maintainability)
 import DashboardRouter from './components/DashboardRouter'
 import DashboardModals from './components/DashboardModals'
 
 // Logic hooks (Encapsulated module-level state)
+import { useBuildingManagement } from '../../features/property/hooks/useBuildingManagement'
+import { useFloorManagement } from '../../features/property/hooks/useFloorManagement'
+import { useRoomTypeManagement } from '../../features/property/hooks/useRoomTypeManagement'
+import { useRoomStatusManagement } from '../../features/property/hooks/useRoomStatusManagement'
 import { useRoomManagement } from '../../features/property/hooks/useRoomManagement'
+import { useTaxManagement } from '../../features/property/hooks/useTaxManagement'
+import { usePersonalDetailManagement } from '../../features/property/hooks/usePersonalDetailManagement'
+import { useDocumentTypeManagement } from '../../features/property/hooks/useDocumentTypeManagement'
 
 /**
  * PmsDashboard (Admin Dashboard Root)
@@ -29,7 +35,6 @@ import { useRoomManagement } from '../../features/property/hooks/useRoomManageme
 const PmsDashboard = () => {
   const { isDark } = useTheme()
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
-  const toast = useToast()
 
   // User Role Detection for permissions
   const [userRole] = useState(() => {
@@ -123,32 +128,51 @@ const PmsDashboard = () => {
     setModals((prev) => ({ ...prev, [modalName]: isOpen }))
   }, [])
 
-  /**
-   * Data Persistence States (Forms)
-   * We maintain separate state for Create (newX) and Edit (editX) scenarios.
-   */
-  const [newFloor, setNewFloor] = useState({ name: '', description: '' })
-  const [editFloor, setEditFloor] = useState({ id: null, name: '', description: '' })
-  const [newBuilding, setNewBuilding] = useState({ name: '', description: '' })
-  const [editBuilding, setEditBuilding] = useState({ id: null, name: '', description: '' })
-  const [newRoomType, setNewRoomType] = useState({ shortName: '', roomTypeName: '', price: '' })
-  const [editRoomType, setEditRoomType] = useState({
-    id: null,
-    shortName: '',
-    roomTypeName: '',
-    price: '',
+  // Module Logic Hooks
+  const {
+    newBuilding,
+    setNewBuilding,
+    editBuilding,
+    setEditBuilding,
+    handleAddBuilding,
+    handleUpdateBuilding,
+    handleEditBuilding,
+  } = useBuildingManagement({ addBuilding, updateBuilding, toggleModal })
+
+  const {
+    newFloor,
+    setNewFloor,
+    editFloor,
+    setEditFloor,
+    handleAddFloor,
+    handleUpdateFloor,
+    handleEditFloor,
+  } = useFloorManagement({ addFloor, updateFloor, toggleModal })
+
+  const {
+    newRoomType,
+    setNewRoomType,
+    editRoomType,
+    setEditRoomType,
+    handleAddRoomType,
+    handleUpdateRoomType,
+    handleEditRoomType,
+  } = useRoomTypeManagement({ addRoomType, updateRoomType, toggleModal })
+
+  const {
+    newRoomStatus,
+    setNewRoomStatus,
+    editRoomStatus,
+    setEditRoomStatus,
+    handleAddRoomStatus,
+    handleUpdateRoomStatus,
+    handleEditRoomStatus,
+  } = useRoomStatusManagement({ 
+    addRoomStatus, 
+    updateRoomStatus: hookUpdateRoomStatus, 
+    toggleModal 
   })
-  const [newRoomStatus, setNewRoomStatus] = useState({
-    roomStatusName: '',
-    roomStatusTitle: '',
-    roomStatusColor: '#2798e8',
-  })
-  const [editRoomStatus, setEditRoomStatus] = useState({
-    id: null,
-    roomStatusName: '',
-    roomStatusTitle: '',
-    roomStatusColor: '#2798e8',
-  })
+
   const {
     newRoom,
     setNewRoom,
@@ -165,225 +189,47 @@ const PmsDashboard = () => {
     updateRoom: hookUpdateRoom,
     toggleModal,
   })
-  const [newTax, setNewTax] = useState({
-    taxMasterName: '',
-    taxTypeEnum: 'Occupancy_tax',
-    perDayTax: false,
-    perStayTax: false,
-  })
-  const [editTax, setEditTax] = useState({
-    id: null,
-    taxMasterName: '',
-    taxTypeEnum: 'Occupancy_tax',
-    perDayTax: false,
-    perStayTax: false,
-  })
 
-  const [newDocumentType, setNewDocumentType] = useState({
-    id: 0,
-    documentTypeShortName: '',
-    documentTypeName: '',
-    documentTypeDescription: '',
-    documentTypeCategory: '',
-    documentTypeDefault: false,
-  })
-  const [editDocumentType, setEditDocumentType] = useState({
-    id: null,
-    documentTypeShortName: '',
-    documentTypeName: '',
-    documentTypeDescription: '',
-    documentTypeCategory: '',
-    documentTypeDefault: false,
-  })
+  const {
+    newTax,
+    setNewTax,
+    editTax,
+    setEditTax,
+    handleAddTax,
+    handleUpdateTax,
+    handleEditTax,
+  } = useTaxManagement({ addTax, updateTax, toggleModal })
 
-  // Personal Detail State
-  const [personalFormData, setPersonalFormData] = useState({
-    firstName: '',
-    lastName: '',
-    companyName: '',
-    phone: '',
-    email: '',
-    address: '',
-    profilePhoto: '',
-    signature: '',
-  })
+  const {
+    newDocumentType,
+    setNewDocumentType,
+    editDocumentType,
+    setEditDocumentType,
+    handleAddDocumentType,
+    handleUpdateDocumentType,
+    handleEditDocumentType,
+  } = useDocumentTypeManagement({ addDocumentType, updateDocumentType, toggleModal })
+
+  const {
+    personalFormData,
+    setPersonalFormData,
+    handleAddPersonalDetail,
+    handleUpdatePersonalDetail,
+    handleEditPersonalDetail,
+  } = usePersonalDetailManagement({ addPersonalDetail, updatePersonalDetail, toggleModal })
+
   const [uploadingType, setUploadingType] = useState(null)
-  const [isSaving, setIsSaving] = useState(false)
 
   /**
    * EVENT HANDLERS - Property Management Actions
    */
-  const handleAddFloor = async (e) => {
-    e.preventDefault()
-    if (!newFloor.name) return
-    await addFloor(newFloor)
-    setNewFloor({ name: '', description: '' })
-    toggleModal('floor', false)
-  }
-
-  const handleUpdateFloor = async (e) => {
-    e.preventDefault()
-    if (!editFloor.name) return
-    await updateFloor(editFloor.id, editFloor)
-    toggleModal('floorEdit', false)
-  }
-
-  const handleAddBuilding = async (e) => {
-    e.preventDefault()
-    if (!newBuilding.name) return
-    try {
-      await addBuilding(newBuilding)
-      setNewBuilding({ name: '', description: '' })
-      toggleModal('building', false)
-    } catch (err) {
-      console.error('Add Building Error:', err)
-      alert('Failed to add building. Please try again.')
-    }
-  }
-
-  const handleUpdateBuilding = async (e) => {
-    e.preventDefault()
-    if (!editBuilding.name) return
-    try {
-      // Send id in body to ensure entire object is updated correctly by backend
-      await updateBuilding(editBuilding.id, {
-        id: editBuilding.id,
-        name: editBuilding.name,
-        description: editBuilding.description || '',
-      })
-      toggleModal('buildingEdit', false)
-    } catch (err) {
-      console.error('Update Building Error:', err)
-      toast.error('Failed to update building. Please check your data.')
-    }
-  }
-
-  const handleAddRoomType = async (e) => {
-    e.preventDefault()
-    if (!newRoomType.roomTypeName) return
-    await addRoomType(newRoomType)
-    setNewRoomType({ shortName: '', roomTypeName: '', price: '' })
-    toggleModal('roomType', false)
-  }
-
-  const handleUpdateRoomType = async (e) => {
-    e.preventDefault()
-    if (!editRoomType.roomTypeName) return
-    await updateRoomType(editRoomType.id, {
-      shortName: editRoomType.shortName,
-      roomTypeName: editRoomType.roomTypeName,
-      price: editRoomType.price,
-    })
-    toggleModal('roomTypeEdit', false)
-  }
-
-  const handleAddRoomStatus = async (e) => {
-    e.preventDefault()
-    if (!newRoomStatus.roomStatusName) return
-    await addRoomStatus({ ...newRoomStatus, roomStatusTextColor: '#000000' })
-    setNewRoomStatus({ roomStatusName: '', roomStatusTitle: '', roomStatusColor: '#2798e8' })
-    toggleModal('roomStatus', false)
-  }
-
-  const handleUpdateRoomStatus = async (e) => {
-    e.preventDefault()
-    if (!editRoomStatus.roomStatusName) return
-    await hookUpdateRoomStatus(editRoomStatus.id, {
-      ...editRoomStatus,
-      roomStatusTextColor: '#000000',
-    })
-    toggleModal('roomStatusEdit', false)
-  }
-
-
-  const handleAddTax = async (e) => {
-    e.preventDefault()
-    if (!newTax.taxMasterName) return
-    await addTax(newTax)
-    setNewTax({
-      taxMasterName: '',
-      taxTypeEnum: 'Occupancy_tax',
-      perDayTax: false,
-      perStayTax: false,
-    })
-    toggleModal('tax', false)
-  }
-
-  const handleUpdateTax = async (e) => {
-    e.preventDefault()
-    try {
-      const payload = {
-        id: editTax.id,
-        taxMasterName: editTax.taxMasterName,
-        taxTypeEnum: editTax.taxTypeEnum,
-        perDayTax: Boolean(editTax.perDayTax),
-        perStayTax: Boolean(editTax.perStayTax),
-        createdOn: editTax.createdOn,
-      }
-      await updateTax(editTax.id, payload)
-      toggleModal('taxEdit', false)
-    } catch (err) {
-      console.error('Update Tax Error:', err)
-      toast.error(
-        'Update failed. Ensure that Tax Type Enum is a valid value recognised by the backend.',
-        'Technical Error',
-      )
-    }
-  }
-
   const handlePersonalSubmit = async (e) => {
     e.preventDefault()
-    if (!personalFormData.firstName) return
-
-    setIsSaving(true)
-    try {
-      if (personalFormData.id) {
-        await updatePersonalDetail(personalFormData.id, personalFormData)
-        alert('Profile updated successfully!')
-      } else {
-        await addPersonalDetail(personalFormData)
-        alert('Profile created successfully!')
-      }
-      setPersonalFormData({
-        firstName: '',
-        lastName: '',
-        companyName: '',
-        phone: '',
-        email: '',
-        address: '',
-        profilePhoto: '',
-        signature: '',
-      })
-      toggleModal('personalDetail', false)
-      toggleModal('personalDetailEdit', false)
-    } catch (err) {
-      console.error('Personal Detail Error:', err)
-      toast.error('Failed to save profile. Please check the console for details.')
-    } finally {
-      setIsSaving(false)
+    if (personalFormData.id) {
+      handleUpdatePersonalDetail()
+    } else {
+      handleAddPersonalDetail()
     }
-  }
-
-  const handleAddDocumentType = async (e) => {
-    e.preventDefault()
-    if (!newDocumentType.documentTypeName) return
-    await addDocumentType(newDocumentType)
-    setNewDocumentType({
-      id: 0,
-      documentTypeShortName: '',
-      documentTypeName: '',
-      documentTypeDescription: '',
-      documentTypeCategory: '',
-      documentTypeDefault: false,
-    })
-    toggleModal('documentType', false)
-  }
-
-  const handleUpdateDocumentType = async (e) => {
-    e.preventDefault()
-    if (!editDocumentType.documentTypeName) return
-    await updateDocumentType(editDocumentType.id, editDocumentType)
-    toggleModal('documentTypeEdit', false)
   }
 
   const handlePersonalFileUpload = async (e, type) => {
@@ -515,24 +361,6 @@ const PmsDashboard = () => {
     documentTypes,
   ])
 
-  // Industrial Standard Performance Optimization: UseMemo for pagination
-  const paginatedData = React.useMemo(() => {
-    const paginate = (data) => {
-      if (!Array.isArray(data)) return []
-      const start = (currentPage - 1) * itemsPerPage
-      return data.slice(start, start + itemsPerPage)
-    }
-    return {
-      floors: paginate(filteredData.floors),
-      buildings: paginate(filteredData.buildings),
-      roomTypes: paginate(filteredData.roomTypes),
-      rooms: paginate(filteredData.rooms),
-      roomStatuses: paginate(filteredData.roomStatuses),
-      personalDetails: paginate(filteredData.personalDetails),
-      taxes: paginate(filteredData.taxes),
-      documentTypes: paginate(filteredData.documentTypes),
-    }
-  }, [currentPage, itemsPerPage, filteredData])
 
   return (
     <div
@@ -572,56 +400,41 @@ const PmsDashboard = () => {
             {/* Dynamic Dashboard Module Rendering */}
             <DashboardRouter
               activeItem={activeItem}
-              floors={paginatedData.floors}
-              buildings={paginatedData.buildings}
-              roomTypes={paginatedData.roomTypes}
-              roomStatuses={paginatedData.roomStatuses}
-              rooms={paginatedData.rooms}
+              floors={filteredData.floors}
+              buildings={filteredData.buildings}
+              roomTypes={filteredData.roomTypes}
+              roomStatuses={roomStatuses}
+              rooms={filteredData.rooms}
               allFloors={floors}
               allBuildings={buildings}
               allRoomTypes={roomTypes}
               allRoomStatuses={roomStatuses}
               searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
               toggleModal={toggleModal}
-              setEditFloor={setEditFloor}
-              setEditBuilding={setEditBuilding}
-              setEditRoomType={setEditRoomType}
-              setEditRoomStatus={setEditRoomStatus}
+              handleEditFloor={handleEditFloor}
+              handleEditBuilding={handleEditBuilding}
+              handleEditRoomType={handleEditRoomType}
+              handleEditRoomStatus={handleEditRoomStatus}
               handleEditRoom={handleEditRoom}
               deleteFloor={deleteFloor}
               deleteBuilding={deleteBuilding}
               deleteRoomType={deleteRoomType}
               deleteRoomStatus={deleteRoomStatus}
               deleteRoom={deleteRoom}
-              setEditTax={setEditTax}
-              deleteTax={deleteTax}
-              taxes={paginatedData.taxes}
-              documentTypes={paginatedData.documentTypes}
-              setEditDocumentType={setEditDocumentType}
-              deleteDocumentType={deleteDocumentType}
-              personalDetails={paginatedData.personalDetails}
-              onAddPersonalDetail={() => {
-                setPersonalFormData({
-                  firstName: '',
-                  lastName: '',
-                  companyName: '',
-                  phone: '',
-                  email: '',
-                  address: '',
-                  profilePhoto: '',
-                  signature: '',
-                })
-                toggleModal('personalDetail', true)
-              }}
-              onEditPersonalDetail={(item) => {
-                setPersonalFormData(item)
-                toggleModal('personalDetailEdit', true)
-              }}
+              personalDetails={personalDetails}
+              onAddPersonalDetail={() => toggleModal('personalDetail', true)}
+              onEditPersonalDetail={handleEditPersonalDetail}
               onDeletePersonalDetail={deletePersonalDetail}
+              taxes={taxes}
+              handleEditTax={handleEditTax}
+              deleteTax={deleteTax}
+              documentTypes={documentTypes}
+              handleEditDocumentType={handleEditDocumentType}
+              deleteDocumentType={deleteDocumentType}
               currentPage={currentPage}
-              isLoading={isLoading}
+              itemsPerPage={itemsPerPage}
               userRole={userRole}
+              isLoading={isLoading}
             />
 
             {/* Pagination Controls */}
@@ -659,6 +472,7 @@ const PmsDashboard = () => {
       <DashboardModals
         modals={modals}
         toggleModal={toggleModal}
+        // Floor
         newFloor={newFloor}
         setNewFloor={setNewFloor}
         handleAddFloor={handleAddFloor}
@@ -666,6 +480,7 @@ const PmsDashboard = () => {
         setEditFloor={setEditFloor}
         handleUpdateFloor={handleUpdateFloor}
         floors={floors}
+        // Building
         newBuilding={newBuilding}
         setNewBuilding={setNewBuilding}
         handleAddBuilding={handleAddBuilding}
@@ -673,6 +488,7 @@ const PmsDashboard = () => {
         setEditBuilding={setEditBuilding}
         handleUpdateBuilding={handleUpdateBuilding}
         buildings={buildings}
+        // Room Type
         newRoomType={newRoomType}
         setNewRoomType={setNewRoomType}
         handleAddRoomType={handleAddRoomType}
@@ -680,6 +496,7 @@ const PmsDashboard = () => {
         setEditRoomType={setEditRoomType}
         handleUpdateRoomType={handleUpdateRoomType}
         roomTypes={roomTypes}
+        // Room Status
         newRoomStatus={newRoomStatus}
         setNewRoomStatus={setNewRoomStatus}
         handleAddRoomStatus={handleAddRoomStatus}
@@ -687,6 +504,7 @@ const PmsDashboard = () => {
         setEditRoomStatus={setEditRoomStatus}
         handleUpdateRoomStatus={handleUpdateRoomStatus}
         roomStatuses={roomStatuses}
+        // Room
         newRoom={newRoom}
         setNewRoom={setNewRoom}
         handleAddRoom={handleAddRoom}
@@ -694,6 +512,14 @@ const PmsDashboard = () => {
         setEditRoom={setEditRoom}
         handleUpdateRoom={handleUpdateRoom}
         rooms={rooms}
+        // Personal Detail
+        personalFormData={personalFormData}
+        setPersonalFormData={setPersonalFormData}
+        handlePersonalSubmit={handlePersonalSubmit}
+        handleEditPersonalDetail={handleEditPersonalDetail}
+        handlePersonalFileUpload={handlePersonalFileUpload}
+        uploadingType={uploadingType}
+        // Tax
         newTax={newTax}
         setNewTax={setNewTax}
         handleAddTax={handleAddTax}
@@ -701,11 +527,7 @@ const PmsDashboard = () => {
         setEditTax={setEditTax}
         handleUpdateTax={handleUpdateTax}
         taxes={taxes}
-        personalFormData={personalFormData}
-        setPersonalFormData={setPersonalFormData}
-        handlePersonalSubmit={handlePersonalSubmit}
-        handlePersonalFileUpload={handlePersonalFileUpload}
-        uploadingType={uploadingType}
+        // Document Type
         newDocumentType={newDocumentType}
         setNewDocumentType={setNewDocumentType}
         handleAddDocumentType={handleAddDocumentType}
@@ -713,7 +535,7 @@ const PmsDashboard = () => {
         setEditDocumentType={setEditDocumentType}
         handleUpdateDocumentType={handleUpdateDocumentType}
         documentTypes={documentTypes}
-        isLoading={isLoading || isSaving}
+        isLoading={isLoading}
       />
 
       <style>{`

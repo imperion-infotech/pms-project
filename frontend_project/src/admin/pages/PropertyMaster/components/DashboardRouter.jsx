@@ -28,10 +28,10 @@ const DashboardRouter = ({
   allRoomStatuses,
   searchTerm,
   toggleModal,
-  setEditFloor,
-  setEditBuilding,
-  setEditRoomType,
-  setEditRoomStatus,
+  handleEditFloor,
+  handleEditBuilding,
+  handleEditRoomType,
+  handleEditRoomStatus,
   handleEditRoom,
   deleteFloor,
   deleteBuilding,
@@ -43,10 +43,10 @@ const DashboardRouter = ({
   onEditPersonalDetail,
   onDeletePersonalDetail,
   taxes,
-  setEditTax,
+  handleEditTax,
   deleteTax,
   documentTypes,
-  setEditDocumentType,
+  handleEditDocumentType,
   deleteDocumentType,
   currentPage,
   itemsPerPage,
@@ -60,10 +60,7 @@ const DashboardRouter = ({
           floors={floors}
           searchTerm={searchTerm}
           setIsFloorModalOpen={(isOpen) => toggleModal('floor', isOpen)}
-          onEdit={(f) => {
-            setEditFloor(f)
-            toggleModal('floorEdit', true)
-          }}
+          onEdit={handleEditFloor}
           onDelete={deleteFloor}
           currentPage={currentPage}
           itemsPerPage={itemsPerPage}
@@ -75,10 +72,7 @@ const DashboardRouter = ({
           buildings={buildings}
           searchTerm={searchTerm}
           setIsBuildingModalOpen={(isOpen) => toggleModal('building', isOpen)}
-          onEdit={(b) => {
-            setEditBuilding(b)
-            toggleModal('buildingEdit', true)
-          }}
+          onEdit={handleEditBuilding}
           onDelete={deleteBuilding}
           currentPage={currentPage}
           itemsPerPage={itemsPerPage}
@@ -89,10 +83,7 @@ const DashboardRouter = ({
         <RoomTypeManagement
           roomTypes={roomTypes}
           setIsRoomTypeModalOpen={(isOpen) => toggleModal('roomType', isOpen)}
-          onEdit={(rt) => {
-            setEditRoomType(rt)
-            toggleModal('roomTypeEdit', true)
-          }}
+          onEdit={handleEditRoomType}
           onDelete={deleteRoomType}
           currentPage={currentPage}
           itemsPerPage={itemsPerPage}
@@ -104,10 +95,7 @@ const DashboardRouter = ({
         <RoomStatusManagement
           roomStatuses={roomStatuses}
           setIsRoomStatusModalOpen={(isOpen) => toggleModal('roomStatus', isOpen)}
-          onEdit={(rs) => {
-            setEditRoomStatus(rs)
-            toggleModal('roomStatusEdit', true)
-          }}
+          onEdit={handleEditRoomStatus}
           onDelete={deleteRoomStatus}
           currentPage={currentPage}
           itemsPerPage={itemsPerPage}
@@ -135,10 +123,7 @@ const DashboardRouter = ({
         <TaxManagement
           taxes={taxes}
           setIsTaxModalOpen={(isOpen) => toggleModal('tax', isOpen)}
-          onEdit={(t) => {
-            setEditTax(t)
-            toggleModal('taxEdit', true)
-          }}
+          onEdit={handleEditTax}
           onDelete={deleteTax}
           currentPage={currentPage}
           itemsPerPage={itemsPerPage}
@@ -162,10 +147,7 @@ const DashboardRouter = ({
           documentTypes={documentTypes}
           searchTerm={searchTerm}
           setIsDocumentTypeModalOpen={(isOpen) => toggleModal('documentType', isOpen)}
-          onEdit={(dt) => {
-            setEditDocumentType(dt)
-            toggleModal('documentTypeEdit', true)
-          }}
+          onEdit={handleEditDocumentType}
           onDelete={deleteDocumentType}
           currentPage={currentPage}
           itemsPerPage={itemsPerPage}
