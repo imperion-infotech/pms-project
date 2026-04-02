@@ -54,6 +54,7 @@ const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], buildings = [
               <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 w-36">Room Type Name</th>
               <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 w-36">Floor Name</th>
               <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 w-32 text-center">Status</th>
+              <th className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 w-36 text-center">Operational Status</th>
               <th className="px-4 py-4 text-center border-r border-slate-200 dark:border-slate-800 w-24 text-orange-600">Smoking</th>
               <th className="px-4 py-4 text-center border-r border-slate-200 dark:border-slate-800 w-24 text-blue-600">Handicap</th>
               <th className="px-4 py-4 text-center border-r border-slate-200 dark:border-slate-800 w-24 text-red-600">Non-room</th>
@@ -68,7 +69,15 @@ const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], buildings = [
                 </td>
               </tr>
             ) : rooms.map((room) => {
-              // Robust lookup: support both flat IDs, nested objects, and various backend naming conventions (buildingId, building_id, etc.)
+              // Extract fields from room object
+              const { 
+                roomName, 
+                roomStatus, 
+                roomStatusTable,
+                smoking: roomSmoking,
+                handicap: roomHandicap,
+                nonRoom: roomNonRoom
+              } = room;
               const roomTypeId = room.roomTypeId || room.room_type_id || room.roomType?.id || room.roomType;
               const floorId = room.floorId || room.floor_id || room.floor?.id || room.floor;
               const buildingId = room.buildingId || room.building_id || room.building?.id || room.building || room.buildings;
@@ -77,26 +86,32 @@ const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], buildings = [
               const matchedFloor = floors.find(f => String(f.id) === String(floorId));
               const matchedBuilding = buildings.find(b => String(b.id) === String(buildingId));
 
-              const roomStatusId = room.roomStatusTableId || room.room_status_table_id || room.roomStatusTable?.id || room.room_status_table?.id || (roomStatuses.find(rs => (rs.roomStatusName || rs.roomStatusTitle) === room.roomStatus)?.id);
-              const matchedStatus = roomStatuses.find(rs => String(rs.id) === String(roomStatusId));
+              const roomStatusValue = (roomStatus || "").toLowerCase();
+              const rStatusId = room.roomStatusId || room.room_status_id || room.roomStatusTableId || room.room_status_table_id || roomStatusTable?.id || (roomStatuses.find(rs => (rs.roomStatusName || "").toLowerCase() === roomStatusValue || (rs.roomStatusTitle || "").toLowerCase() === roomStatusValue)?.id);
+              const matchedStatus = roomStatuses.find(rs => String(rs.id) === String(rStatusId));
 
-              const smoking = room.smoking || room.is_smoking || room.isSmoking;
-              const handicap = room.handicap || room.is_handicap || room.isHandicap;
-              const isNonRoomFlag = room.nonRoom || room.non_room || room.isNonRoom;
+              const smoking = roomSmoking || room.is_smoking || room.isSmoking;
+              const handicap = roomHandicap || room.is_handicap || room.isHandicap;
+              const isNonRoomFlag = roomNonRoom || room.non_room || room.isNonRoom;
 
               // Support direct name fields if backend provides them, or fallback to lookup result
-              const typeName = room.roomTypeName || room.room_type?.roomTypeName || (matchedType ? matchedType.roomTypeName : (isNonRoomFlag ? 'Non-Room Utility' : 'Unknown'));
-              const floorName = room.floorName || room.floor?.name || (matchedFloor ? matchedFloor.name : 'Unknown');
-              const buildingName = room.buildingName || room.building?.name || (matchedBuilding ? matchedBuilding.name : 'Unknown');
+              const typeName = (matchedType ? matchedType.roomTypeName : (room.roomTypeName || room.room_type?.roomTypeName || (isNonRoomFlag ? 'Non-Room Utility' : 'Unknown')));
+              const floorName = (matchedFloor ? matchedFloor.name : (room.floorName || room.floor?.name || 'Unknown'));
+              const buildingName = (matchedBuilding ? matchedBuilding.name : (room.buildingName || room.building?.name || 'Unknown'));
               
-              const statusName = isNonRoomFlag ? '-' : (matchedStatus ? matchedStatus.roomStatusName : (room.roomStatus || room.roomStatusTable?.roomStatusName || 'Unknown'));
-              const statusColor = matchedStatus?.roomStatusColor || '#64748b';
-              // console.log("---------------------Status Name-----------------", statusName);
-              // console.log("---------------------Status Color-----------------", statusColor);
+              let statusName = isNonRoomFlag ? '-' : (roomStatus || (matchedStatus ? (matchedStatus.roomStatusTitle || matchedStatus.roomStatusName) : 'Unknown'));
+              const internalStatus = isNonRoomFlag ? '-' : (roomStatusTable?.roomStatusName || matchedStatus?.roomStatusName || '-');
+
+              // Case: If status is 'Available' but operational status is 'Reserved', show 'RESERVATION'
+              if (statusName.toUpperCase() === 'AVAILABLE' && internalStatus.toLowerCase().includes('reserved')) {
+                statusName = 'RESERVATION';
+              }
+
+              const statusColor = roomStatusTable?.roomStatusColor || matchedStatus?.roomStatusColor || '#64748b';
 
               return (
                 <tr key={room.id} className="hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5 transition-all h-14 group">
-                  <td className="px-6 py-2 border-r border-slate-100 dark:border-slate-800 font-bold text-slate-800 dark:text-slate-200">{room.roomName}</td>
+                  <td className="px-6 py-2 border-r border-slate-100 dark:border-slate-800 font-bold text-slate-800 dark:text-slate-200">{roomName}</td>
                   <td className="px-6 py-2 border-r border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">{buildingName}</td>
                   <td className="px-6 py-2 border-r border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">{typeName}</td>
                   <td className="px-6 py-2 border-r border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-500">{floorName}</td>
@@ -104,13 +119,16 @@ const RoomManagement = ({ rooms = [], roomTypes = [], floors = [], buildings = [
                     <span 
                       className="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border shadow-sm transition-all duration-300 inline-block min-w-[90px]"
                       style={{ 
-                        backgroundColor: matchedStatus?.roomStatusColor ? `${matchedStatus.roomStatusColor}15` : '#f1f5f9',
+                        backgroundColor: `${statusColor}15`,
                         color: statusColor,
-                        borderColor: matchedStatus?.roomStatusColor ? `${matchedStatus.roomStatusColor}30` : '#e2e8f0'
+                        borderColor: `${statusColor}30`
                       }}
                     >
                       {statusName}
                     </span>
+                  </td>
+                  <td className="px-6 py-2 border-r border-slate-100 dark:border-slate-800 text-center font-medium text-slate-500 italic">
+                    {internalStatus}
                   </td>
                   <td className="px-4 py-2 text-center border-r border-slate-100 dark:border-slate-800 bg-orange-50/10">
                     <div className="flex justify-center transition-transform hover:scale-110">

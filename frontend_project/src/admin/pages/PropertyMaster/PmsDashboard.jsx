@@ -19,8 +19,8 @@ import DashboardModals from './components/DashboardModals'
 /**
  * PmsDashboard (Admin Dashboard Root)
  *
- * Ye file Admin Dashboard ka main structure hai. 
- * Iska kaam hai poore dashboard ka Layout (Sidebar, Navbar) dikhana 
+ * Ye file Admin Dashboard ka main structure hai.
+ * Iska kaam hai poore dashboard ka Layout (Sidebar, Navbar) dikhana
  * aur alag-alag modules (Room, Floor, etc.) ko manage karna.
  */
 const PmsDashboard = () => {
@@ -80,11 +80,16 @@ const PmsDashboard = () => {
     addPersonalDetail,
     updatePersonalDetail,
     deletePersonalDetail,
+    documentTypes,
+    addDocumentType,
+    updateDocumentType,
+    deleteDocumentType,
     searchRooms,
     searchFloors,
     searchBuildings,
     searchRoomTypes,
     searchRoomStatuses,
+    searchDocumentTypes,
   } = usePmsData()
 
   // Dashboard navigation state
@@ -107,6 +112,8 @@ const PmsDashboard = () => {
     personalDetailEdit: false,
     tax: false,
     taxEdit: false,
+    documentType: false,
+    documentTypeEdit: false,
   })
 
   const toggleModal = React.useCallback((modalName, isOpen) => {
@@ -146,6 +153,7 @@ const PmsDashboard = () => {
     floorId: '',
     buildingId: '',
     roomStatusTableId: '',
+    roomStatus: '',
     smoking: false,
     handicap: false,
     nonRoom: false,
@@ -158,6 +166,7 @@ const PmsDashboard = () => {
     floorId: '',
     buildingId: '',
     roomStatusTableId: '',
+    roomStatus: '',
     smoking: false,
     handicap: false,
     nonRoom: false,
@@ -174,6 +183,23 @@ const PmsDashboard = () => {
     taxTypeEnum: 'Occupancy_tax',
     perDayTax: false,
     perStayTax: false,
+  })
+
+  const [newDocumentType, setNewDocumentType] = useState({
+    id: 0,
+    documentTypeShortName: '',
+    documentTypeName: '',
+    documentTypeDescription: '',
+    documentTypeCategory: '',
+    documentTypeDefault: false,
+  })
+  const [editDocumentType, setEditDocumentType] = useState({
+    id: null,
+    documentTypeShortName: '',
+    documentTypeName: '',
+    documentTypeDescription: '',
+    documentTypeCategory: '',
+    documentTypeDefault: false,
   })
 
   // Personal Detail State
@@ -295,12 +321,14 @@ const PmsDashboard = () => {
     // Prepare payload matching the provided JSON schema
     const payload = {
       roomName: newRoom.roomName,
-      roomShortName: newRoom.roomShortName || newRoom.roomName,
+      roomShortName: newRoom.roomName, // Fallback to roomName since Short Name was removed from UI
       roomTypeId: isNonRoom ? null : Number(newRoom.roomTypeId),
       floorId: Number(newRoom.floorId),
       buildingId: Number(newRoom.buildingId),
-      roomStatusTableId: isNonRoom ? null : Number(newRoom.roomStatusTableId),
-      roomStatus: isNonRoom ? null : selectedStatus ? selectedStatus.roomStatusName : null,
+      roomStatusId: isNonRoom ? null : Number(newRoom.roomStatusTableId),
+      roomStatus: isNonRoom
+        ? null
+        : newRoom.roomStatus || (selectedStatus ? selectedStatus.roomStatusName : 'Unknown'),
       name: selectedFloor ? selectedFloor.name : '',
       smoking: Boolean(newRoom.smoking),
       handicap: Boolean(newRoom.handicap),
@@ -339,7 +367,6 @@ const PmsDashboard = () => {
       return
     }
 
-
     const selectedStatus = roomStatuses.find(
       (rs) => String(rs.id) === String(editRoom.roomStatusTableId),
     )
@@ -348,19 +375,21 @@ const PmsDashboard = () => {
     const payload = {
       id: editRoom.id,
       roomName: editRoom.roomName,
-      roomShortName: editRoom.roomShortName || editRoom.roomName,
+      roomShortName: editRoom.roomName, // Fallback to roomName since Short Name was removed from UI
       roomTypeId: isNonRoom ? null : Number(editRoom.roomTypeId),
       floorId: Number(editRoom.floorId),
       buildingId: Number(editRoom.buildingId),
-      roomStatusTableId: isNonRoom ? null : (editRoom.roomStatusTableId ? Number(editRoom.roomStatusTableId) : null),
-      roomStatus: isNonRoom ? null : (selectedStatus ? selectedStatus.roomStatusName : editRoom.roomStatus),
-      name: editRoom.roomName, // Fixed: Previous version used floor name here
+      roomStatusId: isNonRoom ? null : Number(editRoom.roomStatusTableId),
+      roomStatus: isNonRoom
+        ? null
+        : editRoom.roomStatus || (selectedStatus ? selectedStatus.roomStatusName : 'Unknown'),
+      name: editRoom.name || editRoom.roomName,
       smoking: Boolean(editRoom.smoking),
       handicap: Boolean(editRoom.handicap),
       nonRoom: isNonRoom,
     }
 
-    console.log('--- Room Update Payload ---', payload);
+    console.log('--- Room Update Payload ---', payload)
 
     try {
       await hookUpdateRoom(editRoom.id, payload)
@@ -438,6 +467,28 @@ const PmsDashboard = () => {
     }
   }
 
+  const handleAddDocumentType = async (e) => {
+    e.preventDefault()
+    if (!newDocumentType.documentTypeName) return
+    await addDocumentType(newDocumentType)
+    setNewDocumentType({
+      id: 0,
+      documentTypeShortName: '',
+      documentTypeName: '',
+      documentTypeDescription: '',
+      documentTypeCategory: '',
+      documentTypeDefault: false,
+    })
+    toggleModal('documentType', false)
+  }
+
+  const handleUpdateDocumentType = async (e) => {
+    e.preventDefault()
+    if (!editDocumentType.documentTypeName) return
+    await updateDocumentType(editDocumentType.id, editDocumentType)
+    toggleModal('documentTypeEdit', false)
+  }
+
   const handlePersonalFileUpload = async (e, type) => {
     const file = e.target.files[0]
     if (!file) return
@@ -497,6 +548,9 @@ const PmsDashboard = () => {
           case 'Room Status':
             searchRoomStatuses(searchTerm)
             break
+          case 'Document Type':
+            searchDocumentTypes(searchTerm)
+            break
           default:
             break
         }
@@ -516,6 +570,7 @@ const PmsDashboard = () => {
     searchRoomStatuses,
     searchRoomTypes,
     searchRooms,
+    searchDocumentTypes,
   ])
 
   // Industrial Standard Performance Optimization: UseMemo for filtering
@@ -549,10 +604,21 @@ const PmsDashboard = () => {
       roomStatuses: filter(roomStatuses),
       personalDetails: filter(personalDetails),
       taxes: filter(taxes),
+      documentTypes: filter(documentTypes),
     }
-  }, [searchTerm, floors, buildings, roomTypes, roomStatuses, rooms, personalDetails, taxes])
+  }, [
+    searchTerm,
+    floors,
+    buildings,
+    roomTypes,
+    roomStatuses,
+    rooms,
+    personalDetails,
+    taxes,
+    documentTypes,
+  ])
 
-  // ✅ Industrial Standard Performance Optimization: UseMemo for pagination
+  // Industrial Standard Performance Optimization: UseMemo for pagination
   const paginatedData = React.useMemo(() => {
     const paginate = (data) => {
       if (!Array.isArray(data)) return []
@@ -567,6 +633,7 @@ const PmsDashboard = () => {
       roomStatuses: paginate(filteredData.roomStatuses),
       personalDetails: paginate(filteredData.personalDetails),
       taxes: paginate(filteredData.taxes),
+      documentTypes: paginate(filteredData.documentTypes),
     }
   }, [currentPage, itemsPerPage, filteredData])
 
@@ -616,6 +683,7 @@ const PmsDashboard = () => {
               allFloors={floors}
               allBuildings={buildings}
               allRoomTypes={roomTypes}
+              allRoomStatuses={roomStatuses}
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               toggleModal={toggleModal}
@@ -632,6 +700,9 @@ const PmsDashboard = () => {
               setEditTax={setEditTax}
               deleteTax={deleteTax}
               taxes={paginatedData.taxes}
+              documentTypes={paginatedData.documentTypes}
+              setEditDocumentType={setEditDocumentType}
+              deleteDocumentType={deleteDocumentType}
               personalDetails={paginatedData.personalDetails}
               onAddPersonalDetail={() => {
                 setPersonalFormData({
@@ -663,6 +734,7 @@ const PmsDashboard = () => {
               activeItem === 'Room' ||
               activeItem === 'Room Status' ||
               activeItem === 'Personal Detail' ||
+              activeItem === 'Document Type' ||
               activeItem === 'Tax') && (
               <div className="mt-8">
                 <Pagination
@@ -674,6 +746,7 @@ const PmsDashboard = () => {
                   roomStatuses={filteredData.roomStatuses}
                   taxes={filteredData.taxes}
                   personalDetails={filteredData.personalDetails}
+                  documentTypes={filteredData.documentTypes}
                   isLoading={isLoading}
                   currentPage={currentPage}
                   itemsPerPage={itemsPerPage}
@@ -736,6 +809,13 @@ const PmsDashboard = () => {
         handlePersonalSubmit={handlePersonalSubmit}
         handlePersonalFileUpload={handlePersonalFileUpload}
         uploadingType={uploadingType}
+        newDocumentType={newDocumentType}
+        setNewDocumentType={setNewDocumentType}
+        handleAddDocumentType={handleAddDocumentType}
+        editDocumentType={editDocumentType}
+        setEditDocumentType={setEditDocumentType}
+        handleUpdateDocumentType={handleUpdateDocumentType}
+        documentTypes={documentTypes}
         isLoading={isLoading || isSaving}
       />
 

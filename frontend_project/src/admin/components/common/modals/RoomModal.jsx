@@ -127,7 +127,7 @@ export const RoomModal = ({
             </div>
             <div>
               <label className="mb-2 block text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                Room Status
+                Operational Status
               </label>
               <select
                 required={!newRoom.nonRoom}
@@ -146,6 +146,69 @@ export const RoomModal = ({
                 ))}
               </select>
             </div>
+
+            {/* Status & Type Preview Section */}
+            {!newRoom.nonRoom && (
+              <div className="col-span-1 flex animate-in fade-in slide-in-from-top-2 flex-wrap items-end gap-6 rounded-2xl border border-slate-100 bg-slate-50/50 p-4 transition-all hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50 sm:col-span-2">
+                {newRoom.roomTypeId && (
+                  <div className="flex flex-col gap-2">
+                    <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+                      Type Summary
+                    </span>
+                    <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-white px-4 py-2.5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+                      <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                      <span className="text-[13px] font-bold text-slate-700 dark:text-slate-200">
+                        {roomTypes.find((rt) => String(rt.id) === String(newRoom.roomTypeId))
+                          ?.roomTypeName || 'Selected Type'}
+                      </span>
+                      <div className="ml-1 h-4 w-px bg-slate-100 dark:bg-slate-700"></div>
+                      <span className="text-[11px] font-black tracking-wider text-emerald-500">
+                        ₹
+                        {roomTypes.find((rt) => String(rt.id) === String(newRoom.roomTypeId))
+                          ?.price || '0'}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {newRoom.roomStatusTableId && (
+                  <div className="flex flex-col gap-2">
+                    <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+                      Selected Status
+                    </span>
+                    <div
+                      className="inline-flex items-center rounded-xl border px-4 py-2 text-[10px] font-black tracking-widest transition-all duration-300 uppercase shadow-sm"
+                      style={{
+                        backgroundColor: `${roomStatuses.find((rs) => String(rs.id) === String(newRoom.roomStatusTableId))?.roomStatusColor || '#64748b'}15`,
+                        color:
+                          roomStatuses.find(
+                            (rs) => String(rs.id) === String(newRoom.roomStatusTableId),
+                          )?.roomStatusColor || '#64748b',
+                        borderColor: `${roomStatuses.find((rs) => String(rs.id) === String(newRoom.roomStatusTableId))?.roomStatusColor || '#64748b'}30`,
+                      }}
+                    >
+                      {roomStatuses.find(
+                        (rs) => String(rs.id) === String(newRoom.roomStatusTableId),
+                      )?.roomStatusName || 'Status'}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div>
+              <label className="mb-2 block text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+                Room Status (Display)
+              </label>
+              <input
+                type="text"
+                value={newRoom.roomStatus || ''}
+                onChange={(e) => setNewRoom({ ...newRoom, roomStatus: e.target.value })}
+                placeholder="e.g. Booked"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 transition-all outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200"
+              />
+            </div>
+
             <div>
               <label className="mb-2 block text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
                 Room Name
@@ -163,18 +226,6 @@ export const RoomModal = ({
                   Room Name already exists!
                 </p>
               )}
-            </div>
-            <div>
-              <label className="mb-2 block text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                Room Short Name
-              </label>
-              <input
-                type="text"
-                value={newRoom.roomShortName || ''}
-                onChange={(e) => setNewRoom({ ...newRoom, roomShortName: e.target.value })}
-                placeholder="e.g. 101"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 transition-all outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200"
-              />
             </div>
           </div>
 

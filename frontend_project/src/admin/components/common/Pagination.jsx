@@ -4,7 +4,7 @@
  * A reusable pagination bar placed at the bottom of data tables to navigate between huge chunks of data.
  */
 // Common UI elements - Pagination component
-const Pagination = ({ activeItem, floors, buildings, roomTypes, rooms, roomStatuses, personalDetails, taxes, isLoading, currentPage, itemsPerPage, onPageChange }) => {
+const Pagination = ({ activeItem, floors, buildings, roomTypes, rooms, roomStatuses, personalDetails, taxes, documentTypes, isLoading, currentPage, itemsPerPage, onPageChange }) => {
   const getDataLength = () => {
     switch (activeItem) {
       case 'Floor': return floors.length;
@@ -14,6 +14,7 @@ const Pagination = ({ activeItem, floors, buildings, roomTypes, rooms, roomStatu
       case 'Room Status': return roomStatuses.length;
       case 'Tax': return taxes ? taxes.length : 0;
       case 'Personal Detail': return personalDetails ? personalDetails.length : 0;
+      case 'Document Type': return documentTypes ? documentTypes.length : 0;
       default: return 0;
     }
   };

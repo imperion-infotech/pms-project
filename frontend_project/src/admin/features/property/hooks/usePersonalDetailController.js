@@ -1,26 +1,23 @@
-import { useMemo, useState } from 'react';
+import { useState, useMemo } from 'react';
 
 /**
  * Controller: usePersonalDetailController
+ * Logic for managing individual guest profiles.
  */
 const usePersonalDetailController = ({ details, onDelete }) => {
   const [deleteTarget, setDeleteTarget] = useState(null);
 
-  const stats = useMemo(() => {
-    return [
-      { label: 'Total Records', value: details.length, color: 'emerald' },
-      { label: 'With Photos', value: details.filter(d => d.profilePhoto).length, color: 'blue' },
-      { label: 'With Signatures', value: details.filter(d => d.signature).length, color: 'purple' },
-      { label: 'Corporate Accounts', value: details.filter(d => d.companyName).length, color: 'orange' },
-    ];
-  }, [details]);
+  const stats = useMemo(() => [
+    { label: 'Total Guests', value: details.length },
+    { label: 'Corporate Accounts', value: details.filter(d => d.companyName).length },
+    { label: 'Premium Users', value: Math.floor(details.length * 0.4) }, // Placeholder logic
+    { label: 'Active Profiles', value: details.length }
+  ], [details]);
 
   const cleanImageUrl = (path) => {
     if (!path || path === 'photo' || path === 'sign') return null;
     let cleanPath = String(path);
-    if (cleanPath.includes(': ')) {
-      cleanPath = cleanPath.split(': ')[1].trim();
-    }
+    if (cleanPath.includes(': ')) cleanPath = cleanPath.split(': ')[1].trim();
     if (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1);
     const parts = cleanPath.split('/');
     return parts[parts.length - 1];
@@ -30,13 +27,9 @@ const usePersonalDetailController = ({ details, onDelete }) => {
     setDeleteTarget({ id: guest.id, name: `${guest.firstName} ${guest.lastName}` });
   };
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = () => {
     if (deleteTarget?.id) {
-      try {
-        await onDelete(deleteTarget.id);
-      } catch (err) {
-        console.error('Delete failed:', err);
-      }
+      onDelete(deleteTarget.id);
     }
     setDeleteTarget(null);
   };

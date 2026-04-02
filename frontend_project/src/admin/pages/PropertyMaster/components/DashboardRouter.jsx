@@ -7,6 +7,7 @@ import RoomManagement from '../../../features/property/components/RoomManagement
 import RoomStatusManagement from '../../../features/property/components/RoomStatusManagement'
 import PersonalDetailManagement from '../../../features/property/components/PersonalDetailManagement'
 import TaxManagement from '../../../features/property/components/TaxManagement'
+import DocumentTypeManagement from '../../../features/property/components/DocumentTypeManagement'
 
 /**
  * DashboardRouter - Ye file 'Traffic Inspector' ka kaam karti hai.
@@ -24,6 +25,7 @@ const DashboardRouter = ({
   allFloors,
   allBuildings,
   allRoomTypes,
+  allRoomStatuses,
   searchTerm,
   toggleModal,
   setEditFloor,
@@ -43,6 +45,9 @@ const DashboardRouter = ({
   taxes,
   setEditTax,
   deleteTax,
+  documentTypes,
+  setEditDocumentType,
+  deleteDocumentType,
   currentPage,
   itemsPerPage,
   userRole,
@@ -115,7 +120,7 @@ const DashboardRouter = ({
           roomTypes={allRoomTypes}
           floors={allFloors}
           buildings={allBuildings}
-          roomStatuses={roomStatuses}
+          roomStatuses={allRoomStatuses}
           searchTerm={searchTerm}
           setIsRoomModalOpen={(isOpen) => toggleModal('room', isOpen)}
           onEdit={(r) => {
@@ -137,7 +142,7 @@ const DashboardRouter = ({
               )?.id
             const finalStatusId =
               rStatusId ||
-              roomStatuses.find(
+              allRoomStatuses.find(
                 (rs) =>
                   (rs.roomStatusName || rs.roomStatusTitle) === r.roomStatus ||
                   (rs.roomStatusName || rs.roomStatusTitle) === r.roomStatusName,
@@ -184,6 +189,21 @@ const DashboardRouter = ({
           onAdd={onAddPersonalDetail}
           onEdit={onEditPersonalDetail}
           onDelete={onDeletePersonalDetail}
+          currentPage={currentPage}
+          itemsPerPage={itemsPerPage}
+        />
+      )
+    case 'Document Type':
+      return (
+        <DocumentTypeManagement
+          documentTypes={documentTypes}
+          searchTerm={searchTerm}
+          setIsDocumentTypeModalOpen={(isOpen) => toggleModal('documentType', isOpen)}
+          onEdit={(dt) => {
+            setEditDocumentType(dt)
+            toggleModal('documentTypeEdit', true)
+          }}
+          onDelete={deleteDocumentType}
           currentPage={currentPage}
           itemsPerPage={itemsPerPage}
         />

@@ -12,3 +12,5 @@ export { TaxModal } from './modals/TaxModal';
 export { TaxEditModal } from './modals/TaxEditModal';
 export { PersonalDetailsModal } from './modals/PersonalDetailsModal';
 export { PersonalDetailsEditModal } from './modals/PersonalDetailsEditModal';
+export { DocumentTypeModal } from './modals/DocumentTypeModal';
+export { DocumentTypeEditModal } from './modals/DocumentTypeEditModal';

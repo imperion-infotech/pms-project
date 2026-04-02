@@ -1,9 +1,9 @@
 /**
  * main.jsx
  * 
- * Application Bootstrap File.
- * Mounts the main React App component to the DOM ('root' div).
- * Imports global CSS styles including Tailwind CSS.
+ * Ye app ka entrance hai. React yahan se shuru hota hai.
+ * Yahan se app HTML ke 'root' div mein attach hota hai.
+ * CSS files bhi yahan import hoti hain.
  */
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'

@@ -1,21 +1,24 @@
-import { useMemo, useState } from 'react';
+import { useState, useMemo } from 'react';
 
 /**
  * Controller: useBuildingController
+ * Logic for managing physical property buildings.
  */
-const useBuildingController = ({ buildings, searchTerm, onDelete, currentPage, itemsPerPage }) => {
+const useBuildingController = ({ buildings, searchTerm, onDelete, currentPage = 1, itemsPerPage = 8 }) => {
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   const processedBuildings = useMemo(() => {
     let result = [...buildings];
     if (searchTerm) {
       result = result.filter(b => 
-        b.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        b.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         b.description?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    return result.sort((a, b) => b.id - a.id);
-  }, [buildings, searchTerm]);
+    
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return result.slice(startIndex, startIndex + itemsPerPage);
+  }, [buildings, searchTerm, currentPage, itemsPerPage]);
 
   const getIndex = (idx) => ((currentPage - 1) * itemsPerPage) + idx + 1;
 

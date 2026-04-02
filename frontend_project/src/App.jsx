@@ -1,14 +1,9 @@
 /**
- * App.jsx - Root Application Component
+ * App.jsx - Main Brain of the Application
  * 
- * Purpose:
- * This is the entry point of the React application. It handles global routing,
- * authentication protection, and wraps the app in the necessary state providers.
- * 
- * Key Functions:
- * 1. Routing: Uses react-router-dom to define paths like /login, /home, and /dashboard.
- * 2. Auth Protection: Includes AdminRoute and UserRoute to prevent unauthorized access.
- * 3. Theme & Sidebar: Wraps everything in ThemeProvider and SidebarProvider for global state.
+ * Ye app ka Router hai. Yahan decide hota hai ki user ko kab
+ * kahan bhejte hain. Isme login, register, aur dashboard ke raaste (routes) hain.
+ * Admin aur User roles ke logic bhi yahan sambhale jaate hain.
  */
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';

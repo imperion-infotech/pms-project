@@ -1,41 +1,64 @@
 import React, { useState, useEffect } from 'react';
-import api from '../../../services/api';
 
+/**
+ * AuthImage Component
+ * 
+ * Purpose:
+ * Fetches an image from the backend using an Authorization token.
+ * This is necessary for protected static assets.
+ * 
+ * Props:
+ * - src: The relative path or URL of the image.
+ * - alt: Alternate text for the image.
+ * - className: CSS classes for styling.
+ * - fallback: Optional React element to show if the image fails to load.
+ */
 export const AuthImage = ({ src, alt, className, fallback }) => {
   const [imgSrc, setImgSrc] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
+    let active = true;
     let objectUrl = null;
-    let isMounted = true;
+
+    if (!src) {
+      setError(true);
+      return;
+    }
+
+    // If it's a blob, data URL, or external HTTP link, use it directly
+    if (src.startsWith('blob:') || src.startsWith('data:') || src.startsWith('http')) {
+      setImgSrc(src);
+      setError(false);
+      return;
+    }
 
     const fetchImage = async () => {
-      if (!src) {
-        setImgSrc(null);
-        setLoading(false);
-        return;
-      }
-
-      // If it's a blob url or local data url, just use it
-      if (src.startsWith('blob:') || src.startsWith('data:')) {
-        setImgSrc(src);
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
       try {
-        const response = await api.get(src, { responseType: 'blob' });
-        if (isMounted) {
-          objectUrl = URL.createObjectURL(response.data);
-          setImgSrc(objectUrl);
+        const token = localStorage.getItem('access_token');
+        const cleanToken = token ? token.replace(/^"|"$/g, '') : null;
+
+        const response = await fetch(src, {
+          method: 'GET',
+          headers: {
+            'Authorization': cleanToken ? `Bearer ${cleanToken}` : ''
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-      } catch (error) {
-        console.error(`Failed to load image from ${src}:`, error);
-        setImgSrc(null);
-      } finally {
-        if (isMounted) {
-          setLoading(false);
+
+        const blob = await response.blob();
+        if (active) {
+          objectUrl = URL.createObjectURL(blob);
+          setImgSrc(objectUrl);
+          setError(false);
+        }
+      } catch (err) {
+        console.error('AuthImage Load Failed:', src, err);
+        if (active) {
+          setError(true);
         }
       }
     };
@@ -43,20 +66,32 @@ export const AuthImage = ({ src, alt, className, fallback }) => {
     fetchImage();
 
     return () => {
-      isMounted = false;
+      active = false;
       if (objectUrl) {
         URL.revokeObjectURL(objectUrl);
       }
     };
   }, [src]);
 
-  if (loading && !imgSrc) {
-    return <div className={`flex items-center justify-center bg-slate-100 dark:bg-slate-800 animate-pulse ${className}`} />;
+  // If there's an error and a fallback is provided, render the fallback
+  if (error && fallback) {
+    return <>{fallback}</>;
   }
 
-  if (!imgSrc) {
-    return fallback || null;
+  // Show a pulsing placeholder while loading unless a source is already available
+  if (!imgSrc && !error) {
+    return <div className={`${className} bg-slate-100 dark:bg-slate-800 animate-pulse rounded-lg`} />;
   }
 
-  return <img src={imgSrc} alt={alt} className={className} />;
+  return (
+    <img
+      src={imgSrc || src}
+      alt={alt}
+      className={className}
+      onError={() => setError(true)}
+      loading="lazy"
+    />
+  );
 };
+
+export default AuthImage;

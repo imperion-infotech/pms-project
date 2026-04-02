@@ -12,6 +12,8 @@ import {
   LogOut,
   User,
   Receipt,
+  Settings,
+  FileText,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useSidebar } from '../../../context/SidebarContext'
@@ -30,8 +32,10 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
   ]
 
   const profileItems = [{ name: 'Personal Detail', icon: User }]
+  const configurationItems = [{ name: 'Document Type', icon: FileText }]
 
   const [isProfileOpen, setIsProfileOpen] = useState(true)
+  const [isConfigOpen, setIsConfigOpen] = useState(true)
 
   return (
     <>
@@ -164,6 +168,50 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
                     >
                       {activeItem === item.name && (
                         <div className="absolute top-0 bottom-0 left-0 w-1 bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.5)]"></div>
+                      )}
+                      <span className="capitalize">{item.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="my-2 border-t border-slate-700/40"></div>
+
+            {/* Configuration Section */}
+            <div>
+              <button
+                onClick={() => setIsConfigOpen(!isConfigOpen)}
+                className="group flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-slate-800"
+              >
+                <div className="flex items-center gap-3">
+                  <Settings className="h-5 w-5 text-orange-400" />
+                  <span className="text-sm font-medium text-slate-200">Configuration</span>
+                </div>
+                {isConfigOpen ? (
+                  <ChevronUp className="h-4 w-4 opacity-50" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 opacity-50" />
+                )}
+              </button>
+
+              {isConfigOpen && (
+                <div className="border-y border-slate-800/50 bg-[#111827] py-1">
+                  {configurationItems.map((item) => (
+                    <button
+                      key={item.name}
+                      onClick={() => {
+                        setActiveItem(item.name)
+                        if (window.innerWidth < 1024) setIsSidebarOpen(false)
+                      }}
+                      className={`relative flex w-full items-center px-6 py-2.5 text-xs font-medium transition-all ${
+                        activeItem === item.name
+                          ? 'bg-slate-800/50 text-white'
+                          : 'text-slate-400 hover:bg-slate-800/30 hover:text-white'
+                      }`}
+                    >
+                      {activeItem === item.name && (
+                        <div className="absolute top-0 bottom-0 left-0 w-1 bg-orange-400 shadow-[0_0_8px_rgba(251,146,60,0.5)]"></div>
                       )}
                       <span className="capitalize">{item.name}</span>
                     </button>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PlusCircle, Pencil, Trash2, AlertTriangle, X, Workflow, Calendar, Palette, Type } from 'lucide-react';
-import useRoomStatusController from '../../../../features/property/hooks/useRoomStatusController';
+import useRoomStatusController from '../hooks/useRoomStatusController';
 
 /**
  * View: RoomStatusManagement

@@ -1,17 +1,21 @@
-import { useMemo, useState } from 'react';
+import { useState, useMemo } from 'react';
 
 /**
  * Controller: useRoomStatusController
+ * Logic for managing room operational states.
  */
 const useRoomStatusController = ({ roomStatuses, onDelete }) => {
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   const processedStatuses = useMemo(() => {
-    return [...roomStatuses].sort((a, b) => b.id - a.id);
+    return [...roomStatuses];
   }, [roomStatuses]);
 
   const handleDeleteClick = (status) => {
-    setDeleteTarget({ id: status.id, name: status.roomStatusName });
+    setDeleteTarget({ 
+      id: status.id, 
+      name: status.roomStatusName || status.roomStatusTitle 
+    });
   };
 
   const handleConfirmDelete = () => {

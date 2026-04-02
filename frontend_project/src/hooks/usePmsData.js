@@ -26,6 +26,7 @@ const usePmsData = () => {
     rooms: [],
     taxes: [],
     personalDetails: [],
+    documentTypes: [],
   })
 
   const [isLoading, setIsLoading] = useState(false)
@@ -52,6 +53,7 @@ const usePmsData = () => {
         rooms: propertyService.getRooms,
         taxes: propertyService.getTaxMasters,
         personalDetails: propertyService.getPersonalDetails,
+        documentTypes: propertyService.getDocumentTypes,
       }
 
       const keysToFetch = targets || Object.keys(serviceMap)
@@ -96,10 +98,14 @@ const usePmsData = () => {
    * executeAction()
    * Generic helper with automatic success/error notifications
    */
-  const executeAction = async (action, successMsg, refreshTargets, ...args) => {
+  const executeAction = async (method, successMsg, refreshTargets, type = 'success', ...args) => {
     try {
-      const result = await action(...args)
-      toast.success(successMsg)
+      const result = await method(...args)
+      if (type === 'error') {
+        toast.error(successMsg, 'Record Deleted')
+      } else {
+        toast.success(successMsg)
+      }
       await fetchData(refreshTargets)
       return result
     } catch (err) {
@@ -127,7 +133,7 @@ const usePmsData = () => {
     [toast],
   )
 
-  // Memoized Search Operations (replaces state with results)
+  // --- SEARCH OPERATIONS (Backend se search karke data yahan update hota hai) ---
   const searchRooms = useCallback(
     (query) => executeSearch(() => propertyService.searchRooms(query), 'rooms'),
     [executeSearch],
@@ -149,6 +155,11 @@ const usePmsData = () => {
     [executeSearch],
   )
 
+  const searchDocumentTypes = useCallback(
+    (query) => executeSearch(() => propertyService.searchDocumentTypes(query), 'documentTypes'),
+    [executeSearch],
+  )
+
   return {
     ...data,
     isLoading,
@@ -159,26 +170,42 @@ const usePmsData = () => {
     searchBuildings,
     searchRoomTypes,
     searchRoomStatuses,
+    searchDocumentTypes,
 
-    // Optimized CRUD with selective refreshing
+    // --- CRUD OPERATIONS (Data Add, Update, aur Delete karne ke routes) ---
+    // Selective refreshing se sirf wahi data dobara fetch hota hai jo change hua hai.
     addFloor: (payload) =>
-      executeAction(propertyService.createFloor, 'Floor created successfully', ['floors'], payload),
+      executeAction(
+        propertyService.createFloor,
+        'Floor created successfully',
+        ['floors'],
+        'success',
+        payload,
+      ),
     updateFloor: (id, payload) =>
       executeAction(
         propertyService.updateFloor,
         'Floor updated successfully',
         ['floors'],
+        'success',
         id,
         payload,
       ),
     deleteFloor: (id) =>
-      executeAction(propertyService.deleteFloor, 'Floor deleted successfully', ['floors'], id),
+      executeAction(
+        propertyService.deleteFloor,
+        'Floor deleted successfully',
+        ['floors'],
+        'error',
+        id,
+      ),
 
     addBuilding: (payload) =>
       executeAction(
         propertyService.createBuilding,
         'Building created successfully',
         ['buildings'],
+        'success',
         payload,
       ),
     updateBuilding: (id, payload) =>
@@ -186,6 +213,7 @@ const usePmsData = () => {
         propertyService.updateBuilding,
         'Building updated successfully',
         ['buildings'],
+        'success',
         id,
         payload,
       ),
@@ -194,6 +222,7 @@ const usePmsData = () => {
         propertyService.deleteBuilding,
         'Building deleted successfully',
         ['buildings'],
+        'error',
         id,
       ),
 
@@ -202,6 +231,7 @@ const usePmsData = () => {
         propertyService.createRoomType,
         'Room type created successfully',
         ['roomTypes'],
+        'success',
         payload,
       ),
     updateRoomType: (id, payload) =>
@@ -209,6 +239,7 @@ const usePmsData = () => {
         propertyService.updateRoomType,
         'Room type updated successfully',
         ['roomTypes'],
+        'success',
         id,
         payload,
       ),
@@ -217,6 +248,7 @@ const usePmsData = () => {
         propertyService.deleteRoomType,
         'Room type deleted successfully',
         ['roomTypes'],
+        'error',
         id,
       ),
 
@@ -225,6 +257,7 @@ const usePmsData = () => {
         propertyService.createRoomStatus,
         'Room status created successfully',
         ['roomStatuses'],
+        'success',
         payload,
       ),
     updateRoomStatus: (id, payload) =>
@@ -232,6 +265,7 @@ const usePmsData = () => {
         propertyService.updateRoomStatus,
         'Room status updated successfully',
         ['roomStatuses'],
+        'success',
         id,
         payload,
       ),
@@ -240,37 +274,61 @@ const usePmsData = () => {
         propertyService.deleteRoomStatus,
         'Room status deleted successfully',
         ['roomStatuses'],
+        'error',
         id,
       ),
 
     addRoom: (payload) =>
-      executeAction(propertyService.createRoom, 'Room created successfully', ['rooms'], payload),
+      executeAction(
+        propertyService.createRoom,
+        'Room created successfully',
+        ['rooms'],
+        'success',
+        payload,
+      ),
     updateRoom: async (id, payload) => {
+      // Optimistically update the UI state IMMEDIATELY
+      setData((prev) => ({
+        ...prev,
+        rooms: prev.rooms.map((r) => (String(r.id) === String(id) ? { ...r, ...payload } : r)),
+      }))
+
       try {
         const result = await propertyService.updateRoom(id, payload)
-        // Optimistically update the UI state
+        // Optionally update with full backend response object once received
         setData((prev) => ({
           ...prev,
-          rooms: prev.rooms.map((r) => (String(r.id) === String(id) ? { ...r, ...payload } : r)),
+          rooms: prev.rooms.map((r) =>
+            String(r.id) === String(id) ? { ...r, ...(result.data || payload) } : r,
+          ),
         }))
         toast.success('Room updated successfully')
-        // Still fetch from server to ensure full sync
-        setTimeout(() => fetchData(['rooms']), 500)
+        // Ensure synchronization
+        setTimeout(() => fetchData(['rooms']), 1000)
         return result
       } catch (err) {
         const errorMsg = err.response?.data?.message || err.message || 'Update failed.'
         toast.error(errorMsg)
+        // Rollback/Sync on error
+        fetchData(['rooms'])
         throw err
       }
     },
     deleteRoom: (id) =>
-      executeAction(propertyService.deleteRoom, 'Room deleted successfully', ['rooms'], id),
+      executeAction(
+        propertyService.deleteRoom,
+        'Room deleted successfully',
+        ['rooms'],
+        'error',
+        id,
+      ),
 
     addTax: (payload) =>
       executeAction(
         propertyService.createTaxMaster,
         'Tax record created successfully',
         ['taxes'],
+        'success',
         payload,
       ),
     updateTax: (id, payload) =>
@@ -278,6 +336,7 @@ const usePmsData = () => {
         propertyService.updateTaxMaster,
         'Tax record updated successfully',
         ['taxes'],
+        'success',
         id,
         payload,
       ),
@@ -286,6 +345,7 @@ const usePmsData = () => {
         propertyService.deleteTaxMaster,
         'Tax record deleted successfully',
         ['taxes'],
+        'error',
         id,
       ),
 
@@ -294,6 +354,7 @@ const usePmsData = () => {
         propertyService.createPersonalDetail,
         'Guest profile created',
         ['personalDetails'],
+        'success',
         payload,
       ),
     updatePersonalDetail: (id, payload) =>
@@ -301,6 +362,7 @@ const usePmsData = () => {
         propertyService.updatePersonalDetail,
         'Guest profile updated',
         ['personalDetails'],
+        'success',
         id,
         payload,
       ),
@@ -309,8 +371,36 @@ const usePmsData = () => {
         propertyService.deletePersonalDetail,
         'Guest profile deleted',
         ['personalDetails'],
+        'error',
         id,
       ),
+
+    addDocumentType: (payload) =>
+      executeAction(
+        propertyService.createDocumentType,
+        'Document Type created!',
+        ['documentTypes'],
+        'success',
+        payload,
+      ),
+    updateDocumentType: (id, payload) =>
+      executeAction(
+        propertyService.updateDocumentType,
+        'Document Type updated!',
+        ['documentTypes'],
+        'success',
+        id,
+        payload,
+      ),
+    deleteDocumentType: (id) =>
+      executeAction(
+        propertyService.deleteDocumentType,
+        'Document Type deleted!',
+        ['documentTypes'],
+        'error',
+        id,
+      ),
+    getDocumentTypeById: (id) => propertyService.getDocumentTypeById(id),
   }
 }
 
