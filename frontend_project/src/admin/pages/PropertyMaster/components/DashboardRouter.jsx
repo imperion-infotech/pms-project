@@ -42,6 +42,7 @@ const DashboardRouter = ({
   onAddPersonalDetail,
   onEditPersonalDetail,
   onDeletePersonalDetail,
+  documentDetails,
   taxes,
   handleEditTax,
   deleteTax,
@@ -133,6 +134,8 @@ const DashboardRouter = ({
       return (
         <PersonalDetailManagement
           details={personalDetails}
+          documentDetails={documentDetails}
+          documentTypes={documentTypes}
           searchTerm={searchTerm}
           onAdd={onAddPersonalDetail}
           onEdit={onEditPersonalDetail}

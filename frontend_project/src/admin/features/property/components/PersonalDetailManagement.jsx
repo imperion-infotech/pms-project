@@ -25,7 +25,14 @@ import { AuthImage } from '../../../components/common/AuthImage'
  * View: PersonalDetailManagement
  * Guest directory and profile management using MVC architecture.
  */
-const PersonalDetailManagement = ({ details = [], onAdd, onEdit, onDelete }) => {
+const PersonalDetailManagement = ({
+  details = [],
+  documentDetails = [],
+  documentTypes = [],
+  onAdd,
+  onEdit,
+  onDelete,
+}) => {
   const {
     stats,
     cleanImageUrl,
@@ -33,8 +40,12 @@ const PersonalDetailManagement = ({ details = [], onAdd, onEdit, onDelete }) => 
     handleDeleteClick,
     handleConfirmDelete,
     handleCancelDelete,
+    getGuestDocument,
+    getDocumentTypeName,
   } = usePersonalDetailController({
     details,
+    documentDetails,
+    documentTypes,
     onDelete,
   })
 
@@ -87,7 +98,7 @@ const PersonalDetailManagement = ({ details = [], onAdd, onEdit, onDelete }) => 
       {/* Guest Table */}
       <div className="dark:bg-surface-100 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-md transition-colors duration-300 dark:border-slate-800">
         <div className="custom-scrollbar max-h-[600px] w-full overflow-auto">
-          <table className="w-full min-w-[1100px] border-collapse text-left">
+          <table className="w-full min-w-[1400px] border-collapse text-left">
             <thead className="sticky top-0 z-10">
               <tr className="border-b border-slate-200 bg-[#f8fafc] text-[11px] font-bold tracking-wider text-[#64748b] uppercase dark:border-slate-800 dark:bg-slate-800 dark:text-slate-400">
                 <th className="w-24 border-r border-slate-200 px-8 py-4 text-center dark:border-slate-800">
@@ -97,13 +108,19 @@ const PersonalDetailManagement = ({ details = [], onAdd, onEdit, onDelete }) => 
                   User Name
                 </th>
                 <th className="border-r border-slate-200 px-8 py-4 dark:border-slate-800">
-                  Company Name
-                </th>
-                <th className="border-r border-slate-200 px-8 py-4 dark:border-slate-800">
                   Email Address
                 </th>
                 <th className="border-r border-slate-200 px-8 py-4 text-center dark:border-slate-800">
                   Phone No.
+                </th>
+                <th className="border-r border-slate-200 px-8 py-4 dark:border-slate-800">
+                  Doc Type
+                </th>
+                <th className="border-r border-slate-200 px-8 py-4 dark:border-slate-800">
+                  Document No.
+                </th>
+                <th className="border-r border-slate-200 px-8 py-4 text-center dark:border-slate-800">
+                  Valid Till
                 </th>
                 <th className="px-8 py-4 text-center">Actions</th>
               </tr>
@@ -124,70 +141,79 @@ const PersonalDetailManagement = ({ details = [], onAdd, onEdit, onDelete }) => 
                   </td>
                 </tr>
               ) : (
-                details.map((guest, idx) => (
-                  <tr
-                    key={guest.id}
-                    className="group h-14 transition-all hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5"
-                  >
-                    <td className="border-r border-slate-100 px-8 py-2 text-center font-mono text-[11px] font-bold text-slate-300 group-hover:text-emerald-500 dark:border-slate-800 dark:text-slate-600">
-                      {idx + 1}
-                    </td>
-                    <td className="border-r border-slate-100 px-8 py-2 dark:border-slate-800">
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 overflow-hidden rounded-full border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
-                          {cleanImageUrl(guest.profilePhoto) ? (
-                            <AuthImage
-                              src={`/user/${cleanImageUrl(guest.profilePhoto)}`}
-                              alt="Profile"
-                              className="h-full w-full object-cover"
-                              fallback={
-                                <img
-                                  src={`https://ui-avatars.com/api/?name=${guest.firstName}+${guest.lastName}&background=334155&color=fff&bold=true`}
-                                  alt="Profile"
-                                  className="h-full w-full object-cover"
-                                />
-                              }
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center text-slate-400">
-                              <User size={14} />
-                            </div>
-                          )}
+                details.map((guest, idx) => {
+                  const guestDocument = getGuestDocument(guest.id)
+                  return (
+                    <tr
+                      key={guest.id}
+                      className="group h-14 transition-all hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5"
+                    >
+                      <td className="border-r border-slate-100 px-8 py-2 text-center font-mono text-[11px] font-bold text-slate-300 group-hover:text-emerald-500 dark:border-slate-800 dark:text-slate-600">
+                        {idx + 1}
+                      </td>
+                      <td className="border-r border-slate-100 px-8 py-2 dark:border-slate-800">
+                        <div className="flex items-center gap-3">
+                          <div className="h-8 w-8 overflow-hidden rounded-full border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
+                            {cleanImageUrl(guest.profilePhoto) ? (
+                              <AuthImage
+                                src={`/user/${cleanImageUrl(guest.profilePhoto)}`}
+                                alt="Profile"
+                                className="h-full w-full object-cover"
+                                fallback={
+                                  <img
+                                    src={`https://ui-avatars.com/api/?name=${guest.firstName}+${guest.lastName}&background=334155&color=fff&bold=true`}
+                                    alt="Profile"
+                                    className="h-full w-full object-cover"
+                                  />
+                                }
+                              />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center text-slate-400">
+                                <User size={14} />
+                              </div>
+                            )}
+                          </div>
+                          <span className="font-bold tracking-tight text-slate-800 uppercase dark:text-slate-200">
+                            {guest.firstName} {guest.lastName}
+                          </span>
                         </div>
-                        <span className="font-bold tracking-tight text-slate-800 uppercase dark:text-slate-200">
-                          {guest.firstName} {guest.lastName}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="border-r border-slate-100 px-8 py-2 font-bold text-slate-600 uppercase dark:border-slate-800 dark:text-slate-400">
-                      {guest.companyName || '—'}
-                    </td>
-                    <td className="border-r border-slate-100 px-8 py-2 font-mono text-slate-500 lowercase dark:border-slate-800 dark:text-slate-400">
-                      {guest.email || '—'}
-                    </td>
-                    <td className="border-r border-slate-100 px-8 py-2 text-center font-bold text-slate-600 dark:border-slate-800 dark:text-slate-400">
-                      {guest.phone || '—'}
-                    </td>
-                    <td className="px-8 py-2 text-center">
-                      <div className="flex items-center justify-center gap-3">
-                        <button
-                          onClick={() => onEdit(guest)}
-                          className="rounded-lg p-1.5 text-blue-500 transition-colors hover:bg-blue-50 dark:hover:bg-blue-500/10"
-                          title="Edit Profile"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteClick(guest)}
-                          className="rounded-lg p-1.5 text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-500/10"
-                          title="Delete Profile"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                      <td className="border-r border-slate-100 px-8 py-2 font-mono text-slate-500 lowercase dark:border-slate-800 dark:text-slate-400">
+                        {guest.email || '—'}
+                      </td>
+                      <td className="border-r border-slate-100 px-8 py-2 text-center font-bold text-slate-600 dark:border-slate-800 dark:text-slate-400">
+                        {guest.phone || '—'}
+                      </td>
+                      <td className="border-r border-slate-100 px-8 py-2 font-bold text-blue-600 uppercase dark:border-slate-800 dark:text-blue-400/80">
+                        {getDocumentTypeName(guestDocument?.documentTypeId)}
+                      </td>
+                      <td className="border-r border-slate-100 px-8 py-2 font-mono text-[11px] font-bold text-slate-600 dark:border-slate-800 dark:text-slate-400">
+                        {guestDocument?.documentNumber || '—'}
+                      </td>
+                      <td className="border-r border-slate-100 px-8 py-2 text-center font-bold text-emerald-600 dark:border-slate-800 dark:text-emerald-400/80">
+                        {guestDocument?.validTill || '—'}
+                      </td>
+                      <td className="px-8 py-2 text-center">
+                        <div className="flex items-center justify-center gap-3">
+                          <button
+                            onClick={() => onEdit(guest, guestDocument)}
+                            className="rounded-lg p-1.5 text-blue-500 transition-colors hover:bg-blue-50 dark:hover:bg-blue-500/10"
+                            title="Edit Profile"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(guest)}
+                            className="rounded-lg p-1.5 text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-500/10"
+                            title="Delete Profile"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })
               )}
             </tbody>
           </table>

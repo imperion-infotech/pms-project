@@ -220,6 +220,7 @@ const DashboardModals = ({
         handleFileUpload={handlePersonalFileUpload}
         uploadingType={uploadingType}
         loading={isLoading}
+        documentTypes={documentTypes}
       />
 
       <PersonalDetailsEditModal
@@ -231,6 +232,7 @@ const DashboardModals = ({
         handleFileUpload={handlePersonalFileUpload}
         uploadingType={uploadingType}
         loading={isLoading}
+        documentTypes={documentTypes}
       />
 
       {/* Document Type Modals */}

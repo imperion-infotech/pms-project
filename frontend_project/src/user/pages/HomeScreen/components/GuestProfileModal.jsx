@@ -43,6 +43,11 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
     roomStatuses,
     rooms: rawRooms,
     documentTypes,
+    fetchDocumentDetailsByPersonalDetailId,
+    addDocumentDetail,
+    deleteDocumentDetail,
+    documentDetails,
+    setDocumentDetails,
   } = usePmsData()
   const [localPreviews, setLocalPreviews] = useState({ profilePhoto: null, signature: null })
 
@@ -120,7 +125,8 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
   useEffect(() => {
     const fetchLatestDetails = async () => {
       // Find the ID to fetch from multiple sources
-      const targetId = room?.profile?.id || room?.personalDetailId || room?.profileId || room?.id
+      // FIXED: Removed room?.id fallback because room ID is not a personal detail ID
+      const targetId = room?.profile?.id || room?.personalDetailId || room?.profileId
 
       if (isOpen && targetId) {
         try {
@@ -160,6 +166,16 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
 
     fetchLatestDetails()
   }, [room, isOpen])
+
+  // NEW: Synchronize document details when profile is loaded
+  useEffect(() => {
+    const targetId = room?.profile?.id || room?.personalDetailId || room?.profileId
+    if (isOpen && targetId) {
+      fetchDocumentDetailsByPersonalDetailId(targetId)
+    } else if (isOpen) {
+      setDocumentDetails([])
+    }
+  }, [room, isOpen, fetchDocumentDetailsByPersonalDetailId, setDocumentDetails])
 
   if (!isOpen || !room) return null
 
@@ -232,19 +248,37 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
   }
 
   const saveDocument = (docData) => {
-    const updatedDocs = [...(formData.documents || [])]
-    if (editingDocIndex >= 0) {
-      updatedDocs[editingDocIndex] = docData
+    const targetProfileId = profile?.id || room?.personalDetailId
+
+    if (targetProfileId) {
+      // API call was already handled by DocumentModal
+      fetchDocumentDetailsByPersonalDetailId(targetProfileId)
     } else {
-      updatedDocs.push(docData)
+      // Local state only for new profiles not yet saved
+      const updatedDocs = [...(formData.documents || [])]
+      if (editingDocIndex >= 0) {
+        updatedDocs[editingDocIndex] = docData
+      } else {
+        updatedDocs.push(docData)
+      }
+      setFormData((prev) => ({ ...prev, documents: updatedDocs }))
     }
-    setFormData((prev) => ({ ...prev, documents: updatedDocs }))
     setShowDocForm(false)
   }
 
-  const deleteDocument = (index) => {
-    const updatedDocs = (formData.documents || []).filter((_, i) => i !== index)
-    setFormData((prev) => ({ ...prev, documents: updatedDocs }))
+  const handleDeleteDocument = async (doc, index) => {
+    if (doc.id) {
+      try {
+        await deleteDocumentDetail(doc.id)
+        const targetProfileId = profile?.id || room?.personalDetailId
+        if (targetProfileId) fetchDocumentDetailsByPersonalDetailId(targetProfileId)
+      } catch (err) {
+        console.error('Failed to delete document:', err)
+      }
+    } else {
+      const updatedDocs = (formData.documents || []).filter((_, i) => i !== index)
+      setFormData((prev) => ({ ...prev, documents: updatedDocs }))
+    }
   }
 
   const handleSubmit = async (e, forcedStatusName = null) => {
@@ -258,6 +292,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
       const targetProfileId = profile?.id || room?.personalDetailId
       const payload = {
         ...formData,
+        mobileNumber: formData.phone, // Map phone to mobileNumber for backend consistency
         id: isExisting ? targetProfileId : 0,
         roomId: room.id,
         roomName: room.roomName,
@@ -269,7 +304,17 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
       } else {
         const result = await addPersonalDetail(payload)
         // Link the newly created profile ID back to the room
-        finalProfileId = result?.data?.id || result?.data || finalProfileId
+        finalProfileId = result?.data?.id || result?.data
+      }
+
+      // NEW: If there were local documents, save them now that we have a profile ID
+      if (!isExisting && formData.documents?.length > 0 && finalProfileId) {
+        for (const doc of formData.documents) {
+          await addDocumentDetail({
+            ...doc,
+            personalDetailsId: finalProfileId,
+          })
+        }
       }
 
       if (forcedStatusName) {
@@ -530,14 +575,20 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                          {formData.documents?.length > 0 ? (
-                            formData.documents.map((doc, idx) => {
+                          {(profile?.id || room?.personalDetailId
+                            ? documentDetails
+                            : formData.documents || []
+                          ).length > 0 ? (
+                            (profile?.id || room?.personalDetailId
+                              ? documentDetails
+                              : formData.documents || []
+                            ).map((doc, idx) => {
                               const docType = documentTypes.find(
                                 (t) => String(t.id) === String(doc.documentTypeId),
                               )
                               return (
                                 <tr
-                                  key={idx}
+                                  key={doc.id || idx}
                                   className="group transition-colors hover:bg-emerald-50/10"
                                 >
                                   <td className="px-6 py-4">
@@ -551,18 +602,32 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                                       </button>
                                       <button
                                         type="button"
-                                        onClick={() => deleteDocument(idx)}
+                                        onClick={() => handleDeleteDocument(doc, idx)}
                                         className="text-slate-400 hover:text-red-500"
                                       >
                                         <Trash2 size={14} />
                                       </button>
                                     </div>
                                   </td>
-                                  <td className="px-6 py-4 text-xs font-black">
-                                    {docType?.documentTypeName || doc.documentTypeId}
+                                  <td className="px-6 py-4">
+                                    <div className="text-xs font-black uppercase">
+                                      {docType?.documentTypeName || doc.documentTypeId}
+                                    </div>
+                                    {doc.validTill && (
+                                      <div className="mt-1 text-[8px] font-bold text-slate-400">
+                                        Exp: {doc.validTill}
+                                      </div>
+                                    )}
                                   </td>
-                                  <td className="px-6 py-4 font-mono text-xs">
-                                    {doc.documentNumber}
+                                  <td className="px-6 py-4">
+                                    <div className="font-mono text-xs font-bold text-slate-600 dark:text-slate-300">
+                                      {doc.documentNumber}
+                                    </div>
+                                    {doc.remark && (
+                                      <div className="mt-1 max-w-[150px] truncate text-[9px] font-medium text-slate-400">
+                                        {doc.remark}
+                                      </div>
+                                    )}
                                   </td>
                                 </tr>
                               )
@@ -649,8 +714,14 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
             onSave={saveDocument}
             isDark={isDark}
             documentTypes={documentTypes}
-            initialData={editingDocIndex >= 0 ? formData.documents[editingDocIndex] : null}
-            profileAddress={formData.address}
+            initialData={
+              editingDocIndex >= 0
+                ? (profile?.id || room?.personalDetailId
+                  ? documentDetails[editingDocIndex]
+                  : formData.documents[editingDocIndex])
+                : null
+            }
+            personalDetailsId={profile?.id || room?.personalDetailId}
           />
         </motion.div>
       </div>

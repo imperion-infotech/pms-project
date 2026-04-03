@@ -20,6 +20,7 @@ export const PersonalDetailsModal = ({
   handleSubmit,
   handleFileUpload,
   uploadingType,
+  documentTypes,
   loading,
 }) => {
   const [localPreviews, setLocalPreviews] = useState({ photo: null, signature: null })
@@ -256,6 +257,128 @@ export const PersonalDetailsModal = ({
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   className="w-full resize-none rounded-2xl bg-slate-50 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 dark:bg-slate-800"
                 ></textarea>
+              </div>
+
+              {/* Document Details Section */}
+              <div className="col-span-2 pt-4">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800"></div>
+                  <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                    Document Verification
+                  </span>
+                  <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800"></div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="mb-2 block text-[10px] font-black text-slate-400 uppercase">
+                      Document Type
+                    </label>
+                    <select
+                      value={formData.documentTypeId}
+                      onChange={(e) => setFormData({ ...formData, documentTypeId: e.target.value })}
+                      className="w-full rounded-2xl bg-slate-50 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 dark:bg-slate-800"
+                    >
+                      <option value="">Select Type</option>
+                      {documentTypes?.map((type) => (
+                        <option key={type.id} value={type.id}>
+                          {type.documentTypeName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-[10px] font-black text-slate-400 uppercase">
+                      Document Number
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. ABC1234567"
+                      value={formData.documentNumber}
+                      onChange={(e) => setFormData({ ...formData, documentNumber: e.target.value })}
+                      className="w-full rounded-2xl bg-slate-50 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 dark:bg-slate-800"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-[10px] font-black text-slate-400 uppercase">
+                      Valid Till
+                    </label>
+                    <input
+                      type="date"
+                      value={formData.validTill}
+                      onChange={(e) => setFormData({ ...formData, validTill: e.target.value })}
+                      className="w-full rounded-2xl bg-slate-50 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 dark:bg-slate-800"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-[10px] font-black text-slate-400 uppercase">
+                      Remark
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Any notes..."
+                      value={formData.remark}
+                      onChange={(e) => setFormData({ ...formData, remark: e.target.value })}
+                      className="w-full rounded-2xl bg-slate-50 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 dark:bg-slate-800"
+                    />
+                  </div>
+
+                  {/* Document Images */}
+                  <div className="col-span-2 grid grid-cols-2 gap-4">
+                    <div className="relative rounded-2xl border-2 border-dashed border-slate-100 bg-slate-50/50 p-4 text-center dark:border-slate-800 dark:bg-slate-800/30">
+                      {formData.frontImagePath ? (
+                        <div className="relative flex h-24 items-center justify-center">
+                          <AuthImage
+                            src={`/user/${cleanImageUrl(formData.frontImagePath)}`}
+                            alt="Front"
+                            className="max-h-full rounded-lg"
+                          />
+                        </div>
+                      ) : (
+                        <div className="py-2">
+                          <Camera size={20} className="mx-auto mb-1 text-slate-300" />
+                          <p className="text-[8px] font-bold tracking-widest text-slate-400 uppercase">
+                            Front Photo
+                          </p>
+                        </div>
+                      )}
+                      <label className="mt-2 block w-full cursor-pointer rounded-xl bg-white py-1.5 text-[9px] font-black text-slate-500 uppercase transition-all hover:bg-slate-50 dark:bg-slate-800">
+                        {uploadingType === 'front' ? '...' : 'Upload Front'}
+                        <input
+                          type="file"
+                          className="hidden"
+                          onChange={(e) => handleFileUpload(e, 'front')}
+                        />
+                      </label>
+                    </div>
+
+                    <div className="relative rounded-2xl border-2 border-dashed border-slate-100 bg-slate-50/50 p-4 text-center dark:border-slate-800 dark:bg-slate-800/30">
+                      {formData.backImagePath ? (
+                        <div className="relative flex h-24 items-center justify-center">
+                          <AuthImage
+                            src={`/user/${cleanImageUrl(formData.backImagePath)}`}
+                            alt="Back"
+                            className="max-h-full rounded-lg"
+                          />
+                        </div>
+                      ) : (
+                        <div className="py-2">
+                          <Camera size={20} className="mx-auto mb-1 text-slate-300" />
+                          <p className="text-[8px] font-bold tracking-widest text-slate-400 uppercase">
+                            Back Photo
+                          </p>
+                        </div>
+                      )}
+                      <label className="mt-2 block w-full cursor-pointer rounded-xl bg-white py-1.5 text-[9px] font-black text-slate-500 uppercase transition-all hover:bg-slate-50 dark:bg-slate-800">
+                        {uploadingType === 'back' ? '...' : 'Upload Back'}
+                        <input
+                          type="file"
+                          className="hidden"
+                          onChange={(e) => handleFileUpload(e, 'back')}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="flex gap-4 border-t border-slate-50 pt-4 dark:border-slate-800">

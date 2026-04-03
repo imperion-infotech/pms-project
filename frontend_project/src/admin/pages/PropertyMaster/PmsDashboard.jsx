@@ -92,6 +92,9 @@ const PmsDashboard = () => {
     addDocumentType,
     updateDocumentType,
     deleteDocumentType,
+    addDocumentDetail,
+    updateDocumentDetail,
+    documentDetails,
     searchRooms,
     searchFloors,
     searchBuildings,
@@ -218,7 +221,13 @@ const PmsDashboard = () => {
     handleAddPersonalDetail,
     handleUpdatePersonalDetail,
     handleEditPersonalDetail,
-  } = usePersonalDetailManagement({ addPersonalDetail, updatePersonalDetail, toggleModal })
+  } = usePersonalDetailManagement({
+    addPersonalDetail,
+    updatePersonalDetail,
+    addDocumentDetail,
+    updateDocumentDetail,
+    toggleModal,
+  })
 
   const [uploadingType, setUploadingType] = useState(null)
 
@@ -253,10 +262,23 @@ const PmsDashboard = () => {
         fileName = responseData.split(': ')[1].trim()
       }
 
-      setPersonalFormData((prev) => ({
-        ...prev,
-        [type === 'photo' ? 'profilePhoto' : 'signature']: fileName,
-      }))
+      let fieldName = type
+      if (type === 'photo') fieldName = 'profilePhoto'
+      if (type === 'signature') fieldName = 'signature'
+      if (type === 'front') fieldName = 'frontImagePath'
+      if (type === 'back') fieldName = 'backImagePath'
+
+      if (modals.personalDetail) {
+        setPersonalFormData((prev) => ({
+          ...prev,
+          [fieldName]: fileName,
+        }))
+      } else if (modals.personalDetailEdit) {
+        setEditPersonalFormData((prev) => ({
+          ...prev,
+          [fieldName]: fileName,
+        }))
+      }
     } catch (err) {
       console.error('Upload failed:', err)
     } finally {
@@ -424,10 +446,11 @@ const PmsDashboard = () => {
               deleteRoomType={deleteRoomType}
               deleteRoomStatus={deleteRoomStatus}
               deleteRoom={deleteRoom}
-              personalDetails={personalDetails}
               onAddPersonalDetail={() => toggleModal('personalDetail', true)}
               onEditPersonalDetail={handleEditPersonalDetail}
               onDeletePersonalDetail={deletePersonalDetail}
+              personalDetails={personalDetails}
+              documentDetails={documentDetails}
               taxes={taxes}
               handleEditTax={handleEditTax}
               deleteTax={deleteTax}

@@ -94,7 +94,7 @@ export const propertyService = {
   createDocumentType: (data) => handleResponse(() => api.post('/admin/createdocumenttype', data)),
   updateDocumentType: (id, data) =>
     handleResponse(() => api.put(`/admin/updatedocumenttype/${id}`, data)),
-  deleteDocumentType: (id) => handleResponse(() => api.delete(`/admin/deletedocumenttype/${id}`)),
+  deleteDocumentType: (id) => handleResponse(() => api.delete(`/admin/documenttype/${id}`)),
   searchDocumentTypes: (query) =>
     handleResponse(() => api.get('/user/documenttype/search', { params: { query } })),
 
