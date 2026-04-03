@@ -32,7 +32,7 @@ const usePmsData = () => {
   const { fetchRoomStatuses } = roomStatusesData
   const { fetchRooms } = roomsData
   const { fetchTaxes } = taxesData
-  const { fetchPersonalDetails } = guestData
+  const { fetchPersonalDetails, fetchPersonalDetailById } = guestData
   const { fetchDocumentTypes } = docTypeData
 
   const { fetchDocumentDetails } = docDetailData
@@ -73,6 +73,7 @@ const usePmsData = () => {
     ...docDetailData,
 
     fetchData,
+    fetchPersonalDetailById,
 
     // Aggregated Loading/Error
     isLoading:

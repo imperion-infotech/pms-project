@@ -60,6 +60,16 @@ export const usePmsGuests = () => {
       throw err
     }
   }, [fetchPersonalDetails, toast])
+ 
+  const fetchPersonalDetailById = useCallback(async (id) => {
+    try {
+      const res = await propertyService.getPersonalDetailById(id)
+      return res
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to fetch guest profile')
+      throw err
+    }
+  }, [toast])
 
   const searchPersonalDetails = useCallback(async (query) => {
     setIsLoading(true)
@@ -73,5 +83,5 @@ export const usePmsGuests = () => {
     }
   }, [toast])
 
-  return { personalDetails, isLoading, fetchPersonalDetails, addPersonalDetail, updatePersonalDetail, deletePersonalDetail, searchPersonalDetails }
+  return { personalDetails, isLoading, fetchPersonalDetails, fetchPersonalDetailById, addPersonalDetail, updatePersonalDetail, deletePersonalDetail, searchPersonalDetails }
 }

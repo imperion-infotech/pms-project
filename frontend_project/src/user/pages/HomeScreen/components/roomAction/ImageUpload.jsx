@@ -13,6 +13,7 @@ const ImageUpload = ({
   icon: Icon,
   isDark,
   aspect = 'aspect-video',
+  renderCustomPreview,
 }) => {
   const containerClass = `p-8 rounded-[35px] border ${isDark ? 'bg-slate-800/20 border-slate-800' : 'bg-slate-50 border-slate-100'}`
 
@@ -58,14 +59,18 @@ const ImageUpload = ({
         <div className={uploadAreaClass}>
           {value ? (
             <>
-              <img
-                src={getImageUrl(value)}
-                alt={label}
-                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                onError={(e) => {
-                  e.target.style.display = 'none'
-                }}
-              />
+              {renderCustomPreview ? (
+                renderCustomPreview(value)
+              ) : (
+                <img
+                  src={getImageUrl(value)}
+                  alt={label}
+                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  onError={(e) => {
+                    e.target.style.display = 'none'
+                  }}
+                />
+              )}
               <div className="absolute inset-0 bg-slate-900/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
             </>
           ) : (

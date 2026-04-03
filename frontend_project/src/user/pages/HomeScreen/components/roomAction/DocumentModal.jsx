@@ -4,6 +4,19 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { propertyService } from '../../../../../services/propertyService'
 import { usePmsDocumentDetails } from '../../../../../hooks/usePmsDocumentDetails'
 import ImageUpload from './ImageUpload'
+import { AuthImage } from '../../../../../admin/components/common/AuthImage'
+
+/**
+ * cleanImageUrl - Helper to extract just the filename from potentially complex paths.
+ */
+const cleanImageUrl = (path) => {
+  if (!path || path === 'photo' || path === 'sign') return null
+  let cleanPath = String(path)
+  if (cleanPath.includes(': ')) cleanPath = cleanPath.split(': ')[1].trim()
+  if (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1)
+  const parts = cleanPath.split('/')
+  return parts[parts.length - 1]
+}
 
 /**
  * DocumentModal Component
@@ -49,8 +62,12 @@ const DocumentModal = ({
           id: initialData.id, // For updates
         })
         setDocPreviews({
-          frontImagePath: initialData.frontImagePath ? propertyService.getImageUrl(initialData.frontImagePath) : null,
-          backImagePath: initialData.backImagePath ? propertyService.getImageUrl(initialData.backImagePath) : null,
+          frontImagePath: initialData.frontImagePath
+            ? propertyService.getImageUrl(initialData.frontImagePath)
+            : null,
+          backImagePath: initialData.backImagePath
+            ? propertyService.getImageUrl(initialData.backImagePath)
+            : null,
         })
       } else {
         setDocFormData({
@@ -83,7 +100,14 @@ const DocumentModal = ({
 
     try {
       const response = await propertyService.uploadImage(uploadFormData)
-      const fileName = response.data.fileName || response.data
+      const responseData = response.data?.fileName || response.data
+
+      let fileName = responseData
+      if (typeof responseData === 'string' && responseData.includes(':')) {
+        // Robust splitting: Take everything after the last colon
+        fileName = responseData.substring(responseData.lastIndexOf(':') + 1).trim()
+      }
+
       setDocFormData((prev) => ({ ...prev, [type]: fileName }))
     } catch (err) {
       console.error('Doc image upload failed:', err)
@@ -100,22 +124,28 @@ const DocumentModal = ({
 
     setIsSubmitting(true)
     try {
-      // Ensure IDs are correctly formatted as numbers if necessary
+      // Ensure IDs are correctly formatted as numbers
+      const pId = Number(docFormData.personalDetailsId)
       const payload = {
         ...docFormData,
-        personalDetailsId: Number(docFormData.personalDetailsId),
+        personalDetailsId: pId,
         documentTypeId: Number(docFormData.documentTypeId),
       }
 
-      console.log('--- Document Submission JSON ---:', payload)
+      console.log('--- Document Submission Data ---:', payload)
 
-      if (docFormData.id) {
-        await updateDocumentDetail(docFormData.id, payload)
+      // CRITICAL FIX: Only call API if personalDetailsId is a valid ID (> 0)
+      if (pId > 0) {
+        if (docFormData.id) {
+          await updateDocumentDetail(docFormData.id, payload)
+        } else {
+          await addDocumentDetail(payload)
+        }
       } else {
-        await addDocumentDetail(payload)
+        console.log('--- Local Save Only (New Profile) ---')
       }
 
-      // If successful, trigger onSave to refresh parent data and close
+      // Always trigger onSave to update parent state/UI
       if (onSave) onSave(payload)
       onClose()
     } catch (err) {
@@ -128,13 +158,15 @@ const DocumentModal = ({
   if (!isOpen) return null
 
   // Shared UI classes
-  const labelClass = 'text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-1'
+  const labelClass =
+    'text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-1'
   const inputContainerClass = `flex items-center gap-4 px-5 py-4 rounded-2xl border transition-all ${
     isDark
       ? 'bg-slate-800/30 border-slate-700 focus-within:border-emerald-500/50'
       : 'bg-slate-50 border-slate-200 focus-within:border-emerald-500'
   }`
-  const inputClass = 'bg-transparent border-none outline-none w-full text-sm font-bold text-slate-600 dark:text-slate-200'
+  const inputClass =
+    'bg-transparent border-none outline-none w-full text-sm font-bold text-slate-600 dark:text-slate-200'
 
   return (
     <AnimatePresence>
@@ -160,7 +192,9 @@ const DocumentModal = ({
                 <FileText size={20} />
               </div>
               <div>
-                <h3 className={`text-sm font-black tracking-widest uppercase ${isDark ? 'text-white' : 'text-slate-800'}`}>
+                <h3
+                  className={`text-sm font-black tracking-widest uppercase ${isDark ? 'text-white' : 'text-slate-800'}`}
+                >
                   {docFormData.id ? 'Edit' : 'Add'} Document
                 </h3>
                 <p className="text-[9px] font-bold tracking-widest text-slate-400 uppercase">
@@ -168,7 +202,10 @@ const DocumentModal = ({
                 </p>
               </div>
             </div>
-            <button onClick={onClose} className="rounded-xl border border-slate-100 p-2 text-slate-400 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800">
+            <button
+              onClick={onClose}
+              className="rounded-xl border border-slate-100 p-2 text-slate-400 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800"
+            >
               <X size={20} />
             </button>
           </div>
@@ -190,7 +227,9 @@ const DocumentModal = ({
                       <select
                         className={inputClass}
                         value={docFormData.documentTypeId}
-                        onChange={(e) => setDocFormData({ ...docFormData, documentTypeId: e.target.value })}
+                        onChange={(e) =>
+                          setDocFormData({ ...docFormData, documentTypeId: e.target.value })
+                        }
                       >
                         <option value="">Select Type</option>
                         {documentTypes.map((t) => (
@@ -209,7 +248,9 @@ const DocumentModal = ({
                         className={inputClass}
                         placeholder="abc12345rtyui..."
                         value={docFormData.documentNumber}
-                        onChange={(e) => setDocFormData({ ...docFormData, documentNumber: e.target.value })}
+                        onChange={(e) =>
+                          setDocFormData({ ...docFormData, documentNumber: e.target.value })
+                        }
                       />
                     </div>
                   </div>
@@ -223,7 +264,9 @@ const DocumentModal = ({
                         type="date"
                         className={inputClass}
                         value={docFormData.validTill}
-                        onChange={(e) => setDocFormData({ ...docFormData, validTill: e.target.value })}
+                        onChange={(e) =>
+                          setDocFormData({ ...docFormData, validTill: e.target.value })
+                        }
                       />
                     </div>
                   </div>
@@ -242,8 +285,12 @@ const DocumentModal = ({
                 </div>
 
                 <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-800/10">
-                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Linked Personal ID</span>
-                  <div className="text-sm font-black text-emerald-500 mt-1">{docFormData.personalDetailsId || 'NEW_PROFILE'}</div>
+                  <span className="text-[9px] font-bold tracking-widest text-slate-400 uppercase">
+                    Linked Personal ID
+                  </span>
+                  <div className="mt-1 text-sm font-black text-emerald-500">
+                    {docFormData.personalDetailsId || 'NEW_PROFILE'}
+                  </div>
                 </div>
               </div>
 
@@ -258,7 +305,7 @@ const DocumentModal = ({
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-1">
                   <ImageUpload
                     label="Front Photo"
-                    value={docPreviews.frontImagePath || docFormData.frontImagePath}
+                    value={docFormData.frontImagePath}
                     onUpload={(file) => handleDocImageSelect(file, 'frontImagePath')}
                     onClear={() => {
                       setDocFormData({ ...docFormData, frontImagePath: '' })
@@ -266,10 +313,17 @@ const DocumentModal = ({
                     }}
                     isDark={isDark}
                     aspect="aspect-video"
+                    renderCustomPreview={(val) => (
+                      <AuthImage
+                        src={`/user/${cleanImageUrl(val)}`}
+                        alt="Front"
+                        className="h-full w-full object-cover"
+                      />
+                    )}
                   />
                   <ImageUpload
                     label="Back Photo"
-                    value={docPreviews.backImagePath || docFormData.backImagePath}
+                    value={docFormData.backImagePath}
                     onUpload={(file) => handleDocImageSelect(file, 'backImagePath')}
                     onClear={() => {
                       setDocFormData({ ...docFormData, backImagePath: '' })
@@ -277,6 +331,13 @@ const DocumentModal = ({
                     }}
                     isDark={isDark}
                     aspect="aspect-video"
+                    renderCustomPreview={(val) => (
+                      <AuthImage
+                        src={`/user/${cleanImageUrl(val)}`}
+                        alt="Back"
+                        className="h-full w-full object-cover"
+                      />
+                    )}
                   />
                 </div>
               </div>
@@ -287,17 +348,21 @@ const DocumentModal = ({
             <button
               onClick={onClose}
               disabled={isSubmitting || !!uploadingType}
-              className={`text-[10px] font-black tracking-widest text-slate-400 uppercase ${(isSubmitting || uploadingType) ? 'cursor-not-allowed opacity-50' : ''}`}
+              className={`text-[10px] font-black tracking-widest text-slate-400 uppercase ${isSubmitting || uploadingType ? 'cursor-not-allowed opacity-50' : ''}`}
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={isSubmitting || !!uploadingType}
-              className={`flex items-center gap-2 rounded-2xl bg-emerald-600 px-10 py-4 text-[10px] font-black tracking-widest text-white uppercase shadow-lg shadow-emerald-500/20 transition-all active:scale-95 ${(isSubmitting || uploadingType) ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'hover:bg-emerald-700'}`}
+              className={`flex items-center gap-2 rounded-2xl bg-emerald-600 px-10 py-4 text-[10px] font-black tracking-widest text-white uppercase shadow-lg shadow-emerald-500/20 transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'hover:bg-emerald-700'}`}
             >
               {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : null}
-              {uploadingType ? 'Uploading Assets...' : (docFormData.id ? 'Update Document' : 'Save Document')}
+              {uploadingType
+                ? 'Uploading Assets...'
+                : docFormData.id
+                  ? 'Update Document'
+                  : 'Save Document'}
             </button>
           </div>
         </motion.div>

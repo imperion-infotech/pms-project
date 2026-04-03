@@ -95,17 +95,18 @@ const HomeScreen = () => {
       return { mappedRooms: [], roomsByFloor: {}, stats: { occupied: 0, available: 0 } }
 
     const mapped = rawRooms.map((r) => {
-      const floorObj = allFloors.find((f) => f.id == r.floorId)
-      console.log('--------------Floor OBJ---------', floorObj)
-      const typeObj = roomTypes.find((t) => t.id == r.roomTypeId)
-      console.log('--------------Type OBJ---------', typeObj)
+      const floorObj = allFloors.find((f) => String(f.id) === String(r.floorId))
+      const typeObj = roomTypes.find((t) => String(t.id) === String(r.roomTypeId))
       const statusObj = roomStatuses.find(
         (s) => String(s.id) === String(r.roomStatusTableId || r.roomStatusId),
       )
-      console.log('--------------Status OBJ---------', statusObj)
 
       // Industrial Mapping: Link guest personal details to the room
       const profile = personalDetails.find((p) => {
+        const matchById = r.personalDetailId && String(p.id) === String(r.personalDetailId)
+        const matchByRoomId = p.roomId && String(p.roomId) === String(r.id)
+
+        // Name matching as fallback
         const pRoomName = String(p.roomName || p.roomname || '')
           .trim()
           .toLowerCase()
@@ -114,9 +115,6 @@ const HomeScreen = () => {
           .trim()
           .toLowerCase()
           .replace(/[^0-9]/g, '')
-
-        const matchById = r.personalDetailId && String(p.id) === String(r.personalDetailId)
-        const matchByRoomId = p.roomId && String(p.roomId) === String(r.id)
         const matchByName = pRoomName !== '' && pRoomName === rRoomName
 
         return matchById || matchByRoomId || matchByName
@@ -130,7 +128,7 @@ const HomeScreen = () => {
         roomTypeName: typeObj?.roomTypeName || r.roomTypeName || 'Standard',
         floorName: floorObj?.name || 'Unknown',
         statusDetails: statusObj || { roomStatusName: 'Unknown', roomStatusColor: '#cbd5e1' },
-        profile: displayProfile || null,
+        profile: displayProfile,
         // Proactively spread profile names for the RoomCard display
         firstName: displayProfile?.firstName || r.firstName,
         lastName: displayProfile?.lastName || r.lastName,

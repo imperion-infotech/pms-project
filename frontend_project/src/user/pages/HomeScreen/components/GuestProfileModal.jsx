@@ -27,6 +27,19 @@ import { propertyService } from '../../../../services/propertyService'
 // Sub-components
 import ImageUpload from './roomAction/ImageUpload'
 import DocumentModal from './roomAction/DocumentModal'
+import { AuthImage } from '../../../../admin/components/common/AuthImage'
+
+/**
+ * cleanImageUrl - Helper to extract just the filename from potentially complex paths.
+ */
+const cleanImageUrl = (path) => {
+  if (!path || path === 'photo' || path === 'sign') return null
+  let cleanPath = String(path)
+  if (cleanPath.includes(': ')) cleanPath = cleanPath.split(': ')[1].trim()
+  if (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1)
+  const parts = cleanPath.split('/')
+  return parts[parts.length - 1]
+}
 
 /**
  * GuestProfileModal Component
@@ -36,7 +49,7 @@ import DocumentModal from './roomAction/DocumentModal'
  * Replaces the older RoomActionModal and integrates the GuestForm directly.
  */
 const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
-  const {
+    const {
     addPersonalDetail,
     updatePersonalDetail,
     updateRoom,
@@ -44,6 +57,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
     rooms: rawRooms,
     documentTypes,
     fetchDocumentDetailsByPersonalDetailId,
+    fetchPersonalDetailById,
     addDocumentDetail,
     deleteDocumentDetail,
     documentDetails,
@@ -130,7 +144,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
 
       if (isOpen && targetId) {
         try {
-          const response = await propertyService.getPersonalDetailById(targetId)
+          const response = await fetchPersonalDetailById(targetId)
           const p = response.data
 
           if (p) {
@@ -165,7 +179,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
     }
 
     fetchLatestDetails()
-  }, [room, isOpen])
+  }, [room, isOpen, fetchPersonalDetailById])
 
   // NEW: Synchronize document details when profile is loaded
   useEffect(() => {
@@ -226,11 +240,12 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
 
     try {
       const response = await propertyService.uploadImage(uploadFormData)
-      const responseData = response.data.fileName || response.data
+      const responseData = response.data?.fileName || response.data
 
       let fileName = responseData
-      if (typeof responseData === 'string' && responseData.includes(': ')) {
-        fileName = responseData.split(': ')[1].trim()
+      if (typeof responseData === 'string' && responseData.includes(':')) {
+        // Robust splitting: Take everything after the last colon
+        fileName = responseData.substring(responseData.lastIndexOf(':') + 1).trim()
       }
 
       setFormData((prev) => ({ ...prev, [type]: fileName }))
@@ -380,21 +395,35 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
             <div className="flex w-full flex-col gap-4">
               <ImageUpload
                 label="Photo"
-                value={localPreviews.profilePhoto || formData.profilePhoto}
+                value={formData.profilePhoto}
                 icon={User}
                 isDark={isDark}
                 aspect="aspect-square"
                 onUpload={(file) => handleImageSelect(file, 'profilePhoto')}
                 onClear={() => handleImageClear('profilePhoto')}
+                renderCustomPreview={(val) => (
+                  <AuthImage
+                    src={`/user/${cleanImageUrl(val)}`}
+                    alt="Photo"
+                    className="h-full w-full object-cover"
+                  />
+                )}
               />
               <ImageUpload
                 label="Signature"
-                value={localPreviews.signature || formData.signature}
+                value={formData.signature}
                 icon={Save}
                 isDark={isDark}
                 aspect="aspect-square"
                 onUpload={(file) => handleImageSelect(file, 'signature')}
                 onClear={() => handleImageClear('signature')}
+                renderCustomPreview={(val) => (
+                  <AuthImage
+                    src={`/user/${cleanImageUrl(val)}`}
+                    alt="Signature"
+                    className="max-h-full"
+                  />
+                )}
               />
             </div>
           </div>
@@ -570,8 +599,8 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                             className={`text-[10px] font-black tracking-widest text-slate-400 uppercase ${isDark ? 'bg-slate-900/50' : 'bg-slate-50'}`}
                           >
                             <th className="px-6 py-4">Action</th>
-                            <th className="px-6 py-4">Doc Type</th>
-                            <th className="px-6 py-4">Doc Number</th>
+                            <th className="px-6 py-4">Doc & Images</th>
+                            <th className="px-6 py-4">Number & Details</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -610,14 +639,46 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                                     </div>
                                   </td>
                                   <td className="px-6 py-4">
-                                    <div className="text-xs font-black uppercase">
-                                      {docType?.documentTypeName || doc.documentTypeId}
-                                    </div>
-                                    {doc.validTill && (
-                                      <div className="mt-1 text-[8px] font-bold text-slate-400">
-                                        Exp: {doc.validTill}
+                                    <div className="flex items-center gap-3">
+                                      <div className="flex gap-1">
+                                        <div className="h-8 w-12 overflow-hidden rounded-md border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
+                                          {doc.frontImagePath ? (
+                                            <AuthImage
+                                              src={`/user/${cleanImageUrl(doc.frontImagePath)}`}
+                                              alt="Front"
+                                              className="h-full w-full object-cover"
+                                            />
+                                          ) : (
+                                            <div className="flex h-full w-full items-center justify-center text-slate-300">
+                                              <Camera size={12} />
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div className="h-8 w-12 overflow-hidden rounded-md border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
+                                          {doc.backImagePath ? (
+                                            <AuthImage
+                                              src={`/user/${cleanImageUrl(doc.backImagePath)}`}
+                                              alt="Back"
+                                              className="h-full w-full object-cover"
+                                            />
+                                          ) : (
+                                            <div className="flex h-full w-full items-center justify-center text-slate-300">
+                                              <Camera size={12} />
+                                            </div>
+                                          )}
+                                        </div>
                                       </div>
-                                    )}
+                                      <div>
+                                        <div className="text-xs font-black uppercase">
+                                          {docType?.documentTypeName || 'Unknown'}
+                                        </div>
+                                        {doc.validTill && (
+                                          <div className="mt-0.5 text-[8px] font-bold text-slate-400">
+                                            Exp: {doc.validTill}
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
                                   </td>
                                   <td className="px-6 py-4">
                                     <div className="font-mono text-xs font-bold text-slate-600 dark:text-slate-300">
@@ -632,6 +693,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                                 </tr>
                               )
                             })
+
                           ) : (
                             <tr>
                               <td
