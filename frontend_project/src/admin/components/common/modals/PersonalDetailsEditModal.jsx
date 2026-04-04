@@ -11,6 +11,7 @@ import {
   Save,
 } from 'lucide-react'
 import { AuthImage } from '../AuthImage'
+import StaySpecifications from '../../../../components/common/StaySpecifications'
 
 export const PersonalDetailsEditModal = ({
   isOpen,
@@ -21,6 +22,10 @@ export const PersonalDetailsEditModal = ({
   handleFileUpload,
   uploadingType,
   documentTypes,
+  buildings = [],
+  floors = [],
+  roomTypes = [],
+  rooms = [],
   loading,
 }) => {
   const [localPreviews, setLocalPreviews] = useState({ photo: null, signature: null })
@@ -73,333 +78,293 @@ export const PersonalDetailsEditModal = ({
         className="animate-in fade-in absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
         onClick={() => setIsOpen(false)}
       ></div>
-      <div className="animate-in zoom-in-95 relative z-10 flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:flex-row dark:bg-slate-900">
-        {/* Media Side */}
-        <div className="flex w-full shrink-0 flex-col items-center border-r border-slate-100 bg-slate-50 p-8 md:w-1/3 dark:border-slate-800 dark:bg-slate-800/50">
-          <div className="mb-8 text-center">
-            <h3 className="font-black tracking-tighter text-blue-500 uppercase">Edit Profile</h3>
-            <p className="mt-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase">
-              Update guest assets
-            </p>
-          </div>
-          <div className="group relative mb-8">
-            <div className="h-32 w-32 overflow-hidden rounded-[32px] border-4 border-white bg-white shadow-xl dark:border-blue-500/20 dark:bg-slate-800">
-              {photoSrc ? (
-                <AuthImage src={photoSrc} alt="Preview" className="h-full w-full object-cover" />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-300 dark:bg-slate-900/50">
-                  <User size={40} />
-                </div>
-              )}
-              {uploadingType === 'photo' && (
-                <div className="absolute inset-0 flex items-center justify-center bg-slate-900/40">
-                  <Loader2 className="animate-spin text-white" />
-                </div>
-              )}
-            </div>
-            <label className="absolute -right-2 -bottom-2 flex h-10 w-10 cursor-pointer items-center justify-center rounded-2xl bg-blue-500 text-white shadow-lg transition-all hover:scale-110">
-              <Camera size={18} />
-              <input
-                type="file"
-                className="hidden"
-                accept="image/*"
-                onChange={(e) => handlePreviewUpload(e, 'photo')}
-              />
-            </label>
-          </div>
-          <div className="w-full space-y-4">
-            <div className="relative rounded-2xl border-2 border-dashed border-slate-200 bg-white p-4 text-center dark:border-slate-700 dark:bg-slate-900/30">
-              {signatureSrc ? (
-                <div className="relative flex h-20 items-center justify-center">
-                  <AuthImage src={signatureSrc} alt="Signature" className="max-h-full" />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFormData({ ...formData, signature: '' })
-                      if (localPreviews.signature) URL.revokeObjectURL(localPreviews.signature)
-                      setLocalPreviews((prev) => ({ ...prev, signature: null }))
-                    }}
-                    className="absolute top-1 right-1 rounded-md bg-red-100 p-1 text-red-500"
-                  >
-                    <X size={12} />
-                  </button>
-                </div>
-              ) : (
-                <div className="py-2">
-                  <SignatureIcon size={24} className="mx-auto mb-1 text-slate-300" />
-                  <p className="text-[9px] font-bold tracking-widest text-slate-400 uppercase">
-                    Update Signature
-                  </p>
-                </div>
-              )}
-              <label className="mt-2 block w-full cursor-pointer rounded-xl bg-slate-100 py-2 text-[10px] font-black text-slate-500 uppercase transition-all hover:bg-slate-200 dark:bg-slate-800">
-                {uploadingType === 'signature' ? (
-                  <Loader2 className="mx-auto h-3 w-3 animate-spin" />
-                ) : (
-                  'New Signature'
-                )}
-                <input
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={(e) => handlePreviewUpload(e, 'signature')}
-                />
-              </label>
-            </div>
-          </div>
-        </div>
-        {/* Form Side */}
-        <div className="flex min-w-0 flex-1 flex-col">
-          <div className="flex items-center justify-between border-b border-slate-100 bg-white p-8 dark:border-slate-800 dark:bg-slate-900/50">
+      <div className="animate-in zoom-in-95 relative z-10 flex max-h-[98vh] w-full max-w-5xl flex-col overflow-hidden rounded-[32px] bg-white shadow-2xl dark:bg-slate-900">
+        <form onSubmit={handleSubmit} className="flex h-full flex-col overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-slate-100 bg-white px-6 py-4 dark:border-slate-800 dark:bg-slate-900/50">
             <div>
-              <h2 className="text-xl font-black tracking-tight text-slate-800 uppercase dark:text-white">
+              <h2 className="text-lg font-black tracking-tight text-slate-800 uppercase dark:text-white">
                 Modify Guest Data
               </h2>
-              <p className="text-[10px] font-bold tracking-widest text-blue-500 uppercase">
-                Record #{formData.id}
+              <p className="text-[9px] font-bold tracking-widest text-blue-500 uppercase">
+                Manage Profile & Stay Specifications
               </p>
             </div>
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="rounded-full p-1.5 text-slate-400 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
             >
-              <X size={24} />
+              <X size={20} />
             </button>
           </div>
-          <form onSubmit={handleSubmit} className="custom-scrollbar space-y-6 overflow-y-auto p-8">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="mb-2 block text-[10px] font-black text-slate-400 uppercase">
-                  First Name
-                </label>
-                <input
-                  required
-                  type="text"
-                  value={formData.firstName}
-                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                  className="w-full rounded-2xl bg-slate-50 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800"
-                />
-              </div>
-              <div>
-                <label className="mb-2 block text-[10px] font-black text-slate-400 uppercase">
-                  Last Name
-                </label>
-                <input
-                  required
-                  type="text"
-                  value={formData.lastName}
-                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                  className="w-full rounded-2xl bg-slate-50 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800"
-                />
-              </div>
-              <div className="col-span-2">
-                <label className="mb-2 block text-[10px] font-black text-slate-400 uppercase">
-                  Company Name
-                </label>
-                <div className="relative">
-                  <Building
-                    size={16}
-                    className="absolute top-1/2 left-4 -translate-y-1/2 text-slate-300"
-                  />
-                  <input
-                    type="text"
-                    value={formData.companyName}
-                    onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                    className="w-full rounded-2xl bg-slate-50 py-3 pr-4 pl-12 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="mb-2 block text-[10px] font-black text-slate-400 uppercase">
-                  Phone
-                </label>
-                <div className="relative">
-                  <Phone
-                    size={16}
-                    className="absolute top-1/2 left-4 -translate-y-1/2 text-slate-300"
-                  />
-                  <input
-                    required
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full rounded-2xl bg-slate-50 py-3 pr-4 pl-12 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="mb-2 block text-[10px] font-black text-slate-400 uppercase">
-                  Email
-                </label>
-                <div className="relative">
-                  <Mail
-                    size={16}
-                    className="absolute top-1/2 left-4 -translate-y-1/2 text-slate-300"
-                  />
-                  <input
-                    required
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full rounded-2xl bg-slate-50 py-3 pr-4 pl-12 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800"
-                  />
-                </div>
-              </div>
-              <div className="col-span-2">
-                <label className="mb-2 block text-[10px] font-black text-slate-400 uppercase">
-                  Address
-                </label>
-                <textarea
-                  required
-                  rows="2"
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  className="w-full resize-none rounded-2xl bg-slate-50 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800"
-                ></textarea>
+
+          <div className="flex flex-1 flex-col overflow-hidden md:flex-row">
+            {/* Left Side: Personal & Documents */}
+            <div className="scrollbar-hide flex-1 space-y-4 overflow-y-auto border-r border-slate-100 p-6 dark:border-slate-800">
+              <div className="mb-2 flex items-center gap-3">
+                <span className="text-[9px] font-black tracking-widest text-blue-500 uppercase">
+                  Personal Details
+                </span>
+                <div className="h-px flex-1 bg-blue-50/50 dark:bg-blue-500/10"></div>
               </div>
 
-              {/* Document Details Section */}
-              <div className="col-span-2 pt-4">
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800"></div>
-                  <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
-                    Update Document
+              {/* Asset Capture */}
+              <div className="flex items-start gap-6">
+                <div className="group relative">
+                  <div className="h-24 w-24 overflow-hidden rounded-[24px] border-4 border-slate-100 bg-white shadow-lg dark:border-blue-500/20 dark:bg-slate-800">
+                    {photoSrc ? (
+                      <AuthImage src={photoSrc} alt="Preview" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-slate-50 text-slate-300 dark:bg-slate-900/50">
+                        <User size={30} />
+                      </div>
+                    )}
+                    {uploadingType === 'photo' && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-slate-900/40">
+                        <Loader2 className="h-5 w-5 animate-spin text-white" />
+                      </div>
+                    )}
+                  </div>
+                  <label className="absolute -right-1 -bottom-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl bg-blue-500 text-white shadow-lg transition-all hover:scale-110">
+                    <Camera size={14} />
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={(e) => handlePreviewUpload(e, 'photo')}
+                    />
+                  </label>
+                </div>
+
+                <div className="flex-1 space-y-2">
+                  <div className="relative h-24 rounded-[24px] border-2 border-dashed border-slate-200 bg-white p-3 text-center dark:border-slate-700 dark:bg-slate-900/30">
+                    {signatureSrc ? (
+                      <div className="relative flex h-full items-center justify-center">
+                        <AuthImage src={signatureSrc} alt="Signature" className="max-h-full" />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormData({ ...formData, signature: '' })
+                            if (localPreviews.signature) URL.revokeObjectURL(localPreviews.signature)
+                            setLocalPreviews((prev) => ({ ...prev, signature: null }))
+                          }}
+                          className="absolute -top-1 -right-1 rounded-full bg-red-100 p-1 text-red-500 shadow-sm transition-colors hover:bg-red-200"
+                        >
+                          <X size={10} />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex h-full flex-col items-center justify-center">
+                        <SignatureIcon size={20} className="mb-0.5 text-slate-300" />
+                        <p className="text-[8px] font-bold tracking-widest text-slate-400 uppercase">
+                          No Sig
+                        </p>
+                      </div>
+                    )}
+                    <label className="absolute inset-0 cursor-pointer opacity-0">
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={(e) => handlePreviewUpload(e, 'signature')}
+                      />
+                    </label>
+                  </div>
+                  <button type="button" className="w-full rounded-xl bg-slate-100 py-1.5 text-[8px] font-black text-slate-500 uppercase dark:bg-slate-800">
+                    Update Sig
+                  </button>
+                </div>
+              </div>
+
+              {/* Personal Fields */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">First Name</label>
+                  <input
+                    required
+                    type="text"
+                    value={formData.firstName}
+                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                    className="w-full rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">Last Name</label>
+                  <input
+                    required
+                    type="text"
+                    value={formData.lastName}
+                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                    className="w-full rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">Company Name</label>
+                  <div className="relative">
+                    <Building size={14} className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-300" />
+                    <input
+                      type="text"
+                      value={formData.companyName}
+                      onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                      className="w-full rounded-xl bg-slate-50 py-2 pr-3 pl-9 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">Phone</label>
+                  <div className="relative">
+                    <Phone size={14} className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-300" />
+                    <input
+                      required
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value, mobileNumber: e.target.value })}
+                      className="w-full rounded-xl bg-slate-50 py-2 pr-3 pl-9 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">Email</label>
+                  <div className="relative">
+                    <Mail size={14} className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-300" />
+                    <input
+                      required
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full rounded-xl bg-slate-50 py-2 pr-3 pl-9 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
+                    />
+                  </div>
+                </div>
+                <div className="col-span-2">
+                  <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">Address</label>
+                  <textarea
+                    required
+                    rows="1"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    className="w-full resize-none rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
+                  ></textarea>
+                </div>
+              </div>
+
+              {/* Document Section */}
+              <div className="pt-2">
+                <div className="mb-3 flex items-center gap-3">
+                  <span className="text-[9px] font-black tracking-widest text-slate-400 uppercase">
+                    Verification
                   </span>
                   <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800"></div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="mb-2 block text-[10px] font-black text-slate-400 uppercase">
-                      Document Type
-                    </label>
+                    <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">Doc Type</label>
                     <select
                       value={formData.documentTypeId}
                       onChange={(e) => setFormData({ ...formData, documentTypeId: e.target.value })}
-                      className="w-full rounded-2xl bg-slate-50 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800"
+                      className="w-full rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
                     >
-                      <option value="">Select Type</option>
+                      <option value="">Type</option>
                       {documentTypes?.map((type) => (
-                        <option key={type.id} value={type.id}>
-                          {type.documentTypeName}
-                        </option>
+                        <option key={type.id} value={type.id}>{type.documentTypeName}</option>
                       ))}
                     </select>
                   </div>
                   <div>
-                    <label className="mb-2 block text-[10px] font-black text-slate-400 uppercase">
-                      Document Number
-                    </label>
+                    <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">Number</label>
                     <input
                       type="text"
-                      placeholder="e.g. ABC1234567"
                       value={formData.documentNumber}
                       onChange={(e) => setFormData({ ...formData, documentNumber: e.target.value })}
-                      className="w-full rounded-2xl bg-slate-50 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800"
+                      className="w-full rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
                     />
                   </div>
                   <div>
-                    <label className="mb-2 block text-[10px] font-black text-slate-400 uppercase">
-                      Valid Till
-                    </label>
+                    <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">Valid Till</label>
                     <input
                       type="date"
                       value={formData.validTill}
                       onChange={(e) => setFormData({ ...formData, validTill: e.target.value })}
-                      className="w-full rounded-2xl bg-slate-50 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800"
+                      className="w-full rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
                     />
                   </div>
                   <div>
-                    <label className="mb-2 block text-[10px] font-black text-slate-400 uppercase">
-                      Remark
-                    </label>
+                    <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">Remark</label>
                     <input
                       type="text"
-                      placeholder="Any notes..."
                       value={formData.remark}
                       onChange={(e) => setFormData({ ...formData, remark: e.target.value })}
-                      className="w-full rounded-2xl bg-slate-50 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800"
+                      className="w-full rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
                     />
                   </div>
-
-                  {/* Document Images */}
-                  <div className="col-span-2 grid grid-cols-2 gap-4">
-                    <div className="relative rounded-2xl border-2 border-dashed border-slate-100 bg-slate-50/50 p-4 text-center dark:border-slate-800 dark:bg-slate-800/30">
+                  <div className="col-span-2 grid grid-cols-2 gap-3">
+                    <div className="relative rounded-xl border-2 border-dashed border-slate-100 bg-slate-50/50 p-2.5 text-center dark:border-slate-800 dark:bg-slate-800/30">
                       {formData.frontImagePath ? (
-                        <div className="relative flex h-24 items-center justify-center">
-                          <AuthImage
-                            src={`/user/${cleanImageUrl(formData.frontImagePath)}`}
-                            alt="Front"
-                            className="max-h-full rounded-lg"
-                          />
-                        </div>
+                        <AuthImage src={`/user/${cleanImageUrl(formData.frontImagePath)}`} alt="Front" className="mx-auto h-16 rounded-lg" />
                       ) : (
-                        <div className="py-2">
-                          <Camera size={20} className="mx-auto mb-1 text-slate-300" />
-                          <p className="text-[8px] font-bold tracking-widest text-slate-400 uppercase">
-                            Front Photo
-                          </p>
+                        <div className="py-1">
+                          <Camera size={16} className="mx-auto mb-0.5 text-slate-300" />
+                          <p className="text-[7px] font-bold text-slate-400 uppercase">Front</p>
                         </div>
                       )}
-                      <label className="mt-2 block w-full cursor-pointer rounded-xl bg-white py-1.5 text-[9px] font-black text-slate-500 uppercase transition-all hover:bg-slate-50 dark:bg-slate-800">
-                        {uploadingType === 'front' ? '...' : 'New Front'}
-                        <input
-                          type="file"
-                          className="hidden"
-                          onChange={(e) => handleFileUpload(e, 'front')}
-                        />
+                      <label className="mt-1.5 block w-full cursor-pointer rounded-lg bg-white py-1 text-[8px] font-black text-slate-500 uppercase shadow-sm dark:bg-slate-800">
+                        Update
+                        <input type="file" className="hidden" onChange={(e) => handleFileUpload(e, 'front')} />
                       </label>
                     </div>
-
-                    <div className="relative rounded-2xl border-2 border-dashed border-slate-100 bg-slate-50/50 p-4 text-center dark:border-slate-800 dark:bg-slate-800/30">
+                    <div className="relative rounded-xl border-2 border-dashed border-slate-100 bg-slate-50/50 p-2.5 text-center dark:border-slate-800 dark:bg-slate-800/30">
                       {formData.backImagePath ? (
-                        <div className="relative flex h-24 items-center justify-center">
-                          <AuthImage
-                            src={`/user/${cleanImageUrl(formData.backImagePath)}`}
-                            alt="Back"
-                            className="max-h-full rounded-lg"
-                          />
-                        </div>
+                        <AuthImage src={`/user/${cleanImageUrl(formData.backImagePath)}`} alt="Back" className="mx-auto h-16 rounded-lg" />
                       ) : (
-                        <div className="py-2">
-                          <Camera size={20} className="mx-auto mb-1 text-slate-300" />
-                          <p className="text-[8px] font-bold tracking-widest text-slate-400 uppercase">
-                            Back Photo
-                          </p>
+                        <div className="py-1">
+                          <Camera size={16} className="mx-auto mb-0.5 text-slate-300" />
+                          <p className="text-[7px] font-bold text-slate-400 uppercase">Back</p>
                         </div>
                       )}
-                      <label className="mt-2 block w-full cursor-pointer rounded-xl bg-white py-1.5 text-[9px] font-black text-slate-500 uppercase transition-all hover:bg-slate-50 dark:bg-slate-800">
-                        {uploadingType === 'back' ? '...' : 'New Back'}
-                        <input
-                          type="file"
-                          className="hidden"
-                          onChange={(e) => handleFileUpload(e, 'back')}
-                        />
+                      <label className="mt-1.5 block w-full cursor-pointer rounded-lg bg-white py-1 text-[8px] font-black text-slate-500 uppercase shadow-sm dark:bg-slate-800">
+                        Update
+                        <input type="file" className="hidden" onChange={(e) => handleFileUpload(e, 'back')} />
                       </label>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="flex gap-4 border-t border-slate-50 pt-4 dark:border-slate-800">
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                className="flex-1 py-4 text-xs font-black tracking-widest text-slate-400 uppercase transition-colors"
-              >
-                Abort
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex flex-2 items-center justify-center gap-3 rounded-2xl bg-blue-600 py-4 text-xs font-black tracking-widest text-white uppercase shadow-xl transition-all hover:bg-blue-700 active:scale-95"
-              >
-                {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                <span>Update Guest Profile</span>
-              </button>
+
+            {/* Right Side: Stay Specifications */}
+            <div className="scrollbar-hide flex-1 space-y-4 overflow-y-auto bg-slate-50/50 p-6 dark:bg-slate-800/20">
+              <StaySpecifications
+                formData={formData}
+                handleChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
+                buildings={buildings}
+                floors={floors}
+                roomTypes={roomTypes}
+                rooms={rooms}
+                isDark={false}
+                showStatus={true}
+              />
             </div>
-          </form>
-        </div>
+          </div>
+          {/* Footer */}
+          <div className="flex gap-4 border-t border-slate-100 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className="flex-1 py-3 text-[10px] font-black tracking-widest text-slate-400 uppercase transition-colors hover:text-slate-600"
+            >
+              Abort
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex flex-2 items-center justify-center gap-3 rounded-xl bg-blue-600 py-3 text-[10px] font-black tracking-widest text-white uppercase shadow-lg transition-all hover:bg-blue-700 active:scale-95 disabled:opacity-50"
+            >
+              {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+              <span>Update Data</span>
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   )

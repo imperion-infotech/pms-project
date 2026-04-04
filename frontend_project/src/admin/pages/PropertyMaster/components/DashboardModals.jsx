@@ -221,6 +221,10 @@ const DashboardModals = ({
         uploadingType={uploadingType}
         loading={isLoading}
         documentTypes={documentTypes}
+        buildings={buildings}
+        floors={floors}
+        roomTypes={roomTypes}
+        rooms={rooms}
       />
 
       <PersonalDetailsEditModal
@@ -233,6 +237,10 @@ const DashboardModals = ({
         uploadingType={uploadingType}
         loading={isLoading}
         documentTypes={documentTypes}
+        buildings={buildings}
+        floors={floors}
+        roomTypes={roomTypes}
+        rooms={rooms}
       />
 
       {/* Document Type Modals */}

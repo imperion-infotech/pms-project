@@ -28,6 +28,7 @@ import { AuthImage } from '../../../components/common/AuthImage'
 const PersonalDetailManagement = ({
   details = [],
   documentDetails = [],
+  stayDetails = [],
   documentTypes = [],
   onAdd,
   onEdit,
@@ -41,10 +42,12 @@ const PersonalDetailManagement = ({
     handleConfirmDelete,
     handleCancelDelete,
     getGuestDocument,
+    getGuestStay,
     getDocumentTypeName,
   } = usePersonalDetailController({
     details,
     documentDetails,
+    stayDetails,
     documentTypes,
     onDelete,
   })
@@ -143,6 +146,7 @@ const PersonalDetailManagement = ({
               ) : (
                 details.map((guest, idx) => {
                   const guestDocument = getGuestDocument(guest.id)
+                  const guestStay = getGuestStay(guest.id)
                   return (
                     <tr
                       key={guest.id}
@@ -196,7 +200,7 @@ const PersonalDetailManagement = ({
                       <td className="px-8 py-2 text-center">
                         <div className="flex items-center justify-center gap-3">
                           <button
-                            onClick={() => onEdit(guest, guestDocument)}
+                            onClick={() => onEdit(guest, guestDocument, guestStay)}
                             className="rounded-lg p-1.5 text-blue-500 transition-colors hover:bg-blue-50 dark:hover:bg-blue-500/10"
                             title="Edit Profile"
                           >

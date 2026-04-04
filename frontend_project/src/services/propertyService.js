@@ -12,7 +12,15 @@ const handleResponse = async (apiCall) => {
     const response = await apiCall()
     return response
   } catch (err) {
-    console.error(`API Call failed: ${err.config?.url || 'unknown'}`, err)
+    if (err.response) {
+      console.error('API Error Details:', {
+        url: err.config?.url,
+        status: err.response.status,
+        data: err.response.data,
+      })
+    } else {
+      console.error(`API Call failed: ${err.config?.url || 'unknown'}`, err)
+    }
     throw err
   }
 }

@@ -95,6 +95,10 @@ const PmsDashboard = () => {
     addDocumentDetail,
     updateDocumentDetail,
     documentDetails,
+    stayDetails,
+    addStayDetail,
+    updateStayDetail,
+    deleteStayDetail,
     searchRooms,
     searchFloors,
     searchBuildings,
@@ -226,6 +230,8 @@ const PmsDashboard = () => {
     updatePersonalDetail,
     addDocumentDetail,
     updateDocumentDetail,
+    addStayDetail,
+    updateStayDetail,
     toggleModal,
   })
 
@@ -451,6 +457,8 @@ const PmsDashboard = () => {
               onDeletePersonalDetail={deletePersonalDetail}
               personalDetails={personalDetails}
               documentDetails={documentDetails}
+              stayDetails={stayDetails}
+              onDeleteStayDetail={deleteStayDetail}
               taxes={taxes}
               handleEditTax={handleEditTax}
               deleteTax={deleteTax}
@@ -562,8 +570,9 @@ const PmsDashboard = () => {
         editDocumentType={editDocumentType}
         setEditDocumentType={setEditDocumentType}
         handleUpdateDocumentType={handleUpdateDocumentType}
-        documentTypes={documentTypes}
         isLoading={isLoading}
+        stayDetails={stayDetails}
+        documentTypes={documentTypes}
       />
 
       <style>{`

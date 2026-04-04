@@ -43,6 +43,7 @@ const DashboardRouter = ({
   onEditPersonalDetail,
   onDeletePersonalDetail,
   documentDetails,
+  stayDetails,
   taxes,
   handleEditTax,
   deleteTax,
@@ -130,11 +131,12 @@ const DashboardRouter = ({
           itemsPerPage={itemsPerPage}
         />
       )
-    case 'Personal Detail':
+      case 'Personal Detail':
       return (
         <PersonalDetailManagement
           details={personalDetails}
           documentDetails={documentDetails}
+          stayDetails={stayDetails}
           documentTypes={documentTypes}
           searchTerm={searchTerm}
           onAdd={onAddPersonalDetail}

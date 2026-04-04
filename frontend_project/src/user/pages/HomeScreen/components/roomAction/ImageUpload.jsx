@@ -15,9 +15,9 @@ const ImageUpload = ({
   aspect = 'aspect-video',
   renderCustomPreview,
 }) => {
-  const containerClass = `p-8 rounded-[35px] border ${isDark ? 'bg-slate-800/20 border-slate-800' : 'bg-slate-50 border-slate-100'}`
+  const containerClass = `p-3 rounded-[20px] border ${isDark ? 'bg-slate-800/20 border-slate-800' : 'bg-slate-50 border-slate-100'}`
 
-  const uploadAreaClass = `${aspect} rounded-2xl border-2 border-dashed flex flex-col items-center justify-center relative overflow-hidden group transition-all ${
+  const uploadAreaClass = `${aspect} rounded-lg border-2 border-dashed flex flex-col items-center justify-center relative overflow-hidden group transition-all ${
     isDark
       ? 'border-slate-700 bg-slate-950/50 hover:border-emerald-500/50'
       : 'border-slate-200 bg-white hover:border-emerald-500'
@@ -42,17 +42,17 @@ const ImageUpload = ({
   return (
     <div className="w-full">
       <div className={containerClass}>
-        <div className="mb-6 flex items-center justify-between">
-          <h4 className="flex items-center gap-2 text-xs leading-none font-black tracking-widest text-emerald-500 uppercase">
-            {Icon && <Icon size={16} />} {label}
+        <div className="mb-3 flex items-center justify-between">
+          <h4 className="flex items-center gap-2 text-[10px] leading-none font-black tracking-widest text-emerald-500 uppercase">
+            {Icon && <Icon size={14} />} {label}
           </h4>
           {value && onClear && (
             <button
               type="button"
               onClick={onClear}
-              className="rounded-lg bg-red-500/10 p-1.5 text-red-500 shadow-sm transition-all hover:bg-red-500 hover:text-white"
+              className="rounded-md bg-red-500/10 p-1 text-red-500 shadow-sm transition-all hover:bg-red-500 hover:text-white"
             >
-              <X size={12} />
+              <X size={10} />
             </button>
           )}
         </div>
@@ -76,14 +76,14 @@ const ImageUpload = ({
           ) : (
             <>
               <div
-                className={`mb-3 flex h-12 w-12 items-center justify-center rounded-full transition-all duration-300 group-hover:scale-110 group-hover:bg-emerald-500/10 ${isDark ? 'bg-slate-800' : 'bg-slate-100'}`}
+                className={`mb-2 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 group-hover:scale-110 group-hover:bg-emerald-500/10 ${isDark ? 'bg-slate-800' : 'bg-slate-100'}`}
               >
                 <Save
-                  size={20}
+                  size={14}
                   className="text-slate-400 transition-colors duration-300 group-hover:text-emerald-500"
                 />
               </div>
-              <span className="text-[10px] leading-none font-black tracking-widest text-slate-400 uppercase transition-colors duration-300 group-hover:text-emerald-500">
+              <span className="text-[8px] leading-none font-black tracking-widest text-slate-400 uppercase transition-colors duration-300 group-hover:text-emerald-500">
                 Upload {label}
               </span>
             </>

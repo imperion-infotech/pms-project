@@ -8,6 +8,8 @@ export const usePersonalDetailManagement = ({
   updatePersonalDetail,
   addDocumentDetail,
   updateDocumentDetail,
+  addStayDetail,
+  updateStayDetail,
   toggleModal,
 }) => {
   const [personalFormData, setPersonalFormData] = useState({
@@ -27,6 +29,15 @@ export const usePersonalDetailManagement = ({
     documentTypeId: '',
     frontImagePath: '',
     backImagePath: '',
+    // Stay Details
+    floorId: '',
+    buildingId: '',
+    roomTypeId: '',
+    roomMasterId: '',
+    comment: '',
+    rateTypeEnum: 'RACK',
+    noOfGuest: 1,
+    stayStatusEnum: 'CONFIRMED',
   })
 
   const [editPersonalFormData, setEditPersonalFormData] = useState({
@@ -48,6 +59,16 @@ export const usePersonalDetailManagement = ({
     documentTypeId: '',
     frontImagePath: '',
     backImagePath: '',
+    // Stay Details
+    stayId: null,
+    floorId: '',
+    buildingId: '',
+    roomTypeId: '',
+    roomMasterId: '',
+    comment: '',
+    rateTypeEnum: 'RACK',
+    noOfGuest: 1,
+    stayStatusEnum: 'CONFIRMED',
   })
 
   const handleAddPersonalDetail = useCallback(async () => {
@@ -74,11 +95,27 @@ export const usePersonalDetailManagement = ({
           documentNumber: personalFormData.documentNumber,
           validTill: personalFormData.validTill,
           remark: personalFormData.remark,
-          personalDetailsId: personalDetailsId,
-          documentTypeId: personalFormData.documentTypeId,
+          personalDetailsId: personalDetailsId, // Plural as per spec
+          documentTypeId: personalFormData.documentTypeId ? Number(personalFormData.documentTypeId) : undefined,
           frontImagePath: personalFormData.frontImagePath,
           backImagePath: personalFormData.backImagePath,
         })
+      }
+
+      // 3. Create Stay Detail if info provided
+      if (personalFormData.buildingId || personalFormData.roomMasterId) {
+        const stayPayload = {
+          floorId: personalFormData.floorId ? Number(personalFormData.floorId) : undefined,
+          buildingId: personalFormData.buildingId ? Number(personalFormData.buildingId) : undefined,
+          roomTypeId: personalFormData.roomTypeId ? Number(personalFormData.roomTypeId) : undefined,
+          roomMasterId: personalFormData.roomMasterId ? Number(personalFormData.roomMasterId) : undefined,
+          comment: personalFormData.comment,
+          rateTypeEnum: personalFormData.rateTypeEnum,
+          noOfGuest: personalFormData.noOfGuest ? Number(personalFormData.noOfGuest) : 1,
+          stayStatusEnum: personalFormData.stayStatusEnum,
+          personalDetailId: personalDetailsId,
+        }
+        await addStayDetail(stayPayload)
       }
 
       setPersonalFormData({
@@ -97,21 +134,30 @@ export const usePersonalDetailManagement = ({
         documentTypeId: '',
         frontImagePath: '',
         backImagePath: '',
+        floorId: '',
+        buildingId: '',
+        roomTypeId: '',
+        roomMasterId: '',
+        comment: '',
+        rateTypeEnum: 'RACK',
+        noOfGuest: 1,
+        stayStatusEnum: 'CONFIRMED',
       })
       toggleModal('personalDetail', false)
     } catch (err) {
-      console.error('Failed to create personal detail / document:', err)
+      console.error('Failed to create personal detail / document / stay:', err)
     }
-  }, [personalFormData, addPersonalDetail, addDocumentDetail, toggleModal])
+  }, [personalFormData, addPersonalDetail, addDocumentDetail, addStayDetail, toggleModal])
 
   const handleUpdatePersonalDetail = useCallback(async () => {
     if (!editPersonalFormData?.id) return
     try {
       // 1. Update Personal Detail
       await updatePersonalDetail(editPersonalFormData.id, {
+        id: editPersonalFormData.id,
         firstName: editPersonalFormData.firstName,
         lastName: editPersonalFormData.lastName,
-        mobileNumber: editPersonalFormData.mobileNumber,
+        mobileNumber: editPersonalFormData.mobileNumber || editPersonalFormData.phone,
         email: editPersonalFormData.email,
         phone: editPersonalFormData.phone,
         address: editPersonalFormData.address,
@@ -126,8 +172,8 @@ export const usePersonalDetailManagement = ({
           documentNumber: editPersonalFormData.documentNumber,
           validTill: editPersonalFormData.validTill,
           remark: editPersonalFormData.remark,
-          personalDetailsId: editPersonalFormData.id,
-          documentTypeId: editPersonalFormData.documentTypeId,
+          personalDetailsId: editPersonalFormData.id, // Plural
+          documentTypeId: editPersonalFormData.documentTypeId ? Number(editPersonalFormData.documentTypeId) : undefined,
           frontImagePath: editPersonalFormData.frontImagePath,
           backImagePath: editPersonalFormData.backImagePath,
         }
@@ -139,21 +185,44 @@ export const usePersonalDetailManagement = ({
         }
       }
 
+      // 3. Update or Create Stay Detail
+      if (editPersonalFormData.buildingId || editPersonalFormData.roomMasterId) {
+        const stayPayload = {
+          floorId: editPersonalFormData.floorId ? Number(editPersonalFormData.floorId) : undefined,
+          buildingId: editPersonalFormData.buildingId ? Number(editPersonalFormData.buildingId) : undefined,
+          roomTypeId: editPersonalFormData.roomTypeId ? Number(editPersonalFormData.roomTypeId) : undefined,
+          roomMasterId: editPersonalFormData.roomMasterId ? Number(editPersonalFormData.roomMasterId) : undefined,
+          comment: editPersonalFormData.comment,
+          rateTypeEnum: editPersonalFormData.rateTypeEnum,
+          noOfGuest: editPersonalFormData.noOfGuest ? Number(editPersonalFormData.noOfGuest) : 1,
+          stayStatusEnum: editPersonalFormData.stayStatusEnum,
+          personalDetailId: editPersonalFormData.id,
+        }
+
+        if (editPersonalFormData.stayId) {
+          await updateStayDetail(editPersonalFormData.stayId, stayPayload)
+        } else {
+          await addStayDetail(stayPayload)
+        }
+      }
+
       setEditPersonalFormData({ id: null })
       toggleModal('personalDetailEdit', false)
     } catch (err) {
-      console.error('Failed to update personal detail / document:', err)
+      console.error('Failed to update personal detail / document / stay:', err)
     }
   }, [
     editPersonalFormData,
     updatePersonalDetail,
     updateDocumentDetail,
     addDocumentDetail,
+    updateStayDetail,
+    addStayDetail,
     toggleModal,
   ])
 
   const handleEditPersonalDetail = useCallback(
-    (detail, document = null) => {
+    (detail, document = null, stay = null) => {
       setEditPersonalFormData({
         ...detail,
         documentId: document?.id || null,
@@ -163,6 +232,15 @@ export const usePersonalDetailManagement = ({
         documentTypeId: document?.documentTypeId || '',
         frontImagePath: document?.frontImagePath || '',
         backImagePath: document?.backImagePath || '',
+        stayId: stay?.id || null,
+        floorId: stay?.floorId || '',
+        buildingId: stay?.buildingId || '',
+        roomTypeId: stay?.roomTypeId || '',
+        roomMasterId: stay?.roomMasterId || '',
+        comment: stay?.comment || '',
+        rateTypeEnum: stay?.rateTypeEnum || 'RACK',
+        noOfGuest: stay?.noOfGuest || 1,
+        stayStatusEnum: stay?.stayStatusEnum || 'CONFIRMED',
       })
       toggleModal('personalDetailEdit', true)
     },

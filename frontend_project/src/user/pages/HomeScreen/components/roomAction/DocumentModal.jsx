@@ -160,13 +160,13 @@ const DocumentModal = ({
   // Shared UI classes
   const labelClass =
     'text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-1'
-  const inputContainerClass = `flex items-center gap-4 px-5 py-4 rounded-2xl border transition-all ${
+  const inputContainerClass = `flex items-center gap-3 px-3 py-2 rounded-xl border transition-all ${
     isDark
       ? 'bg-slate-800/30 border-slate-700 focus-within:border-emerald-500/50'
       : 'bg-slate-50 border-slate-200 focus-within:border-emerald-500'
   }`
   const inputClass =
-    'bg-transparent border-none outline-none w-full text-sm font-bold text-slate-600 dark:text-slate-200'
+    'bg-transparent border-none outline-none w-full text-xs font-bold text-slate-600 dark:text-slate-200'
 
   return (
     <AnimatePresence>
@@ -183,13 +183,13 @@ const DocumentModal = ({
           initial={{ opacity: 0, y: 30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className={`relative flex h-fit max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-[40px] border shadow-2xl ${isDark ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'}`}
+          className={`relative flex h-fit max-h-[95vh] w-full max-w-3xl flex-col overflow-hidden rounded-[30px] border shadow-2xl ${isDark ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'}`}
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-slate-100 p-8 dark:border-slate-800">
-            <div className="flex items-center gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
-                <FileText size={20} />
+          <div className="flex items-center justify-between border-b border-slate-100 p-4 px-6 dark:border-slate-800">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
+                <FileText size={18} />
               </div>
               <div>
                 <h3
@@ -210,17 +210,17 @@ const DocumentModal = ({
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-8">
-            <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+          <div className="flex-1 overflow-y-auto p-6">
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
               {/* Left Column: Form Fields */}
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <div className="flex items-center gap-2 border-l-4 border-emerald-500 pl-3">
                   <h4 className="text-[10px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
                     Primary Information
                   </h4>
                 </div>
 
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="sm:col-span-1">
                     <label className={labelClass}>Doc. Type</label>
                     <div className={inputContainerClass}>
@@ -256,7 +256,7 @@ const DocumentModal = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
                     <label className={labelClass}>Valid Till</label>
                     <div className={inputContainerClass}>
@@ -295,7 +295,7 @@ const DocumentModal = ({
               </div>
 
               {/* Right Column: Image Uploads */}
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <div className="flex items-center gap-2 border-l-4 border-emerald-500 pl-3">
                   <h4 className="text-[10px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
                     Image Assets
@@ -312,7 +312,7 @@ const DocumentModal = ({
                       setDocPreviews({ ...docPreviews, frontImagePath: null })
                     }}
                     isDark={isDark}
-                    aspect="aspect-video"
+                    aspect="aspect-[3/1]"
                     renderCustomPreview={(val) => (
                       <AuthImage
                         src={`/user/${cleanImageUrl(val)}`}
@@ -330,7 +330,7 @@ const DocumentModal = ({
                       setDocPreviews({ ...docPreviews, backImagePath: null })
                     }}
                     isDark={isDark}
-                    aspect="aspect-video"
+                    aspect="aspect-[3/1]"
                     renderCustomPreview={(val) => (
                       <AuthImage
                         src={`/user/${cleanImageUrl(val)}`}
@@ -344,24 +344,24 @@ const DocumentModal = ({
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-4 border-t border-slate-100 p-8 dark:border-slate-800">
+          <div className="flex items-center justify-end gap-4 border-t border-slate-100 p-6 px-10 dark:border-slate-800">
             <button
               onClick={onClose}
               disabled={isSubmitting || !!uploadingType}
-              className={`text-[10px] font-black tracking-widest text-slate-400 uppercase ${isSubmitting || uploadingType ? 'cursor-not-allowed opacity-50' : ''}`}
+              className={`text-[9px] font-black tracking-widest text-slate-400 uppercase ${isSubmitting || uploadingType ? 'cursor-not-allowed opacity-50' : ''}`}
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={isSubmitting || !!uploadingType}
-              className={`flex items-center gap-2 rounded-2xl bg-emerald-600 px-10 py-4 text-[10px] font-black tracking-widest text-white uppercase shadow-lg shadow-emerald-500/20 transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'hover:bg-emerald-700'}`}
+              className={`flex items-center gap-2 rounded-2xl bg-emerald-600 px-8 py-3 text-[10px] font-black tracking-widest text-white uppercase shadow-lg shadow-emerald-500/20 transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'hover:bg-emerald-700'}`}
             >
-              {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : null}
+              {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : null}
               {uploadingType
                 ? 'Uploading Assets...'
                 : docFormData.id
-                  ? 'Update Document'
+                  ? 'Update'
                   : 'Save Document'}
             </button>
           </div>

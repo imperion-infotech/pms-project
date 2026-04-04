@@ -14,6 +14,8 @@ import { usePmsTaxes } from './usePmsTaxes'
 import { usePmsGuests } from './usePmsGuests'
 import { usePmsDocumentTypes } from './usePmsDocumentTypes'
 import { usePmsDocumentDetails } from './usePmsDocumentDetails'
+import { usePmsStayDetails } from './usePmsStayDetails'
+import { usePmsRentDetails } from './usePmsRentDetails'
 
 const usePmsData = () => {
   const floorsData = usePmsFloors()
@@ -25,6 +27,8 @@ const usePmsData = () => {
   const guestData = usePmsGuests()
   const docTypeData = usePmsDocumentTypes()
   const docDetailData = usePmsDocumentDetails()
+  const stayData = usePmsStayDetails()
+  const rentData = usePmsRentDetails()
 
   const { fetchFloors } = floorsData
   const { fetchBuildings } = buildingsData
@@ -34,8 +38,9 @@ const usePmsData = () => {
   const { fetchTaxes } = taxesData
   const { fetchPersonalDetails, fetchPersonalDetailById } = guestData
   const { fetchDocumentTypes } = docTypeData
-
   const { fetchDocumentDetails } = docDetailData
+  const { fetchStayDetails } = stayData
+  const { fetchRentDetails } = rentData
 
   const fetchData = useCallback(async () => {
     await Promise.all([
@@ -48,6 +53,8 @@ const usePmsData = () => {
       fetchPersonalDetails(),
       fetchDocumentTypes(),
       fetchDocumentDetails(),
+      fetchStayDetails(),
+      fetchRentDetails(),
     ])
   }, [
     fetchFloors,
@@ -59,6 +66,8 @@ const usePmsData = () => {
     fetchPersonalDetails,
     fetchDocumentTypes,
     fetchDocumentDetails,
+    fetchStayDetails,
+    fetchRentDetails,
   ])
 
   return {
@@ -71,6 +80,8 @@ const usePmsData = () => {
     ...guestData,
     ...docTypeData,
     ...docDetailData,
+    ...stayData,
+    ...rentData,
 
     fetchData,
     fetchPersonalDetailById,
@@ -85,7 +96,9 @@ const usePmsData = () => {
       taxesData.isLoading ||
       guestData.isLoading ||
       docTypeData.isLoading ||
-      docDetailData.isLoading,
+      docDetailData.isLoading ||
+      stayData.isLoading ||
+      rentData.isLoading,
   }
 }
 

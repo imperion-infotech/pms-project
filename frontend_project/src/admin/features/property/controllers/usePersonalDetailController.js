@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
  * Controller: usePersonalDetailController
  * Logic for managing individual guest profiles.
  */
-const usePersonalDetailController = ({ details, documentDetails = [], documentTypes = [], onDelete }) => {
+const usePersonalDetailController = ({ details, documentDetails = [], stayDetails = [], documentTypes = [], onDelete }) => {
   const [deleteTarget, setDeleteTarget] = useState(null)
 
   const stats = useMemo(
@@ -45,6 +45,10 @@ const usePersonalDetailController = ({ details, documentDetails = [], documentTy
     return documentDetails.find((doc) => String(doc.personalDetailsId) === String(personalDetailsId))
   }
 
+  const getGuestStay = (personalDetailId) => {
+    return stayDetails.find((stay) => String(stay.personalDetailId) === String(personalDetailId))
+  }
+
   const getDocumentTypeName = (documentTypeId) => {
     if (!documentTypeId) return '—'
     const type = documentTypes.find((t) => String(t.id) === String(documentTypeId))
@@ -59,6 +63,7 @@ const usePersonalDetailController = ({ details, documentDetails = [], documentTy
     handleConfirmDelete,
     handleCancelDelete,
     getGuestDocument,
+    getGuestStay,
     getDocumentTypeName,
   }
 }
