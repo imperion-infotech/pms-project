@@ -1,7 +1,5 @@
 import React from 'react'
 import { Building } from 'lucide-react'
-import CheckInOutDetails from './CheckInOutDetails'
-import FinancialPlacement from './FinancialPlacement'
 
 /**
  * StaySpecifications component
@@ -46,7 +44,7 @@ const StaySpecifications = ({
       </div>
 
       {/* Section 1: Guest Management */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <div>
           <label className={labelClass}>Room Status</label>
           <div className={inputContainerClass}>
@@ -65,20 +63,52 @@ const StaySpecifications = ({
             </select>
           </div>
         </div>
+      </div>
+
+      {/* Required Booking Attributes */}
+      <div className="grid grid-cols-3 gap-3">
         <div>
-          <label className={labelClass}>Guest Status</label>
+          <label className={labelClass}>Stay Status*</label>
           <div className={inputContainerClass}>
             <select
-              name="guestDetailsStats"
-              value={formData.guestDetailsStats}
+              name="stayStatusEnum"
+              value={formData.stayStatusEnum || 'Confirmed'}
               onChange={handleChange}
               className={selectClass}
             >
-              <option value="Reservation">Reservation</option>
-              <option value="Check-In">Check-In</option>
-              <option value="In-House">In-House</option>
-              <option value="Check-Out">Check-Out</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="Unconfirmed">Unconfirmed</option>
+              <option value="Cancelled">Cancelled</option>
+              <option value="No_show">No Show</option>
             </select>
+          </div>
+        </div>
+        <div>
+          <label className={labelClass}>Rate Type*</label>
+          <div className={inputContainerClass}>
+            <select
+              name="rateTypeEnum"
+              value={formData.rateTypeEnum || 'RACK'}
+              onChange={handleChange}
+              className={selectClass}
+            >
+              <option value="RACK">RACK</option>
+              <option value="CORPORATE">Corporate</option>
+              <option value="GROUP">Group</option>
+              <option value="COMPLIMENTARY">Complimentary</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label className={labelClass}>Booking Color*</label>
+          <div className={inputContainerClass}>
+            <input
+              type="color"
+              name="color"
+              value={formData.color || '#3B82F6'}
+              onChange={handleChange}
+              className={`${inputClass} h-6 w-full cursor-pointer p-0`}
+            />
           </div>
         </div>
       </div>
@@ -196,12 +226,6 @@ const StaySpecifications = ({
           </div>
         </div>
       </div>
-
-      {/* Section 2: Temporal Logistics (Check In / Out) */}
-      <CheckInOutDetails formData={formData} handleChange={handleChange} isDark={isDark} />
-
-      {/* Row 3: Financial Placement */}
-      <FinancialPlacement formData={formData} handleChange={handleChange} isDark={isDark} />
 
       <div>
         <label className={labelClass}>Special Comments</label>

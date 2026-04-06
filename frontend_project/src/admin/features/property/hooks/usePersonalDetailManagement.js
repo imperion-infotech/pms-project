@@ -40,6 +40,7 @@ export const usePersonalDetailManagement = ({
     roomTypeId: '',
     roomMasterId: '',
     comment: '',
+    color: '#3B82F6',
     rateTypeEnum: 'RACK',
     noOfGuest: 1,
     stayStatusEnum: 'CONFIRMED',
@@ -93,9 +94,10 @@ export const usePersonalDetailManagement = ({
     roomTypeId: '',
     roomMasterId: '',
     comment: '',
+    color: '#3B82F6',
     rateTypeEnum: 'RACK',
+    stayStatusEnum: 'Confirmed',
     noOfGuest: 1,
-    stayStatusEnum: 'CONFIRMED',
     // Guest Details (New)
     guestDetailId: null,
     checkInDate: '',
@@ -167,6 +169,7 @@ export const usePersonalDetailManagement = ({
             ? Number(personalFormData.roomMasterId)
             : undefined,
           comment: personalFormData.comment,
+          color: personalFormData.color || '#3B82F6',
           rateTypeEnum: personalFormData.rateTypeEnum,
           noOfGuest: personalFormData.noOfGuest ? Number(personalFormData.noOfGuest) : 1,
           stayStatusEnum:
@@ -244,6 +247,7 @@ export const usePersonalDetailManagement = ({
         roomTypeId: '',
         roomMasterId: '',
         comment: '',
+        color: '#3B82F6',
         rateTypeEnum: 'RACK',
         noOfGuest: 1,
         stayStatusEnum: 'Confirmed',
@@ -337,6 +341,7 @@ export const usePersonalDetailManagement = ({
             ? Number(editPersonalFormData.roomMasterId)
             : undefined,
           comment: editPersonalFormData.comment,
+          color: editPersonalFormData.color || '#3B82F6',
           rateTypeEnum: editPersonalFormData.rateTypeEnum,
           noOfGuest: editPersonalFormData.noOfGuest ? Number(editPersonalFormData.noOfGuest) : 1,
           stayStatusEnum:
@@ -446,6 +451,7 @@ export const usePersonalDetailManagement = ({
         roomTypeId: stay?.roomTypeId || '',
         roomMasterId: stay?.roomMasterId || '',
         comment: stay?.comment || '',
+        color: stay?.color || '#3B82F6',
         rateTypeEnum: stay?.rateTypeEnum || 'RACK',
         noOfGuest: stay?.noOfGuest || 1,
         stayStatusEnum: stay?.stayStatusEnum || 'Confirmed',

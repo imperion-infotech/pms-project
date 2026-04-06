@@ -11,7 +11,9 @@ import {
   Save,
 } from 'lucide-react'
 import { AuthImage } from '../AuthImage'
+import GuestInformation from '../../../../components/common/GuestInformation'
 import StaySpecifications from '../../../../components/common/StaySpecifications'
+import RentDetails from '../../../../components/common/RentDetails'
 
 export const PersonalDetailsModal = ({
   isOpen,
@@ -102,8 +104,8 @@ export const PersonalDetailsModal = ({
           </div>
 
           <div className="flex flex-1 flex-col overflow-hidden md:flex-row">
-            {/* Left Side: Personal & Documents */}
-            <div className="scrollbar-hide flex-1 space-y-4 overflow-y-auto border-r border-slate-100 p-6 dark:border-slate-800">
+            {/* Column 1: Guest Information */}
+            <div className="scrollbar-hide w-full space-y-4 overflow-y-auto border-r border-slate-100 p-6 md:w-[35%] dark:border-slate-800">
               <div className="mb-2 flex items-center gap-3">
                 <span className="text-[9px] font-black tracking-widest text-emerald-500 uppercase">
                   Personal Details
@@ -395,8 +397,13 @@ export const PersonalDetailsModal = ({
               </div>
             </div>
 
-            {/* Right Side: Stay Specifications */}
-            <div className="scrollbar-hide flex-1 space-y-4 overflow-y-auto bg-slate-50/50 p-6 text-left dark:bg-slate-800/20">
+            {/* Column 2: Stay & Room Allocation */}
+            <div className="scrollbar-hide w-full space-y-4 overflow-y-auto border-r border-slate-100 bg-slate-50/30 p-6 text-left md:w-[45%] dark:border-slate-800 dark:bg-slate-800/10">
+              <GuestInformation
+                formData={formData}
+                handleChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
+                isDark={false}
+              />
               <StaySpecifications
                 formData={formData}
                 handleChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
@@ -410,24 +417,37 @@ export const PersonalDetailsModal = ({
                 showStatus={true}
               />
             </div>
+
+            {/* Column 3: Ledger */}
+            <div className="scrollbar-hide w-full overflow-y-auto bg-slate-50 p-4 md:w-[20%] dark:bg-slate-900/50">
+              <RentDetails
+                formData={formData}
+                handleChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
+                isDark={false}
+              />
+            </div>
           </div>
           {/* Footer */}
-          <div className="flex gap-4 border-t border-slate-100 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
-            <button
-              type="button"
-              onClick={() => setIsOpen(false)}
-              className="flex-1 py-3 text-[10px] font-black tracking-widest text-slate-400 uppercase transition-colors hover:text-slate-600"
-            >
-              Discard
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex flex-2 items-center justify-center gap-3 rounded-xl bg-emerald-500 py-3 text-[10px] font-black tracking-widest text-white uppercase shadow-lg transition-all hover:bg-emerald-600 active:scale-95 disabled:opacity-50"
-            >
-              {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-              <span>Commit Profile</span>
-            </button>
+          <div className="flex w-full border-t border-slate-100 bg-white dark:border-slate-800 dark:bg-slate-900">
+            <div className="w-full p-4 md:w-[35%]">
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="w-full py-3 text-[10px] font-black tracking-widest text-slate-400 uppercase transition-colors hover:text-blue-500"
+              >
+                Discard
+              </button>
+            </div>
+            <div className="w-full border-slate-100 p-4 md:w-[65%] md:border-l dark:border-slate-800">
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex w-full flex-2 items-center justify-center gap-3 rounded-xl bg-emerald-500 py-3 text-[10px] font-black tracking-widest text-white uppercase shadow-lg transition-all hover:bg-emerald-600 active:scale-95 disabled:opacity-50"
+              >
+                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                <span>Commit Profile</span>
+              </button>
+            </div>
           </div>
         </form>
       </div>

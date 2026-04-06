@@ -241,14 +241,14 @@ const PmsDashboard = () => {
   /**
    * EVENT HANDLERS - Property Management Actions
    */
-  const handlePersonalSubmit = async (e) => {
+  const handlePersonalSubmitCreate = async (e) => {
     e.preventDefault()
-    // Determine which action to take based on whether we have an ID in edit state
-    if (editPersonalFormData && editPersonalFormData.id) {
-      handleUpdatePersonalDetail()
-    } else {
-      handleAddPersonalDetail()
-    }
+    handleAddPersonalDetail()
+  }
+
+  const handlePersonalSubmitUpdate = async (e) => {
+    e.preventDefault()
+    handleUpdatePersonalDetail()
   }
 
   const handlePersonalFileUpload = async (e, type) => {
@@ -578,7 +578,8 @@ const PmsDashboard = () => {
         setPersonalFormData={setPersonalFormData}
         editPersonalFormData={editPersonalFormData}
         setEditPersonalFormData={setEditPersonalFormData}
-        handlePersonalSubmit={handlePersonalSubmit}
+        handlePersonalSubmitCreate={handlePersonalSubmitCreate}
+        handlePersonalSubmitUpdate={handlePersonalSubmitUpdate}
         handleEditPersonalDetail={handleEditPersonalDetail}
         handlePersonalFileUpload={handlePersonalFileUpload}
         uploadingType={uploadingType}

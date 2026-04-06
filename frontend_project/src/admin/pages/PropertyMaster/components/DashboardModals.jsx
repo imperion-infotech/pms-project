@@ -72,7 +72,8 @@ const DashboardModals = ({
   setPersonalFormData,
   editPersonalFormData,
   setEditPersonalFormData,
-  handlePersonalSubmit,
+  handlePersonalSubmitCreate,
+  handlePersonalSubmitUpdate,
   handlePersonalFileUpload,
   uploadingType,
   // Tax
@@ -215,10 +216,13 @@ const DashboardModals = ({
       {/* Personal Detail Modals */}
       <PersonalDetailsModal
         isOpen={modals.personalDetail}
-        setIsOpen={(isOpen) => toggleModal('personalDetail', isOpen)}
+        setIsOpen={(isOpen) => {
+          toggleModal('personalDetail', isOpen)
+          if (!isOpen) setPersonalFormData({ id: null, isDeleted: false })
+        }}
         formData={personalFormData}
         setFormData={setPersonalFormData}
-        handleSubmit={handlePersonalSubmit}
+        handleSubmit={handlePersonalSubmitCreate}
         handleFileUpload={handlePersonalFileUpload}
         uploadingType={uploadingType}
         loading={isLoading}
@@ -233,10 +237,13 @@ const DashboardModals = ({
 
       <PersonalDetailsEditModal
         isOpen={modals.personalDetailEdit}
-        setIsOpen={(isOpen) => toggleModal('personalDetailEdit', isOpen)}
+        setIsOpen={(isOpen) => {
+          toggleModal('personalDetailEdit', isOpen)
+          if (!isOpen) setEditPersonalFormData({ id: null, isDeleted: false })
+        }}
         formData={editPersonalFormData}
         setFormData={setEditPersonalFormData}
-        handleSubmit={handlePersonalSubmit}
+        handleSubmit={handlePersonalSubmitUpdate}
         handleFileUpload={handlePersonalFileUpload}
         uploadingType={uploadingType}
         loading={isLoading}
