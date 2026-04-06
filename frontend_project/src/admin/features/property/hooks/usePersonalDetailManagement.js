@@ -169,8 +169,10 @@ export const usePersonalDetailManagement = ({
           comment: personalFormData.comment,
           rateTypeEnum: personalFormData.rateTypeEnum,
           noOfGuest: personalFormData.noOfGuest ? Number(personalFormData.noOfGuest) : 1,
-          stayStatusEnum: personalFormData.stayStatusEnum,
-          personalDetailsId: personalDetailsId,
+          stayStatusEnum:
+            personalFormData.stayStatusEnum === 'CONFIRMED'
+              ? 'Confirmed'
+              : personalFormData.stayStatusEnum,
           deleted: false,
         }
         await addStayDetail(stayPayload)
@@ -244,7 +246,7 @@ export const usePersonalDetailManagement = ({
         comment: '',
         rateTypeEnum: 'RACK',
         noOfGuest: 1,
-        stayStatusEnum: 'CONFIRMED',
+        stayStatusEnum: 'Confirmed',
         checkInDate: '',
         checkOutDate: '',
         checkInTime: '',
@@ -337,8 +339,10 @@ export const usePersonalDetailManagement = ({
           comment: editPersonalFormData.comment,
           rateTypeEnum: editPersonalFormData.rateTypeEnum,
           noOfGuest: editPersonalFormData.noOfGuest ? Number(editPersonalFormData.noOfGuest) : 1,
-          stayStatusEnum: editPersonalFormData.stayStatusEnum,
-          personalDetailsId: editPersonalFormData.id,
+          stayStatusEnum:
+            editPersonalFormData.stayStatusEnum === 'CONFIRMED'
+              ? 'Confirmed'
+              : editPersonalFormData.stayStatusEnum,
           deleted: editPersonalFormData.deleted || false,
         }
 
@@ -433,7 +437,7 @@ export const usePersonalDetailManagement = ({
         documentNumber: document?.documentNumber || '',
         validTill: document?.validTill || '',
         remark: document?.remark || '',
-        documentTypeId: document?.documentTypeId || '',
+        documentTypeId: document?.documentType?.id || document?.documentTypeId || '',
         frontImagePath: document?.frontImagePath || '',
         backImagePath: document?.backImagePath || '',
         stayId: stay?.id || null,
@@ -444,7 +448,7 @@ export const usePersonalDetailManagement = ({
         comment: stay?.comment || '',
         rateTypeEnum: stay?.rateTypeEnum || 'RACK',
         noOfGuest: stay?.noOfGuest || 1,
-        stayStatusEnum: stay?.stayStatusEnum || 'CONFIRMED',
+        stayStatusEnum: stay?.stayStatusEnum || 'Confirmed',
         guestDetailId: guest?.id || null,
         checkInDate: guest?.checkInDate || '',
         checkOutDate: guest?.checkOutDate || '',

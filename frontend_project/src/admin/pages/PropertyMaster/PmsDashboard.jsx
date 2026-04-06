@@ -484,6 +484,7 @@ const PmsDashboard = () => {
               documentDetails={documentDetails}
               stayDetails={stayDetails}
               guestDetails={guestDetails}
+              rentDetails={rentDetails}
               onDeleteStayDetail={deleteStayDetail}
               taxes={taxes}
               handleEditTax={handleEditTax}

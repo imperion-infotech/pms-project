@@ -30,6 +30,7 @@ const PersonalDetailManagement = ({
   documentDetails = [],
   stayDetails = [],
   guestDetails = [], // New
+  rentDetails = [], // New
   documentTypes = [],
   onAdd,
   onEdit,
@@ -130,6 +131,12 @@ const PersonalDetailManagement = ({
                 <th className="border-r border-slate-200 px-8 py-4 text-center dark:border-slate-800">
                   Valid Till
                 </th>
+                <th className="border-r border-slate-200 px-8 py-4 text-center dark:border-slate-800">
+                  Status
+                </th>
+                <th className="border-r border-slate-200 px-8 py-4 text-center dark:border-slate-800">
+                  Total Rent
+                </th>
                 <th className="px-8 py-4 text-center">Actions</th>
               </tr>
             </thead>
@@ -137,7 +144,7 @@ const PersonalDetailManagement = ({
               {details.length === 0 ? (
                 <tr>
                   <td
-                    colSpan="8"
+                    colSpan="10"
                     className="px-8 py-20 text-center text-slate-400 dark:text-slate-500"
                   >
                     <div className="flex flex-col items-center justify-center space-y-2">
@@ -153,6 +160,7 @@ const PersonalDetailManagement = ({
                   const guestDocument = getGuestDocument(guest.id)
                   const guestStay = getGuestStay(guest.id)
                   const guestDetail = getGuestDetail(guest.id) // New
+                  const rent = guestDetail && rentDetails ? rentDetails.find((r) => String(r.id) === String(guestDetail.rentId)) : null
                   return (
                     <tr
                       key={guest.id}
@@ -195,13 +203,19 @@ const PersonalDetailManagement = ({
                         {guest.phone || '—'}
                       </td>
                       <td className="border-r border-slate-100 px-8 py-2 font-bold text-blue-600 uppercase dark:border-slate-800 dark:text-blue-400/80">
-                        {getDocumentTypeName(guestDocument?.documentTypeId)}
+                        {getDocumentTypeName(guestDocument?.documentType?.id || guestDocument?.documentTypeId)}
                       </td>
                       <td className="border-r border-slate-100 px-8 py-2 font-mono text-[11px] font-bold text-slate-600 dark:border-slate-800 dark:text-slate-400">
                         {guestDocument?.documentNumber || '—'}
                       </td>
                       <td className="border-r border-slate-100 px-8 py-2 text-center font-bold text-emerald-600 dark:border-slate-800 dark:text-emerald-400/80">
                         {guestDocument?.validTill || '—'}
+                      </td>
+                      <td className="border-r border-slate-100 px-8 py-2 text-center font-bold text-purple-600 uppercase dark:border-slate-800 dark:text-purple-400/80">
+                        {guestStay?.stayStatusEnum || '—'}
+                      </td>
+                      <td className="border-r border-slate-100 px-8 py-2 text-center font-mono font-bold text-slate-600 dark:border-slate-800 dark:text-slate-300">
+                        {rent?.totalCharges ? `₹${rent.totalCharges}` : '—'}
                       </td>
                       <td className="px-8 py-2 text-center">
                         <div className="flex items-center justify-center gap-3">

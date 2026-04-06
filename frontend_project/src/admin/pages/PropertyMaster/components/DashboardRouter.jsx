@@ -45,6 +45,7 @@ const DashboardRouter = ({
   documentDetails,
   stayDetails,
   guestDetails, // New
+  rentDetails,
   taxes,
   handleEditTax,
   deleteTax,
@@ -140,6 +141,7 @@ const DashboardRouter = ({
           documentDetails={documentDetails}
           stayDetails={stayDetails}
           guestDetails={guestDetails} // New
+          rentDetails={rentDetails}
           documentTypes={documentTypes}
           searchTerm={searchTerm}
           onAdd={onAddPersonalDetail}

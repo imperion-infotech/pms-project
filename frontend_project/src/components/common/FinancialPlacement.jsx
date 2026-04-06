@@ -16,7 +16,7 @@ const FinancialPlacement = ({ formData, handleChange, isDark = false }) => {
       <div className="mb-2 flex items-center gap-2">
         <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500"></div>
         <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">
-          Financial Details
+          Rent Details
         </span>
       </div>
 
