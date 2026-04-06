@@ -116,6 +116,8 @@ export const propertyService = {
     handleResponse(() => api.put(`/admin/updatedocumentdetail/${id}`, data)),
   deleteDocumentDetail: (id) =>
     handleResponse(() => api.delete(`/admin/deletedocumentdetail/${id}`)),
+  searchDocumentDetails: (query) =>
+    handleResponse(() => api.get('/user/documentdetails/search', { params: { query } })),
 
   // --- STAY DETAILS MANAGEMENT ---
   getStayDetails: () => handleResponse(() => api.get('/user/getstaydetails')),

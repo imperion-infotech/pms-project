@@ -26,6 +26,7 @@ export const usePersonalDetailManagement = ({
     companyName: '',
     profilePhoto: '',
     signature: '',
+    isDeleted: false,
     // Document Details
     documentNumber: '',
     validTill: '',
@@ -76,6 +77,7 @@ export const usePersonalDetailManagement = ({
     companyName: '',
     profilePhoto: '',
     signature: '',
+    isDeleted: false,
     // Document Details
     documentId: null,
     documentNumber: '',
@@ -132,6 +134,7 @@ export const usePersonalDetailManagement = ({
         companyName: personalFormData.companyName,
         profilePhoto: personalFormData.profilePhoto,
         signature: personalFormData.signature,
+        isDeleted: personalFormData.isDeleted || false,
       })
 
       const personalDetailsId = res.data.id || res.data
@@ -142,13 +145,14 @@ export const usePersonalDetailManagement = ({
         const docRes = await addDocumentDetail({
           documentNumber: personalFormData.documentNumber,
           validTill: personalFormData.validTill,
-          remark: personalFormData.remark,
-          personalDetailsId: personalDetailsId,
-          documentTypeId: personalFormData.documentTypeId
-            ? Number(personalFormData.documentTypeId)
-            : undefined,
           frontImagePath: personalFormData.frontImagePath,
           backImagePath: personalFormData.backImagePath,
+          remark: personalFormData.remark,
+          personalDetails: { id: personalDetailsId },
+          documentType: personalFormData.documentTypeId
+            ? { id: Number(personalFormData.documentTypeId) }
+            : undefined,
+          deleted: false,
         })
         documentId = docRes.data.id || docRes.data
       }
@@ -167,6 +171,7 @@ export const usePersonalDetailManagement = ({
           noOfGuest: personalFormData.noOfGuest ? Number(personalFormData.noOfGuest) : 1,
           stayStatusEnum: personalFormData.stayStatusEnum,
           personalDetailsId: personalDetailsId,
+          deleted: false,
         }
         await addStayDetail(stayPayload)
       }
@@ -225,6 +230,7 @@ export const usePersonalDetailManagement = ({
         companyName: '',
         profilePhoto: '',
         signature: '',
+        isDeleted: false,
         documentNumber: '',
         validTill: '',
         remark: '',
@@ -288,6 +294,7 @@ export const usePersonalDetailManagement = ({
         companyName: editPersonalFormData.companyName,
         profilePhoto: editPersonalFormData.profilePhoto,
         signature: editPersonalFormData.signature,
+        isDeleted: editPersonalFormData.isDeleted || false,
       })
 
       // 2. Update or Create Document Detail
@@ -297,12 +304,13 @@ export const usePersonalDetailManagement = ({
           documentNumber: editPersonalFormData.documentNumber,
           validTill: editPersonalFormData.validTill,
           remark: editPersonalFormData.remark,
-          personalDetailsId: editPersonalFormData.id,
-          documentTypeId: editPersonalFormData.documentTypeId
-            ? Number(editPersonalFormData.documentTypeId)
+          personalDetails: { id: editPersonalFormData.id },
+          documentType: editPersonalFormData.documentTypeId
+            ? { id: Number(editPersonalFormData.documentTypeId) }
             : undefined,
           frontImagePath: editPersonalFormData.frontImagePath,
           backImagePath: editPersonalFormData.backImagePath,
+          deleted: editPersonalFormData.deleted || false,
         }
 
         if (editPersonalFormData.documentId) {
@@ -331,6 +339,7 @@ export const usePersonalDetailManagement = ({
           noOfGuest: editPersonalFormData.noOfGuest ? Number(editPersonalFormData.noOfGuest) : 1,
           stayStatusEnum: editPersonalFormData.stayStatusEnum,
           personalDetailsId: editPersonalFormData.id,
+          deleted: editPersonalFormData.deleted || false,
         }
 
         if (editPersonalFormData.stayId) {
@@ -397,7 +406,7 @@ export const usePersonalDetailManagement = ({
         }
       }
 
-      setEditPersonalFormData({ id: null })
+      setEditPersonalFormData({ id: null, isDeleted: false })
       toggleModal('personalDetailEdit', false)
     } catch (err) {
       console.error('Failed to update personal detail / document / stay / guest detail:', err)

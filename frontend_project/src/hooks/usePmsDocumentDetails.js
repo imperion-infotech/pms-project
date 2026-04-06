@@ -30,7 +30,8 @@ export const usePmsDocumentDetails = () => {
         const res = await propertyService.getDocumentDetails()
         const rawData = extractData(res)
         const guestDocs = rawData.filter(
-          (item) => String(item.personalDetailsId) === String(personalDetailId),
+          (item) =>
+            String(item.personalDetails?.id || item.personalDetailsId) === String(personalDetailId),
         )
         setDocumentDetails(guestDocs)
         return guestDocs
@@ -91,6 +92,23 @@ export const usePmsDocumentDetails = () => {
     [toast],
   )
 
+  const searchDocumentDetails = useCallback(
+    async (query) => {
+      setIsLoading(true)
+      try {
+        const res = await propertyService.searchDocumentDetails(query)
+        const rawData = extractData(res)
+        setDocumentDetails(rawData)
+        return rawData
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Document search failed')
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [toast],
+  )
+
   return {
     documentDetails,
     isLoading,
@@ -99,6 +117,7 @@ export const usePmsDocumentDetails = () => {
     addDocumentDetail,
     updateDocumentDetail,
     deleteDocumentDetail,
+    searchDocumentDetails,
     setDocumentDetails,
   }
 }
