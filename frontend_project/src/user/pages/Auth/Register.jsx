@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Lock, Eye, EyeOff, BedDouble, ArrowRight, Loader2, User, Shield } from 'lucide-react'
+import { Lock, Eye, EyeOff, BedDouble, ArrowRight, Loader2, User, Shield, Mail } from 'lucide-react'
 import LoadingProcess from '../../../components/common/LoadingProcess'
 
 const Register = () => {
   const navigate = useNavigate()
   const [showPwd, setShowPwd] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState({ username: '', password: '', role: '' })
+  const [formData, setFormData] = useState({ username: '', password: '', role: '', emailId: '' })
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
 
@@ -113,6 +113,21 @@ const Register = () => {
               >
                 {showPwd ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-slate-300">Email Address</label>
+            <div className="relative">
+              <Mail size={18} className="absolute top-1/2 left-4 -translate-y-1/2 text-slate-500" />
+              <input
+                type="email"
+                placeholder="example@mail.com"
+                required
+                value={formData.emailId}
+                onChange={(e) => setFormData({ ...formData, emailId: e.target.value })}
+                className="box-border w-full rounded-xl border border-slate-700 bg-slate-900/60 py-3.5 pr-4 pl-11 text-sm text-white transition-all duration-200 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+              />
             </div>
           </div>
 
