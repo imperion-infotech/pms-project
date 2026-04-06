@@ -26,6 +26,8 @@ export const PersonalDetailsEditModal = ({
   floors = [],
   roomTypes = [],
   rooms = [],
+  roomStatuses = [],
+  rentDetails = [],
   loading,
 }) => {
   const [localPreviews, setLocalPreviews] = useState({ photo: null, signature: null })
@@ -341,6 +343,8 @@ export const PersonalDetailsEditModal = ({
                 floors={floors}
                 roomTypes={roomTypes}
                 rooms={rooms}
+                roomStatuses={roomStatuses}
+                rentDetails={rentDetails}
                 isDark={false}
                 showStatus={true}
               />

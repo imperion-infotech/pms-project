@@ -1,5 +1,7 @@
 import React from 'react'
 import { Building } from 'lucide-react'
+import TemporalLogistics from './TemporalLogistics'
+import FinancialPlacement from './FinancialPlacement'
 
 /**
  * StaySpecifications component
@@ -12,6 +14,7 @@ const StaySpecifications = ({
   floors = [],
   roomTypes = [],
   rooms = [],
+  roomStatuses = [],
   isDark = false,
 }) => {
   // Shared UI classes
@@ -28,8 +31,8 @@ const StaySpecifications = ({
     'bg-transparent border-none outline-none w-full text-xs font-bold text-slate-800 dark:text-slate-100'
 
   return (
-    <div className="mt-12 space-y-6 text-left">
-      <div className="flex items-center gap-3 border-l-4 border-blue-500 pl-4">
+    <div className="mt-8 space-y-6 text-left">
+      <div className="flex items-center gap-3 border-l-4 border-emerald-500 pl-4">
         <div>
           <h3
             className={`text-xs font-black tracking-[0.2em] uppercase ${isDark ? 'text-slate-200' : 'text-slate-800'}`}
@@ -37,8 +40,46 @@ const StaySpecifications = ({
             Stay Specifications
           </h3>
           <p className="mt-0.5 text-[9px] font-bold tracking-widest text-slate-400 uppercase">
-            Booking & Placement
+            Booking & Unit Allocation
           </p>
+        </div>
+      </div>
+
+      {/* Section 1: Guest Management */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className={labelClass}>Room Status</label>
+          <div className={inputContainerClass}>
+            <select
+              name="roomStatusId"
+              value={formData.roomStatusId}
+              onChange={handleChange}
+              className={selectClass}
+            >
+              <option value="">Select Status</option>
+              {roomStatuses?.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.roomStatusName}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div>
+          <label className={labelClass}>Guest Status</label>
+          <div className={inputContainerClass}>
+            <select
+              name="guestDetailsStats"
+              value={formData.guestDetailsStats}
+              onChange={handleChange}
+              className={selectClass}
+            >
+              <option value="Reservation">Reservation</option>
+              <option value="Check-In">Check-In</option>
+              <option value="In-House">In-House</option>
+              <option value="Check-Out">Check-Out</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -54,7 +95,7 @@ const StaySpecifications = ({
               onChange={handleChange}
               className={selectClass}
             >
-              <option value="">Select Building</option>
+              <option value="">Main</option>
               {buildings?.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.name}
@@ -73,7 +114,7 @@ const StaySpecifications = ({
               onChange={handleChange}
               className={selectClass}
             >
-              <option value="">Select Floor</option>
+              <option value="">Floor</option>
               {floors
                 ?.filter(
                   (f) =>
@@ -104,7 +145,7 @@ const StaySpecifications = ({
               onChange={handleChange}
               className={selectClass}
             >
-              <option value="">Type</option>
+              <option value="">Room Type</option>
               {roomTypes
                 ?.filter((rt) => {
                   if (!formData.floorId) return true
@@ -139,7 +180,7 @@ const StaySpecifications = ({
               onChange={handleChange}
               className={selectClass}
             >
-              <option value="">Select Room</option>
+              <option value="">Room</option>
               {rooms
                 ?.filter(
                   (r) =>
@@ -156,37 +197,11 @@ const StaySpecifications = ({
         </div>
       </div>
 
-      {/* Row 3: Rate Type & Guests */}
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className={labelClass}>Rate Type</label>
-          <div className={inputContainerClass}>
-            <select
-              name="rateTypeEnum"
-              value={formData.rateTypeEnum}
-              onChange={handleChange}
-              className={selectClass}
-            >
-              <option value="RACK">RACK</option>
-              <option value="WEEKLY_RATE_TEST">WEEKLY</option>
-              <option value="YEARLY_RATE">YEARLY</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <label className={labelClass}>Guests</label>
-          <div className={inputContainerClass}>
-            <input
-              type="number"
-              name="noOfGuest"
-              value={formData.noOfGuest}
-              onChange={handleChange}
-              className={inputClass}
-              min="1"
-            />
-          </div>
-        </div>
-      </div>
+      {/* Section 2: Temporal Logistics */}
+      <TemporalLogistics formData={formData} handleChange={handleChange} isDark={isDark} />
+
+      {/* Row 3: Financial Placement */}
+      <FinancialPlacement formData={formData} handleChange={handleChange} isDark={isDark} />
 
       <div>
         <label className={labelClass}>Special Comments</label>

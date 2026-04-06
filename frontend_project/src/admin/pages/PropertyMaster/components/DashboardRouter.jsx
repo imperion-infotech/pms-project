@@ -44,6 +44,7 @@ const DashboardRouter = ({
   onDeletePersonalDetail,
   documentDetails,
   stayDetails,
+  guestDetails, // New
   taxes,
   handleEditTax,
   deleteTax,
@@ -56,6 +57,7 @@ const DashboardRouter = ({
   isLoading,
 }) => {
   switch (activeItem) {
+    /* ... skipping other cases ... */
     case 'Floor':
       return (
         <FloorManagement
@@ -137,6 +139,7 @@ const DashboardRouter = ({
           details={personalDetails}
           documentDetails={documentDetails}
           stayDetails={stayDetails}
+          guestDetails={guestDetails} // New
           documentTypes={documentTypes}
           searchTerm={searchTerm}
           onAdd={onAddPersonalDetail}

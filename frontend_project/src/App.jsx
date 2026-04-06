@@ -17,6 +17,8 @@ const PmsDashboard = lazy(() => import('./admin/pages/PropertyMaster/PmsDashboar
 const HomeScreen = lazy(() => import('./user/pages/HomeScreen/HomeScreen'));
 const Login = lazy(() => import('./user/pages/Auth/Login'));
 const Register = lazy(() => import('./user/pages/Auth/Register'));
+const ForgotPassword = lazy(() => import('./user/pages/Auth/ForgotPassword'));
+const ResetPassword = lazy(() => import('./user/pages/Auth/ResetPassword'));
 
 /**
  * getRoleFromToken()
@@ -106,6 +108,8 @@ function App() {
                 {/* PUBLIC ROUTES */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
 
                 {/* SMART ROOT ROUTE */}
                 <Route path="/" element={<RootRoute />} />

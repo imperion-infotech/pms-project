@@ -91,10 +91,12 @@ const DashboardModals = ({
   setEditDocumentType,
   handleUpdateDocumentType,
   documentTypes,
+  rentDetails = [],
   isLoading,
 }) => {
   return (
     <>
+      {/* ... keeping other modals unchanged ... */}
       {/* Floor Modals */}
       <FloorModal
         isFloorModalOpen={modals.floor}
@@ -225,6 +227,8 @@ const DashboardModals = ({
         floors={floors}
         roomTypes={roomTypes}
         rooms={rooms}
+        roomStatuses={roomStatuses}
+        rentDetails={rentDetails}
       />
 
       <PersonalDetailsEditModal
@@ -241,6 +245,8 @@ const DashboardModals = ({
         floors={floors}
         roomTypes={roomTypes}
         rooms={rooms}
+        roomStatuses={roomStatuses}
+        rentDetails={rentDetails}
       />
 
       {/* Document Type Modals */}

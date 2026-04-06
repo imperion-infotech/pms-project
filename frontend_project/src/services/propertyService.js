@@ -122,12 +122,12 @@ export const propertyService = {
   createStayDetail: (data) => handleResponse(() => api.post('/admin/createstaydetail', data)),
   updateStayDetail: (id, data) =>
     handleResponse(() => api.put(`/admin/updatestaydetail/${id}`, data)),
-  deleteStayDetail: (id) => handleResponse(() => api.delete(`/admin/deletestaydetail/${id}`)),
+  deleteStayDetail: (id) => handleResponse(() => api.delete(`/admin/deletestaydetails/${id}`)),
 
   // --- GUEST DETAILS MANAGEMENT ---
   getGuestDetails: () => handleResponse(() => api.get('/user/getguestdetails')),
   getGuestDetailById: (id) => handleResponse(() => api.get(`/user/getguestdetail/${id}`)),
-  createGuestDetail: (data) => handleResponse(() => api.post('/admin/creatguestdetail', data)),
+  createGuestDetail: (data) => handleResponse(() => api.post('/admin/createguestdetail', data)),
   updateGuestDetail: (id, data) =>
     handleResponse(() => api.put(`/admin/updateguestdetail/${id}`, data)),
   deleteGuestDetail: (id) => handleResponse(() => api.delete(`/admin/deleteguestdetail/${id}`)),

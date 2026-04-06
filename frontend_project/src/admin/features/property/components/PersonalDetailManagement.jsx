@@ -29,6 +29,7 @@ const PersonalDetailManagement = ({
   details = [],
   documentDetails = [],
   stayDetails = [],
+  guestDetails = [], // New
   documentTypes = [],
   onAdd,
   onEdit,
@@ -43,14 +44,18 @@ const PersonalDetailManagement = ({
     handleCancelDelete,
     getGuestDocument,
     getGuestStay,
+    getGuestDetail, // New
     getDocumentTypeName,
   } = usePersonalDetailController({
     details,
     documentDetails,
     stayDetails,
+    guestDetails, // New
     documentTypes,
     onDelete,
   })
+
+  /* ... skipping unchanged ... */
 
   return (
     <div className="space-y-6">
@@ -132,7 +137,7 @@ const PersonalDetailManagement = ({
               {details.length === 0 ? (
                 <tr>
                   <td
-                    colSpan="6"
+                    colSpan="8"
                     className="px-8 py-20 text-center text-slate-400 dark:text-slate-500"
                   >
                     <div className="flex flex-col items-center justify-center space-y-2">
@@ -147,6 +152,7 @@ const PersonalDetailManagement = ({
                 details.map((guest, idx) => {
                   const guestDocument = getGuestDocument(guest.id)
                   const guestStay = getGuestStay(guest.id)
+                  const guestDetail = getGuestDetail(guest.id) // New
                   return (
                     <tr
                       key={guest.id}
@@ -200,7 +206,7 @@ const PersonalDetailManagement = ({
                       <td className="px-8 py-2 text-center">
                         <div className="flex items-center justify-center gap-3">
                           <button
-                            onClick={() => onEdit(guest, guestDocument, guestStay)}
+                            onClick={() => onEdit(guest, guestDocument, guestStay, guestDetail)}
                             className="rounded-lg p-1.5 text-blue-500 transition-colors hover:bg-blue-50 dark:hover:bg-blue-500/10"
                             title="Edit Profile"
                           >

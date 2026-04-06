@@ -10,6 +10,10 @@ export const usePersonalDetailManagement = ({
   updateDocumentDetail,
   addStayDetail,
   updateStayDetail,
+  addGuestDetail,
+  updateGuestDetail,
+  addRentDetail,
+  updateRentDetail,
   toggleModal,
 }) => {
   const [personalFormData, setPersonalFormData] = useState({
@@ -38,6 +42,27 @@ export const usePersonalDetailManagement = ({
     rateTypeEnum: 'RACK',
     noOfGuest: 1,
     stayStatusEnum: 'CONFIRMED',
+    // Guest Details (New)
+    checkInDate: '',
+    checkOutDate: '',
+    checkInTime: '',
+    checkOutTime: '',
+    guestDetailsStats: 'Reservation',
+    noOfDays: 1,
+    rentId: '',
+    roomStatusId: '',
+    // Rent Details
+    rent: '',
+    basic: '',
+    taxId: '',
+    totalRental: '',
+    otherChanrges: '',
+    discount: '',
+    totalCharges: '',
+    payments: '',
+    ccAuthorized: '',
+    deposite: '',
+    balance: '',
   })
 
   const [editPersonalFormData, setEditPersonalFormData] = useState({
@@ -52,7 +77,7 @@ export const usePersonalDetailManagement = ({
     profilePhoto: '',
     signature: '',
     // Document Details
-    documentId: null, // To track existing document
+    documentId: null,
     documentNumber: '',
     validTill: '',
     remark: '',
@@ -69,6 +94,28 @@ export const usePersonalDetailManagement = ({
     rateTypeEnum: 'RACK',
     noOfGuest: 1,
     stayStatusEnum: 'CONFIRMED',
+    // Guest Details (New)
+    guestDetailId: null,
+    checkInDate: '',
+    checkOutDate: '',
+    checkInTime: '',
+    checkOutTime: '',
+    guestDetailsStats: 'Reservation',
+    noOfDays: 1,
+    rentId: '',
+    roomStatusId: '',
+    // Rent Details
+    rent: '',
+    basic: '',
+    taxId: '',
+    totalRental: '',
+    otherChanrges: '',
+    discount: '',
+    totalCharges: '',
+    payments: '',
+    ccAuthorized: '',
+    deposite: '',
+    balance: '',
   })
 
   const handleAddPersonalDetail = useCallback(async () => {
@@ -88,18 +135,20 @@ export const usePersonalDetailManagement = ({
       })
 
       const personalDetailsId = res.data.id || res.data
+      let documentId = null
 
       // 2. Create Document Detail if info provided
       if (personalFormData.documentNumber || personalFormData.documentTypeId) {
-        await addDocumentDetail({
+        const docRes = await addDocumentDetail({
           documentNumber: personalFormData.documentNumber,
           validTill: personalFormData.validTill,
           remark: personalFormData.remark,
-          personalDetailsId: personalDetailsId, // Plural as per spec
+          personalDetailsId: personalDetailsId,
           documentTypeId: personalFormData.documentTypeId ? Number(personalFormData.documentTypeId) : undefined,
           frontImagePath: personalFormData.frontImagePath,
           backImagePath: personalFormData.backImagePath,
         })
+        documentId = docRes.data.id || docRes.data
       }
 
       // 3. Create Stay Detail if info provided
@@ -113,9 +162,47 @@ export const usePersonalDetailManagement = ({
           rateTypeEnum: personalFormData.rateTypeEnum,
           noOfGuest: personalFormData.noOfGuest ? Number(personalFormData.noOfGuest) : 1,
           stayStatusEnum: personalFormData.stayStatusEnum,
-          personalDetailId: personalDetailsId,
+          personalDetailsId: personalDetailsId,
         }
         await addStayDetail(stayPayload)
+      }
+
+      // 4. Create Rent Details & Guest Detail (Integration)
+      if (personalFormData.roomMasterId) {
+        let finalRentId = null;
+
+        // If financial info is passed, create RentDetail
+        if (personalFormData.rent || personalFormData.basic || personalFormData.totalCharges) {
+          const rentPayload = {
+            rent: personalFormData.rent ? Number(personalFormData.rent) : 0,
+            basic: personalFormData.basic ? Number(personalFormData.basic) : 0,
+            taxId: personalFormData.taxId ? Number(personalFormData.taxId) : undefined,
+            totalRental: personalFormData.totalRental ? Number(personalFormData.totalRental) : 0,
+            otherChanrges: personalFormData.otherChanrges ? Number(personalFormData.otherChanrges) : 0,
+            discount: personalFormData.discount ? Number(personalFormData.discount) : 0,
+            totalCharges: personalFormData.totalCharges ? Number(personalFormData.totalCharges) : 0,
+            payments: personalFormData.payments ? Number(personalFormData.payments) : 0,
+            ccAuthorized: personalFormData.ccAuthorized ? Number(personalFormData.ccAuthorized) : 0,
+            deposite: personalFormData.deposite ? Number(personalFormData.deposite) : 0,
+            balance: personalFormData.balance ? Number(personalFormData.balance) : 0,
+          };
+          const rentRes = await addRentDetail(rentPayload);
+          finalRentId = rentRes.data.id || rentRes.data;
+        }
+
+        await addGuestDetail({
+          roomMasterId: personalFormData.roomMasterId ? Number(personalFormData.roomMasterId) : undefined,
+          personalDetailsId: personalDetailsId,
+          documentId: documentId,
+          roomStatusId: personalFormData.roomStatusId ? Number(personalFormData.roomStatusId) : undefined,
+          checkInDate: personalFormData.checkInDate,
+          checkOutDate: personalFormData.checkOutDate,
+          checkInTime: personalFormData.checkInTime,
+          checkOutTime: personalFormData.checkOutTime,
+          guestDetailsStats: personalFormData.guestDetailsStats,
+          noOfDays: personalFormData.noOfDays ? Number(personalFormData.noOfDays) : 1,
+          rentId: finalRentId,
+        })
       }
 
       setPersonalFormData({
@@ -142,12 +229,31 @@ export const usePersonalDetailManagement = ({
         rateTypeEnum: 'RACK',
         noOfGuest: 1,
         stayStatusEnum: 'CONFIRMED',
+        checkInDate: '',
+        checkOutDate: '',
+        checkInTime: '',
+        checkOutTime: '',
+        guestDetailsStats: 'Reservation',
+        noOfDays: 1,
+        rentId: '',
+        roomStatusId: '',
+        rent: '',
+        basic: '',
+        taxId: '',
+        totalRental: '',
+        otherChanrges: '',
+        discount: '',
+        totalCharges: '',
+        payments: '',
+        ccAuthorized: '',
+        deposite: '',
+        balance: '',
       })
       toggleModal('personalDetail', false)
     } catch (err) {
-      console.error('Failed to create personal detail / document / stay:', err)
+      console.error('Failed to create personal detail / document / stay / guest detail:', err)
     }
-  }, [personalFormData, addPersonalDetail, addDocumentDetail, addStayDetail, toggleModal])
+  }, [personalFormData, addPersonalDetail, addDocumentDetail, addStayDetail, addGuestDetail, addRentDetail, toggleModal])
 
   const handleUpdatePersonalDetail = useCallback(async () => {
     if (!editPersonalFormData?.id) return
@@ -167,12 +273,13 @@ export const usePersonalDetailManagement = ({
       })
 
       // 2. Update or Create Document Detail
+      let docId = editPersonalFormData.documentId
       if (editPersonalFormData.documentNumber || editPersonalFormData.documentTypeId) {
         const docPayload = {
           documentNumber: editPersonalFormData.documentNumber,
           validTill: editPersonalFormData.validTill,
           remark: editPersonalFormData.remark,
-          personalDetailsId: editPersonalFormData.id, // Plural
+          personalDetailsId: editPersonalFormData.id,
           documentTypeId: editPersonalFormData.documentTypeId ? Number(editPersonalFormData.documentTypeId) : undefined,
           frontImagePath: editPersonalFormData.frontImagePath,
           backImagePath: editPersonalFormData.backImagePath,
@@ -181,7 +288,8 @@ export const usePersonalDetailManagement = ({
         if (editPersonalFormData.documentId) {
           await updateDocumentDetail(editPersonalFormData.documentId, docPayload)
         } else {
-          await addDocumentDetail(docPayload)
+          const docRes = await addDocumentDetail(docPayload)
+          docId = docRes.data.id || docRes.data
         }
       }
 
@@ -196,7 +304,7 @@ export const usePersonalDetailManagement = ({
           rateTypeEnum: editPersonalFormData.rateTypeEnum,
           noOfGuest: editPersonalFormData.noOfGuest ? Number(editPersonalFormData.noOfGuest) : 1,
           stayStatusEnum: editPersonalFormData.stayStatusEnum,
-          personalDetailId: editPersonalFormData.id,
+          personalDetailsId: editPersonalFormData.id,
         }
 
         if (editPersonalFormData.stayId) {
@@ -206,10 +314,57 @@ export const usePersonalDetailManagement = ({
         }
       }
 
+      // 4. Update or Create Rent Details & Guest Detail
+      if (editPersonalFormData.roomMasterId) {
+        let finalRentId = editPersonalFormData.rentId;
+
+        if (editPersonalFormData.rent !== '' || editPersonalFormData.basic !== '') {
+          const rentPayload = {
+            rent: editPersonalFormData.rent ? Number(editPersonalFormData.rent) : 0,
+            basic: editPersonalFormData.basic ? Number(editPersonalFormData.basic) : 0,
+            taxId: editPersonalFormData.taxId ? Number(editPersonalFormData.taxId) : undefined,
+            totalRental: editPersonalFormData.totalRental ? Number(editPersonalFormData.totalRental) : 0,
+            otherChanrges: editPersonalFormData.otherChanrges ? Number(editPersonalFormData.otherChanrges) : 0,
+            discount: editPersonalFormData.discount ? Number(editPersonalFormData.discount) : 0,
+            totalCharges: editPersonalFormData.totalCharges ? Number(editPersonalFormData.totalCharges) : 0,
+            payments: editPersonalFormData.payments ? Number(editPersonalFormData.payments) : 0,
+            ccAuthorized: editPersonalFormData.ccAuthorized ? Number(editPersonalFormData.ccAuthorized) : 0,
+            deposite: editPersonalFormData.deposite ? Number(editPersonalFormData.deposite) : 0,
+            balance: editPersonalFormData.balance ? Number(editPersonalFormData.balance) : 0,
+          };
+          if (finalRentId) {
+            await updateRentDetail(finalRentId, rentPayload);
+          } else {
+            const rentRes = await addRentDetail(rentPayload);
+            finalRentId = rentRes.data.id || rentRes.data;
+          }
+        }
+
+        const guestPayload = {
+          roomMasterId: Number(editPersonalFormData.roomMasterId),
+          personalDetailsId: editPersonalFormData.id,
+          documentId: docId,
+          roomStatusId: editPersonalFormData.roomStatusId ? Number(editPersonalFormData.roomStatusId) : undefined,
+          checkInDate: editPersonalFormData.checkInDate,
+          checkOutDate: editPersonalFormData.checkOutDate,
+          checkInTime: editPersonalFormData.checkInTime,
+          checkOutTime: editPersonalFormData.checkOutTime,
+          guestDetailsStats: editPersonalFormData.guestDetailsStats,
+          noOfDays: Number(editPersonalFormData.noOfDays),
+          rentId: finalRentId ? Number(finalRentId) : undefined,
+        }
+
+        if (editPersonalFormData.guestDetailId) {
+          await updateGuestDetail(editPersonalFormData.guestDetailId, guestPayload)
+        } else {
+          await addGuestDetail(guestPayload)
+        }
+      }
+
       setEditPersonalFormData({ id: null })
       toggleModal('personalDetailEdit', false)
     } catch (err) {
-      console.error('Failed to update personal detail / document / stay:', err)
+      console.error('Failed to update personal detail / document / stay / guest detail:', err)
     }
   }, [
     editPersonalFormData,
@@ -218,11 +373,15 @@ export const usePersonalDetailManagement = ({
     addDocumentDetail,
     updateStayDetail,
     addStayDetail,
+    updateGuestDetail,
+    addGuestDetail,
+    addRentDetail,
+    updateRentDetail,
     toggleModal,
   ])
 
   const handleEditPersonalDetail = useCallback(
-    (detail, document = null, stay = null) => {
+    (detail, document = null, stay = null, guest = null, rentDetailObj = null) => {
       setEditPersonalFormData({
         ...detail,
         documentId: document?.id || null,
@@ -241,6 +400,27 @@ export const usePersonalDetailManagement = ({
         rateTypeEnum: stay?.rateTypeEnum || 'RACK',
         noOfGuest: stay?.noOfGuest || 1,
         stayStatusEnum: stay?.stayStatusEnum || 'CONFIRMED',
+        guestDetailId: guest?.id || null,
+        checkInDate: guest?.checkInDate || '',
+        checkOutDate: guest?.checkOutDate || '',
+        checkInTime: guest?.checkInTime || '',
+        checkOutTime: guest?.checkOutTime || '',
+        guestDetailsStats: guest?.guestDetailsStats || 'Reservation',
+        noOfDays: guest?.noOfDays || 1,
+        rentId: guest?.rentId || '',
+        roomStatusId: guest?.roomStatusId || '',
+        // Rent Detail Populate
+        rent: rentDetailObj?.rent || '',
+        basic: rentDetailObj?.basic || '',
+        taxId: rentDetailObj?.taxId || '',
+        totalRental: rentDetailObj?.totalRental || '',
+        otherChanrges: rentDetailObj?.otherChanrges || '',
+        discount: rentDetailObj?.discount || '',
+        totalCharges: rentDetailObj?.totalCharges || '',
+        payments: rentDetailObj?.payments || '',
+        ccAuthorized: rentDetailObj?.ccAuthorized || '',
+        deposite: rentDetailObj?.deposite || '',
+        balance: rentDetailObj?.balance || '',
       })
       toggleModal('personalDetailEdit', true)
     },

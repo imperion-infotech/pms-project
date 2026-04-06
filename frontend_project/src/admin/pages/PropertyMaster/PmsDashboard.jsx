@@ -94,11 +94,17 @@ const PmsDashboard = () => {
     deleteDocumentType,
     addDocumentDetail,
     updateDocumentDetail,
+    deleteDocumentDetail,
     documentDetails,
     stayDetails,
     addStayDetail,
     updateStayDetail,
     deleteStayDetail,
+    rentDetails, // From usePmsData
+    guestDetails, // From usePmsData
+    addGuestDetail, // From usePmsData
+    updateGuestDetail, // From usePmsData
+    deleteGuestDetail, // From usePmsData
     searchRooms,
     searchFloors,
     searchBuildings,
@@ -174,10 +180,10 @@ const PmsDashboard = () => {
     handleAddRoomStatus,
     handleUpdateRoomStatus,
     handleEditRoomStatus,
-  } = useRoomStatusManagement({ 
-    addRoomStatus, 
-    updateRoomStatus: hookUpdateRoomStatus, 
-    toggleModal 
+  } = useRoomStatusManagement({
+    addRoomStatus,
+    updateRoomStatus: hookUpdateRoomStatus,
+    toggleModal,
   })
 
   const {
@@ -197,15 +203,8 @@ const PmsDashboard = () => {
     toggleModal,
   })
 
-  const {
-    newTax,
-    setNewTax,
-    editTax,
-    setEditTax,
-    handleAddTax,
-    handleUpdateTax,
-    handleEditTax,
-  } = useTaxManagement({ addTax, updateTax, toggleModal })
+  const { newTax, setNewTax, editTax, setEditTax, handleAddTax, handleUpdateTax, handleEditTax } =
+    useTaxManagement({ addTax, updateTax, toggleModal })
 
   const {
     newDocumentType,
@@ -232,6 +231,8 @@ const PmsDashboard = () => {
     updateDocumentDetail,
     addStayDetail,
     updateStayDetail,
+    addGuestDetail,
+    updateGuestDetail,
     toggleModal,
   })
 
@@ -289,6 +290,31 @@ const PmsDashboard = () => {
       console.error('Upload failed:', err)
     } finally {
       setUploadingType(null)
+    }
+  }
+
+  // --- Cascade Delete Implementation ---
+  const handleComprehensiveDeletePersonalDetail = async (id) => {
+    try {
+      // 1. Delete Guest Detail
+      const guestDetail = guestDetails.find((gd) => String(gd.personalDetailsId) === String(id))
+      if (guestDetail) await deleteGuestDetail(guestDetail.id)
+
+      // 2. Delete Stay Detail
+      const stayDetail = stayDetails.find((sd) => String(sd.personalDetailId) === String(id))
+      if (stayDetail) await deleteStayDetail(stayDetail.id)
+
+      // 3. Delete Document Detail
+      const docDetail = documentDetails.find((dd) => String(dd.personalDetailsId) === String(id))
+      if (docDetail) await deleteDocumentDetail(docDetail.id)
+
+      // 4. Finally delete the Personal Detail
+      await deletePersonalDetail(id)
+
+      // Refresh to ensure UI stays consistent
+      fetchData()
+    } catch (err) {
+      console.error('Failed to cascade delete personal details', err)
     }
   }
 
@@ -392,7 +418,6 @@ const PmsDashboard = () => {
     documentTypes,
   ])
 
-
   return (
     <div
       className={`flex h-screen ${isDark ? 'bg-surface-50 text-slate-100' : 'bg-[#f4f7fa] text-slate-800'} overflow-hidden font-sans transition-colors duration-300`}
@@ -454,10 +479,11 @@ const PmsDashboard = () => {
               deleteRoom={deleteRoom}
               onAddPersonalDetail={() => toggleModal('personalDetail', true)}
               onEditPersonalDetail={handleEditPersonalDetail}
-              onDeletePersonalDetail={deletePersonalDetail}
+              onDeletePersonalDetail={handleComprehensiveDeletePersonalDetail}
               personalDetails={personalDetails}
               documentDetails={documentDetails}
               stayDetails={stayDetails}
+              guestDetails={guestDetails}
               onDeleteStayDetail={deleteStayDetail}
               taxes={taxes}
               handleEditTax={handleEditTax}
@@ -573,6 +599,7 @@ const PmsDashboard = () => {
         isLoading={isLoading}
         stayDetails={stayDetails}
         documentTypes={documentTypes}
+        rentDetails={rentDetails}
       />
 
       <style>{`
