@@ -8,22 +8,28 @@ export const useRoomStatusManagement = ({ addRoomStatus, updateRoomStatus, toggl
     roomStatusName: '',
     roomStatusTitle: '',
     roomStatusColor: '#2798e8',
+    roomStatusTextColor: '#ffffff',
   })
   const [editRoomStatus, setEditRoomStatus] = useState({
     id: null,
     roomStatusName: '',
     roomStatusTitle: '',
     roomStatusColor: '#2798e8',
+    roomStatusTextColor: '#ffffff',
   })
 
   const handleAddRoomStatus = useCallback(async () => {
     if (!newRoomStatus.roomStatusName.trim()) return
     try {
-      await addRoomStatus(newRoomStatus)
+      await addRoomStatus({
+        ...newRoomStatus,
+        createdOn: new Date().toISOString(),
+      })
       setNewRoomStatus({
         roomStatusName: '',
         roomStatusTitle: '',
         roomStatusColor: '#2798e8',
+        roomStatusTextColor: '#ffffff',
       })
       toggleModal('roomStatus', false)
     } catch (err) {
@@ -34,16 +40,13 @@ export const useRoomStatusManagement = ({ addRoomStatus, updateRoomStatus, toggl
   const handleUpdateRoomStatus = useCallback(async () => {
     if (!editRoomStatus.id || !editRoomStatus.roomStatusName.trim()) return
     try {
-      await updateRoomStatus(editRoomStatus.id, {
-        roomStatusName: editRoomStatus.roomStatusName,
-        roomStatusTitle: editRoomStatus.roomStatusTitle,
-        roomStatusColor: editRoomStatus.roomStatusColor,
-      })
+      await updateRoomStatus(editRoomStatus.id, editRoomStatus)
       setEditRoomStatus({
         id: null,
         roomStatusName: '',
         roomStatusTitle: '',
         roomStatusColor: '#2798e8',
+        roomStatusTextColor: '#ffffff',
       })
       toggleModal('roomStatusEdit', false)
     } catch (err) {
@@ -58,6 +61,7 @@ export const useRoomStatusManagement = ({ addRoomStatus, updateRoomStatus, toggl
         roomStatusName: status.roomStatusName || '',
         roomStatusTitle: status.roomStatusTitle || '',
         roomStatusColor: status.roomStatusColor || '#2798e8',
+        roomStatusTextColor: status.roomStatusTextColor || '#ffffff',
       })
       toggleModal('roomStatusEdit', true)
     },

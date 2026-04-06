@@ -35,7 +35,7 @@ const usePmsData = () => {
   const { fetchFloors } = floorsData
   const { fetchBuildings } = buildingsData
   const { fetchRoomTypes } = roomTypesData
-  const { fetchRoomStatuses } = roomStatusesData
+  const { fetchRoomStatuses, getRoomStatusById } = roomStatusesData
   const { fetchRooms } = roomsData
   const { fetchTaxes } = taxesData
   const { fetchPersonalDetails, fetchPersonalDetailById } = guestData
@@ -91,6 +91,7 @@ const usePmsData = () => {
 
     fetchData,
     fetchPersonalDetailById,
+    getRoomStatusById,
 
     // Aggregated Loading/Error
     isLoading:

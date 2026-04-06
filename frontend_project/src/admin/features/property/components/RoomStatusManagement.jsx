@@ -66,7 +66,10 @@ const RoomStatusManagement = ({ roomStatuses, setIsRoomStatusModalOpen, onEdit, 
                 Display Label
               </th>
               <th className="border-r border-slate-200 px-8 py-4 text-center dark:border-slate-800">
-                Color Code
+                BG Color
+              </th>
+              <th className="border-r border-slate-200 px-8 py-4 text-center dark:border-slate-800">
+                Text Color
               </th>
               <th className="px-8 py-4 text-center">Actions</th>
             </tr>
@@ -75,7 +78,7 @@ const RoomStatusManagement = ({ roomStatuses, setIsRoomStatusModalOpen, onEdit, 
             {processedStatuses.length === 0 ? (
               <tr>
                 <td
-                  colSpan="5"
+                  colSpan="6"
                   className="px-8 py-20 text-center text-slate-400 dark:text-slate-500"
                 >
                   <div className="flex flex-col items-center justify-center space-y-2">
@@ -102,8 +105,8 @@ const RoomStatusManagement = ({ roomStatuses, setIsRoomStatusModalOpen, onEdit, 
                     <span
                       className="rounded-lg border border-slate-100 px-3 py-1 text-xs font-bold tracking-wide shadow-sm dark:border-slate-700"
                       style={{
-                        backgroundColor: `${status.roomStatusColor}15`,
-                        color: status.roomStatusColor || '#64748b',
+                        backgroundColor: status.roomStatusColor || '#e2e8f0',
+                        color: status.roomStatusTextColor || '#1e293b',
                       }}
                     >
                       {status.roomStatusTitle || 'Untitled State'}
@@ -117,6 +120,17 @@ const RoomStatusManagement = ({ roomStatuses, setIsRoomStatusModalOpen, onEdit, 
                       />
                       <span className="font-mono text-[10px] font-bold text-slate-400 uppercase">
                         {status.roomStatusColor || 'N/A'}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="border-r border-slate-100 px-8 py-2 text-center dark:border-slate-800">
+                    <div className="inline-flex items-center gap-2 rounded-lg border border-slate-100 bg-slate-50 px-3 py-1 dark:border-slate-700 dark:bg-slate-800">
+                      <div
+                        className="h-3 w-3 rounded-full shadow-sm"
+                        style={{ backgroundColor: status.roomStatusTextColor }}
+                      />
+                      <span className="font-mono text-[10px] font-bold text-slate-400 uppercase">
+                        {status.roomStatusTextColor || 'N/A'}
                       </span>
                     </div>
                   </td>

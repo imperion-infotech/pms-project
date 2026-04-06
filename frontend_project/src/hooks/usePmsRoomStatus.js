@@ -55,6 +55,19 @@ export const usePmsRoomStatus = () => {
     [fetchRoomStatuses, toast],
   )
 
+  const getRoomStatusById = useCallback(
+    async (id) => {
+      try {
+        const res = await propertyService.getRoomStatusById(id)
+        return res.data
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to fetch room status details')
+        throw err
+      }
+    },
+    [toast],
+  )
+
   const deleteRoomStatus = useCallback(
     async (id) => {
       try {
@@ -89,6 +102,7 @@ export const usePmsRoomStatus = () => {
     roomStatuses,
     isLoading,
     fetchRoomStatuses,
+    getRoomStatusById,
     addRoomStatus,
     updateRoomStatus,
     deleteRoomStatus,

@@ -107,6 +107,30 @@ export const RoomStatusEditModal = ({
               />
             </div>
           </div>
+          <div>
+            <label className="mb-1.5 block text-xs font-bold text-slate-500 uppercase dark:text-slate-400">
+              Status Text Color
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={editRoomStatus.roomStatusTextColor}
+                onChange={(e) =>
+                  setEditRoomStatus({ ...editRoomStatus, roomStatusTextColor: e.target.value })
+                }
+                className="h-10 w-12 shrink-0 cursor-pointer rounded-lg border border-slate-200 bg-slate-50 p-1 dark:border-slate-700 dark:bg-slate-800/50"
+              />
+              <input
+                type="text"
+                value={editRoomStatus.roomStatusTextColor}
+                onChange={(e) =>
+                  setEditRoomStatus({ ...editRoomStatus, roomStatusTextColor: e.target.value })
+                }
+                placeholder="#ffffff"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 font-mono text-sm transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200"
+              />
+            </div>
+          </div>
           <div className="flex gap-3 pt-2">
             <button
               type="button"

@@ -53,6 +53,7 @@ export const propertyService = {
 
   // --- ROOM STATUS MANAGEMENT ---
   getRoomStatuses: () => handleResponse(() => api.get('/user/getroomstatuses')),
+  getRoomStatusById: (id) => handleResponse(() => api.get(`/user/getroomstatus/${id}`)),
   createRoomStatus: (data) => handleResponse(() => api.post('/admin/createroomstatus', data)),
   updateRoomStatus: (id, data) =>
     handleResponse(() => api.put(`/admin/updateroomstatus/${id}`, data)),

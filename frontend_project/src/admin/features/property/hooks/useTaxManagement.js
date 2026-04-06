@@ -6,25 +6,29 @@ import { useState, useCallback } from 'react'
 export const useTaxManagement = ({ addTax, updateTax, toggleModal }) => {
   const [newTax, setNewTax] = useState({
     taxMasterName: '',
-    taxTypeEnum: 'STANDARD',
+    taxTypeEnum: 'Occupancy_tax',
     perDayTax: false,
     perStayTax: false,
   })
   const [editTax, setEditTax] = useState({
     id: null,
     taxMasterName: '',
-    taxTypeEnum: 'STANDARD',
+    taxTypeEnum: 'Occupancy_tax',
     perDayTax: false,
     perStayTax: false,
+    createdOn: '',
   })
 
   const handleAddTax = useCallback(async () => {
     if (!newTax.taxMasterName.trim()) return
     try {
-      await addTax(newTax)
+      await addTax({
+        ...newTax,
+        createdOn: new Date().toISOString(),
+      })
       setNewTax({
         taxMasterName: '',
-        taxTypeEnum: 'STANDARD',
+        taxTypeEnum: 'Occupancy_tax',
         perDayTax: false,
         perStayTax: false,
       })
@@ -37,7 +41,10 @@ export const useTaxManagement = ({ addTax, updateTax, toggleModal }) => {
   const handleUpdateTax = useCallback(async () => {
     if (!editTax.id || !editTax.taxMasterName.trim()) return
     try {
-      await updateTax(editTax.id, editTax)
+      await updateTax(editTax.id, {
+        ...editTax,
+        createdOn: editTax.createdOn || new Date().toISOString(),
+      })
       setEditTax({
         id: null,
         taxMasterName: '',

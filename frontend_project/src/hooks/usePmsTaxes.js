@@ -70,5 +70,42 @@ export const usePmsTaxes = () => {
     [fetchTaxes, toast],
   )
 
-  return { taxes, isLoading, fetchTaxes, addTax, updateTax, deleteTax }
+  const getTaxMasterById = useCallback(
+    async (id) => {
+      try {
+        const res = await propertyService.getTaxMasterById(id)
+        return res.data
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to fetch tax details')
+        throw err
+      }
+    },
+    [toast],
+  )
+
+  const searchTaxMasters = useCallback(
+    async (query) => {
+      setIsLoading(true)
+      try {
+        const res = await propertyService.searchTaxMasters(query)
+        setTaxes(extractData(res))
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Tax search failed')
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [toast],
+  )
+
+  return {
+    taxes,
+    isLoading,
+    fetchTaxes,
+    getTaxMasterById,
+    addTax,
+    updateTax,
+    deleteTax,
+    searchTaxMasters,
+  }
 }
