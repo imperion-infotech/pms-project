@@ -1,6 +1,6 @@
 import React from 'react'
 
-const TemporalLogistics = ({ formData, handleChange }) => {
+const CheckInOutDetails = ({ formData, handleChange }) => {
   return (
     <div className="space-y-2 rounded-xl bg-slate-100/50 p-3 dark:bg-slate-800/40">
       <div className="flex items-center justify-between gap-2 overflow-x-auto">
@@ -59,4 +59,4 @@ const TemporalLogistics = ({ formData, handleChange }) => {
   )
 }
 
-export default TemporalLogistics
+export default CheckInOutDetails

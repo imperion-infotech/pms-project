@@ -1,6 +1,6 @@
 import React from 'react'
 import { Building } from 'lucide-react'
-import TemporalLogistics from './TemporalLogistics'
+import CheckInOutDetails from './CheckInOutDetails'
 import FinancialPlacement from './FinancialPlacement'
 
 /**
@@ -197,8 +197,8 @@ const StaySpecifications = ({
         </div>
       </div>
 
-      {/* Section 2: Temporal Logistics */}
-      <TemporalLogistics formData={formData} handleChange={handleChange} isDark={isDark} />
+      {/* Section 2: Temporal Logistics (Check In / Out) */}
+      <CheckInOutDetails formData={formData} handleChange={handleChange} isDark={isDark} />
 
       {/* Row 3: Financial Placement */}
       <FinancialPlacement formData={formData} handleChange={handleChange} isDark={isDark} />
