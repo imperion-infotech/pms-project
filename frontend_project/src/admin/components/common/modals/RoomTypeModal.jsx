@@ -1,72 +1,97 @@
-import { LayoutDashboard, X } from 'lucide-react';
+import { LayoutDashboard, X } from 'lucide-react'
 
-export const RoomTypeModal = ({ isRoomTypeModalOpen, setIsRoomTypeModalOpen, newRoomType, setNewRoomType, handleAddRoomType, roomTypes = [] }) => {
-  if (!isRoomTypeModalOpen) return null;
+export const RoomTypeModal = ({
+  isRoomTypeModalOpen,
+  setIsRoomTypeModalOpen,
+  newRoomType,
+  setNewRoomType,
+  handleAddRoomType,
+  roomTypes = [],
+}) => {
+  if (!isRoomTypeModalOpen) return null
 
-  const isDuplicate = roomTypes.some(rt => String(rt.roomTypeName).toLowerCase() === String(newRoomType.roomTypeName).toLowerCase());
+  const isDuplicate = roomTypes.some(
+    (rt) =>
+      String(rt.roomTypeName).toLowerCase() === String(newRoomType.roomTypeName).toLowerCase(),
+  )
 
   const onSubmit = (e) => {
-    e.preventDefault();
-    if (isDuplicate) return;
-    handleAddRoomType(e);
-  };
+    e.preventDefault()
+    if (isDuplicate) return
+    handleAddRoomType(e)
+  }
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
+        className="animate-in fade-in absolute inset-0 bg-slate-900/60 backdrop-blur-sm duration-300"
         onClick={() => setIsRoomTypeModalOpen(false)}
       ></div>
-      <div className="bg-white dark:bg-surface-100 rounded-2xl shadow-2xl w-full max-w-md relative z-10 overflow-hidden animate-in zoom-in-95 duration-300">
-        <div className="p-6 bg-surface-100 dark:bg-surface-100 text-white flex justify-between items-center">
+      <div className="dark:bg-surface-100 animate-in zoom-in-95 relative z-10 w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl duration-300">
+        <div className="bg-surface-100 dark:bg-surface-100 flex items-center justify-between p-6 text-white">
           <div className="flex items-center gap-3">
-            <LayoutDashboard className="w-6 h-6 text-emerald-400" />
+            <LayoutDashboard className="h-6 w-6 text-emerald-400" />
             <div>
-              <h3 className="font-bold text-lg">New Room Type</h3>
-              <p className="text-[10px] text-slate-400 uppercase tracking-widest">Add Room Type</p>
+              <h3 className="text-lg font-bold">New Room Type</h3>
+              <p className="text-[10px] tracking-widest text-slate-400 uppercase">Add Room Type</p>
             </div>
           </div>
-          <button onClick={() => setIsRoomTypeModalOpen(false)} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
-            <X className="w-5 h-5" />
+          <button
+            onClick={() => setIsRoomTypeModalOpen(false)}
+            className="rounded-lg p-1.5 transition-colors hover:bg-white/10"
+          >
+            <X className="h-5 w-5" />
           </button>
         </div>
-        <form onSubmit={onSubmit} className="p-6 flex flex-col gap-4">
+        <form onSubmit={onSubmit} className="flex flex-col gap-4 p-6">
           {/* Short Name */}
           <div>
-            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1.5">Short Name</label>
+            <label className="mb-1.5 block text-xs font-bold text-slate-500 uppercase dark:text-slate-400">
+              Short Name
+            </label>
             <input
               required
               type="text"
               value={newRoomType.shortName}
               onChange={(e) => setNewRoomType({ ...newRoomType, shortName: e.target.value })}
               placeholder="Short Name"
-              className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200"
             />
           </div>
           {/* Room Type Name */}
           <div>
-            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1.5">Room Type Name</label>
+            <label className="mb-1.5 block text-xs font-bold text-slate-500 uppercase dark:text-slate-400">
+              Room Type Name
+            </label>
             <input
               required
               type="text"
               value={newRoomType.roomTypeName}
               onChange={(e) => setNewRoomType({ ...newRoomType, roomTypeName: e.target.value })}
               placeholder="Room Type Name"
-              className={`w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border ${isDuplicate ? 'border-red-500 ring-2 ring-red-500/20 text-red-500' : 'border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all`}
+              className={`w-full border bg-slate-50 px-4 py-2.5 dark:bg-slate-800/50 ${isDuplicate ? 'border-red-500 text-red-500 ring-2 ring-red-500/20' : 'border-slate-200 text-slate-800 dark:border-slate-700 dark:text-slate-200'} rounded-xl text-sm transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none`}
             />
-            {isDuplicate && <p className="text-red-500 text-[10px] sm:text-xs mt-1.5 font-bold animate-in slide-in-from-top-1">Room Type Name already exists!</p>}
+            {isDuplicate && (
+              <p className="animate-in slide-in-from-top-1 mt-1.5 text-[10px] font-bold text-red-500 sm:text-xs">
+                Room Type Name already exists!
+              </p>
+            )}
           </div>
           {/* Price */}
           <div>
-            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1.5">Base Price (Per Night)</label>
+            <label className="mb-1.5 block text-xs font-bold text-slate-500 uppercase dark:text-slate-400">
+              Base Price (Per Night)
+            </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
+              <span className="absolute top-1/2 left-4 -translate-y-1/2 font-bold text-slate-400">
+                $
+              </span>
               <input
                 type="number"
                 value={newRoomType.price || ''}
                 onChange={(e) => setNewRoomType({ ...newRoomType, price: e.target.value })}
                 placeholder="0.00"
-                className="w-full pl-8 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-mono"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pr-4 pl-8 font-mono text-sm transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200"
               />
             </div>
           </div>
@@ -74,14 +99,14 @@ export const RoomTypeModal = ({ isRoomTypeModalOpen, setIsRoomTypeModalOpen, new
             <button
               type="button"
               onClick={() => setIsRoomTypeModalOpen(false)}
-              className="flex-1 py-2.5 text-sm font-bold text-slate-500 dark:hover:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl transition-all hover:bg-slate-50 dark:hover:bg-slate-800"
+              className="flex-1 rounded-xl border border-slate-200 py-2.5 text-sm font-bold text-slate-500 transition-all hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-300"
             >
               CANCEL
             </button>
             <button
               type="submit"
               disabled={isDuplicate || !newRoomType.roomTypeName}
-              className={`flex-2 py-2.5 text-white rounded-xl text-sm font-bold shadow-lg transition-all ${isDuplicate || !newRoomType.roomTypeName ? 'bg-slate-400 cursor-not-allowed shadow-none opacity-70' : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/10 active:scale-95'}`}
+              className={`flex-2 rounded-xl py-2.5 text-sm font-bold text-white shadow-lg transition-all ${isDuplicate || !newRoomType.roomTypeName ? 'cursor-not-allowed bg-slate-400 opacity-70 shadow-none' : 'bg-emerald-500 shadow-emerald-500/10 hover:bg-emerald-600 active:scale-95'}`}
             >
               {isDuplicate ? 'TYPE EXISTS' : 'SAVE ROOM TYPE'}
             </button>
@@ -89,5 +114,5 @@ export const RoomTypeModal = ({ isRoomTypeModalOpen, setIsRoomTypeModalOpen, new
         </form>
       </div>
     </div>
-  );
-};
+  )
+}

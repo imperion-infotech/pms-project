@@ -14,7 +14,8 @@ export const DocumentTypeEditModal = ({
   const isDuplicate = documentTypes.some(
     (d) =>
       String(d.documentTypeName).toLowerCase() ===
-        String(editDocType.documentTypeName).toLowerCase() && String(d.id) !== String(editDocType.id),
+        String(editDocType.documentTypeName).toLowerCase() &&
+      String(d.id) !== String(editDocType.id),
   )
 
   const onSubmit = (e) => {

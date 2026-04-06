@@ -116,7 +116,11 @@ export const PersonalDetailsEditModal = ({
                 <div className="group relative">
                   <div className="h-24 w-24 overflow-hidden rounded-[24px] border-4 border-slate-100 bg-white shadow-lg dark:border-blue-500/20 dark:bg-slate-800">
                     {photoSrc ? (
-                      <AuthImage src={photoSrc} alt="Preview" className="h-full w-full object-cover" />
+                      <AuthImage
+                        src={photoSrc}
+                        alt="Preview"
+                        className="h-full w-full object-cover"
+                      />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center bg-slate-50 text-slate-300 dark:bg-slate-900/50">
                         <User size={30} />
@@ -148,7 +152,8 @@ export const PersonalDetailsEditModal = ({
                           type="button"
                           onClick={() => {
                             setFormData({ ...formData, signature: '' })
-                            if (localPreviews.signature) URL.revokeObjectURL(localPreviews.signature)
+                            if (localPreviews.signature)
+                              URL.revokeObjectURL(localPreviews.signature)
                             setLocalPreviews((prev) => ({ ...prev, signature: null }))
                           }}
                           className="absolute -top-1 -right-1 rounded-full bg-red-100 p-1 text-red-500 shadow-sm transition-colors hover:bg-red-200"
@@ -173,7 +178,10 @@ export const PersonalDetailsEditModal = ({
                       />
                     </label>
                   </div>
-                  <button type="button" className="w-full rounded-xl bg-slate-100 py-1.5 text-[8px] font-black text-slate-500 uppercase dark:bg-slate-800">
+                  <button
+                    type="button"
+                    className="w-full rounded-xl bg-slate-100 py-1.5 text-[8px] font-black text-slate-500 uppercase dark:bg-slate-800"
+                  >
                     Update Sig
                   </button>
                 </div>
@@ -182,71 +190,98 @@ export const PersonalDetailsEditModal = ({
               {/* Personal Fields */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">First Name</label>
+                  <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">
+                    First Name
+                  </label>
                   <input
                     required
                     type="text"
                     value={formData.firstName}
                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                    className="w-full rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
+                    className="w-full rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">Last Name</label>
+                  <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">
+                    Last Name
+                  </label>
                   <input
                     required
                     type="text"
                     value={formData.lastName}
                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                    className="w-full rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
+                    className="w-full rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800"
                   />
                 </div>
                 <div className="col-span-2">
-                  <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">Company Name</label>
+                  <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">
+                    Company Name
+                  </label>
                   <div className="relative">
-                    <Building size={14} className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-300" />
+                    <Building
+                      size={14}
+                      className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-300"
+                    />
                     <input
                       type="text"
                       value={formData.companyName}
                       onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                      className="w-full rounded-xl bg-slate-50 py-2 pr-3 pl-9 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
+                      className="w-full rounded-xl bg-slate-50 py-2 pr-3 pl-9 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">Phone</label>
+                  <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">
+                    Phone
+                  </label>
                   <div className="relative">
-                    <Phone size={14} className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-300" />
+                    <Phone
+                      size={14}
+                      className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-300"
+                    />
                     <input
                       required
                       type="tel"
                       value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value, mobileNumber: e.target.value })}
-                      className="w-full rounded-xl bg-slate-50 py-2 pr-3 pl-9 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          phone: e.target.value,
+                          mobileNumber: e.target.value,
+                        })
+                      }
+                      className="w-full rounded-xl bg-slate-50 py-2 pr-3 pl-9 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">Email</label>
+                  <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">
+                    Email
+                  </label>
                   <div className="relative">
-                    <Mail size={14} className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-300" />
+                    <Mail
+                      size={14}
+                      className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-300"
+                    />
                     <input
                       required
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full rounded-xl bg-slate-50 py-2 pr-3 pl-9 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
+                      className="w-full rounded-xl bg-slate-50 py-2 pr-3 pl-9 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800"
                     />
                   </div>
                 </div>
                 <div className="col-span-2">
-                  <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">Address</label>
+                  <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">
+                    Address
+                  </label>
                   <textarea
                     required
                     rows="1"
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    className="w-full resize-none rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
+                    className="w-full resize-none rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800"
                   ></textarea>
                 </div>
               </div>
@@ -261,49 +296,63 @@ export const PersonalDetailsEditModal = ({
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">Doc Type</label>
+                    <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">
+                      Doc Type
+                    </label>
                     <select
                       value={formData.documentTypeId}
                       onChange={(e) => setFormData({ ...formData, documentTypeId: e.target.value })}
-                      className="w-full rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
+                      className="w-full rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800"
                     >
                       <option value="">Type</option>
                       {documentTypes?.map((type) => (
-                        <option key={type.id} value={type.id}>{type.documentTypeName}</option>
+                        <option key={type.id} value={type.id}>
+                          {type.documentTypeName}
+                        </option>
                       ))}
                     </select>
                   </div>
                   <div>
-                    <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">Number</label>
+                    <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">
+                      Number
+                    </label>
                     <input
                       type="text"
                       value={formData.documentNumber}
                       onChange={(e) => setFormData({ ...formData, documentNumber: e.target.value })}
-                      className="w-full rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
+                      className="w-full rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800"
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">Valid Till</label>
+                    <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">
+                      Valid Till
+                    </label>
                     <input
                       type="date"
                       value={formData.validTill}
                       onChange={(e) => setFormData({ ...formData, validTill: e.target.value })}
-                      className="w-full rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
+                      className="w-full rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800"
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">Remark</label>
+                    <label className="mb-1 block text-[9px] font-black text-slate-400 uppercase">
+                      Remark
+                    </label>
                     <input
                       type="text"
                       value={formData.remark}
                       onChange={(e) => setFormData({ ...formData, remark: e.target.value })}
-                      className="w-full rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:border-slate-700"
+                      className="w-full rounded-xl bg-slate-50 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800"
                     />
                   </div>
                   <div className="col-span-2 grid grid-cols-2 gap-3">
                     <div className="relative rounded-xl border-2 border-dashed border-slate-100 bg-slate-50/50 p-2.5 text-center dark:border-slate-800 dark:bg-slate-800/30">
                       {formData.frontImagePath ? (
-                        <AuthImage src={`/user/${cleanImageUrl(formData.frontImagePath)}`} alt="Front" className="mx-auto h-16 rounded-lg" />
+                        <AuthImage
+                          src={`/user/${cleanImageUrl(formData.frontImagePath)}`}
+                          alt="Front"
+                          className="mx-auto h-16 rounded-lg"
+                        />
                       ) : (
                         <div className="py-1">
                           <Camera size={16} className="mx-auto mb-0.5 text-slate-300" />
@@ -312,12 +361,20 @@ export const PersonalDetailsEditModal = ({
                       )}
                       <label className="mt-1.5 block w-full cursor-pointer rounded-lg bg-white py-1 text-[8px] font-black text-slate-500 uppercase shadow-sm dark:bg-slate-800">
                         Update
-                        <input type="file" className="hidden" onChange={(e) => handleFileUpload(e, 'front')} />
+                        <input
+                          type="file"
+                          className="hidden"
+                          onChange={(e) => handleFileUpload(e, 'front')}
+                        />
                       </label>
                     </div>
                     <div className="relative rounded-xl border-2 border-dashed border-slate-100 bg-slate-50/50 p-2.5 text-center dark:border-slate-800 dark:bg-slate-800/30">
                       {formData.backImagePath ? (
-                        <AuthImage src={`/user/${cleanImageUrl(formData.backImagePath)}`} alt="Back" className="mx-auto h-16 rounded-lg" />
+                        <AuthImage
+                          src={`/user/${cleanImageUrl(formData.backImagePath)}`}
+                          alt="Back"
+                          className="mx-auto h-16 rounded-lg"
+                        />
                       ) : (
                         <div className="py-1">
                           <Camera size={16} className="mx-auto mb-0.5 text-slate-300" />
@@ -326,7 +383,11 @@ export const PersonalDetailsEditModal = ({
                       )}
                       <label className="mt-1.5 block w-full cursor-pointer rounded-lg bg-white py-1 text-[8px] font-black text-slate-500 uppercase shadow-sm dark:bg-slate-800">
                         Update
-                        <input type="file" className="hidden" onChange={(e) => handleFileUpload(e, 'back')} />
+                        <input
+                          type="file"
+                          className="hidden"
+                          onChange={(e) => handleFileUpload(e, 'back')}
+                        />
                       </label>
                     </div>
                   </div>

@@ -3,11 +3,7 @@ import { useState, useCallback } from 'react'
 /**
  * useFloorManagement - Centralized hook for Floor CRUD operations.
  */
-export const useFloorManagement = ({ 
-  addFloor, 
-  updateFloor, 
-  toggleModal 
-}) => {
+export const useFloorManagement = ({ addFloor, updateFloor, toggleModal }) => {
   const [newFloor, setNewFloor] = useState({ name: '', description: '' })
   const [editFloor, setEditFloor] = useState({ id: null, name: '', description: '' })
 
@@ -36,14 +32,17 @@ export const useFloorManagement = ({
     }
   }, [editFloor, updateFloor, toggleModal])
 
-  const handleEditFloor = useCallback((floor) => {
-    setEditFloor({
-      id: floor.id,
-      name: floor.name || '',
-      description: floor.description || '',
-    })
-    toggleModal('floorEdit', true)
-  }, [toggleModal])
+  const handleEditFloor = useCallback(
+    (floor) => {
+      setEditFloor({
+        id: floor.id,
+        name: floor.name || '',
+        description: floor.description || '',
+      })
+      toggleModal('floorEdit', true)
+    },
+    [toggleModal],
+  )
 
   return {
     newFloor,

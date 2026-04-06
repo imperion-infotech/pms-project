@@ -1,76 +1,87 @@
-import React from 'react';
+import React from 'react'
 import {
-  CheckCircle2, Layers, Menu, LogOut, ChevronDown, ChevronUp, LayoutDashboard, Building
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { useSidebar } from '../../../context/SidebarContext';
+  CheckCircle2,
+  Layers,
+  Menu,
+  LogOut,
+  ChevronDown,
+  ChevronUp,
+  LayoutDashboard,
+  Building,
+} from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
+import { useSidebar } from '../../../context/SidebarContext'
 
 /**
  * UserSidebar component - Matches exactly with the Admin Dashboard Sidebar.
  * Displays fetched room types and room statuses as nested accordion lists.
  */
-const UserSidebar = ({
-  buildings = [],
-  roomTypes = [],
-  roomStatuses = [],
-  onGoToPms
-}) => {
-  const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
-  const [isBuildingMenuOpen, setIsBuildingMenuOpen] = React.useState(true);
-  const [isTypeMenuOpen, setIsTypeMenuOpen] = React.useState(true);
-  const [isStatusMenuOpen, setIsStatusMenuOpen] = React.useState(true);
-  const navigate = useNavigate();
+const UserSidebar = ({ buildings = [], roomTypes = [], roomStatuses = [], onGoToPms }) => {
+  const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
+  const [isBuildingMenuOpen, setIsBuildingMenuOpen] = React.useState(true)
+  const [isTypeMenuOpen, setIsTypeMenuOpen] = React.useState(true)
+  const [isStatusMenuOpen, setIsStatusMenuOpen] = React.useState(true)
+  const navigate = useNavigate()
 
   return (
     <>
       {/* Mobile Overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
+          className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         ></div>
       )}
 
       <aside
-        className={`bg-surface-100 text-white flex flex-col shrink-0 shadow-2xl z-50 transition-all duration-300 ease-in-out w-64 fixed lg:static h-full lg:h-auto ${isSidebarOpen ? 'ml-0' : '-ml-64'
-          }`}
+        className={`bg-surface-100 fixed z-50 flex h-full w-64 shrink-0 flex-col text-white shadow-2xl transition-all duration-300 ease-in-out lg:static lg:h-auto ${
+          isSidebarOpen ? 'ml-0' : '-ml-64'
+        }`}
       >
-        <div className="p-4 flex items-center justify-between border-b border-slate-700/50">
+        <div className="flex items-center justify-between border-b border-slate-700/50 p-4">
           <div className="flex items-center gap-3 overflow-hidden">
             <Menu
-              className="w-5 h-5 cursor-pointer text-slate-400 hover:text-white transition-colors"
+              className="h-5 w-5 cursor-pointer text-slate-400 transition-colors hover:text-white"
               onClick={() => setIsSidebarOpen(false)}
             />
-            <span className="font-semibold text-sm whitespace-nowrap uppercase tracking-widest">Imperion Engine</span>
+            <span className="text-sm font-semibold tracking-widest whitespace-nowrap uppercase">
+              Imperion Engine
+            </span>
           </div>
         </div>
 
-        <nav className="flex-1 flex flex-col py-0 overflow-hidden">
-          <div className="flex-1 overflow-y-auto custom-scrollbar py-4">
+        <nav className="flex flex-1 flex-col overflow-hidden py-0">
+          <div className="custom-scrollbar flex-1 overflow-y-auto py-4">
             {/* Go to Dashboard Button */}
             <button
               onClick={onGoToPms}
-              className={`w-full flex items-center gap-3 px-4 py-3 mb-1 transition-all font-semibold text-sm relative text-slate-300 hover:bg-slate-700/60 hover:text-white`}
+              className={`relative mb-1 flex w-full items-center gap-3 px-4 py-3 text-sm font-semibold text-slate-300 transition-all hover:bg-slate-700/60 hover:text-white`}
               style={{ borderRadius: '0' }}
             >
-              <LayoutDashboard className={`w-5 h-5 text-emerald-400`} />
+              <LayoutDashboard className={`h-5 w-5 text-emerald-400`} />
               <span>Go to Dashboard</span>
             </button>
 
-            <div className="border-t border-slate-700/40 my-2"></div>
+            <div className="my-2 border-t border-slate-700/40"></div>
 
             {/* BUILDINGS ACCORDION */}
             <div>
               <button
                 onClick={() => setIsBuildingMenuOpen(!isBuildingMenuOpen)}
-                className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-800 transition-colors group"
+                className="group flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-slate-800"
               >
                 <div className="flex items-center gap-3">
-                  <Building className="w-5 h-5 text-emerald-400" />
-                  <span className="text-sm font-medium text-slate-300 group-hover:text-white">Buildings</span>
+                  <Building className="h-5 w-5 text-emerald-400" />
+                  <span className="text-sm font-medium text-slate-300 group-hover:text-white">
+                    Buildings
+                  </span>
                 </div>
-                {isBuildingMenuOpen ? <ChevronUp className="w-4 h-4 opacity-50 text-slate-400 group-hover:text-white" /> : <ChevronDown className="w-4 h-4 opacity-50 text-slate-400 group-hover:text-white" />}
+                {isBuildingMenuOpen ? (
+                  <ChevronUp className="h-4 w-4 text-slate-400 opacity-50 group-hover:text-white" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 text-slate-400 opacity-50 group-hover:text-white" />
+                )}
               </button>
 
               <AnimatePresence>
@@ -79,17 +90,24 @@ const UserSidebar = ({
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    className="overflow-hidden bg-[#111827] py-1 border-y border-slate-800/50"
+                    className="overflow-hidden border-y border-slate-800/50 bg-[#111827] py-1"
                   >
-                    {buildings.map(building => (
-                      <div key={building.id} className={`w-full flex items-center justify-between px-6 py-2.5 text-xs font-medium transition-all relative text-slate-400 hover:text-white hover:bg-slate-800/30 group`}>
+                    {buildings.map((building) => (
+                      <div
+                        key={building.id}
+                        className={`group relative flex w-full items-center justify-between px-6 py-2.5 text-xs font-medium text-slate-400 transition-all hover:bg-slate-800/30 hover:text-white`}
+                      >
                         <span className="capitalize">{building.name}</span>
-                        <span className="text-[10px] font-bold bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase">
+                        <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] font-bold whitespace-nowrap text-slate-500 uppercase opacity-0 transition-opacity group-hover:opacity-100">
                           {building.location || 'Main'}
                         </span>
                       </div>
                     ))}
-                    {buildings.length === 0 && <span className="block px-6 py-3 text-[11px] text-slate-600 italic font-medium">No buildings found.</span>}
+                    {buildings.length === 0 && (
+                      <span className="block px-6 py-3 text-[11px] font-medium text-slate-600 italic">
+                        No buildings found.
+                      </span>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -99,13 +117,19 @@ const UserSidebar = ({
             <div>
               <button
                 onClick={() => setIsTypeMenuOpen(!isTypeMenuOpen)}
-                className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-800 transition-colors group"
+                className="group flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-slate-800"
               >
                 <div className="flex items-center gap-3">
-                  <Layers className="w-5 h-5 text-emerald-400" />
-                  <span className="text-sm font-medium text-slate-300 group-hover:text-white">Room Types</span>
+                  <Layers className="h-5 w-5 text-emerald-400" />
+                  <span className="text-sm font-medium text-slate-300 group-hover:text-white">
+                    Room Types
+                  </span>
                 </div>
-                {isTypeMenuOpen ? <ChevronUp className="w-4 h-4 opacity-50 text-slate-400 group-hover:text-white" /> : <ChevronDown className="w-4 h-4 opacity-50 text-slate-400 group-hover:text-white" />}
+                {isTypeMenuOpen ? (
+                  <ChevronUp className="h-4 w-4 text-slate-400 opacity-50 group-hover:text-white" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 text-slate-400 opacity-50 group-hover:text-white" />
+                )}
               </button>
 
               <AnimatePresence>
@@ -114,17 +138,24 @@ const UserSidebar = ({
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    className="overflow-hidden bg-[#111827] py-1 border-y border-slate-800/50"
+                    className="overflow-hidden border-y border-slate-800/50 bg-[#111827] py-1"
                   >
-                    {roomTypes.map(type => (
-                      <div key={type.id} className={`w-full flex items-center justify-between px-6 py-2.5 text-xs font-medium transition-all relative text-slate-400 hover:text-white hover:bg-slate-800/30 group`}>
+                    {roomTypes.map((type) => (
+                      <div
+                        key={type.id}
+                        className={`group relative flex w-full items-center justify-between px-6 py-2.5 text-xs font-medium text-slate-400 transition-all hover:bg-slate-800/30 hover:text-white`}
+                      >
                         <span className="capitalize">{type.roomTypeName}</span>
-                        <span className="text-[10px] font-bold bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                        <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] font-bold whitespace-nowrap text-slate-500 opacity-0 transition-opacity group-hover:opacity-100">
                           {type.shortName}
                         </span>
                       </div>
                     ))}
-                    {roomTypes.length === 0 && <span className="block px-6 py-3 text-[11px] text-slate-600 italic font-medium">No room types found.</span>}
+                    {roomTypes.length === 0 && (
+                      <span className="block px-6 py-3 text-[11px] font-medium text-slate-600 italic">
+                        No room types found.
+                      </span>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -134,13 +165,19 @@ const UserSidebar = ({
             <div>
               <button
                 onClick={() => setIsStatusMenuOpen(!isStatusMenuOpen)}
-                className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-800 transition-colors group"
+                className="group flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-slate-800"
               >
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                  <span className="text-sm font-medium text-slate-300 group-hover:text-white">Room Status</span>
+                  <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                  <span className="text-sm font-medium text-slate-300 group-hover:text-white">
+                    Room Status
+                  </span>
                 </div>
-                {isStatusMenuOpen ? <ChevronUp className="w-4 h-4 opacity-50 text-slate-400 group-hover:text-white" /> : <ChevronDown className="w-4 h-4 opacity-50 text-slate-400 group-hover:text-white" />}
+                {isStatusMenuOpen ? (
+                  <ChevronUp className="h-4 w-4 text-slate-400 opacity-50 group-hover:text-white" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 text-slate-400 opacity-50 group-hover:text-white" />
+                )}
               </button>
 
               <AnimatePresence>
@@ -149,42 +186,50 @@ const UserSidebar = ({
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    className="overflow-hidden bg-[#111827] py-1 border-y border-slate-800/50"
+                    className="overflow-hidden border-y border-slate-800/50 bg-[#111827] py-1"
                   >
-                    {roomStatuses.map(status => (
-                      <div key={status.id} className={`w-full flex items-center gap-3 px-6 py-2.5 text-xs font-medium transition-all relative text-slate-400 hover:text-white hover:bg-slate-800/30 group`}>
-                        <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: status.roomStatusColor || '#ef4444' }}></div>
-                        <span className="capitalize truncate w-full">{status.roomStatusName}</span>
+                    {roomStatuses.map((status) => (
+                      <div
+                        key={status.id}
+                        className={`group relative flex w-full items-center gap-3 px-6 py-2.5 text-xs font-medium text-slate-400 transition-all hover:bg-slate-800/30 hover:text-white`}
+                      >
+                        <div
+                          className="h-2 w-2 shrink-0 rounded-full"
+                          style={{ backgroundColor: status.roomStatusColor || '#ef4444' }}
+                        ></div>
+                        <span className="w-full truncate capitalize">{status.roomStatusName}</span>
                       </div>
                     ))}
-                    {roomStatuses.length === 0 && <span className="block px-6 py-3 text-[11px] text-slate-600 italic font-medium">No statuses found.</span>}
+                    {roomStatuses.length === 0 && (
+                      <span className="block px-6 py-3 text-[11px] font-medium text-slate-600 italic">
+                        No statuses found.
+                      </span>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
 
-            <div className="border-t border-slate-700/40 my-2"></div>
-
-
+            <div className="my-2 border-t border-slate-700/40"></div>
           </div>
 
-          <div className="mt-auto p-4 border-t border-slate-700/50">
+          <div className="mt-auto border-t border-slate-700/50 p-4">
             <button
               onClick={() => {
-                localStorage.removeItem('access_token');
-                localStorage.removeItem('refresh_token');
-                navigate('/login');
+                localStorage.removeItem('access_token')
+                localStorage.removeItem('refresh_token')
+                navigate('/login')
               }}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/10 text-slate-300 hover:text-red-400 transition-colors group"
+              className="group flex w-full items-center gap-3 rounded-xl px-4 py-3 text-slate-300 transition-colors hover:bg-red-500/10 hover:text-red-400"
             >
-              <LogOut className="w-5 h-5 text-slate-400 group-hover:text-red-400 transition-colors" />
-              <span className="font-semibold text-sm">Log Out</span>
+              <LogOut className="h-5 w-5 text-slate-400 transition-colors group-hover:text-red-400" />
+              <span className="text-sm font-semibold">Log Out</span>
             </button>
           </div>
         </nav>
       </aside>
     </>
-  );
-};
+  )
+}
 
-export default UserSidebar;
+export default UserSidebar

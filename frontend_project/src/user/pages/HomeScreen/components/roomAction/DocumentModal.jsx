@@ -358,11 +358,7 @@ const DocumentModal = ({
               className={`flex items-center gap-2 rounded-2xl bg-emerald-600 px-8 py-3 text-[10px] font-black tracking-widest text-white uppercase shadow-lg shadow-emerald-500/20 transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'hover:bg-emerald-700'}`}
             >
               {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : null}
-              {uploadingType
-                ? 'Uploading Assets...'
-                : docFormData.id
-                  ? 'Update'
-                  : 'Save Document'}
+              {uploadingType ? 'Uploading Assets...' : docFormData.id ? 'Update' : 'Save Document'}
             </button>
           </div>
         </motion.div>

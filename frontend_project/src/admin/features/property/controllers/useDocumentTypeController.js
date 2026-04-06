@@ -1,38 +1,38 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react'
 
 /**
  * Controller: useDocumentTypeController
  * Logic for managing document types.
  */
 const useDocumentTypeController = ({ documentTypes, onDelete }) => {
-  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null)
 
   const processedDocumentTypes = useMemo(() => {
-    return [...documentTypes];
-  }, [documentTypes]);
+    return [...documentTypes]
+  }, [documentTypes])
 
   const handleDeleteClick = (dt) => {
-    setDeleteTarget({ id: dt.id, name: dt.documentTypeName });
-  };
+    setDeleteTarget({ id: dt.id, name: dt.documentTypeName })
+  }
 
   const handleConfirmDelete = () => {
     if (deleteTarget?.id) {
-      onDelete(deleteTarget.id);
+      onDelete(deleteTarget.id)
     }
-    setDeleteTarget(null);
-  };
+    setDeleteTarget(null)
+  }
 
   const handleCancelDelete = () => {
-    setDeleteTarget(null);
-  };
+    setDeleteTarget(null)
+  }
 
   return {
     processedDocumentTypes,
     deleteTarget,
     handleDeleteClick,
     handleConfirmDelete,
-    handleCancelDelete
-  };
-};
+    handleCancelDelete,
+  }
+}
 
-export default useDocumentTypeController;
+export default useDocumentTypeController

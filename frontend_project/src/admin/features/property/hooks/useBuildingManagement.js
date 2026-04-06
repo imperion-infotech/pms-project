@@ -3,11 +3,7 @@ import { useState, useCallback } from 'react'
 /**
  * useBuildingManagement - Centralized hook for Building CRUD operations.
  */
-export const useBuildingManagement = ({ 
-  addBuilding, 
-  updateBuilding, 
-  toggleModal 
-}) => {
+export const useBuildingManagement = ({ addBuilding, updateBuilding, toggleModal }) => {
   const [newBuilding, setNewBuilding] = useState({ name: '', description: '' })
   const [editBuilding, setEditBuilding] = useState({ id: null, name: '', description: '' })
 
@@ -36,14 +32,17 @@ export const useBuildingManagement = ({
     }
   }, [editBuilding, updateBuilding, toggleModal])
 
-  const handleEditBuilding = useCallback((building) => {
-    setEditBuilding({
-      id: building.id,
-      name: building.name || '',
-      description: building.description || '',
-    })
-    toggleModal('buildingEdit', true)
-  }, [toggleModal])
+  const handleEditBuilding = useCallback(
+    (building) => {
+      setEditBuilding({
+        id: building.id,
+        name: building.name || '',
+        description: building.description || '',
+      })
+      toggleModal('buildingEdit', true)
+    },
+    [toggleModal],
+  )
 
   return {
     newBuilding,

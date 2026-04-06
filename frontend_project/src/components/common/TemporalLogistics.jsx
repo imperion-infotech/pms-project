@@ -4,9 +4,8 @@ const TemporalLogistics = ({ formData, handleChange }) => {
   return (
     <div className="space-y-2 rounded-xl bg-slate-100/50 p-3 dark:bg-slate-800/40">
       <div className="flex items-center justify-between gap-2 overflow-x-auto">
-        
         {/* CHECK-IN */}
-        <div className="flex items-center gap-1 rounded bg-white px-2 py-1 shadow-sm dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700">
+        <div className="flex items-center gap-1 rounded border border-slate-200 bg-white px-2 py-1 shadow-sm dark:border-slate-700 dark:bg-slate-900/50">
           <input
             type="date"
             name="checkInDate"
@@ -38,7 +37,7 @@ const TemporalLogistics = ({ formData, handleChange }) => {
         </div>
 
         {/* CHECK-OUT */}
-        <div className="flex items-center gap-1 rounded bg-white px-2 py-1 shadow-sm dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700">
+        <div className="flex items-center gap-1 rounded border border-slate-200 bg-white px-2 py-1 shadow-sm dark:border-slate-700 dark:bg-slate-900/50">
           <input
             type="date"
             name="checkOutDate"
@@ -55,7 +54,6 @@ const TemporalLogistics = ({ formData, handleChange }) => {
             step="1"
           />
         </div>
-
       </div>
     </div>
   )

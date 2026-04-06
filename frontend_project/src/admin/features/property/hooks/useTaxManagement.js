@@ -3,11 +3,7 @@ import { useState, useCallback } from 'react'
 /**
  * useTaxManagement - Centralized hook for Tax CRUD operations.
  */
-export const useTaxManagement = ({ 
-  addTax, 
-  updateTax, 
-  toggleModal 
-}) => {
+export const useTaxManagement = ({ addTax, updateTax, toggleModal }) => {
   const [newTax, setNewTax] = useState({
     taxMasterName: '',
     taxTypeEnum: 'STANDARD',
@@ -55,10 +51,13 @@ export const useTaxManagement = ({
     }
   }, [editTax, updateTax, toggleModal])
 
-  const handleEditTax = useCallback((tax) => {
-    setEditTax({ ...tax })
-    toggleModal('taxEdit', true)
-  }, [toggleModal])
+  const handleEditTax = useCallback(
+    (tax) => {
+      setEditTax({ ...tax })
+      toggleModal('taxEdit', true)
+    },
+    [toggleModal],
+  )
 
   return {
     newTax,

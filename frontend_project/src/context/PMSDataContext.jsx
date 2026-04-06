@@ -1,18 +1,18 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { propertyService } from '../services/propertyService';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react'
+import { propertyService } from '../services/propertyService'
 
-const PMSDataContext = createContext();
+const PMSDataContext = createContext()
 
 export const usePMSDataState = () => {
-  const context = useContext(PMSDataContext);
+  const context = useContext(PMSDataContext)
   if (!context) {
-    throw new Error('usePMSDataState must be used within a PMSDataProvider');
+    throw new Error('usePMSDataState must be used within a PMSDataProvider')
   }
-  return context;
-};
+  return context
+}
 
-const extractData = (res) => res?.data?.content || (Array.isArray(res?.data) ? res.data : []);
+const extractData = (res) => res?.data?.content || (Array.isArray(res?.data) ? res.data : [])
 
 /**
  * PMSDataProvider - Centralized state for all PMS entities.
@@ -31,30 +31,30 @@ export const PMSDataProvider = ({ children }) => {
     stayDetails: [],
     isLoading: false,
     error: null,
-  });
+  })
 
   const updateEntityState = useCallback((entity, data) => {
-    setState((prev) => ({ ...prev, [entity]: data }));
-  }, []);
+    setState((prev) => ({ ...prev, [entity]: data }))
+  }, [])
 
   const setLoading = useCallback((val) => {
-    setState((prev) => ({ ...prev, isLoading: val }));
-  }, []);
+    setState((prev) => ({ ...prev, isLoading: val }))
+  }, [])
 
   const fetchEntity = useCallback(async (apiCall, entityName, stateKey) => {
     try {
-      const res = await apiCall();
-      const data = extractData(res);
-      setState((prev) => ({ ...prev, [stateKey]: data }));
-      return data;
+      const res = await apiCall()
+      const data = extractData(res)
+      setState((prev) => ({ ...prev, [stateKey]: data }))
+      return data
     } catch (err) {
-      console.error(`Failed to fetch ${entityName}:`, err);
-      return [];
+      console.error(`Failed to fetch ${entityName}:`, err)
+      return []
     }
-  }, []);
+  }, [])
 
   const fetchAllData = useCallback(async () => {
-    setLoading(true);
+    setLoading(true)
     try {
       await Promise.all([
         fetchEntity(propertyService.getBuildings, 'Buildings', 'buildings'),
@@ -67,22 +67,25 @@ export const PMSDataProvider = ({ children }) => {
         fetchEntity(propertyService.getDocumentTypes, 'Doc Types', 'documentTypes'),
         fetchEntity(propertyService.getDocumentDetails, 'Doc Details', 'documentDetails'),
         fetchEntity(propertyService.getStayDetails, 'Stay Details', 'stayDetails'),
-      ]);
+      ])
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [fetchEntity, setLoading]);
+  }, [fetchEntity, setLoading])
 
   useEffect(() => {
-    fetchAllData();
-  }, [fetchAllData]);
+    fetchAllData()
+  }, [fetchAllData])
 
-  const value = {
-    ...state,
-    refreshAll: fetchAllData,
-    refreshEntity: fetchEntity,
-    updateEntityState,
-  };
+  const value = useMemo(
+    () => ({
+      ...state,
+      refreshAll: fetchAllData,
+      refreshEntity: fetchEntity,
+      updateEntityState,
+    }),
+    [state, fetchAllData, fetchEntity, updateEntityState],
+  )
 
-  return <PMSDataContext.Provider value={value}>{children}</PMSDataContext.Provider>;
-};
+  return <PMSDataContext.Provider value={value}>{children}</PMSDataContext.Provider>
+}

@@ -25,59 +25,71 @@ export const usePmsGuestDetails = () => {
     fetchGuestDetails()
   }, [fetchGuestDetails])
 
-  const addGuestDetail = useCallback(async (payload) => {
-    try {
-      const res = await propertyService.createGuestDetail(payload)
-      toast.success('Guest detail created')
-      fetchGuestDetails()
-      return res
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to create guest detail')
-      throw err
-    }
-  }, [fetchGuestDetails, toast])
+  const addGuestDetail = useCallback(
+    async (payload) => {
+      try {
+        const res = await propertyService.createGuestDetail(payload)
+        toast.success('Guest detail created')
+        fetchGuestDetails()
+        return res
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to create guest detail')
+        throw err
+      }
+    },
+    [fetchGuestDetails, toast],
+  )
 
-  const updateGuestDetail = useCallback(async (id, payload) => {
-    try {
-      const res = await propertyService.updateGuestDetail(id, payload)
-      toast.success('Guest detail updated')
-      fetchGuestDetails()
-      return res
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to update guest detail')
-      throw err
-    }
-  }, [fetchGuestDetails, toast])
+  const updateGuestDetail = useCallback(
+    async (id, payload) => {
+      try {
+        const res = await propertyService.updateGuestDetail(id, payload)
+        toast.success('Guest detail updated')
+        fetchGuestDetails()
+        return res
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to update guest detail')
+        throw err
+      }
+    },
+    [fetchGuestDetails, toast],
+  )
 
-  const deleteGuestDetail = useCallback(async (id) => {
-    try {
-      const res = await propertyService.deleteGuestDetail(id)
-      toast.success('Guest detail deleted successfully')
-      fetchGuestDetails()
-      return res
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to delete guest detail')
-      throw err
-    }
-  }, [fetchGuestDetails, toast])
+  const deleteGuestDetail = useCallback(
+    async (id) => {
+      try {
+        const res = await propertyService.deleteGuestDetail(id)
+        toast.success('Guest detail deleted successfully')
+        fetchGuestDetails()
+        return res
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to delete guest detail')
+        throw err
+      }
+    },
+    [fetchGuestDetails, toast],
+  )
 
-  const fetchGuestDetailById = useCallback(async (id) => {
-    try {
-      const res = await propertyService.getGuestDetailById(id)
-      return res
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to fetch guest detail')
-      throw err
-    }
-  }, [toast])
+  const fetchGuestDetailById = useCallback(
+    async (id) => {
+      try {
+        const res = await propertyService.getGuestDetailById(id)
+        return res
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to fetch guest detail')
+        throw err
+      }
+    },
+    [toast],
+  )
 
-  return { 
-    guestDetails, 
-    isLoading, 
-    fetchGuestDetails, 
-    fetchGuestDetailById, 
-    addGuestDetail, 
-    updateGuestDetail, 
-    deleteGuestDetail 
+  return {
+    guestDetails,
+    isLoading,
+    fetchGuestDetails,
+    fetchGuestDetailById,
+    addGuestDetail,
+    updateGuestDetail,
+    deleteGuestDetail,
   }
 }

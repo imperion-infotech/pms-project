@@ -133,7 +133,7 @@ const DashboardRouter = ({
           itemsPerPage={itemsPerPage}
         />
       )
-      case 'Personal Detail':
+    case 'Personal Detail':
       return (
         <PersonalDetailManagement
           details={personalDetails}

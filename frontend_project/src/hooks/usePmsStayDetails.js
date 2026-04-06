@@ -10,7 +10,7 @@ export const usePmsStayDetails = () => {
       delete: propertyService.deleteStayDetail,
     },
     'Stay Details',
-    false
+    false,
   )
   return {
     stayDetails: data,

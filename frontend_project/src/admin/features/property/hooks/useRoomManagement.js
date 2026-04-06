@@ -3,17 +3,17 @@ import { useToast } from '../../../../context/NotificationContext'
 
 /**
  * useRoomManagement - Room se judi saari logic aur state ko handle karne ke liye.
- * 
+ *
  * Ye hook Room create karne, update karne aur form state manage karne ka kaam karta hai.
  * Isse PmsDashboard.jsx ki complexity kam ho jati hai.
  */
-export const useRoomManagement = ({ 
-  floors, 
+export const useRoomManagement = ({
+  floors,
   roomTypes = [],
   roomStatuses = [],
-  addRoom, 
-  updateRoom, 
-  toggleModal 
+  addRoom,
+  updateRoom,
+  toggleModal,
 }) => {
   const toast = useToast()
 
@@ -52,7 +52,7 @@ export const useRoomManagement = ({
   const handleAddRoom = async (e) => {
     e.preventDefault()
     const isNonRoom = Boolean(newRoom.nonRoom)
-    
+
     // Validation: Required fields check
     if (
       !newRoom.roomName ||
@@ -67,18 +67,30 @@ export const useRoomManagement = ({
     const selectedFloor = floors.find((f) => String(f.id) === String(newRoom.floorId))
 
     // Find fallback IDs for Non-room utility spaces if none selected
-    const nonRoomType = roomTypes.find(rt => (rt.roomTypeName || '').toLowerCase().includes('non-room') || (rt.roomTypeName || '').toLowerCase().includes('utility')) || roomTypes[0];
-    const nonRoomStatus = roomStatuses.find(rs => (rs.roomStatusName || '').toLowerCase().includes('non-room') || (rs.roomStatusName || '').toLowerCase().includes('n/a')) || roomStatuses[0];
+    const nonRoomType =
+      roomTypes.find(
+        (rt) =>
+          (rt.roomTypeName || '').toLowerCase().includes('non-room') ||
+          (rt.roomTypeName || '').toLowerCase().includes('utility'),
+      ) || roomTypes[0]
+    const nonRoomStatus =
+      roomStatuses.find(
+        (rs) =>
+          (rs.roomStatusName || '').toLowerCase().includes('non-room') ||
+          (rs.roomStatusName || '').toLowerCase().includes('n/a'),
+      ) || roomStatuses[0]
 
     // Prepare payload matching the backend schema
     const payload = {
       roomName: newRoom.roomName,
       roomShortName: newRoom.roomName,
-      roomTypeId: isNonRoom ? (nonRoomType?.id || 0) : (Number(newRoom.roomTypeId) || 0),
+      roomTypeId: isNonRoom ? nonRoomType?.id || 0 : Number(newRoom.roomTypeId) || 0,
       floorId: Number(newRoom.floorId),
       buildingId: Number(newRoom.buildingId),
-      roomStatusId: isNonRoom ? (nonRoomStatus?.id || 0) : (Number(newRoom.roomStatusTableId) || 0),
-      roomStatus: newRoom.roomStatus || (isNonRoom ? 'NON-ROOM' : (nonRoomStatus?.roomStatusName || 'Available')),
+      roomStatusId: isNonRoom ? nonRoomStatus?.id || 0 : Number(newRoom.roomStatusTableId) || 0,
+      roomStatus:
+        newRoom.roomStatus ||
+        (isNonRoom ? 'NON-ROOM' : nonRoomStatus?.roomStatusName || 'Available'),
       name: selectedFloor ? selectedFloor.name : newRoom.roomName,
       smoking: Boolean(newRoom.smoking),
       handicap: Boolean(newRoom.handicap),
@@ -111,7 +123,7 @@ export const useRoomManagement = ({
   const handleUpdateRoom = async (e) => {
     e.preventDefault()
     const isNonRoom = Boolean(editRoom.nonRoom)
-    
+
     // Validation
     if (
       !editRoom.roomName ||
@@ -123,17 +135,21 @@ export const useRoomManagement = ({
       return
     }
 
-    const nonRoomType = roomTypes.find(rt => (rt.roomTypeName || '').toLowerCase().includes('non-room')) || roomTypes[0];
-    const nonRoomStatus = roomStatuses.find(rs => (rs.roomStatusName || '').toLowerCase().includes('non-room')) || roomStatuses[0];
+    const nonRoomType =
+      roomTypes.find((rt) => (rt.roomTypeName || '').toLowerCase().includes('non-room')) ||
+      roomTypes[0]
+    const nonRoomStatus =
+      roomStatuses.find((rs) => (rs.roomStatusName || '').toLowerCase().includes('non-room')) ||
+      roomStatuses[0]
 
     const payload = {
       id: editRoom.id,
       roomName: editRoom.roomName,
       roomShortName: editRoom.roomName,
-      roomTypeId: isNonRoom ? (nonRoomType?.id || 0) : (Number(editRoom.roomTypeId) || 0),
+      roomTypeId: isNonRoom ? nonRoomType?.id || 0 : Number(editRoom.roomTypeId) || 0,
       floorId: Number(editRoom.floorId),
       buildingId: Number(editRoom.buildingId),
-      roomStatusId: isNonRoom ? (nonRoomStatus?.id || 0) : (Number(editRoom.roomStatusTableId) || 0),
+      roomStatusId: isNonRoom ? nonRoomStatus?.id || 0 : Number(editRoom.roomStatusTableId) || 0,
       roomStatus: editRoom.roomStatus || (isNonRoom ? 'NON-ROOM' : 'Available'),
       name: editRoom.name || editRoom.roomName,
       smoking: Boolean(editRoom.smoking),
@@ -169,7 +185,7 @@ export const useRoomManagement = ({
           (rt.roomTypeName || rt.shortName) === r.roomType ||
           (rt.roomTypeName || rt.shortName) === r.roomTypeName,
       )?.id
-      
+
     const finalStatusId =
       rStatusId ||
       allRoomStatuses.find(

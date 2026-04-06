@@ -10,7 +10,7 @@ export const usePmsRentDetails = () => {
       delete: propertyService.deleteRentDetail,
     },
     'Rent Details',
-    false
+    false,
   )
   return {
     rentDetails: data,

@@ -235,14 +235,13 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
   const inputClass =
     'bg-transparent border-none outline-none w-full text-xs font-bold text-slate-800 dark:text-slate-100 placeholder:text-slate-300'
 
-
   // Handle generic input changes with hierarchical resets
   const handleChange = (e) => {
     const { name, value } = e.target
-    
+
     setFormData((prev) => {
       const updated = { ...prev, [name]: value }
-      
+
       // Hierarchical resets:
       if (name === 'buildingId') {
         updated.floorId = ''
@@ -254,7 +253,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
       } else if (name === 'roomTypeId') {
         updated.roomMasterId = ''
       }
-      
+
       return updated
     })
   }
@@ -383,7 +382,11 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
         comment: formData.comment,
         rateTypeEnum: formData.rateTypeEnum || 'RACK',
         noOfGuest: Number(formData.noOfGuest) || 1,
-        stayStatusEnum: forcedStatusName ? (forcedStatusName.toLowerCase().includes('reserv') ? 'RESERVED' : 'CONFIRMED') : formData.stayStatusEnum,
+        stayStatusEnum: forcedStatusName
+          ? forcedStatusName.toLowerCase().includes('reserv')
+            ? 'RESERVED'
+            : 'CONFIRMED'
+          : formData.stayStatusEnum,
         personalDetailId: finalProfileId,
       }
       await addStayDetail(stayPayload)
@@ -480,7 +483,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                   <div className="space-y-4">
                     {/* Guest Assets: Smaller and Horizontal */}
                     <div className="grid grid-cols-2 gap-3">
-                       <ImageUpload
+                      <ImageUpload
                         label="Photo"
                         value={formData.profilePhoto}
                         icon={User}
@@ -516,7 +519,9 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
 
                     <div className="flex items-center gap-2 border-l-4 border-emerald-500 pl-3">
                       <div>
-                        <h3 className={`text-[11px] font-black tracking-widest uppercase ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                        <h3
+                          className={`text-[11px] font-black tracking-widest uppercase ${isDark ? 'text-slate-200' : 'text-slate-800'}`}
+                        >
                           Guest Details
                         </h3>
                         <p className="mt-0.5 text-[8px] font-bold tracking-widest text-slate-400 uppercase">
@@ -584,7 +589,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                               placeholder="Phone"
                               className={inputClass}
                               required
-                              />
+                            />
                           </div>
                         </div>
                         <div>
@@ -622,7 +627,9 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                     <div className="space-y-4">
                       <div className="flex items-center justify-between gap-3 border-l-4 border-emerald-500 pl-3">
                         <div>
-                          <h3 className={`text-[11px] font-black tracking-widest uppercase ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                          <h3
+                            className={`text-[11px] font-black tracking-widest uppercase ${isDark ? 'text-slate-200' : 'text-slate-800'}`}
+                          >
                             Documentation
                           </h3>
                           <p className="mt-0.5 text-[8px] font-bold tracking-widest text-slate-400 uppercase">
@@ -637,10 +644,14 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                           <Plus size={18} />
                         </button>
                       </div>
-                      <div className={`overflow-hidden rounded-2xl border ${isDark ? 'border-slate-800 bg-slate-900/30' : 'border-slate-100 bg-white'}`}>
+                      <div
+                        className={`overflow-hidden rounded-2xl border ${isDark ? 'border-slate-800 bg-slate-900/30' : 'border-slate-100 bg-white'}`}
+                      >
                         <table className="w-full text-left font-bold">
                           <thead>
-                            <tr className={`text-[10px] font-black tracking-widest text-slate-400 uppercase ${isDark ? 'bg-slate-900/50' : 'bg-slate-50'}`}>
+                            <tr
+                              className={`text-[10px] font-black tracking-widest text-slate-400 uppercase ${isDark ? 'bg-slate-900/50' : 'bg-slate-50'}`}
+                            >
                               <th className="px-4 py-3">Action</th>
                               <th className="px-4 py-3">Doc & Images</th>
                               <th className="px-4 py-3">Number & Details</th>
@@ -659,13 +670,24 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                                   (t) => String(t.id) === String(doc.documentTypeId),
                                 )
                                 return (
-                                  <tr key={doc.id || idx} className="group transition-colors hover:bg-emerald-50/10">
+                                  <tr
+                                    key={doc.id || idx}
+                                    className="group transition-colors hover:bg-emerald-50/10"
+                                  >
                                     <td className="px-4 py-3">
                                       <div className="flex gap-3">
-                                        <button type="button" onClick={() => toggleDocForm(idx)} className="text-slate-400 hover:text-emerald-500">
+                                        <button
+                                          type="button"
+                                          onClick={() => toggleDocForm(idx)}
+                                          className="text-slate-400 hover:text-emerald-500"
+                                        >
                                           <Edit size={12} />
                                         </button>
-                                        <button type="button" onClick={() => handleDeleteDocument(doc, idx)} className="text-slate-400 hover:text-red-500">
+                                        <button
+                                          type="button"
+                                          onClick={() => handleDeleteDocument(doc, idx)}
+                                          className="text-slate-400 hover:text-red-500"
+                                        >
                                           <Trash2 size={12} />
                                         </button>
                                       </div>
@@ -675,7 +697,11 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                                         <div className="flex gap-1">
                                           <div className="h-7 w-10 overflow-hidden rounded-md border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
                                             {doc.frontImagePath ? (
-                                              <AuthImage src={`/user/${cleanImageUrl(doc.frontImagePath)}`} alt="Front" className="h-full w-full object-cover" />
+                                              <AuthImage
+                                                src={`/user/${cleanImageUrl(doc.frontImagePath)}`}
+                                                alt="Front"
+                                                className="h-full w-full object-cover"
+                                              />
                                             ) : (
                                               <div className="flex h-full w-full items-center justify-center text-slate-300">
                                                 <Camera size={10} />
@@ -684,7 +710,11 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                                           </div>
                                           <div className="h-7 w-10 overflow-hidden rounded-md border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
                                             {doc.backImagePath ? (
-                                              <AuthImage src={`/user/${cleanImageUrl(doc.backImagePath)}`} alt="Back" className="h-full w-full object-cover" />
+                                              <AuthImage
+                                                src={`/user/${cleanImageUrl(doc.backImagePath)}`}
+                                                alt="Back"
+                                                className="h-full w-full object-cover"
+                                              />
                                             ) : (
                                               <div className="flex h-full w-full items-center justify-center text-slate-300">
                                                 <Camera size={10} />
@@ -693,20 +723,31 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                                           </div>
                                         </div>
                                         <div>
-                                          <div className="text-[10px] font-black uppercase">{docType?.documentTypeName || 'Unknown'}</div>
-                                          {doc.validTill && <div className="text-[7px] font-bold text-slate-400">Exp: {doc.validTill}</div>}
+                                          <div className="text-[10px] font-black uppercase">
+                                            {docType?.documentTypeName || 'Unknown'}
+                                          </div>
+                                          {doc.validTill && (
+                                            <div className="text-[7px] font-bold text-slate-400">
+                                              Exp: {doc.validTill}
+                                            </div>
+                                          )}
                                         </div>
                                       </div>
                                     </td>
                                     <td className="px-4 py-3">
-                                      <div className="font-mono text-[10px] font-bold text-slate-600 dark:text-slate-300">{doc.documentNumber}</div>
+                                      <div className="font-mono text-[10px] font-bold text-slate-600 dark:text-slate-300">
+                                        {doc.documentNumber}
+                                      </div>
                                     </td>
                                   </tr>
                                 )
                               })
                             ) : (
                               <tr>
-                                <td colSpan="3" className="px-4 py-6 text-center text-[9px] font-black tracking-widest text-slate-400 uppercase">
+                                <td
+                                  colSpan="3"
+                                  className="px-4 py-6 text-center text-[9px] font-black tracking-widest text-slate-400 uppercase"
+                                >
                                   No Documents
                                 </td>
                               </tr>
@@ -715,7 +756,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                         </table>
                       </div>
                     </div>
-                    </div>
+                  </div>
                 </div>
 
                 {/* Right Side: Stay Specifications */}
@@ -734,63 +775,63 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
             </form>
           </div>
           <div
-              className={`flex items-center justify-end gap-4 border-t p-5 sm:px-8 ${isDark ? 'border-slate-800 bg-slate-900/50' : 'border-slate-50 bg-white'}`}
+            className={`flex items-center justify-end gap-4 border-t p-5 sm:px-8 ${isDark ? 'border-slate-800 bg-slate-900/50' : 'border-slate-50 bg-white'}`}
+          >
+            <button
+              type="button"
+              onClick={(e) => handleSubmit(e, 'Reservation')}
+              disabled={isSubmitting || uploadingType || isReserved}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-[9px] font-black tracking-widest text-white uppercase shadow-lg transition-all active:scale-95 ${isSubmitting || uploadingType || isReserved ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-orange-600 shadow-orange-500/20 hover:bg-orange-700'}`}
             >
-              <button
-                type="button"
-                onClick={(e) => handleSubmit(e, 'Reservation')}
-                disabled={isSubmitting || uploadingType || isReserved}
-                className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-[9px] font-black tracking-widest text-white uppercase shadow-lg transition-all active:scale-95 ${isSubmitting || uploadingType || isReserved ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-orange-600 shadow-orange-500/20 hover:bg-orange-700'}`}
-              >
-                <CalendarCheck size={12} />
-                <span>Reservation</span>
-              </button>
+              <CalendarCheck size={12} />
+              <span>Reservation</span>
+            </button>
 
-              <button
-                type="button"
-                onClick={(e) => handleSubmit(e, 'Occupied')}
-                disabled={isSubmitting || uploadingType}
-                className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-[9px] font-black tracking-widest text-white uppercase shadow-lg transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-emerald-600 shadow-emerald-500/20 hover:bg-emerald-700'}`}
-              >
-                <CheckCircle size={12} />
-                <span>Check In</span>
-              </button>
+            <button
+              type="button"
+              onClick={(e) => handleSubmit(e, 'Occupied')}
+              disabled={isSubmitting || uploadingType}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-[9px] font-black tracking-widest text-white uppercase shadow-lg transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-emerald-600 shadow-emerald-500/20 hover:bg-emerald-700'}`}
+            >
+              <CheckCircle size={12} />
+              <span>Check In</span>
+            </button>
 
-              <button
-                type="submit"
-                form="guestProfileForm"
-                disabled={isSubmitting || uploadingType}
-                className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-[9px] font-black tracking-widest text-white uppercase shadow-lg transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-blue-600 shadow-blue-500/20 hover:bg-blue-700'}`}
-              >
-                <RefreshCw size={12} className={isSubmitting ? 'animate-spin' : ''} />
-                <span>Update</span>
-              </button>
+            <button
+              type="submit"
+              form="guestProfileForm"
+              disabled={isSubmitting || uploadingType}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-[9px] font-black tracking-widest text-white uppercase shadow-lg transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-blue-600 shadow-blue-500/20 hover:bg-blue-700'}`}
+            >
+              <RefreshCw size={12} className={isSubmitting ? 'animate-spin' : ''} />
+              <span>Update</span>
+            </button>
 
-              <button
-                type="button"
-                className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-[9px] font-black tracking-widest uppercase transition-all active:scale-95 ${isDark ? 'border-slate-700 text-slate-400 hover:bg-slate-800' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
-              >
-                <ArrowLeftRight size={12} />
-                <span>Chg. Room</span>
-              </button>
+            <button
+              type="button"
+              className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-[9px] font-black tracking-widest uppercase transition-all active:scale-95 ${isDark ? 'border-slate-700 text-slate-400 hover:bg-slate-800' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+            >
+              <ArrowLeftRight size={12} />
+              <span>Chg. Room</span>
+            </button>
 
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-[9px] font-black tracking-widest uppercase transition-all active:scale-95 ${isDark ? 'border-slate-700 text-slate-400 hover:bg-slate-800' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
-              >
-                <Printer size={12} />
-                <span>Print</span>
-              </button>
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-[9px] font-black tracking-widest uppercase transition-all active:scale-95 ${isDark ? 'border-slate-700 text-slate-400 hover:bg-slate-800' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+            >
+              <Printer size={12} />
+              <span>Print</span>
+            </button>
 
-              <button
-                type="button"
-                onClick={onClose}
-                className={`ml-2 text-[9px] font-black tracking-widest uppercase transition-all ${isDark ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600'}`}
-              >
-                Close
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className={`ml-2 text-[9px] font-black tracking-widest uppercase transition-all ${isDark ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600'}`}
+            >
+              Close
+            </button>
+          </div>
           <DocumentModal
             isOpen={showDocForm}
             onClose={() => setShowDocForm(false)}

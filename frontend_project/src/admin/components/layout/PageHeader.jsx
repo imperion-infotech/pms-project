@@ -1,65 +1,73 @@
-import { Layers, Search, RotateCw, Sun, Moon, Home } from 'lucide-react';
-import { useTheme } from '../../../context/ThemeContext';
+import { Layers, Search, RotateCw, Sun, Moon, Home } from 'lucide-react'
+import { useTheme } from '../../../context/ThemeContext'
 
 const PageHeader = ({ activeItem, onRefresh, isLoading, searchTerm, setSearchTerm }) => {
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark, toggleTheme } = useTheme()
 
   return (
-    <div className={`min-h-[3.5rem] ${isDark ? 'bg-surface-100 border-slate-800' : 'bg-white border-slate-200'} border-b flex flex-col sm:flex-row items-center justify-between px-4 md:px-6 py-2 sm:py-0 shrink-0 gap-3 sm:gap-0 transition-colors duration-300`}>
-      <div className="flex items-center gap-2 text-xs md:text-sm font-medium text-slate-500 w-full sm:w-auto">
+    <div
+      className={`min-h-[3.5rem] ${isDark ? 'bg-surface-100 border-slate-800' : 'border-slate-200 bg-white'} flex shrink-0 flex-col items-center justify-between gap-3 border-b px-4 py-2 transition-colors duration-300 sm:flex-row sm:gap-0 sm:py-0 md:px-6`}
+    >
+      <div className="flex w-full items-center gap-2 text-xs font-medium text-slate-500 sm:w-auto md:text-sm">
         {activeItem === 'Home' ? (
           <>
-            <Home className="w-4 h-4 text-emerald-500 shrink-0" />
+            <Home className="h-4 w-4 shrink-0 text-emerald-500" />
             <span className="truncate">Home</span>
             <span className="text-slate-300">/</span>
-            <span className={`font-bold truncate ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>Room View</span>
+            <span className={`truncate font-bold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>
+              Room View
+            </span>
           </>
         ) : (
           <>
-            <Layers className="w-4 h-4 text-emerald-500 shrink-0" />
+            <Layers className="h-4 w-4 shrink-0 text-emerald-500" />
             <span className="truncate">Room Settings</span>
             <span className="text-slate-300">/</span>
-            <span className={`font-bold truncate ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{activeItem}</span>
+            <span className={`truncate font-bold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>
+              {activeItem}
+            </span>
           </>
         )}
       </div>
-      <div className="flex items-center gap-3 w-full sm:w-auto">
+      <div className="flex w-full items-center gap-3 sm:w-auto">
         <button
           onClick={onRefresh}
           disabled={isLoading}
-          className={`p-2 rounded-lg border ${isDark ? 'border-slate-700 hover:bg-slate-800' : 'border-slate-200 hover:bg-slate-50'} transition-all ${isLoading ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}`}
+          className={`rounded-lg border p-2 ${isDark ? 'border-slate-700 hover:bg-slate-800' : 'border-slate-200 hover:bg-slate-50'} transition-all ${isLoading ? 'cursor-not-allowed opacity-50' : 'active:scale-95'}`}
           title="Refresh Data"
         >
-          <RotateCw className={`w-4 h-4 ${isDark ? 'text-slate-400' : 'text-slate-500'} ${isLoading ? 'animate-spin' : ''}`} />
+          <RotateCw
+            className={`h-4 w-4 ${isDark ? 'text-slate-400' : 'text-slate-500'} ${isLoading ? 'animate-spin' : ''}`}
+          />
         </button>
 
         <button
           onClick={toggleTheme}
-          className={`p-2 rounded-lg border ${isDark ? 'border-slate-700 hover:bg-slate-800' : 'border-slate-200 hover:bg-slate-50'} transition-all active:scale-95`}
-          title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          className={`rounded-lg border p-2 ${isDark ? 'border-slate-700 hover:bg-slate-800' : 'border-slate-200 hover:bg-slate-50'} transition-all active:scale-95`}
+          title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         >
           {isDark ? (
-            <Sun className="w-4 h-4 text-amber-500" />
+            <Sun className="h-4 w-4 text-amber-500" />
           ) : (
-            <Moon className="w-4 h-4 text-slate-500" />
+            <Moon className="h-4 w-4 text-slate-500" />
           )}
         </button>
 
         {activeItem !== 'Home' && (
           <div className="relative w-full sm:w-auto">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
               placeholder={`Search ${activeItem.toLowerCase()}s...`}
               value={searchTerm || ''}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className={`pl-9 pr-4 py-1.5 ${isDark ? 'bg-slate-800 border-slate-700 text-slate-200 placeholder:text-slate-500' : 'bg-slate-50 border-slate-200 text-slate-800'} border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all w-full sm:w-48 md:w-64`}
+              className={`py-1.5 pr-4 pl-9 ${isDark ? 'border-slate-700 bg-slate-800 text-slate-200 placeholder:text-slate-500' : 'border-slate-200 bg-slate-50 text-slate-800'} w-full rounded-lg border text-sm transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none sm:w-48 md:w-64`}
             />
           </div>
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default PageHeader;
+export default PageHeader

@@ -25,42 +25,50 @@ export const usePmsTaxes = () => {
     fetchTaxes()
   }, [fetchTaxes])
 
-  const addTax = useCallback(async (payload) => {
-    try {
-      const res = await propertyService.createTaxMaster(payload)
-      toast.success('Tax record created successfully')
-      fetchTaxes()
-      return res
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to create tax record')
-      throw err
-    }
-  }, [fetchTaxes, toast])
+  const addTax = useCallback(
+    async (payload) => {
+      try {
+        const res = await propertyService.createTaxMaster(payload)
+        toast.success('Tax record created successfully')
+        fetchTaxes()
+        return res
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to create tax record')
+        throw err
+      }
+    },
+    [fetchTaxes, toast],
+  )
 
-  const updateTax = useCallback(async (id, payload) => {
-    try {
-      const res = await propertyService.updateTaxMaster(id, payload)
-      toast.success('Tax record updated successfully')
-      fetchTaxes()
-      return res
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to update tax record')
-      throw err
-    }
-  }, [fetchTaxes, toast])
+  const updateTax = useCallback(
+    async (id, payload) => {
+      try {
+        const res = await propertyService.updateTaxMaster(id, payload)
+        toast.success('Tax record updated successfully')
+        fetchTaxes()
+        return res
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to update tax record')
+        throw err
+      }
+    },
+    [fetchTaxes, toast],
+  )
 
-  const deleteTax = useCallback(async (id) => {
-    try {
-      const res = await propertyService.deleteTaxMaster(id)
-      toast.success('Tax record deleted successfully')
-      fetchTaxes()
-      return res
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to delete tax record')
-      throw err
-    }
-  }, [fetchTaxes, toast])
-
+  const deleteTax = useCallback(
+    async (id) => {
+      try {
+        const res = await propertyService.deleteTaxMaster(id)
+        toast.success('Tax record deleted successfully')
+        fetchTaxes()
+        return res
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to delete tax record')
+        throw err
+      }
+    },
+    [fetchTaxes, toast],
+  )
 
   return { taxes, isLoading, fetchTaxes, addTax, updateTax, deleteTax }
 }

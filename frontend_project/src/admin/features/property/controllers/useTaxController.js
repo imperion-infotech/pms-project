@@ -1,38 +1,38 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react'
 
 /**
  * Controller: useTaxController
  * Logic for managing tax master records.
  */
 const useTaxController = ({ taxes, onDelete }) => {
-  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null)
 
   const processedTaxes = useMemo(() => {
-    return [...taxes];
-  }, [taxes]);
+    return [...taxes]
+  }, [taxes])
 
   const handleDeleteClick = (tax) => {
-    setDeleteTarget({ id: tax.id, name: tax.taxMasterName });
-  };
+    setDeleteTarget({ id: tax.id, name: tax.taxMasterName })
+  }
 
   const handleConfirmDelete = () => {
     if (deleteTarget?.id) {
-      onDelete(deleteTarget.id);
+      onDelete(deleteTarget.id)
     }
-    setDeleteTarget(null);
-  };
+    setDeleteTarget(null)
+  }
 
   const handleCancelDelete = () => {
-    setDeleteTarget(null);
-  };
+    setDeleteTarget(null)
+  }
 
   return {
     processedTaxes,
     deleteTarget,
     handleDeleteClick,
     handleConfirmDelete,
-    handleCancelDelete
-  };
-};
+    handleCancelDelete,
+  }
+}
 
-export default useTaxController;
+export default useTaxController

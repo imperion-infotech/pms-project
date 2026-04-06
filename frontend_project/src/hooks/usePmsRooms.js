@@ -25,57 +25,69 @@ export const usePmsRooms = () => {
     fetchRooms()
   }, [fetchRooms])
 
-  const addRoom = useCallback(async (payload) => {
-    try {
-      const res = await propertyService.createRoom(payload)
-      toast.success('Room created successfully')
-      fetchRooms()
-      return res
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to create room')
-      throw err
-    }
-  }, [fetchRooms, toast])
+  const addRoom = useCallback(
+    async (payload) => {
+      try {
+        const res = await propertyService.createRoom(payload)
+        toast.success('Room created successfully')
+        fetchRooms()
+        return res
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to create room')
+        throw err
+      }
+    },
+    [fetchRooms, toast],
+  )
 
-  const updateRoom = useCallback(async (id, payload) => {
-    // Optimistic update
-    setRooms(prev => prev.map(r => String(r.id) === String(id) ? { ...r, ...payload } : r))
-    
-    try {
-      const res = await propertyService.updateRoom(id, payload)
-      toast.success('Room updated successfully')
-      fetchRooms()
-      return res
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to update room')
-      fetchRooms() // Rollback
-      throw err
-    }
-  }, [fetchRooms, toast])
+  const updateRoom = useCallback(
+    async (id, payload) => {
+      // Optimistic update
+      setRooms((prev) => prev.map((r) => (String(r.id) === String(id) ? { ...r, ...payload } : r)))
 
-  const deleteRoom = useCallback(async (id) => {
-    try {
-      const res = await propertyService.deleteRoom(id)
-      toast.success('Room deleted successfully')
-      fetchRooms()
-      return res
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to delete room')
-      throw err
-    }
-  }, [fetchRooms, toast])
+      try {
+        const res = await propertyService.updateRoom(id, payload)
+        toast.success('Room updated successfully')
+        fetchRooms()
+        return res
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to update room')
+        fetchRooms() // Rollback
+        throw err
+      }
+    },
+    [fetchRooms, toast],
+  )
 
-  const searchRooms = useCallback(async (query) => {
-    setIsLoading(true)
-    try {
-      const res = await propertyService.searchRooms(query)
-      setRooms(extractData(res))
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Room search failed')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [toast])
+  const deleteRoom = useCallback(
+    async (id) => {
+      try {
+        const res = await propertyService.deleteRoom(id)
+        toast.success('Room deleted successfully')
+        fetchRooms()
+        return res
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to delete room')
+        throw err
+      }
+    },
+    [fetchRooms, toast],
+  )
+
+  const searchRooms = useCallback(
+    async (query) => {
+      setIsLoading(true)
+      try {
+        const res = await propertyService.searchRooms(query)
+        setRooms(extractData(res))
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Room search failed')
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [toast],
+  )
 
   return { rooms, isLoading, fetchRooms, addRoom, updateRoom, deleteRoom, searchRooms }
 }

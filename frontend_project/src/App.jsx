@@ -1,24 +1,24 @@
 /**
  * App.jsx - Main Brain of the Application
- * 
+ *
  * Ye app ka Router hai. Yahan decide hota hai ki user ko kab
  * kahan bhejte hain. Isme login, register, aur dashboard ke raaste (routes) hain.
  * Admin aur User roles ke logic bhi yahan sambhale jaate hain.
  */
-import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import LoadingProcess from './components/common/LoadingProcess';
-import { ThemeProvider } from './context/ThemeContext';
-import { SidebarProvider } from './context/SidebarContext';
-import { NotificationProvider } from './context/NotificationContext';
+import React, { Suspense, lazy } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import LoadingProcess from './components/common/LoadingProcess'
+import { ThemeProvider } from './context/ThemeContext'
+import { SidebarProvider } from './context/SidebarContext'
+import { NotificationProvider } from './context/NotificationContext'
 
 // Components are lazy-loaded to optimize the initial bundle size
-const PmsDashboard = lazy(() => import('./admin/pages/PropertyMaster/PmsDashboard'));
-const HomeScreen = lazy(() => import('./user/pages/HomeScreen/HomeScreen'));
-const Login = lazy(() => import('./user/pages/Auth/Login'));
-const Register = lazy(() => import('./user/pages/Auth/Register'));
-const ForgotPassword = lazy(() => import('./user/pages/Auth/ForgotPassword'));
-const ResetPassword = lazy(() => import('./user/pages/Auth/ResetPassword'));
+const PmsDashboard = lazy(() => import('./admin/pages/PropertyMaster/PmsDashboard'))
+const HomeScreen = lazy(() => import('./user/pages/HomeScreen/HomeScreen'))
+const Login = lazy(() => import('./user/pages/Auth/Login'))
+const Register = lazy(() => import('./user/pages/Auth/Register'))
+const ForgotPassword = lazy(() => import('./user/pages/Auth/ForgotPassword'))
+const ResetPassword = lazy(() => import('./user/pages/Auth/ResetPassword'))
 
 /**
  * getRoleFromToken()
@@ -26,27 +26,30 @@ const ResetPassword = lazy(() => import('./user/pages/Auth/ResetPassword'));
  * This is used to decide where to redirect the user after login.
  */
 const getRoleFromToken = () => {
-  let token = localStorage.getItem('access_token');
-  if (!token) return null;
+  let token = localStorage.getItem('access_token')
+  if (!token) return null
 
-  token = token.trim().replace(/^"|"$/g, '');
+  token = token.trim().replace(/^"|"$/g, '')
 
   try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    if (payload.role) return payload.role;
-    if (payload.roles) return Array.isArray(payload.roles) ? payload.roles[0] : payload.roles;
-    if (payload.authorities) return Array.isArray(payload.authorities) ? payload.authorities[0]?.authority || payload.authorities[0] : payload.authorities;
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    if (payload.role) return payload.role
+    if (payload.roles) return Array.isArray(payload.roles) ? payload.roles[0] : payload.roles
+    if (payload.authorities)
+      return Array.isArray(payload.authorities)
+        ? payload.authorities[0]?.authority || payload.authorities[0]
+        : payload.authorities
 
-    const localRole = localStorage.getItem('user_role');
-    if (localRole) return localRole;
+    const localRole = localStorage.getItem('user_role')
+    if (localRole) return localRole
 
-    return 'ROLE_USER';
+    return 'ROLE_USER'
   } catch {
-    const localRole = localStorage.getItem('user_role');
-    if (localRole) return localRole;
-    return 'ROLE_ADMIN';
+    const localRole = localStorage.getItem('user_role')
+    if (localRole) return localRole
+    return 'ROLE_ADMIN'
   }
-};
+}
 
 /**
  * AdminRoute Component
@@ -54,17 +57,19 @@ const getRoleFromToken = () => {
  * Non-admins are redirected back to the /home page.
  */
 const AdminRoute = ({ children }) => {
-  const token = localStorage.getItem('access_token');
-  if (!token) return <Navigate to="/login" replace />;
+  const token = localStorage.getItem('access_token')
+  if (!token) return <Navigate to="/login" replace />
 
-  const role = getRoleFromToken() || '';
-  const isAdminOrManager = ['ROLE_ADMIN', 'ADMIN', 'ROLE_MANAGER', 'MANAGER'].includes(role.toUpperCase());
+  const role = getRoleFromToken() || ''
+  const isAdminOrManager = ['ROLE_ADMIN', 'ADMIN', 'ROLE_MANAGER', 'MANAGER'].includes(
+    role.toUpperCase(),
+  )
 
   if (isAdminOrManager) {
-    return children;
+    return children
   }
-  return <Navigate to="/home" replace />;
-};
+  return <Navigate to="/home" replace />
+}
 
 /**
  * UserRoute Component
@@ -72,29 +77,31 @@ const AdminRoute = ({ children }) => {
  * Unauthenticated users are sent to the /login page.
  */
 const UserRoute = ({ children }) => {
-  const token = localStorage.getItem('access_token');
-  if (!token) return <Navigate to="/login" replace />;
-  return children;
-};
+  const token = localStorage.getItem('access_token')
+  if (!token) return <Navigate to="/login" replace />
+  return children
+}
 
 /**
  * RootRoute Component
- * Decides whether the "/" path should show the Admin Dashboard or User Home 
+ * Decides whether the "/" path should show the Admin Dashboard or User Home
  * based on the user's permissions level.
  */
 const RootRoute = () => {
-  const token = localStorage.getItem('access_token');
-  if (!token) return <Navigate to="/login" replace />;
+  const token = localStorage.getItem('access_token')
+  if (!token) return <Navigate to="/login" replace />
 
-  const role = getRoleFromToken() || '';
-  const isAdminOrManager = ['ROLE_ADMIN', 'ADMIN', 'ROLE_MANAGER', 'MANAGER'].includes(role.toUpperCase());
+  const role = getRoleFromToken() || ''
+  const isAdminOrManager = ['ROLE_ADMIN', 'ADMIN', 'ROLE_MANAGER', 'MANAGER'].includes(
+    role.toUpperCase(),
+  )
 
   if (isAdminOrManager) {
-    return <PmsDashboard />;
+    return <PmsDashboard />
   }
 
-  return <Navigate to="/home" replace />;
-};
+  return <Navigate to="/home" replace />
+}
 
 function App() {
   return (
@@ -103,7 +110,9 @@ function App() {
         <SidebarProvider>
           <BrowserRouter>
             {/* Suspense handles the "Loading..." state while lazy-loaded components are being fetched */}
-            <Suspense fallback={<LoadingProcess isLoading={true} spinnerOnly={true} fullScreen={true} />}>
+            <Suspense
+              fallback={<LoadingProcess isLoading={true} spinnerOnly={true} fullScreen={true} />}
+            >
               <Routes>
                 {/* PUBLIC ROUTES */}
                 <Route path="/login" element={<Login />} />
@@ -115,20 +124,24 @@ function App() {
                 <Route path="/" element={<RootRoute />} />
 
                 {/* PROTECTED ADMIN ROUTES */}
-                <Route path="/dashboard" element={
-                  <AdminRoute>
-                    <PmsDashboard />
-                  </AdminRoute>
-                } />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <AdminRoute>
+                      <PmsDashboard />
+                    </AdminRoute>
+                  }
+                />
 
                 {/* PROTECTED USER ROUTES */}
-                <Route path="/home" element={
-                  <UserRoute>
-                    <HomeScreen />
-                  </UserRoute>
-                } />
-
-
+                <Route
+                  path="/home"
+                  element={
+                    <UserRoute>
+                      <HomeScreen />
+                    </UserRoute>
+                  }
+                />
 
                 {/* 404 FALLBACK */}
                 <Route path="*" element={<Navigate to="/" replace />} />
@@ -138,9 +151,7 @@ function App() {
         </SidebarProvider>
       </ThemeProvider>
     </NotificationProvider>
-  );
+  )
 }
 
-export default App;
-
-
+export default App

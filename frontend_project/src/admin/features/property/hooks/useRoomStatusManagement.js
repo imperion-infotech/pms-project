@@ -3,11 +3,7 @@ import { useState, useCallback } from 'react'
 /**
  * useRoomStatusManagement - Centralized hook for Room Status CRUD operations.
  */
-export const useRoomStatusManagement = ({ 
-  addRoomStatus, 
-  updateRoomStatus, 
-  toggleModal 
-}) => {
+export const useRoomStatusManagement = ({ addRoomStatus, updateRoomStatus, toggleModal }) => {
   const [newRoomStatus, setNewRoomStatus] = useState({
     roomStatusName: '',
     roomStatusTitle: '',
@@ -55,15 +51,18 @@ export const useRoomStatusManagement = ({
     }
   }, [editRoomStatus, updateRoomStatus, toggleModal])
 
-  const handleEditRoomStatus = useCallback((status) => {
-    setEditRoomStatus({
-      id: status.id,
-      roomStatusName: status.roomStatusName || '',
-      roomStatusTitle: status.roomStatusTitle || '',
-      roomStatusColor: status.roomStatusColor || '#2798e8',
-    })
-    toggleModal('roomStatusEdit', true)
-  }, [toggleModal])
+  const handleEditRoomStatus = useCallback(
+    (status) => {
+      setEditRoomStatus({
+        id: status.id,
+        roomStatusName: status.roomStatusName || '',
+        roomStatusTitle: status.roomStatusTitle || '',
+        roomStatusColor: status.roomStatusColor || '#2798e8',
+      })
+      toggleModal('roomStatusEdit', true)
+    },
+    [toggleModal],
+  )
 
   return {
     newRoomStatus,

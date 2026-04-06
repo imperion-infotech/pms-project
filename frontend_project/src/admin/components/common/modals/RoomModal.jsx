@@ -149,7 +149,7 @@ export const RoomModal = ({
 
             {/* Status & Type Preview Section */}
             {!newRoom.nonRoom && (
-              <div className="col-span-1 flex animate-in fade-in slide-in-from-top-2 flex-wrap items-end gap-6 rounded-2xl border border-slate-100 bg-slate-50/50 p-4 transition-all hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50 sm:col-span-2">
+              <div className="animate-in fade-in slide-in-from-top-2 col-span-1 flex flex-wrap items-end gap-6 rounded-2xl border border-slate-100 bg-slate-50/50 p-4 transition-all hover:bg-slate-50 sm:col-span-2 dark:border-slate-800 dark:bg-slate-900/50">
                 {newRoom.roomTypeId && (
                   <div className="flex flex-col gap-2">
                     <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
@@ -177,7 +177,7 @@ export const RoomModal = ({
                       Selected Status
                     </span>
                     <div
-                      className="inline-flex items-center rounded-xl border px-4 py-2 text-[10px] font-black tracking-widest transition-all duration-300 uppercase shadow-sm"
+                      className="inline-flex items-center rounded-xl border px-4 py-2 text-[10px] font-black tracking-widest uppercase shadow-sm transition-all duration-300"
                       style={{
                         backgroundColor: `${roomStatuses.find((rs) => String(rs.id) === String(newRoom.roomStatusTableId))?.roomStatusColor || '#64748b'}15`,
                         color:

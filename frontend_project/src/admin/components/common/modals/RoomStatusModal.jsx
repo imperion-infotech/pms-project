@@ -1,75 +1,109 @@
-import { LayoutDashboard, X } from 'lucide-react';
+import { LayoutDashboard, X } from 'lucide-react'
 
-export const RoomStatusModal = ({ isOpen, setIsOpen, newRoomStatus, setNewRoomStatus, handleAddRoomStatus, roomStatuses = [] }) => {
-  if (!isOpen) return null;
+export const RoomStatusModal = ({
+  isOpen,
+  setIsOpen,
+  newRoomStatus,
+  setNewRoomStatus,
+  handleAddRoomStatus,
+  roomStatuses = [],
+}) => {
+  if (!isOpen) return null
 
-  const isDuplicate = roomStatuses.some(rs => String(rs.roomStatusName).toLowerCase() === String(newRoomStatus.roomStatusName).toLowerCase());
+  const isDuplicate = roomStatuses.some(
+    (rs) =>
+      String(rs.roomStatusName).toLowerCase() ===
+      String(newRoomStatus.roomStatusName).toLowerCase(),
+  )
 
   const onSubmit = (e) => {
-    e.preventDefault();
-    if (isDuplicate) return;
-    handleAddRoomStatus(e);
-  };
-  if (!isOpen) return null;
+    e.preventDefault()
+    if (isDuplicate) return
+    handleAddRoomStatus(e)
+  }
+  if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
+        className="animate-in fade-in absolute inset-0 bg-slate-900/60 backdrop-blur-sm duration-300"
         onClick={() => setIsOpen(false)}
       ></div>
-      <div className="bg-white dark:bg-surface-100 rounded-2xl shadow-2xl w-full max-w-md relative z-10 overflow-hidden animate-in zoom-in-95 duration-300">
-        <div className="p-6 bg-surface-100 dark:bg-surface-100 text-white flex justify-between items-center">
+      <div className="dark:bg-surface-100 animate-in zoom-in-95 relative z-10 w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl duration-300">
+        <div className="bg-surface-100 dark:bg-surface-100 flex items-center justify-between p-6 text-white">
           <div className="flex items-center gap-3">
-            <LayoutDashboard className="w-6 h-6 text-emerald-400" />
+            <LayoutDashboard className="h-6 w-6 text-emerald-400" />
             <div>
-              <h3 className="font-bold text-lg">New Room Status</h3>
-              <p className="text-[10px] text-slate-400 uppercase tracking-widest">Add Status Workflows</p>
+              <h3 className="text-lg font-bold">New Room Status</h3>
+              <p className="text-[10px] tracking-widest text-slate-400 uppercase">
+                Add Status Workflows
+              </p>
             </div>
           </div>
-          <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
-            <X className="w-5 h-5" />
+          <button
+            onClick={() => setIsOpen(false)}
+            className="rounded-lg p-1.5 transition-colors hover:bg-white/10"
+          >
+            <X className="h-5 w-5" />
           </button>
         </div>
-        <form onSubmit={onSubmit} className="p-6 flex flex-col gap-4">
+        <form onSubmit={onSubmit} className="flex flex-col gap-4 p-6">
           <div>
-            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1.5">Status Name</label>
+            <label className="mb-1.5 block text-xs font-bold text-slate-500 uppercase dark:text-slate-400">
+              Status Name
+            </label>
             <input
               required
               type="text"
               value={newRoomStatus.roomStatusName}
-              onChange={(e) => setNewRoomStatus({ ...newRoomStatus, roomStatusName: e.target.value })}
+              onChange={(e) =>
+                setNewRoomStatus({ ...newRoomStatus, roomStatusName: e.target.value })
+              }
               placeholder="e.g. Vacant Ready"
-              className={`w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border ${isDuplicate ? 'border-red-500 ring-2 ring-red-500/20 text-red-500' : 'border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all`}
+              className={`w-full border bg-slate-50 px-4 py-2.5 dark:bg-slate-800/50 ${isDuplicate ? 'border-red-500 text-red-500 ring-2 ring-red-500/20' : 'border-slate-200 text-slate-800 dark:border-slate-700 dark:text-slate-200'} rounded-xl text-sm transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none`}
             />
-            {isDuplicate && <p className="text-red-500 text-[10px] sm:text-xs mt-1.5 font-bold animate-in slide-in-from-top-1">Status Name already exists!</p>}
+            {isDuplicate && (
+              <p className="animate-in slide-in-from-top-1 mt-1.5 text-[10px] font-bold text-red-500 sm:text-xs">
+                Status Name already exists!
+              </p>
+            )}
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1.5">Status Title</label>
+            <label className="mb-1.5 block text-xs font-bold text-slate-500 uppercase dark:text-slate-400">
+              Status Title
+            </label>
             <input
               required
               type="text"
               value={newRoomStatus.roomStatusTitle}
-              onChange={(e) => setNewRoomStatus({ ...newRoomStatus, roomStatusTitle: e.target.value })}
+              onChange={(e) =>
+                setNewRoomStatus({ ...newRoomStatus, roomStatusTitle: e.target.value })
+              }
               placeholder="e.g. V/Ready"
-              className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200"
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1.5">Status Color</label>
+            <label className="mb-1.5 block text-xs font-bold text-slate-500 uppercase dark:text-slate-400">
+              Status Color
+            </label>
             <div className="flex items-center gap-3">
               <input
                 type="color"
                 value={newRoomStatus.roomStatusColor}
-                onChange={(e) => setNewRoomStatus({ ...newRoomStatus, roomStatusColor: e.target.value })}
-                className="w-12 h-10 p-1 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer shrink-0"
+                onChange={(e) =>
+                  setNewRoomStatus({ ...newRoomStatus, roomStatusColor: e.target.value })
+                }
+                className="h-10 w-12 shrink-0 cursor-pointer rounded-lg border border-slate-200 bg-slate-50 p-1 dark:border-slate-700 dark:bg-slate-800/50"
               />
               <input
                 type="text"
                 value={newRoomStatus.roomStatusColor}
-                onChange={(e) => setNewRoomStatus({ ...newRoomStatus, roomStatusColor: e.target.value })}
+                onChange={(e) =>
+                  setNewRoomStatus({ ...newRoomStatus, roomStatusColor: e.target.value })
+                }
                 placeholder="#000000"
-                className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-mono"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 font-mono text-sm transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200"
               />
             </div>
           </div>
@@ -77,14 +111,14 @@ export const RoomStatusModal = ({ isOpen, setIsOpen, newRoomStatus, setNewRoomSt
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="flex-1 py-2.5 text-sm font-bold text-slate-500 dark:hover:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl transition-all hover:bg-slate-50 dark:hover:bg-slate-800"
+              className="flex-1 rounded-xl border border-slate-200 py-2.5 text-sm font-bold text-slate-500 transition-all hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-300"
             >
               CANCEL
             </button>
             <button
               type="submit"
               disabled={isDuplicate || !newRoomStatus.roomStatusName}
-              className={`flex-2 py-2.5 text-white rounded-xl text-sm font-bold shadow-lg transition-all ${isDuplicate || !newRoomStatus.roomStatusName ? 'bg-slate-400 cursor-not-allowed shadow-none opacity-70' : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/10 active:scale-95'}`}
+              className={`flex-2 rounded-xl py-2.5 text-sm font-bold text-white shadow-lg transition-all ${isDuplicate || !newRoomStatus.roomStatusName ? 'cursor-not-allowed bg-slate-400 opacity-70 shadow-none' : 'bg-emerald-500 shadow-emerald-500/10 hover:bg-emerald-600 active:scale-95'}`}
             >
               {isDuplicate ? 'STATUS EXISTS' : 'SAVE STATUS'}
             </button>
@@ -92,5 +126,5 @@ export const RoomStatusModal = ({ isOpen, setIsOpen, newRoomStatus, setNewRoomSt
         </form>
       </div>
     </div>
-  );
-};
+  )
+}

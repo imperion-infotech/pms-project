@@ -1,42 +1,57 @@
-import { Pencil, X } from 'lucide-react';
+import { Pencil, X } from 'lucide-react'
 
-export const FloorEditModal = ({ isOpen, setIsOpen, editFloor, setEditFloor, handleUpdateFloor, floors = [] }) => {
-  if (!isOpen) return null;
+export const FloorEditModal = ({
+  isOpen,
+  setIsOpen,
+  editFloor,
+  setEditFloor,
+  handleUpdateFloor,
+  floors = [],
+}) => {
+  if (!isOpen) return null
 
-  const isDuplicate = floors.some(f => String(f.name).toLowerCase() === String(editFloor.name).toLowerCase() && String(f.id) !== String(editFloor.id));
+  const isDuplicate = floors.some(
+    (f) =>
+      String(f.name).toLowerCase() === String(editFloor.name).toLowerCase() &&
+      String(f.id) !== String(editFloor.id),
+  )
 
   const onSubmit = (e) => {
-    e.preventDefault();
-    if (isDuplicate) return;
-    handleUpdateFloor(e);
-  };
-  if (!isOpen) return null;
+    e.preventDefault()
+    if (isDuplicate) return
+    handleUpdateFloor(e)
+  }
+  if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
+        className="animate-in fade-in absolute inset-0 bg-slate-900/60 backdrop-blur-sm duration-300"
         onClick={() => setIsOpen(false)}
       ></div>
-      <div className="bg-white dark:bg-surface-100 rounded-2xl shadow-2xl w-full max-w-md relative z-10 overflow-hidden animate-in zoom-in-95 duration-300 transition-colors duration-300">
-        <div className="p-6 bg-surface-100 dark:bg-surface-100 text-white flex justify-between items-center">
+      <div className="dark:bg-surface-100 animate-in zoom-in-95 relative z-10 w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl transition-colors duration-300">
+        <div className="bg-surface-100 dark:bg-surface-100 flex items-center justify-between p-6 text-white">
           <div className="flex items-center gap-3">
-            <Pencil className="w-6 h-6 text-blue-400" />
+            <Pencil className="h-6 w-6 text-blue-400" />
             <div>
-              <h3 className="font-bold text-lg">Edit Floor</h3>
-              <p className="text-[10px] text-slate-400 uppercase tracking-widest">Update Floor Details</p>
+              <h3 className="text-lg font-bold">Edit Floor</h3>
+              <p className="text-[10px] tracking-widest text-slate-400 uppercase">
+                Update Floor Details
+              </p>
             </div>
           </div>
           <button
             onClick={() => setIsOpen(false)}
-            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+            className="rounded-lg p-1.5 transition-colors hover:bg-white/10"
           >
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" />
           </button>
         </div>
-        <form onSubmit={onSubmit} className="p-6 space-y-5">
+        <form onSubmit={onSubmit} className="space-y-5 p-6">
           <div>
-            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Floor Name</label>
+            <label className="mb-2 block text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+              Floor Name
+            </label>
             <input
               autoFocus
               required
@@ -44,32 +59,38 @@ export const FloorEditModal = ({ isOpen, setIsOpen, editFloor, setEditFloor, han
               value={editFloor.name}
               onChange={(e) => setEditFloor({ ...editFloor, name: e.target.value })}
               placeholder="e.g. 6th Floor"
-              className={`w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border ${isDuplicate ? 'border-red-500 ring-2 ring-red-500/20 text-red-500' : 'border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-inner`}
+              className={`w-full border bg-slate-50 px-4 py-2.5 dark:bg-slate-800/50 ${isDuplicate ? 'border-red-500 text-red-500 ring-2 ring-red-500/20' : 'border-slate-200 text-slate-800 dark:border-slate-700 dark:text-slate-200'} rounded-xl text-sm shadow-inner transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
             />
-            {isDuplicate && <p className="text-red-500 text-[10px] sm:text-xs mt-1.5 font-bold animate-in slide-in-from-top-1">Floor Name already exists!</p>}
+            {isDuplicate && (
+              <p className="animate-in slide-in-from-top-1 mt-1.5 text-[10px] font-bold text-red-500 sm:text-xs">
+                Floor Name already exists!
+              </p>
+            )}
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Description</label>
+            <label className="mb-2 block text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+              Description
+            </label>
             <textarea
               rows="3"
               value={editFloor.description || ''}
               onChange={(e) => setEditFloor({ ...editFloor, description: e.target.value })}
               placeholder="Enter details about this floor..."
-              className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-inner resize-none"
+              className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 shadow-inner transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200"
             ></textarea>
           </div>
           <div className="flex gap-3 pt-2">
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="flex-1 py-3 text-sm font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-colors"
+              className="flex-1 py-3 text-sm font-bold text-slate-500 transition-colors hover:text-slate-800 dark:hover:text-slate-300"
             >
               CANCEL
             </button>
             <button
               type="submit"
               disabled={isDuplicate || !editFloor.name}
-              className={`flex-2 py-3 text-white rounded-xl text-sm font-bold shadow-lg transition-all ${isDuplicate || !editFloor.name ? 'bg-slate-400 cursor-not-allowed shadow-none opacity-70' : 'bg-blue-500 hover:bg-blue-600 shadow-blue-500/20 active:scale-95'}`}
+              className={`flex-2 rounded-xl py-3 text-sm font-bold text-white shadow-lg transition-all ${isDuplicate || !editFloor.name ? 'cursor-not-allowed bg-slate-400 opacity-70 shadow-none' : 'bg-blue-500 shadow-blue-500/20 hover:bg-blue-600 active:scale-95'}`}
             >
               {isDuplicate ? 'FLOOR EXISTS' : 'UPDATE FLOOR'}
             </button>
@@ -77,5 +98,5 @@ export const FloorEditModal = ({ isOpen, setIsOpen, editFloor, setEditFloor, han
         </form>
       </div>
     </div>
-  );
-};
+  )
+}
