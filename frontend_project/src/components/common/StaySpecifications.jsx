@@ -43,87 +43,6 @@ const StaySpecifications = ({
         </div>
       </div>
 
-      {/* Section 1: Guest Management */}
-      <div className="grid grid-cols-1 gap-4">
-        <div>
-          <label className={labelClass}>Room Status</label>
-          <div className={inputContainerClass}>
-            <select
-              name="roomStatusId"
-              value={formData.roomStatusId}
-              onChange={handleChange}
-              className={selectClass}
-            >
-              <option value="">Select Status</option>
-              {roomStatuses?.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.roomStatusName}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Required Booking Attributes */}
-      <div className="grid grid-cols-4 gap-3">
-        <div>
-          <label className={labelClass}>No. Of Guests*</label>
-          <div className={inputContainerClass}>
-            <input
-              type="number"
-              name="noOfGuest"
-              value={formData.noOfGuest || 1}
-              onChange={handleChange}
-              min="1"
-              className={inputClass}
-            />
-          </div>
-        </div>
-        <div>
-          <label className={labelClass}>Stay Status*</label>
-          <div className={inputContainerClass}>
-            <select
-              name="stayStatusEnum"
-              value={formData.stayStatusEnum || 'Confirmed'}
-              onChange={handleChange}
-              className={selectClass}
-            >
-              <option value="Confirmed">Confirmed</option>
-              <option value="Unconfirmed">Unconfirmed</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <label className={labelClass}>Rate Type*</label>
-          <div className={inputContainerClass}>
-            <select
-              name="rateTypeEnum"
-              value={formData.rateTypeEnum || 'RACK'}
-              onChange={handleChange}
-              className={selectClass}
-            >
-              <option value="RACK">RACK</option>
-              <option value="CORPORATE">Corporate</option>
-              <option value="GROUP">Group</option>
-              {/* <option value="COMPLIMENTARY">Complimentary</option> */}
-            </select>
-          </div>
-        </div>
-        <div>
-          <label className={labelClass}>Booking Color*</label>
-          <div className={inputContainerClass}>
-            <input
-              type="color"
-              name="color"
-              value={formData.color || '#3B82F6'}
-              onChange={handleChange}
-              className={`${inputClass} h-6 w-full cursor-pointer p-0`}
-            />
-          </div>
-        </div>
-      </div>
-
       {/* Row 1: Building & Floor */}
       <div className="grid grid-cols-2 gap-3">
         <div>
@@ -259,6 +178,88 @@ const StaySpecifications = ({
             className={`${inputClass} min-h-[60px] resize-none`}
             placeholder="Housekeeping notes, preferences, etc."
           />
+        </div>
+      </div>
+
+      {/* Section 1: Guest Management */}
+      <div className="grid grid-cols-1 gap-4">
+        <div>
+          <label className={labelClass}>Room Status</label>
+          <div className={inputContainerClass}>
+            <select
+              name="roomStatusId"
+              value={formData.roomStatusId}
+              onChange={handleChange}
+              className={selectClass}
+            >
+              <option value="">Select Status</option>
+              {roomStatuses?.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.roomStatusName}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Required Booking Attributes */}
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className={labelClass}>Rate Type*</label>
+          <div className={inputContainerClass}>
+            <select
+              name="rateTypeEnum"
+              value={formData.rateTypeEnum || 'RACK'}
+              onChange={handleChange}
+              className={selectClass}
+            >
+              <option value="RACK">RACK</option>
+              <option value="CORPORATE">Corporate</option>
+              <option value="GROUP">Group</option>
+              {/* <option value="COMPLIMENTARY">Complimentary</option> */}
+            </select>
+          </div>
+        </div>
+        <div>
+          <label className={labelClass}>No. Of Guests*</label>
+          <div className={inputContainerClass}>
+            <input
+              type="number"
+              name="noOfGuest"
+              value={formData.noOfGuest || 1}
+              onChange={handleChange}
+              min="1"
+              className={inputClass}
+            />
+          </div>
+        </div>
+        <div>
+          <label className={labelClass}>Stay Status*</label>
+          <div className={inputContainerClass}>
+            <select
+              name="stayStatusEnum"
+              value={formData.stayStatusEnum || 'Confirmed'}
+              onChange={handleChange}
+              className={selectClass}
+            >
+              <option value="Confirmed">Confirmed</option>
+              <option value="Unconfirmed">Unconfirmed</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label className={labelClass}>Booking Color*</label>
+          <div className={inputContainerClass}>
+            <input
+              type="color"
+              name="color"
+              value={formData.color || '#3B82F6'}
+              onChange={handleChange}
+              className={`${inputClass} h-6 w-full cursor-pointer p-0`}
+            />
+          </div>
         </div>
       </div>
     </div>
