@@ -14,7 +14,6 @@ const GuestInformation = ({ formData, handleChange, isDark = false }) => {
 
   return (
     <div className="space-y-4 text-left">
-
       <div className="grid grid-cols-1 gap-4">
         <div>
           <label className={labelClass}>Guest Status</label>

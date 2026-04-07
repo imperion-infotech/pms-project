@@ -100,11 +100,14 @@ const PmsDashboard = () => {
     addStayDetail,
     updateStayDetail,
     deleteStayDetail,
-    rentDetails, // From usePmsData
-    guestDetails, // From usePmsData
-    addGuestDetail, // From usePmsData
-    updateGuestDetail, // From usePmsData
-    deleteGuestDetail, // From usePmsData
+    rentDetails,
+    addRentDetail,
+    updateRentDetail,
+    deleteRentDetail,
+    guestDetails,
+    addGuestDetail,
+    updateGuestDetail,
+    deleteGuestDetail,
     searchRooms,
     searchFloors,
     searchBuildings,
@@ -234,6 +237,8 @@ const PmsDashboard = () => {
     updateStayDetail,
     addGuestDetail,
     updateGuestDetail,
+    addRentDetail,
+    updateRentDetail,
     toggleModal,
   })
 
@@ -297,19 +302,28 @@ const PmsDashboard = () => {
   // --- Cascade Delete Implementation ---
   const handleComprehensiveDeletePersonalDetail = async (id) => {
     try {
-      // 1. Delete Guest Detail
+      // 1. Find the guest detail to identify associated records
       const guestDetail = guestDetails.find((gd) => String(gd.personalDetailsId) === String(id))
-      if (guestDetail) await deleteGuestDetail(guestDetail.id)
 
-      // 2. Delete Stay Detail
+      // 2. Cascade delete associated records via Guest Detail
+      if (guestDetail) {
+        // Delete Rent Detail if it exists
+        if (guestDetail.rentDetailsId) {
+          await deleteRentDetail(guestDetail.rentDetailsId)
+        }
+        // Delete the core Guest Detail entry
+        await deleteGuestDetail(guestDetail.id)
+      }
+
+      // 3. Delete Stay Detail
       const stayDetail = stayDetails.find((sd) => String(sd.personalDetailId) === String(id))
       if (stayDetail) await deleteStayDetail(stayDetail.id)
 
-      // 3. Delete Document Detail
+      // 4. Delete Document Detail
       const docDetail = documentDetails.find((dd) => String(dd.personalDetailsId) === String(id))
       if (docDetail) await deleteDocumentDetail(docDetail.id)
 
-      // 4. Finally delete the Personal Detail
+      // 5. Finally delete the Personal Detail root
       await deletePersonalDetail(id)
 
       // Refresh to ensure UI stays consistent

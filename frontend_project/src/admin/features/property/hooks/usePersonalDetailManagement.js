@@ -72,7 +72,7 @@ export const usePersonalDetailManagement = ({
     checkOutDate: defaults.checkOutDate,
     checkInTime: defaults.checkInTime,
     checkOutTime: defaults.checkOutTime,
-    guestDetailsStats: 'Reservation',
+    guestDetailsStatus: 'Reservation',
     noOfDays: defaults.noOfDays,
     rentId: '',
     roomStatusId: '',
@@ -127,7 +127,7 @@ export const usePersonalDetailManagement = ({
     checkOutDate: defaults.checkOutDate,
     checkInTime: defaults.checkInTime,
     checkOutTime: defaults.checkOutTime,
-    guestDetailsStats: 'Reservation',
+    guestDetailsStatus: 'Reservation',
     noOfDays: defaults.noOfDays,
     rentId: '',
     roomStatusId: '',
@@ -149,17 +149,23 @@ export const usePersonalDetailManagement = ({
     if (!personalFormData.firstName.trim()) return
     try {
       // 1. Create Personal Detail
-      const res = await addPersonalDetail({
+      const personalPayload = {
         firstName: personalFormData.firstName,
         lastName: personalFormData.lastName,
         companyName: personalFormData.companyName,
         phone: personalFormData.phone || personalFormData.mobileNumber,
+        mobileNumber: personalFormData.mobileNumber || personalFormData.phone,
         email: personalFormData.email,
         address: personalFormData.address,
-        profilePhoto: personalFormData.profilePhoto,
-        signature: personalFormData.signature,
-        isDeleted: personalFormData.isDeleted || false,
-      })
+        profilePhoto: personalFormData.profilePhoto || null,
+        signature: personalFormData.signature || null,
+        isDeleted: false,
+      }
+      console.log('---------------Personal Payload---------------', personalPayload)
+
+      const res = await addPersonalDetail(personalPayload)
+
+      console.log('---------------Personal Details---------------', res)
 
       const personalDetailsId = res.data.id || res.data
       let documentDetailsId = null
@@ -180,6 +186,7 @@ export const usePersonalDetailManagement = ({
             : undefined,
           deleted: false,
         })
+        console.log('---------------Document Details---------------', docRes)
         documentDetailsId = docRes.data.id || docRes.data
       }
 
@@ -220,6 +227,7 @@ export const usePersonalDetailManagement = ({
           balance: personalFormData.balance ? Number(personalFormData.balance) : 0,
           deleted: false,
         }
+        console.log('---------------Rent Payload---------------', rentPayload)
         const rentRes = await addRentDetail(rentPayload)
         rentDetailsId = rentRes.data.id || rentRes.data
       }
@@ -233,12 +241,10 @@ export const usePersonalDetailManagement = ({
         documentDetailsId: documentDetailsId,
         rentDetailsId: rentDetailsId,
         stayDetailsId: stayDetailsId,
-        checkInDate: personalFormData.checkInDate,
-        checkOutDate: personalFormData.checkOutDate,
-        checkInTime: personalFormData.checkInTime,
-        checkOutTime: personalFormData.checkOutTime,
+        checkInDate: `${personalFormData.checkInDate}T${personalFormData.checkInTime || '00:00'}:00`,
+        checkOutDate: `${personalFormData.checkOutDate}T${personalFormData.checkOutTime || '00:00'}:00`,
         noOfDays: personalFormData.noOfDays ? Number(personalFormData.noOfDays) : 1,
-        guestDetailsStats: personalFormData.guestDetailsStats || 'Reservation',
+        guestDetailsStatus: personalFormData.guestDetailsStatus || 'Reservation',
       })
 
       setPersonalFormData({
@@ -271,7 +277,7 @@ export const usePersonalDetailManagement = ({
         checkOutDate: defaults.checkOutDate,
         checkInTime: defaults.checkInTime,
         checkOutTime: defaults.checkOutTime,
-        guestDetailsStats: 'Reservation',
+        guestDetailsStatus: 'Reservation',
         noOfDays: defaults.noOfDays,
         rentId: '',
         roomStatusId: '',
@@ -306,18 +312,20 @@ export const usePersonalDetailManagement = ({
     if (!editPersonalFormData?.id) return
     try {
       // 1. Update Personal Detail
-      await updatePersonalDetail(editPersonalFormData.id, {
+      const updatePayload = {
         id: editPersonalFormData.id,
         firstName: editPersonalFormData.firstName,
         lastName: editPersonalFormData.lastName,
         companyName: editPersonalFormData.companyName,
         phone: editPersonalFormData.phone || editPersonalFormData.mobileNumber,
+        mobileNumber: editPersonalFormData.mobileNumber || editPersonalFormData.phone,
         email: editPersonalFormData.email,
         address: editPersonalFormData.address,
-        profilePhoto: editPersonalFormData.profilePhoto,
-        signature: editPersonalFormData.signature,
+        profilePhoto: editPersonalFormData.profilePhoto || null,
+        signature: editPersonalFormData.signature || null,
         isDeleted: editPersonalFormData.isDeleted || false,
-      })
+      }
+      await updatePersonalDetail(editPersonalFormData.id, updatePayload)
 
       // 2. Update or Create Document Detail
       let docId = editPersonalFormData.documentId
@@ -416,13 +424,13 @@ export const usePersonalDetailManagement = ({
         documentDetailsId: docId,
         stayDetailsId: stayId,
         rentDetailsId: rentId,
-        checkInDate: editPersonalFormData.checkInDate,
-        checkOutDate: editPersonalFormData.checkOutDate,
-        checkInTime: editPersonalFormData.checkInTime,
-        checkOutTime: editPersonalFormData.checkOutTime,
+        checkInDate: `${editPersonalFormData.checkInDate}T${editPersonalFormData.checkInTime || '00:00'}:00`,
+        checkOutDate: `${editPersonalFormData.checkOutDate}T${editPersonalFormData.checkOutTime || '00:00'}:00`,
         noOfDays: Number(editPersonalFormData.noOfDays),
-        guestDetailsStats: editPersonalFormData.guestDetailsStats || 'Reservation',
+        guestDetailsStatus: editPersonalFormData.guestDetailsStatus || 'Reservation',
       }
+
+      console.log('---------------guestPayload---------------', guestPayload)
       if (editPersonalFormData.guestDetailId) {
         await updateGuestDetail(editPersonalFormData.guestDetailId, guestPayload)
       } else {
@@ -474,7 +482,7 @@ export const usePersonalDetailManagement = ({
         checkOutDate: guest?.checkOutDate || defaults.checkOutDate,
         checkInTime: guest?.checkInTime || defaults.checkInTime,
         checkOutTime: guest?.checkOutTime || defaults.checkOutTime,
-        guestDetailsStats: guest?.guestDetailsStats || 'Reservation',
+        guestDetailsStatus: guest?.guestDetailsStatus || 'Reservation',
         noOfDays: guest?.noOfDays || defaults.noOfDays,
         rentId: guest?.rentDetailsId || guest?.rentId || '',
         roomStatusId: guest?.roomStatusId || '',
@@ -533,7 +541,7 @@ export const usePersonalDetailManagement = ({
       checkOutDate: newDefaults.checkOutDate,
       checkInTime: newDefaults.checkInTime,
       checkOutTime: newDefaults.checkOutTime,
-      guestDetailsStats: 'Reservation',
+      guestDetailsStatus: 'Reservation',
       noOfDays: 1,
       rentId: '',
       roomStatusId: '',
