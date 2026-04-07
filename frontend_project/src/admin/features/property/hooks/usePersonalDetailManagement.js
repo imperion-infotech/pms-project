@@ -63,11 +63,11 @@ export const usePersonalDetailManagement = ({
     roomTypeId: '',
     roomMasterId: '',
     comment: '',
-    color: '#3B82F6',
     rateTypeEnum: 'RACK',
     noOfGuest: 1,
-    stayStatusEnum: 'CONFIRMED',
-    // Guest Details (New)
+    stayStatusEnum: 'Confirmed',
+    deleted: false,
+    // Guest Details
     checkInDate: defaults.checkInDate,
     checkOutDate: defaults.checkOutDate,
     checkInTime: defaults.checkInTime,
@@ -117,11 +117,11 @@ export const usePersonalDetailManagement = ({
     roomTypeId: '',
     roomMasterId: '',
     comment: '',
-    color: '#3B82F6',
     rateTypeEnum: 'RACK',
     stayStatusEnum: 'Confirmed',
     noOfGuest: 1,
-    // Guest Details (New)
+    deleted: false,
+    // Guest Details
     guestDetailId: null,
     checkInDate: defaults.checkInDate,
     checkOutDate: defaults.checkOutDate,
@@ -152,18 +152,19 @@ export const usePersonalDetailManagement = ({
       const res = await addPersonalDetail({
         firstName: personalFormData.firstName,
         lastName: personalFormData.lastName,
-        mobileNumber: personalFormData.mobileNumber,
-        email: personalFormData.email,
-        phone: personalFormData.phone,
-        address: personalFormData.address,
         companyName: personalFormData.companyName,
+        phone: personalFormData.phone || personalFormData.mobileNumber,
+        email: personalFormData.email,
+        address: personalFormData.address,
         profilePhoto: personalFormData.profilePhoto,
         signature: personalFormData.signature,
         isDeleted: personalFormData.isDeleted || false,
       })
 
       const personalDetailsId = res.data.id || res.data
-      let documentId = null
+      let documentDetailsId = null
+      let stayDetailsId = null
+      let rentDetailsId = null
 
       // 2. Create Document Detail if info provided
       if (personalFormData.documentNumber || personalFormData.documentTypeId) {
@@ -179,74 +180,66 @@ export const usePersonalDetailManagement = ({
             : undefined,
           deleted: false,
         })
-        documentId = docRes.data.id || docRes.data
+        documentDetailsId = docRes.data.id || docRes.data
       }
 
       // 3. Create Stay Detail if info provided
       if (personalFormData.buildingId || personalFormData.roomMasterId) {
         const stayPayload = {
-          floorId: personalFormData.floorId ? Number(personalFormData.floorId) : undefined,
-          buildingId: personalFormData.buildingId ? Number(personalFormData.buildingId) : undefined,
-          roomTypeId: personalFormData.roomTypeId ? Number(personalFormData.roomTypeId) : undefined,
-          roomMasterId: personalFormData.roomMasterId
-            ? Number(personalFormData.roomMasterId)
-            : undefined,
-          comment: personalFormData.comment,
-          color: personalFormData.color || '#3B82F6',
-          rateTypeEnum: personalFormData.rateTypeEnum,
-          noOfGuest: personalFormData.noOfGuest ? Number(personalFormData.noOfGuest) : 1,
-          stayStatusEnum:
-            personalFormData.stayStatusEnum === 'CONFIRMED'
-              ? 'Confirmed'
-              : personalFormData.stayStatusEnum,
+          floorId: Number(personalFormData.floorId) || 1,
+          buildingId: Number(personalFormData.buildingId) || 1,
+          roomTypeId: Number(personalFormData.roomTypeId) || 1,
+          roomMasterId: Number(personalFormData.roomMasterId) || 1,
+          comment: personalFormData.comment || '',
+          color: '#3B82F6',
+          rateTypeEnum: personalFormData.rateTypeEnum || 'RACK',
+          stayStatusEnum: personalFormData.stayStatusEnum || 'Confirmed',
+          noOfGuest: Number(personalFormData.noOfGuest) || 1,
+          deleted: false,
+          personalDetailsId: personalDetailsId,
+        }
+        const stayRes = await addStayDetail(stayPayload)
+        stayDetailsId = stayRes.data.id || stayRes.data
+      }
+
+      // 4. Create Rent Details
+      if (personalFormData.rent !== '' || personalFormData.basic !== '') {
+        const rentPayload = {
+          rent: personalFormData.rent ? Number(personalFormData.rent) : 0,
+          basic: personalFormData.basic ? Number(personalFormData.basic) : 0,
+          taxId: personalFormData.taxId ? Number(personalFormData.taxId) : undefined,
+          totalRental: personalFormData.totalRental ? Number(personalFormData.totalRental) : 0,
+          otherChanrges: personalFormData.otherChanrges
+            ? Number(personalFormData.otherChanrges)
+            : 0,
+          discount: personalFormData.discount ? Number(personalFormData.discount) : 0,
+          totalCharges: personalFormData.totalCharges ? Number(personalFormData.totalCharges) : 0,
+          payments: personalFormData.payments ? Number(personalFormData.payments) : 0,
+          ccAuthorized: personalFormData.ccAuthorized ? Number(personalFormData.ccAuthorized) : 0,
+          deposite: personalFormData.deposite ? Number(personalFormData.deposite) : 0,
+          balance: personalFormData.balance ? Number(personalFormData.balance) : 0,
           deleted: false,
         }
-        await addStayDetail(stayPayload)
+        const rentRes = await addRentDetail(rentPayload)
+        rentDetailsId = rentRes.data.id || rentRes.data
       }
 
-      // 4. Create Rent Details & Guest Detail (Integration)
-      if (personalFormData.roomMasterId) {
-        let finalRentId = null
-
-        // If financial info is passed, create RentDetail
-        if (personalFormData.rent || personalFormData.basic || personalFormData.totalCharges) {
-          const rentPayload = {
-            rent: personalFormData.rent ? Number(personalFormData.rent) : 0,
-            basic: personalFormData.basic ? Number(personalFormData.basic) : 0,
-            taxId: personalFormData.taxId ? Number(personalFormData.taxId) : undefined,
-            totalRental: personalFormData.totalRental ? Number(personalFormData.totalRental) : 0,
-            otherChanrges: personalFormData.otherChanrges
-              ? Number(personalFormData.otherChanrges)
-              : 0,
-            discount: personalFormData.discount ? Number(personalFormData.discount) : 0,
-            totalCharges: personalFormData.totalCharges ? Number(personalFormData.totalCharges) : 0,
-            payments: personalFormData.payments ? Number(personalFormData.payments) : 0,
-            ccAuthorized: personalFormData.ccAuthorized ? Number(personalFormData.ccAuthorized) : 0,
-            deposite: personalFormData.deposite ? Number(personalFormData.deposite) : 0,
-            balance: personalFormData.balance ? Number(personalFormData.balance) : 0,
-          }
-          const rentRes = await addRentDetail(rentPayload)
-          finalRentId = rentRes.data.id || rentRes.data
-        }
-
-        await addGuestDetail({
-          roomMasterId: personalFormData.roomMasterId
-            ? Number(personalFormData.roomMasterId)
-            : undefined,
-          personalDetailsId: personalDetailsId,
-          documentId: documentId,
-          roomStatusId: personalFormData.roomStatusId
-            ? Number(personalFormData.roomStatusId)
-            : undefined,
-          checkInDate: personalFormData.checkInDate,
-          checkOutDate: personalFormData.checkOutDate,
-          checkInTime: personalFormData.checkInTime,
-          checkOutTime: personalFormData.checkOutTime,
-          guestDetailsStats: personalFormData.guestDetailsStats,
-          noOfDays: personalFormData.noOfDays ? Number(personalFormData.noOfDays) : 1,
-          rentId: finalRentId,
-        })
-      }
+      // 5. Create Guest Detail (Integration)
+      await addGuestDetail({
+        roomMasterId: personalFormData.roomMasterId
+          ? Number(personalFormData.roomMasterId)
+          : undefined,
+        personalDetailsId: personalDetailsId,
+        documentDetailsId: documentDetailsId,
+        rentDetailsId: rentDetailsId,
+        stayDetailsId: stayDetailsId,
+        checkInDate: personalFormData.checkInDate,
+        checkOutDate: personalFormData.checkOutDate,
+        checkInTime: personalFormData.checkInTime,
+        checkOutTime: personalFormData.checkOutTime,
+        noOfDays: personalFormData.noOfDays ? Number(personalFormData.noOfDays) : 1,
+        guestDetailsStats: personalFormData.guestDetailsStats || 'Reservation',
+      })
 
       setPersonalFormData({
         firstName: '',
@@ -270,10 +263,10 @@ export const usePersonalDetailManagement = ({
         roomTypeId: '',
         roomMasterId: '',
         comment: '',
-        color: '#3B82F6',
         rateTypeEnum: 'RACK',
         noOfGuest: 1,
         stayStatusEnum: 'Confirmed',
+        deleted: false,
         checkInDate: defaults.checkInDate,
         checkOutDate: defaults.checkOutDate,
         checkInTime: defaults.checkInTime,
@@ -296,7 +289,7 @@ export const usePersonalDetailManagement = ({
       })
       toggleModal('personalDetail', false)
     } catch (err) {
-      console.error('Failed to create personal detail / document / stay / guest detail:', err)
+      console.error('Failed to create guest package:', err)
     }
   }, [
     personalFormData,
@@ -317,11 +310,10 @@ export const usePersonalDetailManagement = ({
         id: editPersonalFormData.id,
         firstName: editPersonalFormData.firstName,
         lastName: editPersonalFormData.lastName,
-        mobileNumber: editPersonalFormData.mobileNumber || editPersonalFormData.phone,
-        email: editPersonalFormData.email,
-        phone: editPersonalFormData.phone,
-        address: editPersonalFormData.address,
         companyName: editPersonalFormData.companyName,
+        phone: editPersonalFormData.phone || editPersonalFormData.mobileNumber,
+        email: editPersonalFormData.email,
+        address: editPersonalFormData.address,
         profilePhoto: editPersonalFormData.profilePhoto,
         signature: editPersonalFormData.signature,
         isDeleted: editPersonalFormData.isDeleted || false,
@@ -333,14 +325,14 @@ export const usePersonalDetailManagement = ({
         const docPayload = {
           documentNumber: editPersonalFormData.documentNumber,
           validTill: editPersonalFormData.validTill,
+          frontImagePath: editPersonalFormData.frontImagePath,
+          backImagePath: editPersonalFormData.backImagePath,
           remark: editPersonalFormData.remark,
           personalDetails: { id: editPersonalFormData.id },
           documentType: editPersonalFormData.documentTypeId
             ? { id: Number(editPersonalFormData.documentTypeId) }
             : undefined,
-          frontImagePath: editPersonalFormData.frontImagePath,
-          backImagePath: editPersonalFormData.backImagePath,
-          deleted: editPersonalFormData.deleted || false,
+          deleted: false,
         }
 
         if (editPersonalFormData.documentId) {
@@ -352,6 +344,8 @@ export const usePersonalDetailManagement = ({
       }
 
       // 3. Update or Create Stay Detail
+      let stayId = editPersonalFormData.stayId
+      console.log('Stay ID', stayId)
       if (editPersonalFormData.buildingId || editPersonalFormData.roomMasterId) {
         const stayPayload = {
           floorId: editPersonalFormData.floorId ? Number(editPersonalFormData.floorId) : undefined,
@@ -365,84 +359,80 @@ export const usePersonalDetailManagement = ({
             ? Number(editPersonalFormData.roomMasterId)
             : undefined,
           comment: editPersonalFormData.comment,
-          color: editPersonalFormData.color || '#3B82F6',
+          color: '#3B82F6',
           rateTypeEnum: editPersonalFormData.rateTypeEnum,
+          stayStatusEnum: editPersonalFormData.stayStatusEnum,
           noOfGuest: editPersonalFormData.noOfGuest ? Number(editPersonalFormData.noOfGuest) : 1,
-          stayStatusEnum:
-            editPersonalFormData.stayStatusEnum === 'CONFIRMED'
-              ? 'Confirmed'
-              : editPersonalFormData.stayStatusEnum,
           deleted: editPersonalFormData.deleted || false,
+          personalDetailsId: editPersonalFormData.id,
         }
 
         if (editPersonalFormData.stayId) {
           await updateStayDetail(editPersonalFormData.stayId, stayPayload)
         } else {
-          await addStayDetail(stayPayload)
+          const stayRes = await addStayDetail(stayPayload)
+          stayId = stayRes.data.id || stayRes.data
         }
       }
 
-      // 4. Update or Create Rent Details & Guest Detail
-      if (editPersonalFormData.roomMasterId) {
-        let finalRentId = editPersonalFormData.rentId
-
-        if (editPersonalFormData.rent !== '' || editPersonalFormData.basic !== '') {
-          const rentPayload = {
-            rent: editPersonalFormData.rent ? Number(editPersonalFormData.rent) : 0,
-            basic: editPersonalFormData.basic ? Number(editPersonalFormData.basic) : 0,
-            taxId: editPersonalFormData.taxId ? Number(editPersonalFormData.taxId) : undefined,
-            totalRental: editPersonalFormData.totalRental
-              ? Number(editPersonalFormData.totalRental)
-              : 0,
-            otherChanrges: editPersonalFormData.otherChanrges
-              ? Number(editPersonalFormData.otherChanrges)
-              : 0,
-            discount: editPersonalFormData.discount ? Number(editPersonalFormData.discount) : 0,
-            totalCharges: editPersonalFormData.totalCharges
-              ? Number(editPersonalFormData.totalCharges)
-              : 0,
-            payments: editPersonalFormData.payments ? Number(editPersonalFormData.payments) : 0,
-            ccAuthorized: editPersonalFormData.ccAuthorized
-              ? Number(editPersonalFormData.ccAuthorized)
-              : 0,
-            deposite: editPersonalFormData.deposite ? Number(editPersonalFormData.deposite) : 0,
-            balance: editPersonalFormData.balance ? Number(editPersonalFormData.balance) : 0,
-          }
-          if (finalRentId) {
-            await updateRentDetail(finalRentId, rentPayload)
-          } else {
-            const rentRes = await addRentDetail(rentPayload)
-            finalRentId = rentRes.data.id || rentRes.data
-          }
+      // 4. Update or Create Rent Details
+      let rentId = editPersonalFormData.rentId
+      console.log('Rent ID', rentId)
+      if (editPersonalFormData.rent !== '' || editPersonalFormData.basic !== '') {
+        const rentPayload = {
+          rent: editPersonalFormData.rent ? Number(editPersonalFormData.rent) : 0,
+          basic: editPersonalFormData.basic ? Number(editPersonalFormData.basic) : 0,
+          taxId: editPersonalFormData.taxId ? Number(editPersonalFormData.taxId) : undefined,
+          totalRental: editPersonalFormData.totalRental
+            ? Number(editPersonalFormData.totalRental)
+            : 0,
+          otherChanrges: editPersonalFormData.otherChanrges
+            ? Number(editPersonalFormData.otherChanrges)
+            : 0,
+          discount: editPersonalFormData.discount ? Number(editPersonalFormData.discount) : 0,
+          totalCharges: editPersonalFormData.totalCharges
+            ? Number(editPersonalFormData.totalCharges)
+            : 0,
+          payments: editPersonalFormData.payments ? Number(editPersonalFormData.payments) : 0,
+          ccAuthorized: editPersonalFormData.ccAuthorized
+            ? Number(editPersonalFormData.ccAuthorized)
+            : 0,
+          deposite: editPersonalFormData.deposite ? Number(editPersonalFormData.deposite) : 0,
+          balance: editPersonalFormData.balance ? Number(editPersonalFormData.balance) : 0,
+          deleted: false,
         }
-
-        const guestPayload = {
-          roomMasterId: Number(editPersonalFormData.roomMasterId),
-          personalDetailsId: editPersonalFormData.id,
-          documentId: docId,
-          roomStatusId: editPersonalFormData.roomStatusId
-            ? Number(editPersonalFormData.roomStatusId)
-            : undefined,
-          checkInDate: editPersonalFormData.checkInDate,
-          checkOutDate: editPersonalFormData.checkOutDate,
-          checkInTime: editPersonalFormData.checkInTime,
-          checkOutTime: editPersonalFormData.checkOutTime,
-          guestDetailsStats: editPersonalFormData.guestDetailsStats,
-          noOfDays: Number(editPersonalFormData.noOfDays),
-          rentId: finalRentId ? Number(finalRentId) : undefined,
-        }
-
-        if (editPersonalFormData.guestDetailId) {
-          await updateGuestDetail(editPersonalFormData.guestDetailId, guestPayload)
+        if (rentId) {
+          await updateRentDetail(rentId, rentPayload)
         } else {
-          await addGuestDetail(guestPayload)
+          const rentRes = await addRentDetail(rentPayload)
+          rentId = rentRes.data.id || rentRes.data
         }
+      }
+
+      // 5. Update or Create Guest Detail
+      const guestPayload = {
+        roomMasterId: Number(editPersonalFormData.roomMasterId),
+        personalDetailsId: editPersonalFormData.id,
+        documentDetailsId: docId,
+        stayDetailsId: stayId,
+        rentDetailsId: rentId,
+        checkInDate: editPersonalFormData.checkInDate,
+        checkOutDate: editPersonalFormData.checkOutDate,
+        checkInTime: editPersonalFormData.checkInTime,
+        checkOutTime: editPersonalFormData.checkOutTime,
+        noOfDays: Number(editPersonalFormData.noOfDays),
+        guestDetailsStats: editPersonalFormData.guestDetailsStats || 'Reservation',
+      }
+      if (editPersonalFormData.guestDetailId) {
+        await updateGuestDetail(editPersonalFormData.guestDetailId, guestPayload)
+      } else {
+        await addGuestDetail(guestPayload)
       }
 
       setEditPersonalFormData({ id: null, isDeleted: false })
       toggleModal('personalDetailEdit', false)
     } catch (err) {
-      console.error('Failed to update personal detail / document / stay / guest detail:', err)
+      console.error('Failed to update guest package:', err)
     }
   }, [
     editPersonalFormData,
@@ -475,10 +465,10 @@ export const usePersonalDetailManagement = ({
         roomTypeId: stay?.roomTypeId || '',
         roomMasterId: stay?.roomMasterId || '',
         comment: stay?.comment || '',
-        color: stay?.color || '#3B82F6',
         rateTypeEnum: stay?.rateTypeEnum || 'RACK',
         noOfGuest: stay?.noOfGuest || 1,
         stayStatusEnum: stay?.stayStatusEnum || 'Confirmed',
+        deleted: stay?.deleted || false,
         guestDetailId: guest?.id || null,
         checkInDate: guest?.checkInDate || defaults.checkInDate,
         checkOutDate: guest?.checkOutDate || defaults.checkOutDate,
@@ -486,7 +476,7 @@ export const usePersonalDetailManagement = ({
         checkOutTime: guest?.checkOutTime || defaults.checkOutTime,
         guestDetailsStats: guest?.guestDetailsStats || 'Reservation',
         noOfDays: guest?.noOfDays || defaults.noOfDays,
-        rentId: guest?.rentId || '',
+        rentId: guest?.rentDetailsId || guest?.rentId || '',
         roomStatusId: guest?.roomStatusId || '',
         // Rent Detail Populate
         rent: rentDetailObj?.rent || '',
@@ -534,10 +524,10 @@ export const usePersonalDetailManagement = ({
       roomTypeId: '',
       roomMasterId: '',
       comment: '',
-      color: '#3B82F6',
       rateTypeEnum: 'RACK',
       noOfGuest: 1,
       stayStatusEnum: 'Confirmed',
+      deleted: false,
       // Dynamic Defaults
       checkInDate: newDefaults.checkInDate,
       checkOutDate: newDefaults.checkOutDate,

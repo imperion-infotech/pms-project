@@ -159,8 +159,8 @@ const PersonalDetailManagement = ({
                 details.map((guest, idx) => {
                   const guestDocument = getGuestDocument(guest.id)
                   const guestStay = getGuestStay(guest.id)
-                  const guestDetail = getGuestDetail(guest.id) // New
-                  const rent = guestDetail && rentDetails ? rentDetails.find((r) => String(r.id) === String(guestDetail.rentId)) : null
+                  const guestDetail = getGuestDetail(guest.id)
+                  const rent = guestDetail && rentDetails ? rentDetails.find((r) => String(r.id) === String(guestDetail.rentDetailsId || guestDetail.rentId)) : null
                   return (
                     <tr
                       key={guest.id}
@@ -220,7 +220,7 @@ const PersonalDetailManagement = ({
                       <td className="px-8 py-2 text-center">
                         <div className="flex items-center justify-center gap-3">
                           <button
-                            onClick={() => onEdit(guest, guestDocument, guestStay, guestDetail)}
+                            onClick={() => onEdit(guest, guestDocument, guestStay, guestDetail, rent)}
                             className="rounded-lg p-1.5 text-blue-500 transition-colors hover:bg-blue-50 dark:hover:bg-blue-500/10"
                             title="Edit Profile"
                           >

@@ -50,16 +50,23 @@ const usePersonalDetailController = ({
 
   const getGuestDocument = (personalDetailsId) => {
     return documentDetails.find(
-      (doc) => String(doc.personalDetails?.id || doc.personalDetailsId) === String(personalDetailsId),
+      (doc) =>
+        String(doc.personalDetails?.id || doc.personalDetailsId) === String(personalDetailsId),
     )
   }
 
   const getGuestStay = (personalDetailId) => {
-    return stayDetails.find((stay) => String(stay.personalDetails?.id || stay.personalDetailId || stay.personalDetailsId) === String(personalDetailId))
+    return stayDetails.find(
+      (stay) =>
+        String(stay.personalDetails?.id || stay.personalDetailId || stay.personalDetailsId) ===
+        String(personalDetailId),
+    )
   }
 
   const getGuestDetail = (personalDetailsId) => {
-    return guestDetails.find((gd) => String(gd.personalDetails?.id || gd.personalDetailsId) === String(personalDetailsId))
+    return guestDetails.find(
+      (gd) => String(gd.personalDetails?.id || gd.personalDetailsId) === String(personalDetailsId),
+    )
   }
 
   const getDocumentTypeName = (documentTypeId) => {

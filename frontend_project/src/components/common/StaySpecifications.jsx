@@ -12,7 +12,7 @@ const StaySpecifications = ({
   floors = [],
   roomTypes = [],
   rooms = [],
-  roomStatuses = [],
+  // roomStatuses = [],
   isDark = false,
 }) => {
   // Shared UI classes
@@ -55,7 +55,7 @@ const StaySpecifications = ({
               onChange={handleChange}
               className={selectClass}
             >
-              {/* <option value="">Main</option> */}
+              {/* <option value="1">Main</option> */}
               {buildings?.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.name}
@@ -181,7 +181,8 @@ const StaySpecifications = ({
         </div>
       </div>
 
-      {/* Section 1: Guest Management */}
+      {/* Section 1: Guest Management (Commented out as it's not in the requested JSON) */}
+      {/* 
       <div className="grid grid-cols-1 gap-4">
         <div>
           <label className={labelClass}>Room Status</label>
@@ -202,6 +203,7 @@ const StaySpecifications = ({
           </div>
         </div>
       </div>
+      */}
 
       {/* Required Booking Attributes */}
       <div className="grid grid-cols-2 gap-3">
@@ -246,19 +248,6 @@ const StaySpecifications = ({
               <option value="Confirmed">Confirmed</option>
               <option value="Unconfirmed">Unconfirmed</option>
             </select>
-          </div>
-        </div>
-
-        <div>
-          <label className={labelClass}>Booking Color*</label>
-          <div className={inputContainerClass}>
-            <input
-              type="color"
-              name="color"
-              value={formData.color || '#3B82F6'}
-              onChange={handleChange}
-              className={`${inputClass} h-6 w-full cursor-pointer p-0`}
-            />
           </div>
         </div>
       </div>

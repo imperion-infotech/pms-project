@@ -57,8 +57,8 @@ const RentDetails = ({ formData, handleChange, isDark = false }) => {
           isDark={isDark}
         />
         <FieldRow
-          label="Basic Rent"
-          name="totalRental"
+          label="Basic"
+          name="basic"
           formData={formData}
           handleChange={handleChange}
           isDark={isDark}
@@ -126,25 +126,14 @@ const RentDetails = ({ formData, handleChange, isDark = false }) => {
           handleChange={handleChange}
           isDark={isDark}
         />
-      </div>
-
-      <div className="mt-4 border-t-2 border-slate-800 pt-3 dark:border-slate-200">
-        <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-800">
-          <label className="text-[11px] font-black tracking-widest text-slate-900 uppercase dark:text-white">
-            Balance
-          </label>
-          <div className="w-[45%]">
-            <input
-              type="number"
-              name="balance"
-              value={formData.balance || ''}
-              onChange={handleChange}
-              readOnly
-              className="w-full bg-transparent text-right text-base font-black text-slate-900 outline-none dark:text-slate-100"
-              placeholder="0.00"
-            />
-          </div>
-        </div>
+        <FieldRow
+          label="Balance"
+          name="balance"
+          highlight
+          formData={formData}
+          handleChange={handleChange}
+          isDark={isDark}
+        />
       </div>
     </div>
   )
