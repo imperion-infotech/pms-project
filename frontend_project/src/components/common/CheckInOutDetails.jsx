@@ -2,61 +2,67 @@ import React from 'react'
 
 const CheckInOutDetails = ({ formData, handleChange }) => {
   return (
-    <div className="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50/50 p-1.5 dark:border-slate-800 dark:bg-slate-800/40">
+    <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/40 grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+      
       {/* CHECK-IN */}
-      <div className="flex flex-1 items-center justify-between rounded-lg border border-slate-200 bg-white px-2 py-1.5 shadow-sm transition-all focus-within:border-blue-500/50 focus-within:ring-2 focus-within:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900">
-        <input
-          type="date"
-          name="checkInDate"
-          value={formData.checkInDate ? formData.checkInDate.split('T')[0] : ''}
-          onChange={handleChange}
-          className="w-full bg-transparent text-[10px] font-bold text-slate-700 outline-none dark:text-slate-200"
-        />
-        <div className="mx-2 h-3 w-px bg-slate-200 dark:bg-slate-700"></div>
-        <input
-          type="time"
-          name="checkInTime"
-          value={formData.checkInTime}
-          onChange={handleChange}
-          className="w-16 bg-transparent text-[10px] font-bold text-slate-700 outline-none dark:text-slate-200"
-          step="1"
-        />
+      <div>
+        <label className="mb-1.5 block text-[9px] font-black tracking-widest text-slate-400 uppercase">Check-In</label>
+        <div className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-2.5 py-2 shadow-sm transition-all focus-within:border-emerald-500/50 focus-within:ring-2 focus-within:ring-emerald-500/10 dark:border-slate-700 dark:bg-slate-900">
+          <input
+            type="date"
+            name="checkInDate"
+            value={formData.checkInDate ? formData.checkInDate.split('T')[0] : ''}
+            onChange={handleChange}
+            className="w-full min-w-0 bg-transparent text-[10px] font-bold text-slate-700 outline-none dark:text-slate-200"
+          />
+          <div className="mx-2 h-3 w-px shrink-0 bg-slate-200 dark:bg-slate-700"></div>
+          <input
+            type="time"
+            name="checkInTime"
+            value={formData.checkInTime}
+            onChange={handleChange}
+            className="w-auto shrink-0 bg-transparent text-[10px] font-bold text-slate-700 outline-none dark:text-slate-200"
+            step="1"
+          />
+        </div>
       </div>
 
-      {/* DURATION */}
-      <div className="flex items-center rounded-lg border border-blue-100 bg-blue-50 px-2 py-1.5 dark:border-blue-900/50 dark:bg-blue-900/20">
-        <span className="mr-1 text-[9px] font-black tracking-widest text-blue-500 uppercase">
-          Days
-        </span>
-        <input
-          type="number"
-          name="noOfDays"
-          value={formData.noOfDays}
-          onChange={handleChange}
-          className="w-6 bg-transparent text-center text-[11px] font-black text-blue-700 outline-none dark:text-blue-400"
-          min="1"
-        />
+      {/* CHECK-OUT & DURATION */}
+      <div>
+        <div className="flex items-center justify-between mb-1.5">
+          <label className="block text-[9px] font-black tracking-widest text-slate-400 uppercase">Check-Out</label>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[8px] font-black tracking-widest text-blue-500 uppercase">Days</span>
+            <input
+              type="number"
+              name="noOfDays"
+              value={formData.noOfDays}
+              onChange={handleChange}
+              className="w-10 rounded-md bg-blue-100/60 px-1 py-0.5 text-center text-[10px] font-black text-blue-700 outline-none dark:bg-blue-900/40 dark:text-blue-400 focus:ring-2 focus:ring-blue-400/30"
+              min="1"
+            />
+          </div>
+        </div>
+        <div className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-2.5 py-2 shadow-sm transition-all focus-within:border-emerald-500/50 focus-within:ring-2 focus-within:ring-emerald-500/10 dark:border-slate-700 dark:bg-slate-900">
+          <input
+            type="date"
+            name="checkOutDate"
+            value={formData.checkOutDate ? formData.checkOutDate.split('T')[0] : ''}
+            onChange={handleChange}
+            className="w-full min-w-0 bg-transparent text-[10px] font-bold text-slate-700 outline-none dark:text-slate-200"
+          />
+          <div className="mx-2 h-3 w-px shrink-0 bg-slate-200 dark:bg-slate-700"></div>
+          <input
+            type="time"
+            name="checkOutTime"
+            value={formData.checkOutTime}
+            onChange={handleChange}
+            className="w-auto shrink-0 bg-transparent text-[10px] font-bold text-slate-700 outline-none dark:text-slate-200"
+            step="1"
+          />
+        </div>
       </div>
 
-      {/* CHECK-OUT */}
-      <div className="flex flex-1 items-center justify-between rounded-lg border border-slate-200 bg-white px-2 py-1.5 shadow-sm transition-all focus-within:border-blue-500/50 focus-within:ring-2 focus-within:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900">
-        <input
-          type="date"
-          name="checkOutDate"
-          value={formData.checkOutDate ? formData.checkOutDate.split('T')[0] : ''}
-          onChange={handleChange}
-          className="w-full bg-transparent text-[10px] font-bold text-slate-700 outline-none dark:text-slate-200"
-        />
-        <div className="mx-2 h-3 w-px bg-slate-200 dark:bg-slate-700"></div>
-        <input
-          type="time"
-          name="checkOutTime"
-          value={formData.checkOutTime}
-          onChange={handleChange}
-          className="w-16 bg-transparent text-[10px] font-bold text-slate-700 outline-none dark:text-slate-200"
-          step="1"
-        />
-      </div>
     </div>
   )
 }

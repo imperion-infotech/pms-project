@@ -35,7 +35,7 @@ const StaySpecifications = ({
           <h3
             className={`text-xs font-black tracking-[0.2em] uppercase ${isDark ? 'text-slate-200' : 'text-slate-800'}`}
           >
-            Stay Specifications
+            Stay Details
           </h3>
           <p className="mt-0.5 text-[9px] font-bold tracking-widest text-slate-400 uppercase">
             Booking & Unit Allocation

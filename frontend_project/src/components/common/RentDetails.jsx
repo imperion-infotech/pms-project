@@ -10,12 +10,12 @@ const FieldRow = ({
   isDark,
 }) => {
   const containerClass =
-    'flex items-center justify-between py-1.5 border-b border-dashed border-slate-200 dark:border-slate-700/50'
+    'flex items-center justify-between py-1 border-b border-dashed border-slate-200 dark:border-slate-700/50'
   const labelClass = 'text-[9px] font-bold text-slate-500 uppercase tracking-widest'
-  const inputContainerClass = `flex items-center px-2 py-1 rounded-lg w-20 md:w-24 border transition-all ${
+  const inputContainerClass = `flex items-center px-2 py-0.5 rounded-lg w-24 border transition-all ${
     isDark
       ? 'bg-slate-800/30 border-slate-700 focus-within:border-blue-500/50 focus-within:ring-2 focus-within:ring-blue-500/10'
-      : 'bg-white border-slate-200 shadow-sm focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/10'
+      : 'bg-white border-slate-100 shadow-sm focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/10'
   }`
   const inputClass =
     'bg-transparent border-none outline-none w-full text-[10px] font-black text-right text-slate-800 dark:text-slate-100 placeholder:text-slate-300'
@@ -47,14 +47,7 @@ const FieldRow = ({
 const RentDetails = ({ formData, handleChange, isDark = false }) => {
   return (
     <div className="flex h-full flex-col font-sans">
-      <div className="mb-4 flex items-center gap-2 border-b border-slate-200 pb-2 dark:border-slate-700">
-        <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-500"></div>
-        <span className="text-[10px] font-black tracking-widest text-slate-700 uppercase dark:text-slate-200">
-          Rent Details
-        </span>
-      </div>
-
-      <div className="flex-1 space-y-0.5">
+      <div className="flex-1 space-y-1">
         <FieldRow
           label="Rent"
           name="rent"
@@ -135,12 +128,12 @@ const RentDetails = ({ formData, handleChange, isDark = false }) => {
         />
       </div>
 
-      <div className="mt-4 border-t-2 border-slate-800 pt-2 dark:border-slate-200">
-        <div className="flex items-center justify-between rounded-xl bg-slate-100 px-4 py-3 dark:bg-slate-800">
-          <label className="text-xs font-black tracking-widest text-slate-900 uppercase dark:text-white">
+      <div className="mt-4 border-t-2 border-slate-800 pt-3 dark:border-slate-200">
+        <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-800">
+          <label className="text-[11px] font-black tracking-widest text-slate-900 uppercase dark:text-white">
             Balance
           </label>
-          <div className="w-24">
+          <div className="w-[45%]">
             <input
               type="number"
               name="balance"
