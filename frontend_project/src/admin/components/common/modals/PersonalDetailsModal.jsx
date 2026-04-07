@@ -80,7 +80,7 @@ export const PersonalDetailsModal = ({
     (cleanImageUrl(formData.signature) ? `/user/${cleanImageUrl(formData.signature)}` : null)
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div
         className="animate-in fade-in absolute inset-0 bg-slate-900/80 backdrop-blur-md"
         onClick={() => setIsOpen(false)}
@@ -90,7 +90,7 @@ export const PersonalDetailsModal = ({
           {/* Header */}
           <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-white/80 px-8 py-5 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80">
             <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/20">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/20">
                 <User className="h-6 w-6 text-white" />
               </div>
               <div>
@@ -477,7 +477,7 @@ export const PersonalDetailsModal = ({
 
             {/* Column 3: Rent / Financial Details */}
             <div className="scrollbar-hide relative flex w-full flex-col bg-emerald-50/30 transition-all lg:w-[22%] dark:bg-emerald-900/5">
-              <div className="absolute inset-y-0 left-0 hidden w-px bg-gradient-to-b from-transparent via-emerald-200 to-transparent lg:block dark:via-emerald-500/20"></div>
+              <div className="absolute inset-y-0 left-0 hidden w-px bg-linear-to-b from-transparent via-emerald-200 to-transparent lg:block dark:via-emerald-500/20"></div>
 
               <div className="flex items-center gap-3 p-5 pb-0">
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30">
@@ -514,7 +514,7 @@ export const PersonalDetailsModal = ({
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center gap-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-3 text-xs font-black tracking-widest text-white uppercase shadow-lg shadow-emerald-500/30 transition-all hover:scale-105 hover:shadow-emerald-500/40 active:scale-95 disabled:pointer-events-none disabled:opacity-70"
+              className="flex items-center gap-3 rounded-xl bg-linear-to-r from-emerald-500 to-teal-500 px-8 py-3 text-xs font-black tracking-widest text-white uppercase shadow-lg shadow-emerald-500/30 transition-all hover:scale-105 hover:shadow-emerald-500/40 active:scale-95 disabled:pointer-events-none disabled:opacity-70"
             >
               {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
               <span>Commit Guest Profile</span>
