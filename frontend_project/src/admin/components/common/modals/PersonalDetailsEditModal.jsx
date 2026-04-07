@@ -401,7 +401,29 @@ export const PersonalDetailsEditModal = ({
             <div className="scrollbar-hide w-full space-y-4 overflow-y-auto border-r border-slate-100 bg-slate-50/30 p-6 text-left md:w-[45%] dark:border-slate-800 dark:bg-slate-800/10">
               <GuestInformation
                 formData={formData}
-                handleChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
+                handleChange={(e) => {
+                  const { name, value } = e.target
+                  let updated = { ...formData, [name]: value }
+
+                  if (name === 'noOfDays' || name === 'checkInDate') {
+                    const days = parseInt(name === 'noOfDays' ? value : formData.noOfDays || 1) || 1
+                    const start = name === 'checkInDate' ? value : formData.checkInDate
+                    if (start) {
+                      const d = new Date(start)
+                      d.setDate(d.getDate() + days)
+                      updated.checkOutDate = d.toISOString().split('T')[0]
+                      updated.noOfDays = days
+                    }
+                  } else if (name === 'checkOutDate') {
+                    if (formData.checkInDate && value) {
+                      const start = new Date(formData.checkInDate)
+                      const end = new Date(value)
+                      const diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24))
+                      updated.noOfDays = diff >= 0 ? diff : 0
+                    }
+                  }
+                  setFormData(updated)
+                }}
                 isDark={false}
               />
               <StaySpecifications

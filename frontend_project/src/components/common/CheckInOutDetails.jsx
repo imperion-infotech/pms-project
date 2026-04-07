@@ -1,6 +1,8 @@
 import React from 'react'
 
 const CheckInOutDetails = ({ formData, handleChange }) => {
+  const today = new Date().toISOString().split('T')[0]
+
   return (
     <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/40 grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
       
@@ -11,8 +13,9 @@ const CheckInOutDetails = ({ formData, handleChange }) => {
           <input
             type="date"
             name="checkInDate"
-            value={formData.checkInDate ? formData.checkInDate.split('T')[0] : ''}
+            value={formData.checkInDate ? (formData.checkInDate.includes('T') ? formData.checkInDate.split('T')[0] : formData.checkInDate) : ''}
             onChange={handleChange}
+            min={today}
             className="w-full min-w-0 bg-transparent text-[10px] font-bold text-slate-700 outline-none dark:text-slate-200"
           />
           <div className="mx-2 h-3 w-px shrink-0 bg-slate-200 dark:bg-slate-700"></div>
@@ -47,8 +50,9 @@ const CheckInOutDetails = ({ formData, handleChange }) => {
           <input
             type="date"
             name="checkOutDate"
-            value={formData.checkOutDate ? formData.checkOutDate.split('T')[0] : ''}
+            value={formData.checkOutDate ? (formData.checkOutDate.includes('T') ? formData.checkOutDate.split('T')[0] : formData.checkOutDate) : ''}
             onChange={handleChange}
+            min={formData.checkInDate ? (formData.checkInDate.includes('T') ? formData.checkInDate.split('T')[0] : formData.checkInDate) : today}
             className="w-full min-w-0 bg-transparent text-[10px] font-bold text-slate-700 outline-none dark:text-slate-200"
           />
           <div className="mx-2 h-3 w-px shrink-0 bg-slate-200 dark:bg-slate-700"></div>

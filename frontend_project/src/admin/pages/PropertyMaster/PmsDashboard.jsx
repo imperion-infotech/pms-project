@@ -224,6 +224,7 @@ const PmsDashboard = () => {
     handleAddPersonalDetail,
     handleUpdatePersonalDetail,
     handleEditPersonalDetail,
+    handleAddNewPersonalDetail,
   } = usePersonalDetailManagement({
     addPersonalDetail,
     updatePersonalDetail,
@@ -477,7 +478,7 @@ const PmsDashboard = () => {
               deleteRoomType={deleteRoomType}
               deleteRoomStatus={deleteRoomStatus}
               deleteRoom={deleteRoom}
-              onAddPersonalDetail={() => toggleModal('personalDetail', true)}
+              onAddPersonalDetail={handleAddNewPersonalDetail}
               onEditPersonalDetail={handleEditPersonalDetail}
               onDeletePersonalDetail={handleComprehensiveDeletePersonalDetail}
               personalDetails={personalDetails}

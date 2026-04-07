@@ -449,9 +449,30 @@ export const PersonalDetailsModal = ({
                 <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                   <GuestInformation
                     formData={formData}
-                    handleChange={(e) =>
-                      setFormData({ ...formData, [e.target.name]: e.target.value })
-                    }
+                    handleChange={(e) => {
+                      const { name, value } = e.target
+                      let updated = { ...formData, [name]: value }
+
+                      if (name === 'noOfDays' || name === 'checkInDate') {
+                        const days =
+                          parseInt(name === 'noOfDays' ? value : formData.noOfDays || 1) || 1
+                        const start = name === 'checkInDate' ? value : formData.checkInDate
+                        if (start) {
+                          const d = new Date(start)
+                          d.setDate(d.getDate() + days)
+                          updated.checkOutDate = d.toISOString().split('T')[0]
+                          updated.noOfDays = days
+                        }
+                      } else if (name === 'checkOutDate') {
+                        if (formData.checkInDate && value) {
+                          const start = new Date(formData.checkInDate)
+                          const end = new Date(value)
+                          const diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24))
+                          updated.noOfDays = diff >= 0 ? diff : 0
+                        }
+                      }
+                      setFormData(updated)
+                    }}
                     isDark={false}
                   />
                 </div>
@@ -459,9 +480,7 @@ export const PersonalDetailsModal = ({
                 <div className="rounded-2xl border border-amber-100/50 bg-amber-50/50 p-5 dark:border-amber-900/20 dark:bg-amber-900/10">
                   <StaySpecifications
                     formData={formData}
-                    handleChange={(e) =>
-                      setFormData({ ...formData, [e.target.name]: e.target.value })
-                    }
+                    handleChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
                     buildings={buildings}
                     floors={floors}
                     roomTypes={roomTypes}

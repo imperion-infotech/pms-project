@@ -78,8 +78,6 @@ const StaySpecifications = ({
             >
               <option value="Confirmed">Confirmed</option>
               <option value="Unconfirmed">Unconfirmed</option>
-              <option value="Cancelled">Cancelled</option>
-              <option value="No_show">No Show</option>
             </select>
           </div>
         </div>
@@ -95,7 +93,7 @@ const StaySpecifications = ({
               <option value="RACK">RACK</option>
               <option value="CORPORATE">Corporate</option>
               <option value="GROUP">Group</option>
-              <option value="COMPLIMENTARY">Complimentary</option>
+              {/* <option value="COMPLIMENTARY">Complimentary</option> */}
             </select>
           </div>
         </div>
@@ -125,7 +123,7 @@ const StaySpecifications = ({
               onChange={handleChange}
               className={selectClass}
             >
-              <option value="">Main</option>
+              {/* <option value="">Main</option> */}
               {buildings?.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.name}

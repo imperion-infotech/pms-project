@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 
 /**
  * usePersonalDetailManagement - Centralized hook for Guest Personal Detail CRUD operations.
@@ -16,6 +16,29 @@ export const usePersonalDetailManagement = ({
   updateRentDetail,
   toggleModal,
 }) => {
+  // --- Standardized Industrial Stay Defaults ---
+  const getIndustrialStayDefaults = useCallback(() => {
+    const now = new Date()
+    // Extract YYYY-MM-DD
+    const checkInDate = now.toISOString().split('T')[0]
+    // Extract HH:mm
+    const checkInTime = now.toTimeString().slice(0, 5)
+
+    const tomorrow = new Date(now)
+    tomorrow.setDate(now.getDate() + 1)
+    const checkOutDate = tomorrow.toISOString().split('T')[0]
+
+    return {
+      checkInDate,
+      checkInTime,
+      checkOutDate,
+      checkOutTime: checkInTime,
+      noOfDays: 1,
+    }
+  }, [])
+
+  const defaults = useMemo(() => getIndustrialStayDefaults(), [getIndustrialStayDefaults])
+
   const [personalFormData, setPersonalFormData] = useState({
     firstName: '',
     lastName: '',
@@ -45,12 +68,12 @@ export const usePersonalDetailManagement = ({
     noOfGuest: 1,
     stayStatusEnum: 'CONFIRMED',
     // Guest Details (New)
-    checkInDate: '',
-    checkOutDate: '',
-    checkInTime: '',
-    checkOutTime: '',
+    checkInDate: defaults.checkInDate,
+    checkOutDate: defaults.checkOutDate,
+    checkInTime: defaults.checkInTime,
+    checkOutTime: defaults.checkOutTime,
     guestDetailsStats: 'Reservation',
-    noOfDays: 1,
+    noOfDays: defaults.noOfDays,
     rentId: '',
     roomStatusId: '',
     // Rent Details
@@ -100,12 +123,12 @@ export const usePersonalDetailManagement = ({
     noOfGuest: 1,
     // Guest Details (New)
     guestDetailId: null,
-    checkInDate: '',
-    checkOutDate: '',
-    checkInTime: '',
-    checkOutTime: '',
+    checkInDate: defaults.checkInDate,
+    checkOutDate: defaults.checkOutDate,
+    checkInTime: defaults.checkInTime,
+    checkOutTime: defaults.checkOutTime,
     guestDetailsStats: 'Reservation',
-    noOfDays: 1,
+    noOfDays: defaults.noOfDays,
     rentId: '',
     roomStatusId: '',
     // Rent Details
@@ -251,12 +274,12 @@ export const usePersonalDetailManagement = ({
         rateTypeEnum: 'RACK',
         noOfGuest: 1,
         stayStatusEnum: 'Confirmed',
-        checkInDate: '',
-        checkOutDate: '',
-        checkInTime: '',
-        checkOutTime: '',
+        checkInDate: defaults.checkInDate,
+        checkOutDate: defaults.checkOutDate,
+        checkInTime: defaults.checkInTime,
+        checkOutTime: defaults.checkOutTime,
         guestDetailsStats: 'Reservation',
-        noOfDays: 1,
+        noOfDays: defaults.noOfDays,
         rentId: '',
         roomStatusId: '',
         rent: '',
@@ -283,6 +306,7 @@ export const usePersonalDetailManagement = ({
     addGuestDetail,
     addRentDetail,
     toggleModal,
+    defaults,
   ])
 
   const handleUpdatePersonalDetail = useCallback(async () => {
@@ -456,12 +480,12 @@ export const usePersonalDetailManagement = ({
         noOfGuest: stay?.noOfGuest || 1,
         stayStatusEnum: stay?.stayStatusEnum || 'Confirmed',
         guestDetailId: guest?.id || null,
-        checkInDate: guest?.checkInDate || '',
-        checkOutDate: guest?.checkOutDate || '',
-        checkInTime: guest?.checkInTime || '',
-        checkOutTime: guest?.checkOutTime || '',
+        checkInDate: guest?.checkInDate || defaults.checkInDate,
+        checkOutDate: guest?.checkOutDate || defaults.checkOutDate,
+        checkInTime: guest?.checkInTime || defaults.checkInTime,
+        checkOutTime: guest?.checkOutTime || defaults.checkOutTime,
         guestDetailsStats: guest?.guestDetailsStats || 'Reservation',
-        noOfDays: guest?.noOfDays || 1,
+        noOfDays: guest?.noOfDays || defaults.noOfDays,
         rentId: guest?.rentId || '',
         roomStatusId: guest?.roomStatusId || '',
         // Rent Detail Populate
@@ -479,8 +503,64 @@ export const usePersonalDetailManagement = ({
       })
       toggleModal('personalDetailEdit', true)
     },
-    [toggleModal],
+    [toggleModal, defaults],
   )
+
+  /**
+   * handleAddNewPersonalDetail - Resets the form with industrial defaults for a new guest.
+   */
+  const handleAddNewPersonalDetail = useCallback(() => {
+    const newDefaults = getIndustrialStayDefaults()
+
+    setPersonalFormData({
+      firstName: '',
+      lastName: '',
+      mobileNumber: '',
+      email: '',
+      phone: '',
+      address: '',
+      companyName: '',
+      profilePhoto: '',
+      signature: '',
+      isDeleted: false,
+      documentNumber: '',
+      validTill: '',
+      remark: '',
+      documentTypeId: '',
+      frontImagePath: '',
+      backImagePath: '',
+      floorId: '',
+      buildingId: '',
+      roomTypeId: '',
+      roomMasterId: '',
+      comment: '',
+      color: '#3B82F6',
+      rateTypeEnum: 'RACK',
+      noOfGuest: 1,
+      stayStatusEnum: 'Confirmed',
+      // Dynamic Defaults
+      checkInDate: newDefaults.checkInDate,
+      checkOutDate: newDefaults.checkOutDate,
+      checkInTime: newDefaults.checkInTime,
+      checkOutTime: newDefaults.checkOutTime,
+      guestDetailsStats: 'Reservation',
+      noOfDays: 1,
+      rentId: '',
+      roomStatusId: '',
+      rent: '',
+      basic: '',
+      taxId: '',
+      totalRental: '',
+      otherChanrges: '',
+      discount: '',
+      totalCharges: '',
+      payments: '',
+      ccAuthorized: '',
+      deposite: '',
+      balance: '',
+    })
+    toggleModal('personalDetail', true)
+  }, [toggleModal, getIndustrialStayDefaults])
 
   return {
     personalFormData,
@@ -490,5 +570,6 @@ export const usePersonalDetailManagement = ({
     handleAddPersonalDetail,
     handleUpdatePersonalDetail,
     handleEditPersonalDetail,
+    handleAddNewPersonalDetail,
   }
 }
