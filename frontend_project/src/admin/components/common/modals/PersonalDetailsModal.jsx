@@ -470,6 +470,9 @@ export const PersonalDetailsModal = ({
                           const diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24))
                           updated.noOfDays = diff >= 0 ? diff : 0
                         }
+                      } else if (name === 'guestDetailsStats') {
+                        if (value === 'Reservation') updated.color = '#2F8B2C'
+                        if (value === 'Check-In') updated.color = '#ffa500'
                       }
                       setFormData(updated)
                     }}
@@ -480,7 +483,11 @@ export const PersonalDetailsModal = ({
                 <div className="rounded-2xl border border-amber-100/50 bg-amber-50/50 p-5 dark:border-amber-900/20 dark:bg-amber-900/10">
                   <StaySpecifications
                     formData={formData}
-                    handleChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
+                    handleChange={(e) => {
+                      const { name, value } = e.target
+                      const val = name === 'noOfGuest' ? parseInt(value) || 1 : value
+                      setFormData({ ...formData, [name]: val })
+                    }}
                     buildings={buildings}
                     floors={floors}
                     roomTypes={roomTypes}

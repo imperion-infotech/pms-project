@@ -66,7 +66,20 @@ const StaySpecifications = ({
       </div>
 
       {/* Required Booking Attributes */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-4 gap-3">
+        <div>
+          <label className={labelClass}>No. Of Guests*</label>
+          <div className={inputContainerClass}>
+            <input
+              type="number"
+              name="noOfGuest"
+              value={formData.noOfGuest || 1}
+              onChange={handleChange}
+              min="1"
+              className={inputClass}
+            />
+          </div>
+        </div>
         <div>
           <label className={labelClass}>Stay Status*</label>
           <div className={inputContainerClass}>
@@ -210,11 +223,22 @@ const StaySpecifications = ({
             >
               <option value="">Room</option>
               {rooms
-                ?.filter(
-                  (r) =>
+                ?.filter((r) => {
+                  const isMatchingLocation =
                     (!formData.floorId || String(r.floorId) === String(formData.floorId)) &&
-                    (!formData.roomTypeId || String(r.roomTypeId) === String(formData.roomTypeId)),
-                )
+                    (!formData.roomTypeId || String(r.roomTypeId) === String(formData.roomTypeId))
+
+                  if (!isMatchingLocation) return false
+
+                  // Status Check: Only show 'Available' rooms
+                  // But ALWAYS show the currently selected room (for Edit mode)
+                  const rStatus =
+                    r.roomStatus || r.roomStatusTable?.roomStatusName || r.room_status || ''
+                  const isAvailable = String(rStatus).toUpperCase() === 'AVAILABLE'
+                  const isCurrentRoom = String(r.id) === String(formData.roomMasterId)
+
+                  return isAvailable || isCurrentRoom
+                })
                 .map((r) => (
                   <option key={r.id} value={r.id}>
                     {r.roomName}
