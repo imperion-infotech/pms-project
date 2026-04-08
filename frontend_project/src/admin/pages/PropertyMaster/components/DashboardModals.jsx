@@ -16,6 +16,8 @@ import {
   TaxEditModal,
   DocumentTypeModal,
   DocumentTypeEditModal,
+  PaymentTypeModal,
+  PaymentTypeEditModal,
 } from '../../../components/common/Modals'
 
 /**
@@ -85,6 +87,7 @@ const DashboardModals = ({
   handleUpdateTax,
   taxes,
   // Document Type
+  // Document Type
   newDocumentType,
   setNewDocumentType,
   handleAddDocumentType,
@@ -92,6 +95,14 @@ const DashboardModals = ({
   setEditDocumentType,
   handleUpdateDocumentType,
   documentTypes,
+  // Payment Type
+  newPaymentType,
+  setNewPaymentType,
+  handleAddPaymentType,
+  editPaymentType,
+  setEditPaymentType,
+  handleUpdatePaymentType,
+  paymentTypes,
   rentDetails = [],
   isLoading,
 }) => {
@@ -272,6 +283,24 @@ const DashboardModals = ({
         setEditDocType={setEditDocumentType}
         handleUpdate={handleUpdateDocumentType}
         documentTypes={documentTypes}
+      />
+
+      {/* Payment Type Modals */}
+      <PaymentTypeModal
+        isOpen={modals.paymentType}
+        setIsOpen={(isOpen) => toggleModal('paymentType', isOpen)}
+        newPaymentType={newPaymentType}
+        setNewPaymentType={setNewPaymentType}
+        handleAdd={handleAddPaymentType}
+        paymentTypes={paymentTypes}
+      />
+      <PaymentTypeEditModal
+        isOpen={modals.paymentTypeEdit}
+        setIsOpen={(isOpen) => toggleModal('paymentTypeEdit', isOpen)}
+        editPaymentType={editPaymentType}
+        setEditPaymentType={setEditPaymentType}
+        handleUpdate={handleUpdatePaymentType}
+        paymentTypes={paymentTypes}
       />
     </>
   )

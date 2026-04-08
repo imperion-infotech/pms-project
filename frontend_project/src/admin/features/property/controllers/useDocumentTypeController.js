@@ -4,12 +4,21 @@ import { useState, useMemo } from 'react'
  * Controller: useDocumentTypeController
  * Logic for managing document types.
  */
-const useDocumentTypeController = ({ documentTypes, onDelete }) => {
+const useDocumentTypeController = ({
+  documentTypes,
+  onDelete,
+  currentPage = 1,
+  itemsPerPage = 8,
+}) => {
   const [deleteTarget, setDeleteTarget] = useState(null)
 
   const processedDocumentTypes = useMemo(() => {
-    return [...documentTypes]
-  }, [documentTypes])
+    let result = [...documentTypes]
+    const startIndex = (currentPage - 1) * itemsPerPage
+    return result.slice(startIndex, startIndex + itemsPerPage)
+  }, [documentTypes, currentPage, itemsPerPage])
+
+  const getIndex = (idx) => (currentPage - 1) * itemsPerPage + idx + 1
 
   const handleDeleteClick = (dt) => {
     setDeleteTarget({ id: dt.id, name: dt.documentTypeName })
@@ -28,6 +37,7 @@ const useDocumentTypeController = ({ documentTypes, onDelete }) => {
 
   return {
     processedDocumentTypes,
+    getIndex,
     deleteTarget,
     handleDeleteClick,
     handleConfirmDelete,

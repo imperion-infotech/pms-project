@@ -150,4 +150,14 @@ export const propertyService = {
     ),
   getImageUrl: (filename) => `/user/${filename}`,
   deleteImage: (filename) => handleResponse(() => api.delete(`/user/delete/${filename}`)),
+
+  // --- PAYMENT TYPE MANAGEMENT ---
+  getPaymentTypes: () => handleResponse(() => api.get('/user/getpaymenttypes')),
+  getPaymentTypeById: (id) => handleResponse(() => api.get(`/user/getpaymenttype/${id}`)),
+  createPaymentType: (data) => handleResponse(() => api.post('/admin/createpaymenttype', data)),
+  updatePaymentType: (id, data) =>
+    handleResponse(() => api.put(`/admin/updatepaymenttype/${id}`, data)),
+  deletePaymentType: (id) => handleResponse(() => api.delete(`/admin/deletepaymenttype/${id}`)),
+  searchPaymentTypes: (query) =>
+    handleResponse(() => api.get('/user/paymenttype/search', { params: { query } })),
 }

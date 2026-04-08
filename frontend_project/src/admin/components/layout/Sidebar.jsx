@@ -36,7 +36,7 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
 
   const configurationItems = [
     { name: 'Document Type', icon: FileText },
-    { name: 'Payments', icon: CreditCard },
+    { name: 'Payment Type', icon: CreditCard },
   ]
 
   const [isProfileOpen, setIsProfileOpen] = useState(true)

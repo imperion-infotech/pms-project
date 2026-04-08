@@ -6,7 +6,13 @@ import { useState, useMemo } from 'react'
  * Logic for managing individual room table entries, searching results locally,
  * and handling UI states like deletion confirmation.
  */
-export const useRoomController = ({ rooms, searchTerm, onDelete }) => {
+export const useRoomController = ({
+  rooms,
+  searchTerm,
+  onDelete,
+  currentPage = 1,
+  itemsPerPage = 8,
+}) => {
   const [deleteTarget, setDeleteTarget] = useState(null)
 
   // Industrial Standard Optimization: Filter results locally for UI feedback while waiting for sync
@@ -23,8 +29,11 @@ export const useRoomController = ({ rooms, searchTerm, onDelete }) => {
       )
     }
 
-    return result
-  }, [rooms, searchTerm])
+    const startIndex = (currentPage - 1) * itemsPerPage
+    return result.slice(startIndex, startIndex + itemsPerPage)
+  }, [rooms, searchTerm, currentPage, itemsPerPage])
+
+  const getIndex = (idx) => (currentPage - 1) * itemsPerPage + idx + 1
 
   const handleDeleteClick = (room) => {
     setDeleteTarget({ id: room.id, name: room.roomName })
@@ -43,6 +52,7 @@ export const useRoomController = ({ rooms, searchTerm, onDelete }) => {
 
   return {
     processedRooms,
+    getIndex,
     deleteTarget,
     handleDeleteClick,
     handleConfirmDelete,

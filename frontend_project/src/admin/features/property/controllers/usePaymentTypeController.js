@@ -1,30 +1,27 @@
 import { useState, useMemo } from 'react'
 
 /**
- * Controller: useRoomStatusController
- * Logic for managing room operational states.
+ * Controller: usePaymentTypeController
+ * Logic for managing payment types.
  */
-const useRoomStatusController = ({
-  roomStatuses,
+const usePaymentTypeController = ({
+  paymentTypes,
   onDelete,
   currentPage = 1,
   itemsPerPage = 8,
 }) => {
   const [deleteTarget, setDeleteTarget] = useState(null)
 
-  const processedStatuses = useMemo(() => {
-    let result = [...roomStatuses]
+  const processedPaymentTypes = useMemo(() => {
+    let result = [...paymentTypes]
     const startIndex = (currentPage - 1) * itemsPerPage
     return result.slice(startIndex, startIndex + itemsPerPage)
-  }, [roomStatuses, currentPage, itemsPerPage])
+  }, [paymentTypes, currentPage, itemsPerPage])
 
   const getIndex = (idx) => (currentPage - 1) * itemsPerPage + idx + 1
 
-  const handleDeleteClick = (status) => {
-    setDeleteTarget({
-      id: status.id,
-      name: status.roomStatusName || status.roomStatusTitle,
-    })
+  const handleDeleteClick = (pt) => {
+    setDeleteTarget({ id: pt.id, name: pt.paymentTypeName })
   }
 
   const handleConfirmDelete = () => {
@@ -39,7 +36,7 @@ const useRoomStatusController = ({
   }
 
   return {
-    processedStatuses,
+    processedPaymentTypes,
     getIndex,
     deleteTarget,
     handleDeleteClick,
@@ -48,4 +45,4 @@ const useRoomStatusController = ({
   }
 }
 
-export default useRoomStatusController
+export default usePaymentTypeController

@@ -35,9 +35,13 @@ const GuestPersonalDetailsManagement = ({
   onAdd,
   onEdit,
   onDelete,
+  currentPage = 1,
+  itemsPerPage = 8,
 }) => {
   const {
     stats,
+    processedDetails,
+    getIndex,
     cleanImageUrl,
     deleteTarget,
     handleDeleteClick,
@@ -54,6 +58,8 @@ const GuestPersonalDetailsManagement = ({
     guestDetails, // New
     documentTypes,
     onDelete,
+    currentPage,
+    itemsPerPage,
   })
 
   /* ... skipping unchanged ... */
@@ -73,7 +79,7 @@ const GuestPersonalDetailsManagement = ({
 
         <button
           onClick={onAdd}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-[11px] font-black tracking-wider text-white shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-600 active:scale-95 sm:w-auto md:px-6 md:text-xs"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 px-5 py-2.5 text-[11px] font-black tracking-wider text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-600 active:scale-95 sm:w-auto md:px-6 md:text-xs"
         >
           <PlusCircle size={18} />
           ADD NEW PROFILE
@@ -85,7 +91,7 @@ const GuestPersonalDetailsManagement = ({
         {stats.map((stat, i) => (
           <div
             key={i}
-            className="dark:bg-surface-100 group rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-emerald-500/30 dark:border-slate-800"
+            className="dark:bg-surface-100 group rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-blue-500/30 dark:border-slate-800"
           >
             <div className="flex flex-col">
               <span className="mb-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase">
@@ -95,7 +101,7 @@ const GuestPersonalDetailsManagement = ({
                 <h4 className="text-2xl font-bold text-[#1a2b4b] dark:text-slate-100">
                   {stat.value}
                 </h4>
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500 transition-all group-hover:bg-emerald-500 group-hover:text-white">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-500 transition-all group-hover:bg-blue-500 group-hover:text-white">
                   <ChevronRight size={16} />
                 </div>
               </div>
@@ -141,7 +147,7 @@ const GuestPersonalDetailsManagement = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-[13px] dark:divide-slate-800">
-              {details.length === 0 ? (
+              {processedDetails.length === 0 ? (
                 <tr>
                   <td
                     colSpan="10"
@@ -156,7 +162,7 @@ const GuestPersonalDetailsManagement = ({
                   </td>
                 </tr>
               ) : (
-                details.map((guest, idx) => {
+                processedDetails.map((guest, idx) => {
                   const guestDocument = getGuestDocument(guest.id)
                   const guestStay = getGuestStay(guest.id)
                   const guestDetail = getGuestDetail(guest.id)
@@ -164,10 +170,10 @@ const GuestPersonalDetailsManagement = ({
                   return (
                     <tr
                       key={guest.id}
-                      className="group h-14 transition-all hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5"
+                      className="group h-14 transition-all hover:bg-blue-50/40 dark:hover:bg-blue-500/5"
                     >
-                      <td className="border-r border-slate-100 px-8 py-2 text-center font-mono text-[11px] font-bold text-slate-300 group-hover:text-emerald-500 dark:border-slate-800 dark:text-slate-600">
-                        {idx + 1}
+                      <td className="border-r border-slate-100 px-8 py-2 text-center font-mono text-[11px] font-bold text-slate-300 group-hover:text-blue-500 dark:border-slate-800 dark:text-slate-600">
+                        {getIndex(idx)}
                       </td>
                       <td className="border-r border-slate-100 px-8 py-2 dark:border-slate-800">
                         <div className="flex items-center gap-3">
@@ -179,7 +185,7 @@ const GuestPersonalDetailsManagement = ({
                                 className="h-full w-full object-cover"
                                 fallback={
                                   <img
-                                    src={`https://ui-avatars.com/api/?name=${guest.firstName}+${guest.lastName}&background=334155&color=fff&bold=true`}
+                                    src={`https://ui-avatars.com/api/?name=${guest.firstName}+${guest.lastName}&background=3b82f6&color=fff&bold=true`}
                                     alt="Profile"
                                     className="h-full w-full object-cover"
                                   />
@@ -208,7 +214,7 @@ const GuestPersonalDetailsManagement = ({
                       <td className="border-r border-slate-100 px-8 py-2 font-mono text-[11px] font-bold text-slate-600 dark:border-slate-800 dark:text-slate-400">
                         {guestDocument?.documentNumber || '—'}
                       </td>
-                      <td className="border-r border-slate-100 px-8 py-2 text-center font-bold text-emerald-600 dark:border-slate-800 dark:text-emerald-400/80">
+                      <td className="border-r border-slate-100 px-8 py-2 text-center font-bold text-blue-600 dark:border-slate-800 dark:text-blue-400/80">
                         {guestDocument?.validTill || '—'}
                       </td>
                       <td className="border-r border-slate-100 px-8 py-2 text-center font-bold text-purple-600 uppercase dark:border-slate-800 dark:text-purple-400/80">

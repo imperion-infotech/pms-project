@@ -11,6 +11,8 @@ const useGuestPersonalDetailsController = ({
   guestDetails = [],
   documentTypes = [],
   onDelete,
+  currentPage = 1,
+  itemsPerPage = 8,
 }) => {
   const [deleteTarget, setDeleteTarget] = useState(null)
 
@@ -23,6 +25,14 @@ const useGuestPersonalDetailsController = ({
     ],
     [details],
   )
+
+  const processedDetails = useMemo(() => {
+    let result = [...details]
+    const startIndex = (currentPage - 1) * itemsPerPage
+    return result.slice(startIndex, startIndex + itemsPerPage)
+  }, [details, currentPage, itemsPerPage])
+
+  const getIndex = (idx) => (currentPage - 1) * itemsPerPage + idx + 1
 
   const cleanImageUrl = (path) => {
     if (!path || path === 'photo' || path === 'sign') return null
@@ -77,6 +87,8 @@ const useGuestPersonalDetailsController = ({
 
   return {
     stats,
+    processedDetails,
+    getIndex,
     cleanImageUrl,
     deleteTarget,
     handleDeleteClick,

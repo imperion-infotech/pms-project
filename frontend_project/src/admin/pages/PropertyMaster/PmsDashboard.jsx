@@ -24,6 +24,7 @@ import { useRoomManagement } from '../../features/property/hooks/useRoomManageme
 import { useTaxManagement } from '../../features/property/hooks/useTaxManagement'
 import { useGuestPersonalDetailsManagement } from '../../features/property/hooks/useGuestPersonalDetailsManagement'
 import { useDocumentTypeManagement } from '../../features/property/hooks/useDocumentTypeManagement'
+import { usePaymentTypeManagement } from '../../features/property/hooks/usePaymentTypeManagement'
 
 /**
  * PmsDashboard (Admin Dashboard Root)
@@ -114,6 +115,11 @@ const PmsDashboard = () => {
     searchRoomTypes,
     searchRoomStatuses,
     searchDocumentTypes,
+    paymentTypes,
+    addPaymentType,
+    updatePaymentType,
+    deletePaymentType,
+    searchPaymentTypes,
   } = usePmsData()
 
   // Dashboard navigation state
@@ -138,6 +144,8 @@ const PmsDashboard = () => {
     taxEdit: false,
     documentType: false,
     documentTypeEdit: false,
+    paymentType: false,
+    paymentTypeEdit: false,
   })
 
   const toggleModal = React.useCallback((modalName, isOpen) => {
@@ -218,6 +226,16 @@ const PmsDashboard = () => {
     handleUpdateDocumentType,
     handleEditDocumentType,
   } = useDocumentTypeManagement({ addDocumentType, updateDocumentType, toggleModal })
+
+  const {
+    newPaymentType,
+    setNewPaymentType,
+    editPaymentType,
+    setEditPaymentType,
+    handleAddPaymentType,
+    handleUpdatePaymentType,
+    handleEditPaymentType,
+  } = usePaymentTypeManagement({ addPaymentType, updatePaymentType, toggleModal })
 
   const {
     personalFormData,
@@ -366,6 +384,9 @@ const PmsDashboard = () => {
           case 'Document Type':
             searchDocumentTypes(searchTerm)
             break
+          case 'Payment Type':
+            searchPaymentTypes(searchTerm)
+            break
           default:
             break
         }
@@ -386,6 +407,7 @@ const PmsDashboard = () => {
     searchRoomTypes,
     searchRooms,
     searchDocumentTypes,
+    searchPaymentTypes,
   ])
 
   // Industrial Standard Performance Optimization: UseMemo for filtering
@@ -407,7 +429,10 @@ const PmsDashboard = () => {
           m(item.phone) ||
           m(item.companyName) ||
           m(item.taxMasterName) ||
-          m(item.taxTypeEnum)
+          m(item.taxTypeEnum) ||
+          m(item.paymentTypeName) ||
+          m(item.paymentTypeShortName) ||
+          m(item.categoryName)
         )
       })
     }
@@ -420,6 +445,7 @@ const PmsDashboard = () => {
       personalDetails: filter(personalDetails),
       taxes: filter(taxes),
       documentTypes: filter(documentTypes),
+      paymentTypes: filter(paymentTypes),
     }
   }, [
     searchTerm,
@@ -431,6 +457,7 @@ const PmsDashboard = () => {
     personalDetails,
     taxes,
     documentTypes,
+    paymentTypes,
   ])
 
   return (
@@ -507,6 +534,9 @@ const PmsDashboard = () => {
               documentTypes={documentTypes}
               handleEditDocumentType={handleEditDocumentType}
               deleteDocumentType={deleteDocumentType}
+              paymentTypes={filteredData.paymentTypes}
+              handleEditPaymentType={handleEditPaymentType}
+              deletePaymentType={deletePaymentType}
               currentPage={currentPage}
               itemsPerPage={itemsPerPage}
               userRole={userRole}
@@ -521,6 +551,7 @@ const PmsDashboard = () => {
               activeItem === 'Room Status' ||
               activeItem === 'Personal Detail' ||
               activeItem === 'Document Type' ||
+              activeItem === 'Payment Type' ||
               activeItem === 'Tax') && (
               <div className="mt-8">
                 <Pagination
@@ -533,6 +564,7 @@ const PmsDashboard = () => {
                   taxes={filteredData.taxes}
                   personalDetails={filteredData.personalDetails}
                   documentTypes={filteredData.documentTypes}
+                  paymentTypes={filteredData.paymentTypes}
                   isLoading={isLoading}
                   currentPage={currentPage}
                   itemsPerPage={itemsPerPage}
@@ -616,6 +648,14 @@ const PmsDashboard = () => {
         isLoading={isLoading}
         stayDetails={stayDetails}
         documentTypes={documentTypes}
+        // Payment Type
+        newPaymentType={newPaymentType}
+        setNewPaymentType={setNewPaymentType}
+        handleAddPaymentType={handleAddPaymentType}
+        editPaymentType={editPaymentType}
+        setEditPaymentType={setEditPaymentType}
+        handleUpdatePaymentType={handleUpdatePaymentType}
+        paymentTypes={paymentTypes}
         rentDetails={rentDetails}
       />
 

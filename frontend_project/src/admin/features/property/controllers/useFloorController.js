@@ -1,11 +1,17 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 
 /**
  * Controller: useFloorController
  * Logic for managing building levels (floors).
  */
-const useFloorController = ({ onDelete, currentPage = 1, itemsPerPage = 8 }) => {
+const useFloorController = ({ floors = [], onDelete, currentPage = 1, itemsPerPage = 8 }) => {
   const [deleteTarget, setDeleteTarget] = useState(null)
+
+  const processedFloors = useMemo(() => {
+    let result = [...floors]
+    const startIndex = (currentPage - 1) * itemsPerPage
+    return result.slice(startIndex, startIndex + itemsPerPage)
+  }, [floors, currentPage, itemsPerPage])
 
   const getIndex = (idx) => (currentPage - 1) * itemsPerPage + idx + 1
 
@@ -25,6 +31,7 @@ const useFloorController = ({ onDelete, currentPage = 1, itemsPerPage = 8 }) => 
   }
 
   return {
+    processedFloors,
     getIndex,
     deleteTarget,
     handleDeleteClick,

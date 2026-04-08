@@ -4,9 +4,15 @@ import { useTheme } from '../../../context/ThemeContext'
 const PageHeader = ({ activeItem, onRefresh, isLoading, searchTerm, setSearchTerm }) => {
   const { isDark, toggleTheme } = useTheme()
 
+  const getParentLabel = () => {
+    if (activeItem === 'Personal Detail') return 'Profile Setting'
+    if (activeItem === 'Document Type' || activeItem === 'Payment Type') return 'Configuration'
+    return 'Room Settings'
+  }
+
   return (
     <div
-      className={`min-h-[3.5rem] ${isDark ? 'bg-surface-100 border-slate-800' : 'border-slate-200 bg-white'} flex shrink-0 flex-col items-center justify-between gap-3 border-b px-4 py-2 transition-colors duration-300 sm:flex-row sm:gap-0 sm:py-0 md:px-6`}
+      className={`min-h-14 ${isDark ? 'bg-surface-100 border-slate-800' : 'border-slate-200 bg-white'} flex shrink-0 flex-col items-center justify-between gap-3 border-b px-4 py-2 transition-colors duration-300 sm:flex-row sm:gap-0 sm:py-0 md:px-6`}
     >
       <div className="flex w-full items-center gap-2 text-xs font-medium text-slate-500 sm:w-auto md:text-sm">
         {activeItem === 'Home' ? (
@@ -21,7 +27,7 @@ const PageHeader = ({ activeItem, onRefresh, isLoading, searchTerm, setSearchTer
         ) : (
           <>
             <Layers className="h-4 w-4 shrink-0 text-emerald-500" />
-            <span className="truncate">Room Settings</span>
+            <span className="truncate">{getParentLabel()}</span>
             <span className="text-slate-300">/</span>
             <span className={`truncate font-bold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>
               {activeItem}

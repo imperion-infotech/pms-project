@@ -32,14 +32,17 @@ const RoomManagement = ({
   setIsRoomModalOpen,
   onEdit,
   onDelete,
+  currentPage = 1,
+  itemsPerPage = 8,
 }) => {
   const {
     processedRooms,
+    getIndex,
     deleteTarget,
     handleDeleteClick,
     handleConfirmDelete,
     handleCancelDelete,
-  } = useRoomController({ rooms, searchTerm, onDelete })
+  } = useRoomController({ rooms, searchTerm, onDelete, currentPage, itemsPerPage })
 
   return (
     <div className="dark:bg-surface-100 rounded-xl border border-slate-200 bg-white shadow-md transition-colors duration-300 dark:border-slate-800">
@@ -68,6 +71,9 @@ const RoomManagement = ({
         <table className="w-full min-w-[1200px] border-collapse text-left">
           <thead className="sticky top-0 z-10">
             <tr className="border-b border-slate-200 bg-[#f8fafc] text-[11px] font-bold tracking-wider text-[#64748b] uppercase dark:border-slate-800 dark:bg-slate-800 dark:text-slate-400">
+              <th className="w-16 border-r border-slate-200 px-6 py-4 text-center dark:border-slate-800">
+                No.
+              </th>
               <th className="w-32 border-r border-slate-200 px-6 py-4 dark:border-slate-800">
                 Room Name
               </th>
@@ -102,7 +108,7 @@ const RoomManagement = ({
             {processedRooms.length === 0 ? (
               <tr>
                 <td
-                  colSpan="9"
+                  colSpan="10"
                   className="px-6 py-10 text-center text-slate-400 italic dark:text-slate-500"
                 >
                   {searchTerm
@@ -111,7 +117,7 @@ const RoomManagement = ({
                 </td>
               </tr>
             ) : (
-              processedRooms.map((room) => {
+              processedRooms.map((room, index) => {
                 // Extract fields from room object
                 const {
                   roomName,
@@ -192,6 +198,9 @@ const RoomManagement = ({
                     key={room.id}
                     className="group h-14 transition-all hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5"
                   >
+                    <td className="border-r border-slate-100 px-6 py-2 text-center font-mono text-[11px] font-bold text-slate-300 group-hover:text-emerald-500 dark:border-slate-800 dark:text-slate-600">
+                      {getIndex(index)}
+                    </td>
                     <td className="border-r border-slate-100 px-6 py-2 font-bold text-slate-800 dark:border-slate-800 dark:text-slate-200">
                       {roomName}
                     </td>

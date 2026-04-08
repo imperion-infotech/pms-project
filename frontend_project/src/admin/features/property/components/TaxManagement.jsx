@@ -16,9 +16,17 @@ import useTaxController from '../controllers/useTaxController'
  * View: TaxManagement
  * Tax configuration module using MVC architecture.
  */
-const TaxManagement = ({ taxes, setIsTaxModalOpen, onEdit, onDelete }) => {
+const TaxManagement = ({
+  taxes,
+  setIsTaxModalOpen,
+  onEdit,
+  onDelete,
+  currentPage = 1,
+  itemsPerPage = 8,
+}) => {
   const {
     processedTaxes,
+    getIndex,
     deleteTarget,
     handleDeleteClick,
     handleConfirmDelete,
@@ -26,6 +34,8 @@ const TaxManagement = ({ taxes, setIsTaxModalOpen, onEdit, onDelete }) => {
   } = useTaxController({
     taxes,
     onDelete,
+    currentPage,
+    itemsPerPage,
   })
 
   return (
@@ -94,7 +104,7 @@ const TaxManagement = ({ taxes, setIsTaxModalOpen, onEdit, onDelete }) => {
                   className="group h-14 transition-all hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5"
                 >
                   <td className="border-r border-slate-100 px-8 py-2 text-center font-mono text-[11px] font-bold text-slate-300 group-hover:text-emerald-500 dark:border-slate-800 dark:text-slate-600">
-                    {idx + 1}
+                    {getIndex(idx)}
                   </td>
                   <td className="border-r border-slate-100 px-8 py-2 font-bold tracking-tight text-slate-800 uppercase dark:border-slate-800 dark:text-slate-200">
                     {tax.taxMasterName}

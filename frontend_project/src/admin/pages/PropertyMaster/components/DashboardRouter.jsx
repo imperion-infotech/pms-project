@@ -8,6 +8,7 @@ import RoomStatusManagement from '../../../features/property/components/RoomStat
 import GuestPersonalDetailsManagement from '../../../features/property/components/GuestPersonalDetailsManagement'
 import TaxManagement from '../../../features/property/components/TaxManagement'
 import DocumentTypeManagement from '../../../features/property/components/DocumentTypeManagement'
+import PaymentTypeManagement from '../../../features/property/components/PaymentTypeManagement'
 
 /**
  * DashboardRouter - Ye file 'Traffic Inspector' ka kaam karti hai.
@@ -52,6 +53,9 @@ const DashboardRouter = ({
   documentTypes,
   handleEditDocumentType,
   deleteDocumentType,
+  paymentTypes,
+  handleEditPaymentType,
+  deletePaymentType,
   currentPage,
   itemsPerPage,
   userRole,
@@ -159,6 +163,17 @@ const DashboardRouter = ({
           setIsDocumentTypeModalOpen={(isOpen) => toggleModal('documentType', isOpen)}
           onEdit={handleEditDocumentType}
           onDelete={deleteDocumentType}
+          currentPage={currentPage}
+          itemsPerPage={itemsPerPage}
+        />
+      )
+    case 'Payment Type':
+      return (
+        <PaymentTypeManagement
+          paymentTypes={paymentTypes}
+          setIsPaymentTypeModalOpen={(isOpen) => toggleModal('paymentType', isOpen)}
+          onEdit={handleEditPaymentType}
+          onDelete={deletePaymentType}
           currentPage={currentPage}
           itemsPerPage={itemsPerPage}
         />

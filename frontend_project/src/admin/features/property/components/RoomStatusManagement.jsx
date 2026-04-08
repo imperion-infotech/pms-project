@@ -17,9 +17,17 @@ import useRoomStatusController from '../controllers/useRoomStatusController'
  * View: RoomStatusManagement
  * Custom status management for room workflows using MVC architecture.
  */
-const RoomStatusManagement = ({ roomStatuses, setIsRoomStatusModalOpen, onEdit, onDelete }) => {
+const RoomStatusManagement = ({
+  roomStatuses,
+  setIsRoomStatusModalOpen,
+  onEdit,
+  onDelete,
+  currentPage = 1,
+  itemsPerPage = 8,
+}) => {
   const {
     processedStatuses,
+    getIndex,
     deleteTarget,
     handleDeleteClick,
     handleConfirmDelete,
@@ -27,6 +35,8 @@ const RoomStatusManagement = ({ roomStatuses, setIsRoomStatusModalOpen, onEdit, 
   } = useRoomStatusController({
     roomStatuses,
     onDelete,
+    currentPage,
+    itemsPerPage,
   })
 
   return (
@@ -96,7 +106,7 @@ const RoomStatusManagement = ({ roomStatuses, setIsRoomStatusModalOpen, onEdit, 
                   className="group h-14 transition-all hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5"
                 >
                   <td className="border-r border-slate-100 px-8 py-2 text-center font-mono text-[11px] font-bold text-slate-300 group-hover:text-emerald-500 dark:border-slate-800 dark:text-slate-600">
-                    {idx + 1}
+                    {getIndex(idx)}
                   </td>
                   <td className="border-r border-slate-100 px-8 py-2 font-bold tracking-tighter text-slate-800 uppercase dark:border-slate-800 dark:text-slate-200">
                     {status.roomStatusName}

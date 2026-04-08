@@ -18,8 +18,14 @@ const FloorManagement = ({
   currentPage = 1,
   itemsPerPage = 8,
 }) => {
-  const { getIndex, deleteTarget, handleDeleteClick, handleConfirmDelete, handleCancelDelete } =
-    useFloorController({ floors, onDelete, currentPage, itemsPerPage })
+  const {
+    processedFloors,
+    getIndex,
+    deleteTarget,
+    handleDeleteClick,
+    handleConfirmDelete,
+    handleCancelDelete,
+  } = useFloorController({ floors, onDelete, currentPage, itemsPerPage })
 
   return (
     <div className="dark:bg-surface-100 rounded-xl border border-slate-200 bg-white shadow-md transition-colors duration-300 dark:border-slate-800">
@@ -61,7 +67,7 @@ const FloorManagement = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 text-[13px] dark:divide-slate-800">
-            {floors.length === 0 ? (
+            {processedFloors.length === 0 ? (
               <tr>
                 <td
                   colSpan="4"
@@ -76,7 +82,7 @@ const FloorManagement = ({
                 </td>
               </tr>
             ) : (
-              floors.map((floor, idx) => (
+              processedFloors.map((floor, idx) => (
                 <tr
                   key={floor.id ?? idx}
                   className="group h-14 transition-all hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5"

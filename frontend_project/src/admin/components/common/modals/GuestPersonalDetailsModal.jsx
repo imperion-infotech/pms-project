@@ -90,7 +90,7 @@ export const GuestPersonalDetailsModal = ({
           {/* Header */}
           <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-white/80 px-8 py-5 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80">
             <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/20">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-blue-500 to-blue-700 shadow-lg shadow-blue-500/20">
                 <User className="h-6 w-6 text-white" />
               </div>
               <div>
@@ -540,7 +540,7 @@ export const GuestPersonalDetailsModal = ({
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center gap-3 rounded-xl bg-linear-to-r from-emerald-500 to-teal-500 px-8 py-3 text-xs font-black tracking-widest text-white uppercase shadow-lg shadow-emerald-500/30 transition-all hover:scale-105 hover:shadow-emerald-500/40 active:scale-95 disabled:pointer-events-none disabled:opacity-70"
+              className="flex items-center gap-3 rounded-xl bg-linear-to-r from-blue-500 to-blue-600 px-8 py-3 text-xs font-black tracking-widest text-white uppercase shadow-lg shadow-blue-500/30 transition-all hover:scale-105 hover:shadow-blue-500/40 active:scale-95 disabled:pointer-events-none disabled:opacity-70"
             >
               {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
               <span>Commit Guest Profile</span>

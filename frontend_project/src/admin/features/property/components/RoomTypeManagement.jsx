@@ -17,9 +17,18 @@ import useRoomTypeController from '../controllers/useRoomTypeController'
  * View: RoomTypeManagement
  * Visual representation of room types with industrial-grade UI and MVC controller.
  */
-const RoomTypeManagement = ({ roomTypes, setIsRoomTypeModalOpen, onEdit, onDelete, userRole }) => {
+const RoomTypeManagement = ({
+  roomTypes,
+  setIsRoomTypeModalOpen,
+  onEdit,
+  onDelete,
+  userRole,
+  currentPage = 1,
+  itemsPerPage = 8,
+}) => {
   const {
     processedRoomTypes,
+    getIndex,
     isAdmin,
     deleteTarget,
     handleDeleteClick,
@@ -29,6 +38,8 @@ const RoomTypeManagement = ({ roomTypes, setIsRoomTypeModalOpen, onEdit, onDelet
     roomTypes,
     onDelete,
     userRole,
+    currentPage,
+    itemsPerPage,
   })
 
   return (
@@ -60,6 +71,9 @@ const RoomTypeManagement = ({ roomTypes, setIsRoomTypeModalOpen, onEdit, onDelet
         <table className="w-full min-w-[800px] border-collapse text-left">
           <thead className="sticky top-0 z-10">
             <tr className="border-b border-slate-200 bg-[#f8fafc] text-[11px] font-bold tracking-wider text-[#64748b] uppercase dark:border-slate-800 dark:bg-slate-800 dark:text-slate-400">
+              <th className="w-20 border-r border-slate-200 px-8 py-4 text-center dark:border-slate-800">
+                No.
+              </th>
               <th className="w-24 border-r border-slate-200 px-8 py-4 dark:border-slate-800">
                 Code
               </th>
@@ -76,7 +90,7 @@ const RoomTypeManagement = ({ roomTypes, setIsRoomTypeModalOpen, onEdit, onDelet
             {processedRoomTypes.length === 0 ? (
               <tr>
                 <td
-                  colSpan="4"
+                  colSpan="5"
                   className="px-8 py-20 text-center text-slate-400 dark:text-slate-500"
                 >
                   <div className="flex flex-col items-center justify-center space-y-2">
@@ -88,11 +102,14 @@ const RoomTypeManagement = ({ roomTypes, setIsRoomTypeModalOpen, onEdit, onDelet
                 </td>
               </tr>
             ) : (
-              processedRoomTypes.map((room) => (
+              processedRoomTypes.map((room, index) => (
                 <tr
-                  key={room.id}
+                  key={room.id ?? index}
                   className="group h-14 transition-all hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5"
                 >
+                  <td className="border-r border-slate-100 px-8 py-2 text-center font-mono text-[11px] font-bold text-slate-300 group-hover:text-emerald-500 dark:border-slate-800 dark:text-slate-600">
+                    {getIndex(index)}
+                  </td>
                   <td className="border-r border-slate-100 px-8 py-2 dark:border-slate-800">
                     <span className="font-mono text-xs font-bold text-slate-800 dark:text-slate-200">
                       {room.shortName || 'N/A'}

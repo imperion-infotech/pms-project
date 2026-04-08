@@ -1,66 +1,57 @@
 import React from 'react'
-import {
-  Plus,
-  Search,
-  Edit3,
-  Trash2,
-  FileText,
-  Check,
-  X,
-  ShieldCheck,
-  AlertTriangle,
-} from 'lucide-react'
-import useDocumentTypeController from '../controllers/useDocumentTypeController'
+import { Plus, Edit3, Trash2, CreditCard, Check, X, ShieldCheck, AlertTriangle } from 'lucide-react'
+import usePaymentTypeController from '../controllers/usePaymentTypeController'
 
 /**
- * DocumentTypeManagement component for managing various document types (ID proofs, etc.)
+ * PaymentTypeManagement component for managing various payment methods.
  */
-const DocumentTypeManagement = ({
-  documentTypes = [],
-  setIsDocumentTypeModalOpen,
+const PaymentTypeManagement = ({
+  paymentTypes = [],
+  setIsPaymentTypeModalOpen,
   onEdit,
   onDelete,
   currentPage = 1,
   itemsPerPage = 8,
 }) => {
   const {
-    processedDocumentTypes,
+    processedPaymentTypes,
     getIndex,
     deleteTarget,
     handleDeleteClick,
     handleConfirmDelete,
     handleCancelDelete,
-  } = useDocumentTypeController({
-    documentTypes,
+  } = usePaymentTypeController({
+    paymentTypes,
     onDelete,
     currentPage,
     itemsPerPage,
   })
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 space-y-6 duration-700">
-      {/* Header & Search Bar Layer */}
+      {/* Header Layer */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-500 shadow-sm transition-all hover:scale-110">
-            <FileText className="h-6 w-6" />
+            <CreditCard className="h-6 w-6" />
           </div>
           <div>
             <h2 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white">
-              Document Type's
+              Payment Type's
             </h2>
             <p className="text-xs font-medium text-slate-400">
-              Manage acceptable identity proofs and guest documentation
+              Configure accepted payment types and credit card processing
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           <button
-            onClick={() => setIsDocumentTypeModalOpen(true)}
+            onClick={() => setIsPaymentTypeModalOpen(true)}
             className="flex items-center gap-2 rounded-xl bg-orange-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-orange-500/20 transition-all hover:bg-orange-700 hover:shadow-orange-500/40 active:scale-95"
           >
             <Plus className="h-4 w-4 stroke-3" />
-            <span>Add Document Type</span>
+            <span>Add Payment Method</span>
           </button>
         </div>
       </div>
@@ -78,16 +69,13 @@ const DocumentTypeManagement = ({
                   Short Name
                 </th>
                 <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">
-                  Document Name
+                  Payment Name
                 </th>
                 <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">
                   Category
                 </th>
-                <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">
-                  Description
-                </th>
                 <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">
-                  Default
+                  CC Processing
                 </th>
                 <th className="px-6 py-4 text-right text-xs font-bold tracking-widest text-slate-500 uppercase">
                   Actions
@@ -95,10 +83,10 @@ const DocumentTypeManagement = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-              {processedDocumentTypes.length > 0 ? (
-                processedDocumentTypes.map((doc, index) => (
+              {processedPaymentTypes.length > 0 ? (
+                processedPaymentTypes.map((pt, index) => (
                   <tr
-                    key={doc.id || index}
+                    key={pt.id || index}
                     className="group transition-all hover:bg-orange-500/5 dark:hover:bg-orange-500/10"
                   >
                     <td className="px-6 py-5 text-center font-mono text-xs font-bold text-slate-300 group-hover:text-orange-500 dark:text-slate-600">
@@ -106,32 +94,27 @@ const DocumentTypeManagement = ({
                     </td>
                     <td className="px-6 py-5">
                       <span className="inline-flex items-center rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                        {doc.documentTypeShortName}
+                        {pt.paymentTypeShortName}
                       </span>
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-3">
                         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400">
-                          <FileText className="h-4 w-4" />
+                          <CreditCard className="h-4 w-4" />
                         </div>
                         <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-                          {doc.documentTypeName}
+                          {pt.paymentTypeName}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap">
                       <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                        {doc.documentTypeCategory || 'N/A'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-5">
-                      <span className="line-clamp-1 text-xs font-medium text-slate-400 dark:text-slate-500">
-                        {doc.documentTypeDescription || 'No description provided'}
+                        {pt.categoryName || 'N/A'}
                       </span>
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex justify-center">
-                        {doc.documentTypeDefault ? (
+                        {pt.creditCardProcessing ? (
                           <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400">
                             <Check className="h-3.5 w-3.5 stroke-3" />
                           </div>
@@ -145,13 +128,13 @@ const DocumentTypeManagement = ({
                     <td className="px-6 py-5 text-right">
                       <div className="flex items-center justify-end gap-2 opacity-0 transition-opacity group-hover:opacity-100">
                         <button
-                          onClick={() => onEdit(doc)}
+                          onClick={() => onEdit(pt)}
                           className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 shadow-sm transition-all hover:scale-110 hover:border-orange-200 hover:text-orange-500 hover:shadow-orange-100 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-orange-900 dark:hover:shadow-none"
                         >
                           <Edit3 className="h-4 w-4" />
                         </button>
                         <button
-                          onClick={() => handleDeleteClick(doc)}
+                          onClick={() => handleDeleteClick(pt)}
                           className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 shadow-sm transition-all hover:scale-110 hover:border-red-200 hover:text-red-500 hover:shadow-red-100 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-red-900 dark:hover:shadow-none"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -162,17 +145,17 @@ const DocumentTypeManagement = ({
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" className="px-6 py-20 text-center">
+                  <td colSpan="6" className="px-6 py-20 text-center">
                     <div className="flex flex-col items-center justify-center gap-3">
                       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 dark:bg-slate-800/20">
-                        <FileText className="h-8 w-8 text-slate-200 dark:text-slate-700" />
+                        <CreditCard className="h-8 w-8 text-slate-200 dark:text-slate-700" />
                       </div>
-                      <p className="text-sm font-medium text-slate-400">No document types found</p>
+                      <p className="text-sm font-medium text-slate-400">No payment methods found</p>
                       <button
-                        onClick={() => setIsDocumentTypeModalOpen(true)}
+                        onClick={() => setIsPaymentTypeModalOpen(true)}
                         className="text-xs font-bold text-orange-500 hover:underline"
                       >
-                        Create your first document type
+                        Create your first payment type
                       </button>
                     </div>
                   </td>
@@ -197,7 +180,7 @@ const DocumentTypeManagement = ({
               </div>
               <div>
                 <h3 className="text-lg font-bold text-slate-800 dark:text-white">
-                  Delete Document Type
+                  Delete Payment type
                 </h3>
                 <p className="text-xs font-medium tracking-widest text-slate-400 uppercase">
                   Permanent Action
@@ -209,7 +192,7 @@ const DocumentTypeManagement = ({
               <span className="font-bold text-slate-800 dark:text-slate-100">
                 "{deleteTarget.name}"
               </span>
-              ? This will remove it from all future guest profile selections.
+              ? This will remove it from all future payment processing options.
             </p>
             <div className="flex gap-3">
               <button
@@ -232,4 +215,4 @@ const DocumentTypeManagement = ({
   )
 }
 
-export default DocumentTypeManagement
+export default PaymentTypeManagement

@@ -4,12 +4,16 @@ import { useState, useMemo } from 'react'
  * Controller: useTaxController
  * Logic for managing tax master records.
  */
-const useTaxController = ({ taxes, onDelete }) => {
+const useTaxController = ({ taxes, onDelete, currentPage = 1, itemsPerPage = 8 }) => {
   const [deleteTarget, setDeleteTarget] = useState(null)
 
   const processedTaxes = useMemo(() => {
-    return [...taxes]
-  }, [taxes])
+    let result = [...taxes]
+    const startIndex = (currentPage - 1) * itemsPerPage
+    return result.slice(startIndex, startIndex + itemsPerPage)
+  }, [taxes, currentPage, itemsPerPage])
+
+  const getIndex = (idx) => (currentPage - 1) * itemsPerPage + idx + 1
 
   const handleDeleteClick = (tax) => {
     setDeleteTarget({ id: tax.id, name: tax.taxMasterName })
@@ -28,6 +32,7 @@ const useTaxController = ({ taxes, onDelete }) => {
 
   return {
     processedTaxes,
+    getIndex,
     deleteTarget,
     handleDeleteClick,
     handleConfirmDelete,
