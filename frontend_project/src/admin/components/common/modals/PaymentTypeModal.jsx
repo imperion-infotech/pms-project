@@ -84,6 +84,7 @@ export const PaymentTypeModal = ({
                 <option value="Credit Card">Credit Card</option>
                 <option value="Debit Card">Debit Card</option>
                 <option value="Cash">Cash</option>
+                <option value="Check">Check</option>
                 <option value="Net Banking">Net Banking</option>
                 <option value="UPI">UPI</option>
                 <option value="Other">Other</option>
