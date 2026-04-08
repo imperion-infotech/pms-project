@@ -175,7 +175,9 @@ export const useGuestPersonalDetailsManagement = ({
       if (personalFormData.documentNumber || personalFormData.documentTypeId) {
         const docRes = await addDocumentDetail({
           documentNumber: personalFormData.documentNumber,
-          validTill: personalFormData.validTill,
+          validTill: personalFormData.validTill
+            ? `${personalFormData.validTill}T00:00:00.000Z`
+            : null,
           frontImagePath: personalFormData.frontImagePath,
           backImagePath: personalFormData.backImagePath,
           remark: personalFormData.remark,
@@ -197,12 +199,10 @@ export const useGuestPersonalDetailsManagement = ({
           roomTypeId: Number(personalFormData.roomTypeId) || 1,
           roomMasterId: Number(personalFormData.roomMasterId) || 1,
           comment: personalFormData.comment || '',
-          color: '#3B82F6',
           rateTypeEnum: personalFormData.rateTypeEnum || 'RACK',
           stayStatusEnum: personalFormData.stayStatusEnum || 'Confirmed',
           noOfGuest: Number(personalFormData.noOfGuest) || 1,
           deleted: false,
-          personalDetailsId: personalDetailsId,
         }
         const stayRes = await addStayDetail(stayPayload)
         stayDetailsId = stayRes.data.id || stayRes.data
@@ -240,8 +240,18 @@ export const useGuestPersonalDetailsManagement = ({
         documentDetailsId: documentDetailsId,
         rentDetailsId: rentDetailsId,
         stayDetailsId: stayDetailsId,
-        checkInDate: `${personalFormData.checkInDate}T${personalFormData.checkInTime || '00:00'}:00`,
-        checkOutDate: `${personalFormData.checkOutDate}T${personalFormData.checkOutTime || '00:00'}:00`,
+        checkInDate: personalFormData.checkInDate
+          ? `${personalFormData.checkInDate}T${personalFormData.checkInTime || '00:00'}:00.000Z`
+          : null,
+        checkOutDate: personalFormData.checkOutDate
+          ? `${personalFormData.checkOutDate}T${personalFormData.checkOutTime || '00:00'}:00.000Z`
+          : null,
+        checkInTime: personalFormData.checkInTime
+          ? `${personalFormData.checkInTime}:00`
+          : '00:00:00',
+        checkOutTime: personalFormData.checkOutTime
+          ? `${personalFormData.checkOutTime}:00`
+          : '00:00:00',
         noOfDays: personalFormData.noOfDays ? Number(personalFormData.noOfDays) : 1,
         guestDetailsStatus: personalFormData.guestDetailsStatus || 'Reservation',
       })
@@ -329,7 +339,11 @@ export const useGuestPersonalDetailsManagement = ({
       if (editPersonalFormData.documentNumber || editPersonalFormData.documentTypeId) {
         const docPayload = {
           documentNumber: editPersonalFormData.documentNumber,
-          validTill: editPersonalFormData.validTill,
+          validTill: editPersonalFormData.validTill
+            ? editPersonalFormData.validTill.includes('T')
+              ? editPersonalFormData.validTill
+              : `${editPersonalFormData.validTill}T00:00:00.000Z`
+            : null,
           frontImagePath: editPersonalFormData.frontImagePath,
           backImagePath: editPersonalFormData.backImagePath,
           remark: editPersonalFormData.remark,
@@ -364,12 +378,10 @@ export const useGuestPersonalDetailsManagement = ({
             ? Number(editPersonalFormData.roomMasterId)
             : undefined,
           comment: editPersonalFormData.comment,
-          color: '#3B82F6',
           rateTypeEnum: editPersonalFormData.rateTypeEnum,
           stayStatusEnum: editPersonalFormData.stayStatusEnum,
           noOfGuest: editPersonalFormData.noOfGuest ? Number(editPersonalFormData.noOfGuest) : 1,
           deleted: editPersonalFormData.deleted || false,
-          personalDetailsId: editPersonalFormData.id,
         }
 
         if (editPersonalFormData.stayId) {
@@ -421,8 +433,18 @@ export const useGuestPersonalDetailsManagement = ({
         documentDetailsId: docId,
         stayDetailsId: stayId,
         rentDetailsId: rentId,
-        checkInDate: `${editPersonalFormData.checkInDate}T${editPersonalFormData.checkInTime || '00:00'}:00`,
-        checkOutDate: `${editPersonalFormData.checkOutDate}T${editPersonalFormData.checkOutTime || '00:00'}:00`,
+        checkInDate: editPersonalFormData.checkInDate
+          ? `${editPersonalFormData.checkInDate}T${editPersonalFormData.checkInTime || '00:00'}:00.000Z`
+          : null,
+        checkOutDate: editPersonalFormData.checkOutDate
+          ? `${editPersonalFormData.checkOutDate}T${editPersonalFormData.checkOutTime || '00:00'}:00.000Z`
+          : null,
+        checkInTime: editPersonalFormData.checkInTime
+          ? `${editPersonalFormData.checkInTime}:00`
+          : '00:00:00',
+        checkOutTime: editPersonalFormData.checkOutTime
+          ? `${editPersonalFormData.checkOutTime}:00`
+          : '00:00:00',
         noOfDays: Number(editPersonalFormData.noOfDays),
         guestDetailsStatus: editPersonalFormData.guestDetailsStatus || 'Reservation',
       }
