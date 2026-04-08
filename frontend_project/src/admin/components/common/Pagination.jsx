@@ -15,6 +15,7 @@ const Pagination = ({
   taxes,
   documentTypes,
   paymentTypes,
+  otherCharges,
   isLoading,
   currentPage,
   itemsPerPage,
@@ -40,6 +41,8 @@ const Pagination = ({
         return documentTypes ? documentTypes.length : 0
       case 'Payment Type':
         return paymentTypes ? paymentTypes.length : 0
+      case 'Other Charge':
+        return otherCharges ? otherCharges.length : 0
       default:
         return 0
     }

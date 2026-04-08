@@ -17,20 +17,20 @@ const StaySpecifications = ({
 }) => {
   // Shared UI classes
   const labelClass =
-    'text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-1'
+    'text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block'
   const inputContainerClass = `flex items-center gap-3 px-3 py-2 rounded-xl border transition-all ${
     isDark
-      ? 'bg-slate-800/30 border-slate-700 focus-within:border-emerald-500/50'
-      : 'bg-slate-50 border-slate-200 focus-within:border-emerald-500'
+      ? 'bg-slate-800/30 border-slate-700 focus-within:border-blue-500/50'
+      : 'bg-white border-slate-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 shadow-sm'
   }`
   const inputClass =
-    'bg-transparent border-none outline-none w-full text-xs font-bold text-slate-800 dark:text-slate-100 placeholder:text-slate-300'
+    'bg-transparent border-none outline-none w-full text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder:text-slate-400'
   const selectClass =
-    'bg-transparent border-none outline-none w-full text-xs font-bold text-slate-800 dark:text-slate-100'
+    'bg-transparent border-none outline-none w-full text-xs font-semibold text-slate-800 dark:text-slate-100'
 
   return (
-    <div className="mt-8 space-y-6 text-left">
-      <div className="flex items-center gap-3 border-l-4 border-emerald-500 pl-4">
+    <div className="mt-4 space-y-4 text-left">
+      <div className="flex items-center gap-3 border-l-4 border-blue-500 pl-4">
         <div>
           <h3
             className={`text-xs font-black tracking-[0.2em] uppercase ${isDark ? 'text-slate-200' : 'text-slate-800'}`}

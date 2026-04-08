@@ -85,19 +85,19 @@ export const GuestPersonalDetailsModal = ({
         className="animate-in fade-in absolute inset-0 bg-slate-900/80 backdrop-blur-md"
         onClick={() => setIsOpen(false)}
       ></div>
-      <div className="animate-in zoom-in-95 relative z-10 flex h-[98vh] w-full max-w-6xl flex-col overflow-hidden rounded-[32px] border border-slate-200/50 bg-white shadow-2xl dark:border-slate-700/50 dark:bg-slate-900">
+      <div className="animate-in zoom-in-95 relative z-10 flex h-[98vh] w-full max-w-7xl flex-col overflow-hidden rounded-[32px] border border-slate-200/50 bg-white shadow-2xl dark:border-slate-700/50 dark:bg-slate-900">
         <form onSubmit={handleSubmit} className="flex h-full flex-col overflow-hidden">
           {/* Header */}
-          <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-white/80 px-8 py-5 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80">
+          <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-white/80 px-8 py-4 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80">
             <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-blue-500 to-blue-700 shadow-lg shadow-blue-500/20">
-                <User className="h-6 w-6 text-white" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-linear-to-br from-blue-500 to-blue-700 shadow-lg shadow-blue-500/20">
+                <User className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h2 className="text-xl font-black tracking-tight text-slate-800 uppercase dark:text-white">
+                <h2 className="text-lg font-black tracking-tight text-slate-800 uppercase dark:text-white">
                   Create Guest Profile
                 </h2>
-                <p className="text-xs font-bold tracking-widest text-slate-400 uppercase">
+                <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
                   Comprehensive Check-in & Allotment
                 </p>
               </div>
@@ -105,16 +105,16 @@ export const GuestPersonalDetailsModal = ({
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-400 transition-all hover:rotate-90 hover:bg-red-50 hover:text-red-500 dark:bg-slate-800 dark:hover:bg-red-900/30"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-400 transition-all hover:rotate-90 hover:bg-red-50 hover:text-red-500 dark:bg-slate-800 dark:hover:bg-red-900/30"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
           </div>
 
           <div className="flex flex-1 flex-col overflow-hidden bg-slate-50/50 lg:flex-row dark:bg-slate-900">
             {/* Column 1: Identity & Documentation */}
             <div className="scrollbar-hide flex w-full flex-col border-b border-slate-200 bg-white transition-all lg:w-[32%] lg:border-r lg:border-b-0 dark:border-slate-800 dark:bg-slate-900">
-              <div className="flex items-center gap-3 p-5 pb-0">
+              <div className="flex items-center gap-3 p-4 pb-0">
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
                   <ShieldCheck size={16} className="text-blue-600 dark:text-blue-400" />
                 </div>
@@ -122,11 +122,11 @@ export const GuestPersonalDetailsModal = ({
                   Part 1: Identity & Docs
                 </h3>
               </div>
-              <div className="scrollbar-hide flex-1 space-y-6 overflow-y-auto p-5">
+              <div className="scrollbar-hide flex-1 space-y-4 overflow-y-auto p-4">
                 {/* Asset Capture */}
-                <div className="flex items-start gap-4 rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-700/50 dark:bg-slate-800/50">
+                <div className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-700/50 dark:bg-slate-800/50">
                   <div className="group relative">
-                    <div className="h-28 w-28 overflow-hidden rounded-[20px] border-4 border-white bg-slate-100 shadow-md dark:border-slate-800 dark:bg-slate-900">
+                    <div className="h-24 w-24 overflow-hidden rounded-[20px] border-4 border-white bg-slate-100 shadow-md dark:border-slate-800 dark:bg-slate-900">
                       {photoSrc ? (
                         <AuthImage
                           src={photoSrc}
@@ -147,8 +147,8 @@ export const GuestPersonalDetailsModal = ({
                         </div>
                       )}
                     </div>
-                    <label className="absolute -right-2 -bottom-2 flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl bg-blue-500 text-white shadow-lg ring-2 ring-white transition-transform hover:scale-110 dark:ring-slate-900">
-                      <Camera size={16} />
+                      <label className="absolute -right-2 -bottom-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl bg-blue-500 text-white shadow-lg ring-2 ring-white transition-transform hover:scale-110 dark:ring-slate-900">
+                      <Camera size={14} />
                       <input
                         type="file"
                         className="hidden"
@@ -158,8 +158,8 @@ export const GuestPersonalDetailsModal = ({
                     </label>
                   </div>
 
-                  <div className="flex h-28 flex-1 flex-col justify-end space-y-3">
-                    <div className="relative flex-1 rounded-[18px] border-2 border-dashed border-slate-200 bg-white p-2 text-center transition-colors group-hover:border-blue-400 hover:border-blue-300 dark:border-slate-700 dark:bg-slate-800">
+                  <div className="flex h-24 flex-1 flex-col justify-end space-y-2">
+                    <div className="relative flex-1 rounded-[18px] border-2 border-dashed border-slate-200 bg-white p-1.5 text-center transition-colors group-hover:border-blue-400 hover:border-blue-300 dark:border-slate-700 dark:bg-slate-800">
                       {signatureSrc ? (
                         <div className="relative flex h-full items-center justify-center">
                           <AuthImage
@@ -208,9 +208,9 @@ export const GuestPersonalDetailsModal = ({
                     </span>
                     <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800"></div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                     <div>
-                      <label className="mb-1 block text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
+                      <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
                         First Name
                       </label>
                       <input
@@ -218,12 +218,12 @@ export const GuestPersonalDetailsModal = ({
                         type="text"
                         value={formData.firstName}
                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:focus:ring-blue-900/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
                         placeholder="John"
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
+                      <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
                         Last Name
                       </label>
                       <input
@@ -231,18 +231,18 @@ export const GuestPersonalDetailsModal = ({
                         type="text"
                         value={formData.lastName}
                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:focus:ring-blue-900/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
                         placeholder="Doe"
                       />
                     </div>
                     <div className="col-span-2">
-                      <label className="mb-1 block text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
+                      <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
                         Company Name
                       </label>
-                      <div className="relative">
+                      <div className="relative group">
                         <Building
-                          size={16}
-                          className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400"
+                          size={14}
+                          className="absolute top-1/2 left-3.5 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-blue-500"
                         />
                         <input
                           type="text"
@@ -250,19 +250,19 @@ export const GuestPersonalDetailsModal = ({
                           onChange={(e) =>
                             setFormData({ ...formData, companyName: e.target.value })
                           }
-                          className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pr-4 pl-10 text-sm font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:focus:ring-blue-900/20"
+                          className="w-full rounded-xl border border-slate-200 bg-white py-2 pr-4 pl-10 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
                           placeholder="Company Ltd."
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="mb-1 block text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
+                      <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
                         Phone Number
                       </label>
-                      <div className="relative">
+                      <div className="relative group">
                         <Phone
-                          size={16}
-                          className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400"
+                          size={14}
+                          className="absolute top-1/2 left-3.5 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-blue-500"
                         />
                         <input
                           required
@@ -275,32 +275,32 @@ export const GuestPersonalDetailsModal = ({
                               mobileNumber: e.target.value,
                             })
                           }
-                          className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pr-4 pl-10 text-sm font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:focus:ring-blue-900/20"
+                          className="w-full rounded-xl border border-slate-200 bg-white py-2 pr-4 pl-10 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
                           placeholder="+1 234 567 890"
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="mb-1 block text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
+                      <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
                         Email Address
                       </label>
-                      <div className="relative">
+                      <div className="relative group">
                         <Mail
-                          size={16}
-                          className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400"
+                          size={14}
+                          className="absolute top-1/2 left-3.5 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-blue-500"
                         />
                         <input
                           required
                           type="email"
                           value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pr-4 pl-10 text-sm font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:focus:ring-blue-900/20"
+                          className="w-full rounded-xl border border-slate-200 bg-white py-2 pr-4 pl-10 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
                           placeholder="mail@example.com"
                         />
                       </div>
                     </div>
                     <div className="col-span-2">
-                      <label className="mb-1 block text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
+                      <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
                         Full Address
                       </label>
                       <textarea
@@ -308,7 +308,7 @@ export const GuestPersonalDetailsModal = ({
                         rows="2"
                         value={formData.address}
                         onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:focus:ring-blue-900/20"
+                        className="scrollbar-hide w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
                         placeholder="Street, City, Zip"
                       ></textarea>
                     </div>
@@ -323,9 +323,9 @@ export const GuestPersonalDetailsModal = ({
                     </span>
                     <div className="h-px flex-1 bg-blue-200/50 dark:bg-blue-800/50"></div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                     <div className="col-span-2 sm:col-span-1">
-                      <label className="mb-1 block text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
+                      <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
                         Document Type
                       </label>
                       <select
@@ -333,7 +333,7 @@ export const GuestPersonalDetailsModal = ({
                         onChange={(e) =>
                           setFormData({ ...formData, documentTypeId: e.target.value })
                         }
-                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:focus:ring-blue-900/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
                       >
                         <option value="">Select ID Type</option>
                         {documentTypes?.map((type) => (
@@ -344,7 +344,7 @@ export const GuestPersonalDetailsModal = ({
                       </select>
                     </div>
                     <div className="col-span-2 sm:col-span-1">
-                      <label className="mb-1 block text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
+                      <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
                         ID Number
                       </label>
                       <input
@@ -353,30 +353,30 @@ export const GuestPersonalDetailsModal = ({
                         onChange={(e) =>
                           setFormData({ ...formData, documentNumber: e.target.value })
                         }
-                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:focus:ring-blue-900/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
                         placeholder="e.g. AB1234567"
                       />
                     </div>
                     <div className="col-span-2 sm:col-span-1">
-                      <label className="mb-1 block text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
+                      <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
                         Valid Until
                       </label>
                       <input
                         type="date"
                         value={formData.validTill}
                         onChange={(e) => setFormData({ ...formData, validTill: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:focus:ring-blue-900/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
                       />
                     </div>
                     <div className="col-span-2 sm:col-span-1">
-                      <label className="mb-1 block text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
+                      <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
                         Remarks (Opt)
                       </label>
                       <input
                         type="text"
                         value={formData.remark}
                         onChange={(e) => setFormData({ ...formData, remark: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:focus:ring-blue-900/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
                         placeholder="Optional remarks"
                       />
                     </div>
@@ -393,7 +393,7 @@ export const GuestPersonalDetailsModal = ({
                         ) : (
                           <div className="flex flex-col items-center">
                             <Camera size={20} className="mb-1 text-slate-400" />
-                            <span className="text-[10px] font-bold text-slate-500 uppercase">
+                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                               Upload Front
                             </span>
                           </div>
@@ -417,7 +417,7 @@ export const GuestPersonalDetailsModal = ({
                         ) : (
                           <div className="flex flex-col items-center">
                             <Camera size={20} className="mb-1 text-slate-400" />
-                            <span className="text-[10px] font-bold text-slate-500 uppercase">
+                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                               Upload Back
                             </span>
                           </div>
@@ -436,7 +436,7 @@ export const GuestPersonalDetailsModal = ({
 
             {/* Column 2: Guest Details & Stay */}
             <div className="scrollbar-hide flex w-full flex-col border-b border-slate-200 bg-slate-50/50 transition-all lg:w-[46%] lg:border-r lg:border-b-0 dark:border-slate-800 dark:bg-slate-800/20">
-              <div className="flex items-center gap-3 p-5 pb-0">
+              <div className="flex items-center gap-3 p-4 pb-0">
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30">
                   <BedDouble size={16} className="text-amber-600 dark:text-amber-400" />
                 </div>
@@ -445,8 +445,8 @@ export const GuestPersonalDetailsModal = ({
                 </h3>
               </div>
 
-              <div className="scrollbar-hide flex-1 space-y-6 overflow-y-auto p-5">
-                <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <div className="scrollbar-hide flex-1 space-y-4 overflow-y-auto p-4 text-left">
+                <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                   <GuestInformation
                     formData={formData}
                     handleChange={(e) => {
@@ -480,7 +480,7 @@ export const GuestPersonalDetailsModal = ({
                   />
                 </div>
 
-                <div className="rounded-2xl border border-amber-100/50 bg-amber-50/50 p-5 dark:border-amber-900/20 dark:bg-amber-900/10">
+                <div className="rounded-2xl border border-amber-100/50 bg-amber-50/50 p-4 dark:border-amber-900/20 dark:bg-amber-900/10">
                   <StaySpecifications
                     formData={formData}
                     handleChange={(e) => {
@@ -505,7 +505,7 @@ export const GuestPersonalDetailsModal = ({
             <div className="scrollbar-hide relative flex w-full flex-col bg-emerald-50/30 transition-all lg:w-[22%] dark:bg-emerald-900/5">
               <div className="absolute inset-y-0 left-0 hidden w-px bg-linear-to-b from-transparent via-emerald-200 to-transparent lg:block dark:via-emerald-500/20"></div>
 
-              <div className="flex items-center gap-3 p-5 pb-0">
+              <div className="flex items-center gap-3 p-4 pb-0">
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30">
                   <Receipt size={16} className="text-emerald-600 dark:text-emerald-400" />
                 </div>
@@ -514,8 +514,8 @@ export const GuestPersonalDetailsModal = ({
                 </h3>
               </div>
 
-              <div className="scrollbar-hide flex-1 overflow-y-auto p-5">
-                <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-white p-5 shadow-lg shadow-emerald-500/5 dark:border-emerald-900/30 dark:bg-slate-900">
+              <div className="scrollbar-hide flex-1 overflow-y-auto p-4 text-left scrollbar-hide">
+                <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-white p-4 shadow-lg shadow-emerald-500/5 dark:border-emerald-900/30 dark:bg-slate-900">
                   <RentDetails
                     formData={formData}
                     handleChange={(e) =>

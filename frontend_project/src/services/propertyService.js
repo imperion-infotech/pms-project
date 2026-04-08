@@ -160,4 +160,14 @@ export const propertyService = {
   deletePaymentType: (id) => handleResponse(() => api.delete(`/admin/deletepaymenttype/${id}`)),
   searchPaymentTypes: (query) =>
     handleResponse(() => api.get('/user/paymenttype/search', { params: { query } })),
+
+  // --- OTHER CHARGES MANAGEMENT ---
+  getOtherCharges: () => handleResponse(() => api.get('/user/getothercharges')),
+  getOtherChargeById: (id) => handleResponse(() => api.get(`/user/getothercharge/${id}`)),
+  createOtherCharge: (data) => handleResponse(() => api.post('/admin/createothercharge', data)),
+  updateOtherCharge: (id, data) =>
+    handleResponse(() => api.put(`/admin/updateothercharge/${id}`, data)),
+  deleteOtherCharge: (id) => handleResponse(() => api.delete(`/admin/deleteothercharge/${id}`)),
+  searchOtherCharges: (query) =>
+    handleResponse(() => api.get('/user/othercharge/search', { params: { query } })),
 }

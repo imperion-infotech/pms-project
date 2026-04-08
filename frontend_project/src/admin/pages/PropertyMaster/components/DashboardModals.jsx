@@ -18,6 +18,8 @@ import {
   DocumentTypeEditModal,
   PaymentTypeModal,
   PaymentTypeEditModal,
+  OtherChargeModal,
+  OtherChargeEditModal,
 } from '../../../components/common/Modals'
 
 /**
@@ -103,6 +105,14 @@ const DashboardModals = ({
   setEditPaymentType,
   handleUpdatePaymentType,
   paymentTypes,
+  // Other Charge
+  newOtherCharge,
+  setNewOtherCharge,
+  handleAddOtherCharge,
+  editOtherCharge,
+  setEditOtherCharge,
+  handleUpdateOtherCharge,
+  otherCharges,
   rentDetails = [],
   isLoading,
 }) => {
@@ -301,6 +311,24 @@ const DashboardModals = ({
         setEditPaymentType={setEditPaymentType}
         handleUpdate={handleUpdatePaymentType}
         paymentTypes={paymentTypes}
+      />
+
+      {/* Other Charge Modals */}
+      <OtherChargeModal
+        isOpen={modals.otherCharge}
+        setIsOpen={(isOpen) => toggleModal('otherCharge', isOpen)}
+        newOtherCharge={newOtherCharge}
+        setNewOtherCharge={setNewOtherCharge}
+        handleAdd={handleAddOtherCharge}
+        otherCharges={otherCharges}
+      />
+      <OtherChargeEditModal
+        isOpen={modals.otherChargeEdit}
+        setIsOpen={(isOpen) => toggleModal('otherChargeEdit', isOpen)}
+        editOtherCharge={editOtherCharge}
+        setEditOtherCharge={setEditOtherCharge}
+        handleUpdate={handleUpdateOtherCharge}
+        otherCharges={otherCharges}
       />
     </>
   )

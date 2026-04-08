@@ -10,26 +10,24 @@ const FieldRow = ({
   isDark,
 }) => {
   const containerClass =
-    'flex items-center justify-between py-1 border-b border-dashed border-slate-200 dark:border-slate-700/50'
-  const labelClass = 'text-[9px] font-bold text-slate-500 uppercase tracking-widest'
-  const inputContainerClass = `flex items-center px-2 py-0.5 rounded-lg w-24 border transition-all ${
+    'flex items-center justify-between py-2 border-b border-dashed border-slate-200 dark:border-slate-700/50'
+  const labelClass = 'text-[10px] font-bold text-slate-500 uppercase tracking-widest'
+  const inputContainerClass = `flex items-center px-4 py-2 rounded-xl border transition-all w-32 ${
     isDark
-      ? 'bg-slate-800/30 border-slate-700 focus-within:border-blue-500/50 focus-within:ring-2 focus-within:ring-blue-500/10'
-      : 'bg-white border-slate-100 shadow-sm focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/10'
-  }`
+      ? 'bg-slate-800/30 border-slate-700 focus-within:border-blue-500/50'
+      : 'bg-white border-slate-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 shadow-sm'
+  } ${highlight ? 'border-blue-400/50 ring-4 ring-blue-500/5 shadow-blue-500/10' : ''}`
   const inputClass =
-    'bg-transparent border-none outline-none w-full text-[10px] font-black text-right text-slate-800 dark:text-slate-100 placeholder:text-slate-300'
+    'bg-transparent border-none outline-none w-full text-xs font-black text-right text-slate-800 dark:text-slate-100 placeholder:text-slate-400'
 
   return (
     <div className={containerClass}>
       <label
-        className={`${labelClass} ${highlight ? 'font-black text-emerald-600 dark:text-emerald-400' : ''} ${colorClass}`}
+        className={`${labelClass} ${highlight ? 'text-blue-600 dark:text-blue-400' : ''} ${colorClass}`}
       >
         {label}
       </label>
-      <div
-        className={`${inputContainerClass} ${highlight ? 'border-emerald-200 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-900/20' : ''}`}
-      >
+      <div className={inputContainerClass}>
         <input
           type="number"
           name={name}
