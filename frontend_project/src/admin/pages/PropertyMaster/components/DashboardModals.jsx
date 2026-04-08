@@ -20,13 +20,10 @@ import {
   PaymentTypeEditModal,
   OtherChargeModal,
   OtherChargeEditModal,
-} from '../../../components/common/Modals'
+} from '../../../components/common/modals'
 
 /**
  * DashboardModals - Saare Pop-ups (Modals) ki central place.
- *
- * Is file mein saare 'Add' aur 'Edit' karne waale windows ko
- * manage kiya gaya hai. Ye file decide karti hai ki kab kon sa form khulna hai.
  */
 const DashboardModals = ({
   modals,
@@ -81,14 +78,13 @@ const DashboardModals = ({
   handlePersonalFileUpload,
   uploadingType,
   // Tax
+  taxes,
   newTax,
   setNewTax,
   handleAddTax,
   editTax,
   setEditTax,
   handleUpdateTax,
-  taxes,
-  // Document Type
   // Document Type
   newDocumentType,
   setNewDocumentType,
@@ -118,7 +114,6 @@ const DashboardModals = ({
 }) => {
   return (
     <>
-      {/* ... keeping other modals unchanged ... */}
       {/* Floor Modals */}
       <FloorModal
         isFloorModalOpen={modals.floor}
@@ -234,6 +229,7 @@ const DashboardModals = ({
         handleUpdateTax={handleUpdateTax}
         taxes={taxes}
       />
+
       {/* Personal Detail Modals */}
       <GuestPersonalDetailsModal
         isOpen={modals.personalDetail}
@@ -254,6 +250,7 @@ const DashboardModals = ({
         rooms={rooms}
         roomStatuses={roomStatuses}
         rentDetails={rentDetails}
+        taxes={taxes}
       />
 
       <GuestPersonalDetailsEditModal
@@ -275,6 +272,7 @@ const DashboardModals = ({
         rooms={rooms}
         roomStatuses={roomStatuses}
         rentDetails={rentDetails}
+        taxes={taxes}
       />
 
       {/* Document Type Modals */}

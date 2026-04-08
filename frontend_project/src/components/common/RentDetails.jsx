@@ -8,6 +8,8 @@ const FieldRow = ({
   formData,
   handleChange,
   isDark,
+  type = 'number',
+  options = [],
 }) => {
   const containerClass =
     'flex items-center justify-between py-2 border-b border-dashed border-slate-200 dark:border-slate-700/50'
@@ -28,21 +30,37 @@ const FieldRow = ({
         {label}
       </label>
       <div className={inputContainerClass}>
-        <input
-          type="number"
-          name={name}
-          value={formData[name] || ''}
-          onChange={handleChange}
-          className={`${inputClass} ${colorClass}`}
-          step="0.01"
-          placeholder="0.00"
-        />
+        {type === 'select' ? (
+          <select
+            name={name}
+            value={formData[name] || ''}
+            onChange={handleChange}
+            className={`${inputClass} text-left! cursor-pointer appearance-none ${colorClass}`}
+          >
+            <option value="">Select</option>
+            {options.map((opt) => (
+              <option key={opt.id} value={opt.id}>
+                {opt.name}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <input
+            type="number"
+            name={name}
+            value={formData[name] || ''}
+            onChange={handleChange}
+            className={`${inputClass} ${colorClass}`}
+            step="0.01"
+            placeholder="0.00"
+          />
+        )}
       </div>
     </div>
   )
 }
 
-const RentDetails = ({ formData, handleChange, isDark = false }) => {
+const RentDetails = ({ formData, handleChange, isDark = false, taxes = [] }) => {
   return (
     <div className="flex h-full flex-col font-sans">
       <div className="flex-1 space-y-1">
@@ -64,6 +82,8 @@ const RentDetails = ({ formData, handleChange, isDark = false }) => {
         <FieldRow
           label="Tax"
           name="taxId"
+          type="select"
+          options={taxes.map((t) => ({ id: t.id, name: t.taxMasterName }))}
           formData={formData}
           handleChange={handleChange}
           isDark={isDark}

@@ -9,6 +9,9 @@ import {
   Pen as SignatureIcon,
   Loader2,
   Save,
+  ShieldCheck,
+  BedDouble,
+  Receipt,
 } from 'lucide-react'
 import { AuthImage } from '../AuthImage'
 import GuestInformation from '../../../../components/common/GuestInformation'
@@ -30,6 +33,7 @@ export const GuestPersonalDetailsEditModal = ({
   rooms = [],
   roomStatuses = [],
   rentDetails = [],
+  taxes = [],
   loading,
 }) => {
   const [localPreviews, setLocalPreviews] = useState({ photo: null, signature: null })
@@ -509,6 +513,7 @@ export const GuestPersonalDetailsEditModal = ({
                     handleChange={(e) =>
                       setFormData({ ...formData, [e.target.name]: e.target.value })
                     }
+                    taxes={taxes}
                     isDark={false}
                   />
                 </div>

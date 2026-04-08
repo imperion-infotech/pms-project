@@ -33,6 +33,7 @@ export const GuestPersonalDetailsModal = ({
   rooms = [],
   roomStatuses = [],
   rentDetails = [],
+  taxes = [],
   loading,
 }) => {
   const [localPreviews, setLocalPreviews] = useState({ photo: null, signature: null })
@@ -521,6 +522,7 @@ export const GuestPersonalDetailsModal = ({
                     handleChange={(e) =>
                       setFormData({ ...formData, [e.target.name]: e.target.value })
                     }
+                    taxes={taxes}
                     isDark={false}
                   />
                 </div>
