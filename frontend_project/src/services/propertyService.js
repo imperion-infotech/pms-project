@@ -87,7 +87,7 @@ export const propertyService = {
 
   // --- GUEST PERSONAL DETAILS ---
   getPersonalDetails: () => handleResponse(() => api.get('/user/getpersonaldetails')),
-  getPersonalDetailById: (id) => handleResponse(() => api.get(`/user/getpersonaldetails/${id}`)),
+  getPersonalDetailById: (id) => handleResponse(() => api.get(`/user/getpersonaldetail/${id}`)),
   createPersonalDetail: (data) =>
     handleResponse(() => api.post('/user/createpersonaldetail', data)),
   updatePersonalDetail: (id, data) =>

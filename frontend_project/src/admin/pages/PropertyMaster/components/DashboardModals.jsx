@@ -10,8 +10,8 @@ import {
   RoomStatusEditModal,
   RoomModal,
   RoomEditModal,
-  PersonalDetailsModal,
-  PersonalDetailsEditModal,
+  GuestPersonalDetailsModal,
+  GuestPersonalDetailsEditModal,
   TaxModal,
   TaxEditModal,
   DocumentTypeModal,
@@ -214,7 +214,7 @@ const DashboardModals = ({
         taxes={taxes}
       />
       {/* Personal Detail Modals */}
-      <PersonalDetailsModal
+      <GuestPersonalDetailsModal
         isOpen={modals.personalDetail}
         setIsOpen={(isOpen) => {
           toggleModal('personalDetail', isOpen)
@@ -235,7 +235,7 @@ const DashboardModals = ({
         rentDetails={rentDetails}
       />
 
-      <PersonalDetailsEditModal
+      <GuestPersonalDetailsEditModal
         isOpen={modals.personalDetailEdit}
         setIsOpen={(isOpen) => {
           toggleModal('personalDetailEdit', isOpen)

@@ -22,7 +22,7 @@ import { useRoomTypeManagement } from '../../features/property/hooks/useRoomType
 import { useRoomStatusManagement } from '../../features/property/hooks/useRoomStatusManagement'
 import { useRoomManagement } from '../../features/property/hooks/useRoomManagement'
 import { useTaxManagement } from '../../features/property/hooks/useTaxManagement'
-import { usePersonalDetailManagement } from '../../features/property/hooks/usePersonalDetailManagement'
+import { useGuestPersonalDetailsManagement } from '../../features/property/hooks/useGuestPersonalDetailsManagement'
 import { useDocumentTypeManagement } from '../../features/property/hooks/useDocumentTypeManagement'
 
 /**
@@ -228,7 +228,7 @@ const PmsDashboard = () => {
     handleUpdatePersonalDetail,
     handleEditPersonalDetail,
     handleAddNewPersonalDetail,
-  } = usePersonalDetailManagement({
+  } = useGuestPersonalDetailsManagement({
     addPersonalDetail,
     updatePersonalDetail,
     addDocumentDetail,

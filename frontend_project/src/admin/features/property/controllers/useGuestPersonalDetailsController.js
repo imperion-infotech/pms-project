@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react'
  * Controller: usePersonalDetailController
  * Logic for managing individual guest profiles.
  */
-const usePersonalDetailController = ({
+const useGuestPersonalDetailsController = ({
   details,
   documentDetails = [],
   stayDetails = [],
@@ -89,4 +89,4 @@ const usePersonalDetailController = ({
   }
 }
 
-export default usePersonalDetailController
+export default useGuestPersonalDetailsController

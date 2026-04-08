@@ -14,6 +14,7 @@ import {
   Receipt,
   Settings,
   FileText,
+  CreditCard,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useSidebar } from '../../../context/SidebarContext'
@@ -32,7 +33,11 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
   ]
 
   const profileItems = [{ name: 'Personal Detail', icon: User }]
-  const configurationItems = [{ name: 'Document Type', icon: FileText }]
+
+  const configurationItems = [
+    { name: 'Document Type', icon: FileText },
+    { name: 'Payments', icon: CreditCard },
+  ]
 
   const [isProfileOpen, setIsProfileOpen] = useState(true)
   const [isConfigOpen, setIsConfigOpen] = useState(true)

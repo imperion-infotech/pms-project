@@ -15,7 +15,7 @@ import GuestInformation from '../../../../components/common/GuestInformation'
 import StaySpecifications from '../../../../components/common/StaySpecifications'
 import RentDetails from '../../../../components/common/RentDetails'
 
-export const PersonalDetailsEditModal = ({
+export const GuestPersonalDetailsEditModal = ({
   isOpen,
   setIsOpen,
   formData,

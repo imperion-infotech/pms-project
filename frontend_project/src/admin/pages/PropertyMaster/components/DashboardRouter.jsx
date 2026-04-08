@@ -5,7 +5,7 @@ import BuildingManagement from '../../../features/property/components/BuildingMa
 import RoomTypeManagement from '../../../features/property/components/RoomTypeManagement'
 import RoomManagement from '../../../features/property/components/RoomManagement'
 import RoomStatusManagement from '../../../features/property/components/RoomStatusManagement'
-import PersonalDetailManagement from '../../../features/property/components/PersonalDetailManagement'
+import GuestPersonalDetailsManagement from '../../../features/property/components/GuestPersonalDetailsManagement'
 import TaxManagement from '../../../features/property/components/TaxManagement'
 import DocumentTypeManagement from '../../../features/property/components/DocumentTypeManagement'
 
@@ -136,7 +136,7 @@ const DashboardRouter = ({
       )
     case 'Personal Detail':
       return (
-        <PersonalDetailManagement
+        <GuestPersonalDetailsManagement
           details={personalDetails}
           documentDetails={documentDetails}
           stayDetails={stayDetails}

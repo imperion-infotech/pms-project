@@ -18,14 +18,14 @@ import {
   Pencil,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import usePersonalDetailController from '../controllers/usePersonalDetailController'
+import useGuestPersonalDetailsController from '../controllers/useGuestPersonalDetailsController'
 import { AuthImage } from '../../../components/common/AuthImage'
 
 /**
  * View: PersonalDetailManagement
  * Guest directory and profile management using MVC architecture.
  */
-const PersonalDetailManagement = ({
+const GuestPersonalDetailsManagement = ({
   details = [],
   documentDetails = [],
   stayDetails = [],
@@ -47,7 +47,7 @@ const PersonalDetailManagement = ({
     getGuestStay,
     getGuestDetail, // New
     getDocumentTypeName,
-  } = usePersonalDetailController({
+  } = useGuestPersonalDetailsController({
     details,
     documentDetails,
     stayDetails,
@@ -294,4 +294,4 @@ const PersonalDetailManagement = ({
   )
 }
 
-export default React.memo(PersonalDetailManagement)
+export default React.memo(GuestPersonalDetailsManagement)

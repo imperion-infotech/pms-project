@@ -3,7 +3,7 @@ import { useState, useCallback, useMemo } from 'react'
 /**
  * usePersonalDetailManagement - Centralized hook for Guest Personal Detail CRUD operations.
  */
-export const usePersonalDetailManagement = ({
+export const useGuestPersonalDetailsManagement = ({
   addPersonalDetail,
   updatePersonalDetail,
   addDocumentDetail,
@@ -154,7 +154,6 @@ export const usePersonalDetailManagement = ({
         lastName: personalFormData.lastName,
         companyName: personalFormData.companyName,
         phone: personalFormData.phone || personalFormData.mobileNumber,
-        mobileNumber: personalFormData.mobileNumber || personalFormData.phone,
         email: personalFormData.email,
         address: personalFormData.address,
         profilePhoto: personalFormData.profilePhoto || null,
@@ -313,12 +312,10 @@ export const usePersonalDetailManagement = ({
     try {
       // 1. Update Personal Detail
       const updatePayload = {
-        id: editPersonalFormData.id,
         firstName: editPersonalFormData.firstName,
         lastName: editPersonalFormData.lastName,
         companyName: editPersonalFormData.companyName,
         phone: editPersonalFormData.phone || editPersonalFormData.mobileNumber,
-        mobileNumber: editPersonalFormData.mobileNumber || editPersonalFormData.phone,
         email: editPersonalFormData.email,
         address: editPersonalFormData.address,
         profilePhoto: editPersonalFormData.profilePhoto || null,
