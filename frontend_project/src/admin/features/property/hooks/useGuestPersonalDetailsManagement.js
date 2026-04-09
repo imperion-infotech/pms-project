@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from 'react'
+import { useToast } from '../../../../context/NotificationContext'
 
 /**
  * usePersonalDetailManagement - Centralized hook for Guest Personal Detail CRUD operations.
@@ -16,6 +17,7 @@ export const useGuestPersonalDetailsManagement = ({
   updateRentDetail,
   toggleModal,
 }) => {
+  const toast = useToast()
   const getIndustrialStayDefaults = useCallback(() => {
     const now = new Date()
     const checkInDate = now.toISOString()
@@ -333,8 +335,10 @@ export const useGuestPersonalDetailsManagement = ({
         balance: '',
       })
       toggleModal('personalDetail', false)
+      toast.success('Guest Personal Detail created successfully')
     } catch (err) {
       console.error('Failed to create guest package:', err)
+      toast.error(err.response?.data?.message || 'Failed to create Guest Personal Detail')
     }
   }, [
     personalFormData,
@@ -345,6 +349,7 @@ export const useGuestPersonalDetailsManagement = ({
     addRentDetail,
     toggleModal,
     defaults,
+    toast,
   ])
 
   const handleUpdatePersonalDetail = useCallback(async () => {
@@ -454,26 +459,16 @@ export const useGuestPersonalDetailsManagement = ({
 
       // 3. Update or Create Stay Detail
       let stayId = editPersonalFormData.stayId
-      console.log('Stay ID', stayId)
       if (editPersonalFormData.buildingId || editPersonalFormData.roomMasterId) {
         const stayPayload = {
-          floorId: editPersonalFormData.floorId ? Number(editPersonalFormData.floorId) : undefined,
-          buildingId: editPersonalFormData.buildingId
-            ? Number(editPersonalFormData.buildingId)
-            : undefined,
-          roomTypeId: editPersonalFormData.roomTypeId
-            ? Number(editPersonalFormData.roomTypeId)
-            : undefined,
-          roomMasterId: editPersonalFormData.roomMasterId
-            ? Number(editPersonalFormData.roomMasterId)
-            : undefined,
-          comment: editPersonalFormData.comment,
-          rateTypeEnum: editPersonalFormData.rateTypeEnum,
-          stayStatusEnum: editPersonalFormData.stayStatusEnum,
-          noOfGuest: editPersonalFormData.noOfGuest ? Number(editPersonalFormData.noOfGuest) : 1,
-          roomStatusId: editPersonalFormData.roomStatusId
-            ? Number(editPersonalFormData.roomStatusId)
-            : undefined,
+          floorId: Number(editPersonalFormData.floorId) || 1,
+          buildingId: Number(editPersonalFormData.buildingId) || 1,
+          roomTypeId: Number(editPersonalFormData.roomTypeId) || 1,
+          roomMasterId: Number(editPersonalFormData.roomMasterId) || 1,
+          comment: editPersonalFormData.comment || '',
+          rateTypeEnum: editPersonalFormData.rateTypeEnum || 'RACK',
+          stayStatusEnum: editPersonalFormData.stayStatusEnum || 'Confirmed',
+          noOfGuest: Number(editPersonalFormData.noOfGuest) || 1,
           deleted: editPersonalFormData.deleted || false,
         }
         console.log(
@@ -516,7 +511,12 @@ export const useGuestPersonalDetailsManagement = ({
         if (editPersonalFormData.stayId) {
           await updateStayDetail(editPersonalFormData.stayId, stayPayload)
         } else {
-          const stayRes = await addStayDetail(stayPayload)
+          // If creating a new stay during update, we must link it to the personal detail
+          const createStayPayload = {
+            ...stayPayload,
+            personalDetailsId: editPersonalFormData.id,
+          }
+          const stayRes = await addStayDetail(createStayPayload)
           stayId = stayRes.data.id || stayRes.data
         }
       }
@@ -597,25 +597,31 @@ export const useGuestPersonalDetailsManagement = ({
 
       // 5. Update or Create Guest Detail
       const guestPayload = {
-        roomMasterId: Number(editPersonalFormData.roomMasterId),
+        roomMasterId: editPersonalFormData.roomMasterId
+          ? Number(editPersonalFormData.roomMasterId)
+          : undefined,
         personalDetailsId: editPersonalFormData.id,
         documentDetailsId: docId,
         stayDetailsId: stayId,
         rentDetailsId: rentId,
         checkInDate: editPersonalFormData.checkInDate
-          ? `${editPersonalFormData.checkInDate}T${editPersonalFormData.checkInTime || '00:00'}`
+          ? `${editPersonalFormData.checkInDate}T${editPersonalFormData.checkInTime ? (editPersonalFormData.checkInTime.split(':').length === 2 ? editPersonalFormData.checkInTime + ':00' : editPersonalFormData.checkInTime) : '00:00:00'}.000`
           : null,
         checkOutDate: editPersonalFormData.checkOutDate
-          ? `${editPersonalFormData.checkOutDate}T${editPersonalFormData.checkOutTime || '00:00'}`
+          ? `${editPersonalFormData.checkOutDate}T${editPersonalFormData.checkOutTime ? (editPersonalFormData.checkOutTime.split(':').length === 2 ? editPersonalFormData.checkOutTime + ':00' : editPersonalFormData.checkOutTime) : '00:00:00'}.000`
           : null,
         checkInTime: editPersonalFormData.checkInTime
-          ? `${editPersonalFormData.checkInTime}`
+          ? editPersonalFormData.checkInTime.split(':').length === 2
+            ? `${editPersonalFormData.checkInTime}:00`
+            : editPersonalFormData.checkInTime
           : '00:00:00',
         checkOutTime: editPersonalFormData.checkOutTime
-          ? `${editPersonalFormData.checkOutTime}`
+          ? editPersonalFormData.checkOutTime.split(':').length === 2
+            ? `${editPersonalFormData.checkOutTime}:00`
+            : editPersonalFormData.checkOutTime
           : '00:00:00',
-        noOfDays: Number(editPersonalFormData.noOfDays),
-        guestDetailsStatus: editPersonalFormData.guestDetailsStatus || 'confirmed',
+        noOfDays: editPersonalFormData.noOfDays ? Number(editPersonalFormData.noOfDays) : 1,
+        guestDetailsStatus: editPersonalFormData.guestDetailsStatus || 'Reservation',
         deleted: false,
       }
 
@@ -655,8 +661,10 @@ export const useGuestPersonalDetailsManagement = ({
 
       setEditPersonalFormData({ id: null, isDeleted: false })
       toggleModal('personalDetailEdit', false)
+      toast.success('Guest Personal Detail updated successfully')
     } catch (err) {
       console.error('Failed to update guest package:', err)
+      toast.error(err.response?.data?.message || 'Failed to update Guest Personal Detail')
     }
   }, [
     editPersonalFormData,
@@ -670,6 +678,7 @@ export const useGuestPersonalDetailsManagement = ({
     addRentDetail,
     updateRentDetail,
     toggleModal,
+    toast,
   ])
 
   const handleEditPersonalDetail = useCallback(
@@ -735,7 +744,8 @@ export const useGuestPersonalDetailsManagement = ({
           'WEEKLY_RATE_TEST',
           'YEARLY_RATE',
         ]),
-        noOfGuest: stay?.noOfGuest || stay?.noOfGuests || guest?.noOfGuest || guest?.noOfGuests || 1,
+        noOfGuest:
+          stay?.noOfGuest || stay?.noOfGuests || guest?.noOfGuest || guest?.noOfGuests || 1,
 
         // Normalize Status for Dropdowns in StaySpecifications.jsx
         stayStatusEnum: normalizeDropdown(stay?.stayStatusEnum || 'Confirmed', [
