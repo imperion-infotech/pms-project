@@ -16,8 +16,7 @@ const StaySpecifications = ({
   isDark = false,
 }) => {
   // Shared UI classes
-  const labelClass =
-    'text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block'
+  const labelClass = 'text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block'
   const inputContainerClass = `flex items-center gap-3 px-3 py-2 rounded-xl border transition-all ${
     isDark
       ? 'bg-slate-800/30 border-slate-700 focus-within:border-blue-500/50'
@@ -217,8 +216,8 @@ const StaySpecifications = ({
               className={selectClass}
             >
               <option value="RACK">RACK</option>
-              <option value="CORPORATE">Corporate</option>
-              <option value="GROUP">Group</option>
+              <option value="WEEKLY_RATE_TEST">Weekly Rate Test</option>
+              <option value="YEARLY_RATE">Yearly Rate</option>
               {/* <option value="COMPLIMENTARY">Complimentary</option> */}
             </select>
           </div>

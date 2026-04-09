@@ -76,14 +76,14 @@ export const useGuestPersonalDetailsManagement = ({
     comment: '',
     rateTypeEnum: 'RACK',
     noOfGuest: 1,
-    stayStatusEnum: 'Confirmed',
+    stayStatusEnum: 'CONFIRMED',
     deleted: false,
     // Guest Details
     checkInDate: defaults.checkInDate,
     checkOutDate: defaults.checkOutDate,
     checkInTime: defaults.checkInTime,
     checkOutTime: defaults.checkOutTime,
-    guestDetailsStatus: 'Reservation',
+    guestDetailsStatus: 'RESERVATION',
     noOfDays: defaults.noOfDays,
     rentId: '',
     roomStatusId: '',
@@ -92,7 +92,7 @@ export const useGuestPersonalDetailsManagement = ({
     basic: '',
     taxId: '',
     totalRental: '',
-    otherChanrges: '',
+    otherCharges: '',
     discount: '',
     totalCharges: '',
     payments: '',
@@ -133,6 +133,7 @@ export const useGuestPersonalDetailsManagement = ({
     noOfGuest: 1,
     deleted: false,
     // Guest Details
+    checkInId: null,
     guestDetailId: null,
     checkInDate: defaults.checkInDate,
     checkOutDate: defaults.checkOutDate,
@@ -147,7 +148,7 @@ export const useGuestPersonalDetailsManagement = ({
     basic: '',
     taxId: '',
     totalRental: '',
-    otherChanrges: '',
+    otherCharges: '',
     discount: '',
     totalCharges: '',
     payments: '',
@@ -171,16 +172,7 @@ export const useGuestPersonalDetailsManagement = ({
         signature: personalFormData.signature || null,
         isDeleted: false,
       }
-      console.log('---------------Personal Payload (Create)---------------')
-      console.log('first name:', personalPayload.firstName)
-      console.log('last name:', personalPayload.lastName)
-      console.log('company:', personalPayload.companyName)
-      console.log('phone:', personalPayload.phone)
-      console.log('email:', personalPayload.email)
-      console.log('address:', personalPayload.address)
-      console.log('photo:', personalPayload.profilePhoto)
-      console.log('sign:', personalPayload.signature)
-
+      console.log('1. Personal Payload:', JSON.stringify(personalPayload, null, 2))
       const res = await addPersonalDetail(personalPayload)
       console.log('---------------Personal Details API Response---------------', res)
 
@@ -205,11 +197,7 @@ export const useGuestPersonalDetailsManagement = ({
             : undefined,
           deleted: false,
         }
-        console.log('---------------Document Payload (Create)---------------')
-        console.log('doc number:', docPayload.documentNumber)
-        console.log('valid till:', docPayload.validTill)
-        console.log('type id:', docPayload.documentType)
-        console.log('remark:', docPayload.remark)
+        console.log('2. Document Payload:', JSON.stringify(docPayload, null, 2))
         const docRes = await addDocumentDetail(docPayload)
         console.log('---------------Document Details API Response---------------', docRes)
         documentDetailsId = docRes.data.id || docRes.data
@@ -226,8 +214,11 @@ export const useGuestPersonalDetailsManagement = ({
           rateTypeEnum: personalFormData.rateTypeEnum || 'RACK',
           stayStatusEnum: personalFormData.stayStatusEnum || 'Confirmed',
           noOfGuest: Number(personalFormData.noOfGuest) || 1,
+          personalDetailsId: personalDetailsId,
           deleted: false,
         }
+        console.log('3. Stay Payload:', JSON.stringify(stayPayload, null, 2))
+        const stayRes = await addStayDetail(stayPayload)
         console.log('---------------Stay Payload (Create)---------------')
         console.log('floor id:', stayPayload.floorId)
         console.log('building id:', stayPayload.buildingId)
@@ -237,7 +228,6 @@ export const useGuestPersonalDetailsManagement = ({
         console.log('stay status:', stayPayload.stayStatusEnum)
         console.log('no of guest:', stayPayload.noOfGuest)
         console.log('comment:', stayPayload.comment)
-        const stayRes = await addStayDetail(stayPayload)
         console.log('---------------Stay Details API Response---------------', stayRes)
         stayDetailsId = stayRes.data.id || stayRes.data
       }
@@ -249,9 +239,7 @@ export const useGuestPersonalDetailsManagement = ({
           basic: personalFormData.basic ? Number(personalFormData.basic) : 0,
           taxId: personalFormData.taxId ? Number(personalFormData.taxId) : undefined,
           totalRental: personalFormData.totalRental ? Number(personalFormData.totalRental) : 0,
-          otherChanrges: personalFormData.otherChanrges
-            ? Number(personalFormData.otherChanrges)
-            : 0,
+          otherCharges: personalFormData.otherCharges ? Number(personalFormData.otherCharges) : 0,
           discount: personalFormData.discount ? Number(personalFormData.discount) : 0,
           totalCharges: personalFormData.totalCharges ? Number(personalFormData.totalCharges) : 0,
           payments: personalFormData.payments ? Number(personalFormData.payments) : 0,
@@ -260,17 +248,7 @@ export const useGuestPersonalDetailsManagement = ({
           balance: personalFormData.balance ? Number(personalFormData.balance) : 0,
           deleted: false,
         }
-        console.log('---------------Rent Payload (Create)---------------')
-        console.log('rent:', rentPayload.rent)
-        console.log('basic:', rentPayload.basic)
-        console.log('tax id:', rentPayload.taxId)
-        console.log('total rental:', rentPayload.totalRental)
-        console.log('other charges:', rentPayload.otherChanrges)
-        console.log('discount:', rentPayload.discount)
-        console.log('total charges:', rentPayload.totalCharges)
-        console.log('payments:', rentPayload.payments)
-        console.log('deposit:', rentPayload.deposite)
-        console.log('balance:', rentPayload.balance)
+        console.log('4. Rent Payload:', JSON.stringify(rentPayload, null, 2))
         const rentRes = await addRentDetail(rentPayload)
         console.log('---------------Rent Details API Response---------------', rentRes)
         rentDetailsId = rentRes.data.id || rentRes.data
@@ -296,6 +274,8 @@ export const useGuestPersonalDetailsManagement = ({
         noOfDays: personalFormData.noOfDays ? Number(personalFormData.noOfDays) : 1,
         guestDetailsStatus: personalFormData.guestDetailsStatus || 'Reservation',
       }
+      console.log('5. Guest Payload:', JSON.stringify(guestPayload, null, 2))
+      await addGuestDetail(guestPayload)
       console.log('---------------Guest Payload (Create)---------------')
       console.log('room master id:', guestPayload.roomMasterId)
       console.log('personal id:', guestPayload.personalDetailsId)
@@ -348,7 +328,7 @@ export const useGuestPersonalDetailsManagement = ({
         basic: '',
         taxId: '',
         totalRental: '',
-        otherChanrges: '',
+        otherCharges: '',
         discount: '',
         totalCharges: '',
         payments: '',
@@ -554,8 +534,8 @@ export const useGuestPersonalDetailsManagement = ({
           totalRental: editPersonalFormData.totalRental
             ? Number(editPersonalFormData.totalRental)
             : 0,
-          otherChanrges: editPersonalFormData.otherChanrges
-            ? Number(editPersonalFormData.otherChanrges)
+          otherCharges: editPersonalFormData.otherCharges
+            ? Number(editPersonalFormData.otherCharges)
             : 0,
           discount: editPersonalFormData.discount ? Number(editPersonalFormData.discount) : 0,
           totalCharges: editPersonalFormData.totalCharges
@@ -578,7 +558,7 @@ export const useGuestPersonalDetailsManagement = ({
         )
         console.log(
           '---------------Rent Payload (Update/Create)---------------',
-          rentPayload.otherChanrges,
+          rentPayload.otherCharges,
         )
         console.log(
           '---------------Rent Payload (Update/Create)---------------',
@@ -633,7 +613,7 @@ export const useGuestPersonalDetailsManagement = ({
         checkInTime: parseTimeStringToObj(editPersonalFormData.checkInTime),
         checkOutTime: parseTimeStringToObj(editPersonalFormData.checkOutTime),
         noOfDays: Number(editPersonalFormData.noOfDays),
-        guestDetailsStatus: editPersonalFormData.guestDetailsStatus || 'Reservation',
+        guestDetailsStatus: editPersonalFormData.guestDetailsStatus || 'RESERVATION',
       }
 
       console.log('---------------Guest Payload (Update)---------------', guestPayload)
@@ -709,14 +689,14 @@ export const useGuestPersonalDetailsManagement = ({
         comment: stay?.comment || '',
         rateTypeEnum: stay?.rateTypeEnum || 'RACK',
         noOfGuest: stay?.noOfGuest || 1,
-        stayStatusEnum: stay?.stayStatusEnum || 'Confirmed',
+        stayStatusEnum: stay?.stayStatusEnum || 'CONFIRMED',
         deleted: stay?.deleted || false,
         guestDetailId: guest?.id || null,
         checkInDate: guest?.checkInDate || defaults.checkInDate,
         checkOutDate: guest?.checkOutDate || defaults.checkOutDate,
         checkInTime: guest?.checkInTime || defaults.checkInTime,
         checkOutTime: guest?.checkOutTime || defaults.checkOutTime,
-        guestDetailsStatus: guest?.guestDetailsStatus || 'Reservation',
+        guestDetailsStatus: guest?.guestDetailsStatus || 'RESERVATION',
         noOfDays: guest?.noOfDays || defaults.noOfDays,
         rentId: guest?.rentDetailsId || guest?.rentId || '',
         roomStatusId: guest?.roomStatusId || '',
@@ -725,7 +705,7 @@ export const useGuestPersonalDetailsManagement = ({
         basic: rentDetailObj?.basic || '',
         taxId: rentDetailObj?.taxId || rentDetailObj?.taxMaster?.id || '',
         totalRental: rentDetailObj?.totalRental || '',
-        otherChanrges: rentDetailObj?.otherChanrges || '',
+        otherCharges: rentDetailObj?.otherCharges || '',
         discount: rentDetailObj?.discount || '',
         totalCharges: rentDetailObj?.totalCharges || '',
         payments: rentDetailObj?.payments || '',
@@ -783,7 +763,7 @@ export const useGuestPersonalDetailsManagement = ({
       basic: '',
       taxId: '',
       totalRental: '',
-      otherChanrges: '',
+      otherCharges: '',
       discount: '',
       totalCharges: '',
       payments: '',

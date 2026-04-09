@@ -35,7 +35,7 @@ const FieldRow = ({
             name={name}
             value={formData[name] || ''}
             onChange={handleChange}
-            className={`${inputClass} text-left! cursor-pointer appearance-none ${colorClass}`}
+            className={`${inputClass} cursor-pointer appearance-none text-left! ${colorClass}`}
           >
             <option value="">Select</option>
             {options.map((opt) => (
@@ -99,7 +99,7 @@ const RentDetails = ({ formData, handleChange, isDark = false, taxes = [] }) => 
         <div className="my-2 h-px bg-transparent"></div> {/* Spacing */}
         <FieldRow
           label="Other Charges"
-          name="otherChanrges"
+          name="otherCharges"
           colorClass="text-blue-600 dark:text-blue-400"
           formData={formData}
           handleChange={handleChange}

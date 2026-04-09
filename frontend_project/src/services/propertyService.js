@@ -134,7 +134,7 @@ export const propertyService = {
   // --- GUEST OVERALL STATUS (Active, Inactive status) ---
   getGuestDetails: () => handleResponse(() => api.get('/user/getguestdetails')),
   getGuestDetailById: (id) => handleResponse(() => api.get(`/user/getguestdetail/${id}`)),
-  createGuestDetail: (data) => handleResponse(() => api.post('/admin/creatguestdetail', data)),
+  createGuestDetail: (data) => handleResponse(() => api.post('/admin/createguestdetail', data)),
   updateGuestDetail: (id, data) =>
     handleResponse(() => api.put(`/admin/updateguestdetail/${id}`, data)),
   deleteGuestDetail: (id) => handleResponse(() => api.delete(`/admin/deleteguestdetail/${id}`)),
@@ -175,4 +175,3 @@ export const propertyService = {
   searchOtherCharges: (query) =>
     handleResponse(() => api.get('/user/othercharge/search', { params: { query } })),
 }
-

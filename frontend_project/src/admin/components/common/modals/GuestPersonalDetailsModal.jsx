@@ -110,7 +110,7 @@ export const GuestPersonalDetailsModal = ({
                 <h2 className="text-xl font-black tracking-tight text-slate-800 uppercase dark:text-white">
                   Create Guest Profile
                 </h2>
-                <div className="flex items-center gap-2 mt-0.5">
+                <div className="mt-0.5 flex items-center gap-2">
                   <div className="h-1 w-1 rounded-full bg-blue-500"></div>
                   <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
                     Comprehensive Check-in & Allotment
@@ -163,7 +163,7 @@ export const GuestPersonalDetailsModal = ({
                         </div>
                       )}
                     </div>
-                      <label className="absolute -right-2 -bottom-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl bg-blue-500 text-white shadow-lg ring-2 ring-white transition-transform hover:scale-110 dark:ring-slate-900">
+                    <label className="absolute -right-2 -bottom-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl bg-blue-500 text-white shadow-lg ring-2 ring-white transition-transform hover:scale-110 dark:ring-slate-900">
                       <Camera size={14} />
                       <input
                         type="file"
@@ -234,7 +234,7 @@ export const GuestPersonalDetailsModal = ({
                         type="text"
                         value={formData.firstName}
                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
                         placeholder="John"
                       />
                     </div>
@@ -247,7 +247,7 @@ export const GuestPersonalDetailsModal = ({
                         type="text"
                         value={formData.lastName}
                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
                         placeholder="Doe"
                       />
                     </div>
@@ -255,7 +255,7 @@ export const GuestPersonalDetailsModal = ({
                       <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
                         Company Name
                       </label>
-                      <div className="relative group">
+                      <div className="group relative">
                         <Building
                           size={14}
                           className="absolute top-1/2 left-3.5 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-blue-500"
@@ -266,7 +266,7 @@ export const GuestPersonalDetailsModal = ({
                           onChange={(e) =>
                             setFormData({ ...formData, companyName: e.target.value })
                           }
-                          className="w-full rounded-xl border border-slate-200 bg-white py-2 pr-4 pl-10 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
+                          className="w-full rounded-xl border border-slate-200 bg-white py-2 pr-4 pl-10 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
                           placeholder="Company Ltd."
                         />
                       </div>
@@ -275,7 +275,7 @@ export const GuestPersonalDetailsModal = ({
                       <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
                         Phone Number
                       </label>
-                      <div className="relative group">
+                      <div className="group relative">
                         <Phone
                           size={14}
                           className="absolute top-1/2 left-3.5 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-blue-500"
@@ -291,7 +291,7 @@ export const GuestPersonalDetailsModal = ({
                               mobileNumber: e.target.value,
                             })
                           }
-                          className="w-full rounded-xl border border-slate-200 bg-white py-2 pr-4 pl-10 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
+                          className="w-full rounded-xl border border-slate-200 bg-white py-2 pr-4 pl-10 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
                           placeholder="+1 234 567 890"
                         />
                       </div>
@@ -300,7 +300,7 @@ export const GuestPersonalDetailsModal = ({
                       <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
                         Email Address
                       </label>
-                      <div className="relative group">
+                      <div className="group relative">
                         <Mail
                           size={14}
                           className="absolute top-1/2 left-3.5 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-blue-500"
@@ -310,7 +310,7 @@ export const GuestPersonalDetailsModal = ({
                           type="email"
                           value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          className="w-full rounded-xl border border-slate-200 bg-white py-2 pr-4 pl-10 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
+                          className="w-full rounded-xl border border-slate-200 bg-white py-2 pr-4 pl-10 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
                           placeholder="mail@example.com"
                         />
                       </div>
@@ -324,7 +324,7 @@ export const GuestPersonalDetailsModal = ({
                         rows="2"
                         value={formData.address}
                         onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        className="scrollbar-hide w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
+                        className="scrollbar-hide w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
                         placeholder="Street, City, Zip"
                       ></textarea>
                     </div>
@@ -349,7 +349,7 @@ export const GuestPersonalDetailsModal = ({
                         onChange={(e) =>
                           setFormData({ ...formData, documentTypeId: e.target.value })
                         }
-                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
                       >
                         <option value="">Select ID Type</option>
                         {documentTypes?.map((type) => (
@@ -369,7 +369,7 @@ export const GuestPersonalDetailsModal = ({
                         onChange={(e) =>
                           setFormData({ ...formData, documentNumber: e.target.value })
                         }
-                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
                         placeholder="e.g. AB1234567"
                       />
                     </div>
@@ -381,7 +381,7 @@ export const GuestPersonalDetailsModal = ({
                         type="date"
                         value={formData.validTill}
                         onChange={(e) => setFormData({ ...formData, validTill: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
                       />
                     </div>
                     <div className="col-span-2 sm:col-span-1">
@@ -392,7 +392,7 @@ export const GuestPersonalDetailsModal = ({
                         type="text"
                         value={formData.remark}
                         onChange={(e) => setFormData({ ...formData, remark: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
                         placeholder="Optional remarks"
                       />
                     </div>
@@ -409,7 +409,7 @@ export const GuestPersonalDetailsModal = ({
                         ) : (
                           <div className="flex flex-col items-center">
                             <Camera size={20} className="mb-1 text-slate-400" />
-                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                            <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
                               Upload Front
                             </span>
                           </div>
@@ -433,7 +433,7 @@ export const GuestPersonalDetailsModal = ({
                         ) : (
                           <div className="flex flex-col items-center">
                             <Camera size={20} className="mb-1 text-slate-400" />
-                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                            <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
                               Upload Back
                             </span>
                           </div>
@@ -486,7 +486,7 @@ export const GuestPersonalDetailsModal = ({
                           const diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24))
                           updated.noOfDays = diff >= 0 ? diff : 0
                         }
-                      } else if (name === 'guestDetailsStats') {
+                      } else if (name === 'guestDetailsStatus') {
                         if (value === 'Reservation') updated.color = '#2F8B2C'
                         if (value === 'Check-In') updated.color = '#ffa500'
                       }
@@ -530,7 +530,7 @@ export const GuestPersonalDetailsModal = ({
                 </h3>
               </div>
 
-              <div className="scrollbar-hide flex-1 overflow-y-auto p-4 text-left scrollbar-hide">
+              <div className="scrollbar-hide scrollbar-hide flex-1 overflow-y-auto p-4 text-left">
                 <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-white p-4 shadow-lg shadow-emerald-500/5 dark:border-emerald-900/30 dark:bg-slate-900">
                   <RentDetails
                     formData={formData}
@@ -555,9 +555,13 @@ export const GuestPersonalDetailsModal = ({
               Cancel Process
             </button>
             <div className="flex items-center gap-4">
-              <div className="hidden flex-col items-end mr-2 md:flex">
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Ready to go?</span>
-                <span className="text-[10px] font-black text-blue-500 uppercase">Save all changes</span>
+              <div className="mr-2 hidden flex-col items-end md:flex">
+                <span className="text-[9px] font-bold tracking-widest text-slate-400 uppercase">
+                  Ready to go?
+                </span>
+                <span className="text-[10px] font-black text-blue-500 uppercase">
+                  Save all changes
+                </span>
               </div>
               <button
                 type="submit"

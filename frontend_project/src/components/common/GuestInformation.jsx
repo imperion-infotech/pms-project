@@ -19,8 +19,8 @@ const GuestInformation = ({ formData, handleChange, isDark = false }) => {
           <label className={labelClass}>Guest Status</label>
           <div className={inputContainerClass}>
             <select
-              name="guestDetailsStats"
-              value={formData.guestDetailsStats}
+              name="guestDetailsStatus"
+              value={formData.guestDetailsStatus}
               onChange={handleChange}
               className={selectClass}
             >
