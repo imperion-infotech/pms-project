@@ -11,7 +11,6 @@ import {
   X,
   Search,
   ShieldCheck,
-  ChevronRight,
   UserCircle2,
   Edit3,
   PlusCircle,
@@ -39,7 +38,6 @@ const GuestPersonalDetailsManagement = ({
   itemsPerPage = 8,
 }) => {
   const {
-    stats,
     processedDetails,
     getIndex,
     cleanImageUrl,
@@ -86,64 +84,41 @@ const GuestPersonalDetailsManagement = ({
         </button>
       </div>
 
-      {/* Stats Section */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, i) => (
-          <div
-            key={i}
-            className="dark:bg-surface-100 group rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-blue-500/30 dark:border-slate-800"
-          >
-            <div className="flex flex-col">
-              <span className="mb-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase">
-                {stat.label}
-              </span>
-              <div className="flex items-end justify-between">
-                <h4 className="text-2xl font-bold text-[#1a2b4b] dark:text-slate-100">
-                  {stat.value}
-                </h4>
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-500 transition-all group-hover:bg-blue-500 group-hover:text-white">
-                  <ChevronRight size={16} />
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
 
       {/* Guest Table */}
       <div className="dark:bg-surface-100 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/50 transition-colors duration-300 dark:border-slate-800 dark:shadow-none">
         <div className="scrollbar-hide max-h-[650px] w-full overflow-auto">
           <table className="w-full min-w-[1400px] border-collapse text-left">
             <thead className="sticky top-0 z-10 shadow-[0_4px_12px_-4px_rgba(0,0,0,0.1)]">
-              <tr className="border-b border-slate-200 bg-white/95 text-[11px] font-black tracking-widest text-slate-400 uppercase backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95 dark:text-slate-500">
-                <th className="w-24 border-r border-slate-100 px-8 py-5 text-center dark:border-slate-800">
-                  No.
+              <tr className="border-b border-slate-200 bg-white/95 text-[11px] font-bold tracking-widest text-[#a0aec0] uppercase backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95 dark:text-slate-500">
+                <th className="w-24 px-8 py-5 text-center">
+                  NO.
                 </th>
-                <th className="border-r border-slate-100 px-8 py-5 dark:border-slate-800">
-                  User Name
+                <th className="px-8 py-5">
+                  USER NAME
                 </th>
-                <th className="border-r border-slate-100 px-8 py-5 dark:border-slate-800">
-                  Email Address
+                <th className="px-8 py-5">
+                  EMAIL ADDRESS
                 </th>
-                <th className="border-r border-slate-100 px-8 py-5 text-center dark:border-slate-800">
-                  Phone No.
+                <th className="px-8 py-5 text-center">
+                  PHONE NO.
                 </th>
-                <th className="border-r border-slate-100 px-8 py-5 dark:border-slate-800">
-                  Doc Type
+                <th className="px-8 py-5 text-center">
+                  DOC TYPE
                 </th>
-                <th className="border-r border-slate-100 px-8 py-5 dark:border-slate-800">
-                  Document No.
+                <th className="px-8 py-5">
+                  DOCUMENT NO.
                 </th>
-                <th className="border-r border-slate-100 px-8 py-5 text-center dark:border-slate-800">
-                  Valid Till
+                <th className="px-8 py-5 text-center">
+                  VALID TILL
                 </th>
-                <th className="border-r border-slate-100 px-8 py-5 text-center dark:border-slate-800">
-                  Status
+                <th className="px-8 py-5 text-center">
+                  STATUS
                 </th>
-                <th className="border-r border-slate-100 px-8 py-5 text-center dark:border-slate-800">
-                  Total Rent
+                <th className="px-8 py-5 text-center">
+                  TOTAL RENT
                 </th>
-                <th className="px-8 py-5 text-center">Actions</th>
+                <th className="px-8 py-5 text-center">ACTIONS</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-[13px] dark:divide-slate-800">
@@ -170,14 +145,14 @@ const GuestPersonalDetailsManagement = ({
                   return (
                     <tr
                       key={guest.id}
-                      className="group h-14 transition-all hover:bg-blue-50/40 dark:hover:bg-blue-500/5"
+                      className="group h-16 transition-all hover:bg-slate-50/50 dark:hover:bg-blue-500/5"
                     >
-                      <td className="border-r border-slate-100 px-8 py-2 text-center font-mono text-[11px] font-bold text-slate-300 group-hover:text-blue-500 dark:border-slate-800 dark:text-slate-600">
+                      <td className="px-8 py-2 text-center font-mono text-xs font-bold text-blue-400 group-hover:text-blue-600">
                         {getIndex(idx)}
                       </td>
-                      <td className="border-r border-slate-100 px-8 py-2 dark:border-slate-800">
-                        <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 overflow-hidden rounded-full border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
+                      <td className="px-8 py-2">
+                        <div className="flex items-center gap-4">
+                          <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 ring-slate-100 dark:ring-slate-800">
                             {cleanImageUrl(guest.profilePhoto) ? (
                               <AuthImage
                                 src={`/user/${cleanImageUrl(guest.profilePhoto)}`}
@@ -192,52 +167,56 @@ const GuestPersonalDetailsManagement = ({
                                 }
                               />
                             ) : (
-                              <div className="flex h-full w-full items-center justify-center text-slate-400">
-                                <User size={14} />
+                              <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-400">
+                                <User size={18} />
                               </div>
                             )}
                           </div>
-                          <span className="font-bold tracking-tight text-slate-800 uppercase dark:text-slate-200">
-                            {guest.firstName} {guest.lastName}
-                          </span>
+                          <div className="flex flex-col">
+                            <span className="font-bold tracking-tight text-[#1a2b4b] uppercase dark:text-slate-200">
+                              {guest.firstName} {guest.lastName}
+                            </span>
+                          </div>
                         </div>
                       </td>
-                      <td className="border-r border-slate-100 px-8 py-2 font-mono text-slate-500 lowercase dark:border-slate-800 dark:text-slate-400">
+                      <td className="px-8 py-2 font-mono text-slate-400 lowercase">
                         {guest.email || '—'}
                       </td>
-                      <td className="border-r border-slate-100 px-8 py-2 text-center font-bold text-slate-600 dark:border-slate-800 dark:text-slate-400">
+                      <td className="px-8 py-2 text-center font-bold text-[#1a2b4b] dark:text-slate-400">
                         {guest.phone || '—'}
                       </td>
-                      <td className="border-r border-slate-100 px-8 py-2 font-bold text-blue-600 uppercase dark:border-slate-800 dark:text-blue-400/80">
+                      <td className="px-8 py-2 text-center font-bold text-blue-500 uppercase">
                         {getDocumentTypeName(guestDocument?.documentType?.id || guestDocument?.documentTypeId)}
                       </td>
-                      <td className="border-r border-slate-100 px-8 py-2 font-mono text-[11px] font-bold text-slate-600 dark:border-slate-800 dark:text-slate-400">
+                      <td className="px-8 py-2 font-mono text-xs font-bold text-slate-600 dark:text-slate-400">
                         {guestDocument?.documentNumber || '—'}
                       </td>
-                      <td className="border-r border-slate-100 px-8 py-2 text-center font-bold text-blue-600 dark:border-slate-800 dark:text-blue-400/80">
+                      <td className="px-8 py-2 text-center font-bold text-blue-600 dark:text-blue-400/80">
                         {guestDocument?.validTill || '—'}
                       </td>
-                      <td className="border-r border-slate-100 px-8 py-2 text-center font-bold text-purple-600 uppercase dark:border-slate-800 dark:text-purple-400/80">
-                        {guestStay?.stayStatusEnum || '—'}
+                      <td className="px-8 py-2 text-center text-purple-600 dark:text-purple-400/80">
+                        <span className="font-bold uppercase tracking-tight">
+                          {guestDetail?.guestDetailsStatus || guestStay?.stayStatusEnum || '—'}
+                        </span>
                       </td>
-                      <td className="border-r border-slate-100 px-8 py-2 text-center font-mono font-bold text-slate-600 dark:border-slate-800 dark:text-slate-300">
+                      <td className="px-8 py-2 text-center font-mono font-bold text-[#1a2b4b] dark:text-slate-300">
                         {rent?.totalCharges ? `₹${rent.totalCharges}` : '—'}
                       </td>
                       <td className="px-8 py-2 text-center">
-                        <div className="flex items-center justify-center gap-3">
+                        <div className="flex items-center justify-center gap-4">
                           <button
                             onClick={() => onEdit(guest, guestDocument, guestStay, guestDetail, rent)}
-                            className="rounded-lg p-1.5 text-blue-500 transition-colors hover:bg-blue-50 dark:hover:bg-blue-500/10"
+                            className="rounded-lg p-1.5 text-blue-400 transition-colors hover:bg-blue-50 dark:hover:bg-blue-500/10"
                             title="Edit Profile"
                           >
-                            <Pencil className="h-4 w-4" />
+                            <Pencil className="h-5 w-5" />
                           </button>
                           <button
                             onClick={() => handleDeleteClick(guest)}
-                            className="rounded-lg p-1.5 text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-500/10"
+                            className="rounded-lg p-1.5 text-red-400 transition-colors hover:bg-red-50 dark:hover:bg-red-500/10"
                             title="Delete Profile"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-5 w-5" />
                           </button>
                         </div>
                       </td>
