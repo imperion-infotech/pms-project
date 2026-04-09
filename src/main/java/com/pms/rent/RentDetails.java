@@ -1,0 +1,241 @@
+/**
+ * 
+ */
+package com.pms.rent;
+
+import java.time.LocalDateTime;
+import java.util.Date;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.pms.guestdetails.GuestDetails;
+import com.pms.taxmaster.entity.TaxMaster;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+/**
+ * 
+ */
+
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Table(name="rent_details")
+public class RentDetails {
+	
+static final Logger logger = LoggerFactory.getLogger(RentDetails.class);
+	
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	@Column(name="id")
+	private Integer id;
+	
+	@Column(name="rent")
+	private Double rent;
+	
+	@Column(name="basic")
+	private Double basic;
+	
+	@Column(name="tax_id")
+	private Integer taxId;
+	
+	@OneToOne
+    @JoinColumn(name = "tax_id", insertable = false, updatable = false)
+    private TaxMaster taxMaster;
+	
+	@Column(name="total_rental")
+	private Double totalRental;
+	
+	@Column(name="other_charges")
+	private Double otherChanrges;
+	
+	@Column(name="discount")
+	private Double discount;
+	
+	@Column(name="total_charges")
+	private Double totalCharges;
+	
+	@Column(name="payments")
+	private Double payments;
+	
+	@Column(name="cc_authorized")
+	private Double ccAuthorized;
+	
+	@Column(name="deposite")
+	private Double deposite;
+	
+	@Column(name="balance")
+	private Double balance;
+	
+//	 @OneToOne(mappedBy = "rentDetails")
+//	 private GuestDetails guest;
+	
+	@Column(name="created_on", nullable = false, updatable = false)
+	@CreationTimestamp // Automatically sets value when entity is persisted
+	private Date createdOn;
+	
+	 // ✅ NEW FIELDS (Soft Delete)
+    @Column(name = "is_deleted")
+    private boolean isDeleted = false;
+
+    private LocalDateTime deletedAt;
+
+    private String deletedBy;
+    
+	public Date getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(Date createdOn) {
+		this.createdOn = createdOn;
+	}
+
+	public boolean isDeleted() {
+		return isDeleted;
+	}
+
+	public void setDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
+
+	public LocalDateTime getDeletedAt() {
+		return deletedAt;
+	}
+
+	public void setDeletedAt(LocalDateTime deletedAt) {
+		this.deletedAt = deletedAt;
+	}
+
+	public String getDeletedBy() {
+		return deletedBy;
+	}
+
+	public void setDeletedBy(String deletedBy) {
+		this.deletedBy = deletedBy;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public Double getRent() {
+		return rent;
+	}
+
+	public void setRent(Double rent) {
+		this.rent = rent;
+	}
+
+	public Double getBasic() {
+		return basic;
+	}
+
+	public void setBasic(Double basic) {
+		this.basic = basic;
+	}
+
+	public Integer getTaxId() {
+		return taxId;
+	}
+
+	public void setTaxId(Integer taxId) {
+		this.taxId = taxId;
+	}
+
+	public TaxMaster getTaxMaster() {
+		return taxMaster;
+	}
+
+	public void setTaxMaster(TaxMaster taxMaster) {
+		this.taxMaster = taxMaster;
+	}
+
+	public Double getTotalRental() {
+		return totalRental;
+	}
+
+	public void setTotalRental(Double totalRental) {
+		this.totalRental = totalRental;
+	}
+
+	public Double getOtherChanrges() {
+		return otherChanrges;
+	}
+
+	public void setOtherChanrges(Double otherChanrges) {
+		this.otherChanrges = otherChanrges;
+	}
+
+	public Double getDiscount() {
+		return discount;
+	}
+
+	public void setDiscount(Double discount) {
+		this.discount = discount;
+	}
+
+	public Double getTotalCharges() {
+		return totalCharges;
+	}
+
+	public void setTotalCharges(Double totalCharges) {
+		this.totalCharges = totalCharges;
+	}
+
+	public Double getPayments() {
+		return payments;
+	}
+
+	public void setPayments(Double payments) {
+		this.payments = payments;
+	}
+
+	public Double getCcAuthorized() {
+		return ccAuthorized;
+	}
+
+	public void setCcAuthorized(Double ccAuthorized) {
+		this.ccAuthorized = ccAuthorized;
+	}
+
+	public Double getDeposite() {
+		return deposite;
+	}
+
+	public void setDeposite(Double deposite) {
+		this.deposite = deposite;
+	}
+
+	public Double getBalance() {
+		return balance;
+	}
+
+	public void setBalance(Double balance) {
+		this.balance = balance;
+	}
+	
+	
+}
