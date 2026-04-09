@@ -674,34 +674,101 @@ export const useGuestPersonalDetailsManagement = ({
 
   const handleEditPersonalDetail = useCallback(
     (detail, document = null, stay = null, guest = null, rentDetailObj = null) => {
+      // Helper to clean ISO date time for input fields
+      const formatDate = (dateStr) => {
+        if (!dateStr) return ''
+        return dateStr.includes('T') ? dateStr.split('T')[0] : dateStr
+      }
+
+      const formatTime = (timeStr) => {
+        if (!timeStr) return ''
+        return timeStr.includes(':') ? timeStr.split('.')[0] : timeStr
+      }
+
+      // Helper to match string values with dropdown options (case-insensitive)
+      const normalizeDropdown = (val, options = []) => {
+        if (!val) return ''
+        const found = options.find((opt) => String(opt).toLowerCase() === String(val).toLowerCase())
+        return found || val
+      }
+
       setEditPersonalFormData({
         ...detail,
         documentId: document?.id || null,
         documentNumber: document?.documentNumber || '',
-        validTill: document?.validTill || '',
+        validTill: formatDate(document?.validTill) || '',
         remark: document?.remark || '',
         documentTypeId: document?.documentType?.id || document?.documentTypeId || '',
         frontImagePath: document?.frontImagePath || '',
         backImagePath: document?.backImagePath || '',
-        stayId: stay?.id || null,
-        floorId: stay?.floorId || '',
-        buildingId: stay?.buildingId || '',
-        roomTypeId: stay?.roomTypeId || '',
-        roomMasterId: stay?.roomMasterId || '',
-        comment: stay?.comment || '',
-        rateTypeEnum: stay?.rateTypeEnum || 'RACK',
-        noOfGuest: stay?.noOfGuest || 1,
-        stayStatusEnum: stay?.stayStatusEnum || 'CONFIRMED',
+
+        // Stay Details Mapping - Robust against various naming conventions
+        stayId: stay?.id || guest?.stayDetailsId || null,
+        floorId: stay?.floorId || stay?.floor?.id || stay?.floor_id || '',
+        buildingId: stay?.buildingId || stay?.building?.id || stay?.building_id || '',
+        roomTypeId: stay?.roomTypeId || stay?.roomType?.id || stay?.room_type_id || '',
+        roomMasterId:
+          stay?.roomMasterId ||
+          stay?.roomMaster?.id ||
+          stay?.room_master_id ||
+          guest?.room_master_id ||
+          guest?.roomMasterId ||
+          '',
+
+        // Handle all possible comment fields
+        comment:
+          stay?.comment ||
+          stay?.comments ||
+          stay?.specialComment ||
+          stay?.special_comment ||
+          stay?.specialComments ||
+          stay?.remarks ||
+          stay?.remark ||
+          stay?.description ||
+          guest?.comment ||
+          guest?.remarks ||
+          guest?.remark ||
+          guest?.description ||
+          '',
+        rateTypeEnum: normalizeDropdown(stay?.rateTypeEnum || 'RACK', [
+          'RACK',
+          'WEEKLY_RATE_TEST',
+          'YEARLY_RATE',
+        ]),
+        noOfGuest: stay?.noOfGuest || stay?.noOfGuests || guest?.noOfGuest || guest?.noOfGuests || 1,
+
+        // Normalize Status for Dropdowns in StaySpecifications.jsx
+        stayStatusEnum: normalizeDropdown(stay?.stayStatusEnum || 'Confirmed', [
+          'Confirmed',
+          'Unconfirmed',
+        ]),
         deleted: stay?.deleted || false,
+
+        // Guest Details / Temporal Logistics
         guestDetailId: guest?.id || null,
-        checkInDate: guest?.checkInDate || defaults.checkInDate,
-        checkOutDate: guest?.checkOutDate || defaults.checkOutDate,
-        checkInTime: guest?.checkInTime || defaults.checkInTime,
-        checkOutTime: guest?.checkOutTime || defaults.checkOutTime,
-        guestDetailsStatus: guest?.guestDetailsStatus || 'RESERVATION',
+        checkInDate: formatDate(guest?.checkInDate) || formatDate(defaults.checkInDate),
+        checkOutDate: formatDate(guest?.checkOutDate) || formatDate(defaults.checkOutDate),
+        checkInTime: formatTime(guest?.checkInTime) || formatTime(defaults.checkInTime),
+        checkOutTime: formatTime(guest?.checkOutTime) || formatTime(defaults.checkOutTime),
+
+        guestDetailsStatus: normalizeDropdown(guest?.guestDetailsStatus || 'Reservation', [
+          'Reservation',
+          'Check-In',
+          'In-House',
+          'Check-Out',
+        ]),
         noOfDays: guest?.noOfDays || defaults.noOfDays,
         rentId: guest?.rentDetailsId || guest?.rentId || '',
-        roomStatusId: guest?.roomStatusId || '',
+
+        // Room Status
+        roomStatusId:
+          stay?.roomStatusId ||
+          stay?.roomStatus?.id ||
+          stay?.room_status_id ||
+          guest?.roomStatusId ||
+          guest?.room_status_id ||
+          '',
+
         // Rent Detail Populate
         rent: rentDetailObj?.rent || '',
         basic: rentDetailObj?.basic || '',

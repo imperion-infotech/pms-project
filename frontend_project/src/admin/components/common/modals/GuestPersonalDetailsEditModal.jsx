@@ -82,6 +82,33 @@ export const GuestPersonalDetailsEditModal = ({
     }
   }, [isOpen])
 
+  // Safety Net: Auto-fill Building, Floor, and Room Type if Room is selected but they are missing
+  useEffect(() => {
+    if (isOpen && formData.roomMasterId && rooms.length > 0) {
+      const currentRoom = rooms.find((r) => String(r.id) === String(formData.roomMasterId))
+      if (currentRoom) {
+        setFormData((prev) => {
+          const updates = {}
+          // Check for buildingId, floorId, and roomTypeId in various casing formats
+          const bId = currentRoom.buildingId || currentRoom.building?.id || currentRoom.building_id
+          const fId = currentRoom.floorId || currentRoom.floor?.id || currentRoom.floor_id
+          const rtId = currentRoom.roomTypeId || currentRoom.roomType?.id || currentRoom.room_type_id
+          const rsId = currentRoom.roomStatusId || currentRoom.roomStatus?.id || currentRoom.room_status_id
+
+          if (!prev.buildingId && bId) updates.buildingId = bId
+          if (!prev.floorId && fId) updates.floorId = fId
+          if (!prev.roomTypeId && rtId) updates.roomTypeId = rtId
+          if (!prev.roomStatusId && rsId) updates.roomStatusId = rsId
+
+          if (Object.keys(updates).length > 0) {
+            return { ...prev, ...updates }
+          }
+          return prev
+        })
+      }
+    }
+  }, [isOpen, formData.roomMasterId, rooms, setFormData])
+
   if (!isOpen) return null
 
   // Determine source: Local preview takes precedence during upload/session

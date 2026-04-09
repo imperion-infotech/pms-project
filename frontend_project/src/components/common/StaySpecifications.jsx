@@ -73,15 +73,18 @@ const StaySpecifications = ({
               onChange={handleChange}
               className={selectClass}
             >
-              <option value="">Floor</option>
+              <option value="">Select Floor</option>
               {floors
-                ?.filter(
-                  (f) =>
-                    !formData.buildingId || String(f.buildingId) === String(formData.buildingId),
-                )
+                ?.filter((f) => {
+                  if (!formData.buildingId) return true
+                  // If floor doesn't have buildingId, show it as fallback, otherwise match
+                  const fBuildingId = f.buildingId || f.building?.id || f.building_id
+                  return !fBuildingId || String(fBuildingId) === String(formData.buildingId)
+                })
                 .map((f) => {
                   const roomCount =
-                    rooms?.filter((r) => String(r.floorId) === String(f.id)).length || 0
+                    rooms?.filter((r) => String(r.floorId || r.floor_id) === String(f.id)).length ||
+                    0
                   return (
                     <option key={f.id} value={f.id}>
                       {f.name} {roomCount > 0 ? `(${roomCount} Rooms)` : '(No Rooms)'}

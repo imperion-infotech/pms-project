@@ -61,21 +61,36 @@ const useGuestPersonalDetailsController = ({
   const getGuestDocument = (personalDetailsId) => {
     return documentDetails.find(
       (doc) =>
-        String(doc.personalDetails?.id || doc.personalDetailsId) === String(personalDetailsId),
+        String(
+          doc.personalDetails?.id ||
+            doc.personalDetail?.id ||
+            doc.personalDetailsId ||
+            doc.personalDetailId,
+        ) === String(personalDetailsId),
     )
   }
 
   const getGuestStay = (personalDetailId) => {
     return stayDetails.find(
       (stay) =>
-        String(stay.personalDetails?.id || stay.personalDetailId || stay.personalDetailsId) ===
-        String(personalDetailId),
+        String(
+          stay.personalDetails?.id ||
+            stay.personalDetail?.id ||
+            stay.personalDetailId ||
+            stay.personalDetailsId,
+        ) === String(personalDetailId),
     )
   }
 
   const getGuestDetail = (personalDetailsId) => {
     return guestDetails.find(
-      (gd) => String(gd.personalDetails?.id || gd.personalDetailsId) === String(personalDetailsId),
+      (gd) =>
+        String(
+          gd.personalDetails?.id ||
+            gd.personalDetail?.id ||
+            gd.personalDetailsId ||
+            gd.personalDetailId,
+        ) === String(personalDetailsId),
     )
   }
 
