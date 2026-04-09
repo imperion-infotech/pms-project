@@ -253,10 +253,10 @@ export const useGuestPersonalDetailsManagement = ({
         rentDetailsId: rentDetailsId,
         stayDetailsId: stayDetailsId,
         checkInDate: personalFormData.checkInDate
-          ? `${personalFormData.checkInDate}T${personalFormData.checkInTime ? (personalFormData.checkInTime.split(':').length === 2 ? personalFormData.checkInTime + ':00' : personalFormData.checkInTime) : '00:00:00'}.000Z`
+          ? `${personalFormData.checkInDate}T${personalFormData.checkInTime ? (personalFormData.checkInTime.split(':').length === 2 ? personalFormData.checkInTime + ':00' : personalFormData.checkInTime) : '00:00:00'}.000`
           : null,
         checkOutDate: personalFormData.checkOutDate
-          ? `${personalFormData.checkOutDate}T${personalFormData.checkOutTime ? (personalFormData.checkOutTime.split(':').length === 2 ? personalFormData.checkOutTime + ':00' : personalFormData.checkOutTime) : '00:00:00'}.000Z`
+          ? `${personalFormData.checkOutDate}T${personalFormData.checkOutTime ? (personalFormData.checkOutTime.split(':').length === 2 ? personalFormData.checkOutTime + ':00' : personalFormData.checkOutTime) : '00:00:00'}.000`
           : null,
         checkInTime: personalFormData.checkInTime
           ? personalFormData.checkInTime.split(':').length === 2
@@ -271,7 +271,6 @@ export const useGuestPersonalDetailsManagement = ({
         noOfDays: personalFormData.noOfDays ? Number(personalFormData.noOfDays) : 1,
         guestDetailsStatus: personalFormData.guestDetailsStatus || 'Reservation',
       }
-      console.log('5. Guest Payload:', JSON.stringify(guestPayload, null, 2))
       await addGuestDetail(guestPayload)
       console.log('---------------Guest Payload (Create)---------------')
       console.log('room master id:', guestPayload.roomMasterId)
