@@ -70,6 +70,18 @@ export const GuestPersonalDetailsModal = ({
     handleFileUpload(e, type)
   }
 
+  // Body Scroll Lock
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen])
+
   if (!isOpen) return null
 
   // Determine source: Local preview takes precedence during upload/session
@@ -81,34 +93,37 @@ export const GuestPersonalDetailsModal = ({
     (cleanImageUrl(formData.signature) ? `/user/${cleanImageUrl(formData.signature)}` : null)
 
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <div
-        className="animate-in fade-in absolute inset-0 bg-slate-900/80 backdrop-blur-md"
+        className="animate-in fade-in absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
         onClick={() => setIsOpen(false)}
       ></div>
-      <div className="animate-in zoom-in-95 relative z-10 flex h-[98vh] w-full max-w-7xl flex-col overflow-hidden rounded-[32px] border border-slate-200/50 bg-white shadow-2xl dark:border-slate-700/50 dark:bg-slate-900">
+      <div className="animate-in zoom-in-95 relative z-10 flex h-[95vh] w-full max-w-7xl flex-col overflow-hidden rounded-[40px] border border-white/20 bg-white shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] dark:bg-slate-900">
         <form onSubmit={handleSubmit} className="flex h-full flex-col overflow-hidden">
           {/* Header */}
-          <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-white/80 px-8 py-4 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80">
-            <div className="flex items-center gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-linear-to-br from-blue-500 to-blue-700 shadow-lg shadow-blue-500/20">
-                <User className="h-5 w-5 text-white" />
+          <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-white/80 px-10 py-5 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/80">
+            <div className="flex items-center gap-5">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-blue-500 to-blue-600 shadow-xl shadow-blue-500/20">
+                <User className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h2 className="text-lg font-black tracking-tight text-slate-800 uppercase dark:text-white">
+                <h2 className="text-xl font-black tracking-tight text-slate-800 uppercase dark:text-white">
                   Create Guest Profile
                 </h2>
-                <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
-                  Comprehensive Check-in & Allotment
-                </p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <div className="h-1 w-1 rounded-full bg-blue-500"></div>
+                  <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+                    Comprehensive Check-in & Allotment
+                  </p>
+                </div>
               </div>
             </div>
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-400 transition-all hover:rotate-90 hover:bg-red-50 hover:text-red-500 dark:bg-slate-800 dark:hover:bg-red-900/30"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-400 transition-all hover:rotate-90 hover:bg-red-50 hover:text-red-500 dark:bg-slate-800 dark:hover:bg-red-900/30"
             >
-              <X size={18} />
+              <X size={20} />
             </button>
           </div>
 
@@ -531,22 +546,28 @@ export const GuestPersonalDetailsModal = ({
           </div>
 
           {/* Footer */}
-          <div className="flex w-full shrink-0 items-center justify-between border-t border-slate-200 bg-white px-8 py-4 dark:border-slate-800 dark:bg-slate-900">
+          <div className="flex w-full shrink-0 items-center justify-between border-t border-slate-100 bg-white/95 px-10 py-5 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95">
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="rounded-xl px-6 py-3 text-xs font-black tracking-widest text-slate-500 uppercase transition-all hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+              className="rounded-2xl px-8 py-3.5 text-[11px] font-black tracking-[0.2em] text-slate-400 uppercase transition-all hover:bg-slate-50 hover:text-slate-600 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-300"
             >
               Cancel Process
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex items-center gap-3 rounded-xl bg-linear-to-r from-blue-500 to-blue-600 px-8 py-3 text-xs font-black tracking-widest text-white uppercase shadow-lg shadow-blue-500/30 transition-all hover:scale-105 hover:shadow-blue-500/40 active:scale-95 disabled:pointer-events-none disabled:opacity-70"
-            >
-              {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-              <span>Commit Guest Profile</span>
-            </button>
+            <div className="flex items-center gap-4">
+              <div className="hidden flex-col items-end mr-2 md:flex">
+                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Ready to go?</span>
+                <span className="text-[10px] font-black text-blue-500 uppercase">Save all changes</span>
+              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex items-center gap-3 rounded-2xl bg-linear-to-r from-blue-500 to-blue-700 px-10 py-3.5 text-[11px] font-black tracking-[0.2em] text-white uppercase shadow-2xl shadow-blue-500/40 transition-all hover:translate-y-[-2px] hover:shadow-blue-500/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-70"
+              >
+                {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                <span>Commit Guest Profile</span>
+              </button>
+            </div>
           </div>
         </form>
       </div>

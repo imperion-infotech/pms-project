@@ -1,9 +1,9 @@
 /**
- * App.jsx - Main Brain of the Application
+ * App.jsx - Project ka Main Router
  *
- * Ye app ka Router hai. Yahan decide hota hai ki user ko kab
- * kahan bhejte hain. Isme login, register, aur dashboard ke raaste (routes) hain.
- * Admin aur User roles ke logic bhi yahan sambhale jaate hain.
+ * Is file mein decide hota hai ki user ko login page dikhana hai,
+ * admin dashboard, ya user home screen.
+ * Role-based authentication (Admin/User) yahi se control hota hai.
  */
 import React, { Suspense, lazy } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
@@ -12,7 +12,7 @@ import { ThemeProvider } from './context/ThemeContext'
 import { SidebarProvider } from './context/SidebarContext'
 import { NotificationProvider } from './context/NotificationContext'
 
-// Components are lazy-loaded to optimize the initial bundle size
+// Components ko lazy-load kiya gaya hai taaki app fast load ho
 const PmsDashboard = lazy(() => import('./admin/pages/PropertyMaster/PmsDashboard'))
 const HomeScreen = lazy(() => import('./user/pages/HomeScreen/HomeScreen'))
 const Login = lazy(() => import('./user/pages/Auth/Login'))
@@ -22,8 +22,7 @@ const ResetPassword = lazy(() => import('./user/pages/Auth/ResetPassword'))
 
 /**
  * getRoleFromToken()
- * Extracts the user's role from the JWT (Json Web Token) stored in localStorage.
- * This is used to decide where to redirect the user after login.
+ * Token se user ka role (ADMIN/USER) nikalta hai.
  */
 const getRoleFromToken = () => {
   let token = localStorage.getItem('access_token')
@@ -52,9 +51,7 @@ const getRoleFromToken = () => {
 }
 
 /**
- * AdminRoute Component
- * A wrapper that only allows users with ADMIN or MANAGER roles.
- * Non-admins are redirected back to the /home page.
+ * AdminRoute: Sirf ADMIN aur MANAGER ko entry deta hai.
  */
 const AdminRoute = ({ children }) => {
   const token = localStorage.getItem('access_token')
@@ -72,9 +69,7 @@ const AdminRoute = ({ children }) => {
 }
 
 /**
- * UserRoute Component
- * A wrapper that ensures the user is logged in (has a token).
- * Unauthenticated users are sent to the /login page.
+ * UserRoute: Sirf logged-in users ko entry deta hai.
  */
 const UserRoute = ({ children }) => {
   const token = localStorage.getItem('access_token')
@@ -83,9 +78,7 @@ const UserRoute = ({ children }) => {
 }
 
 /**
- * RootRoute Component
- * Decides whether the "/" path should show the Admin Dashboard or User Home
- * based on the user's permissions level.
+ * RootRoute: Decide karta hai ki "/" path par Admin Dashboard dikhega ya User Home.
  */
 const RootRoute = () => {
   const token = localStorage.getItem('access_token')
@@ -109,21 +102,21 @@ function App() {
       <ThemeProvider>
         <SidebarProvider>
           <BrowserRouter>
-            {/* Suspense handles the "Loading..." state while lazy-loaded components are being fetched */}
+            {/* Suspense: Jab tak page load ho raha hai, tab tak loader dikhata hai */}
             <Suspense
               fallback={<LoadingProcess isLoading={true} spinnerOnly={true} fullScreen={true} />}
             >
               <Routes>
-                {/* PUBLIC ROUTES */}
+                {/* PUBLIC ROUTES - Sab ke liye open hain */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
 
-                {/* SMART ROOT ROUTE */}
+                {/* SMART ROOT ROUTE - Role check karke sahi jagah bhejta hai */}
                 <Route path="/" element={<RootRoute />} />
 
-                {/* PROTECTED ADMIN ROUTES */}
+                {/* PROTECTED ADMIN ROUTES - Sirf admin ke liye */}
                 <Route
                   path="/dashboard"
                   element={
@@ -133,7 +126,7 @@ function App() {
                   }
                 />
 
-                {/* PROTECTED USER ROUTES */}
+                {/* PROTECTED USER ROUTES - Logged-in users ke liye */}
                 <Route
                   path="/home"
                   element={
@@ -143,7 +136,7 @@ function App() {
                   }
                 />
 
-                {/* 404 FALLBACK */}
+                {/* 404 FALLBACK - Agar link galat hai toh home par bhej do */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Suspense>

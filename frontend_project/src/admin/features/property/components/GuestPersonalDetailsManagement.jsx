@@ -111,39 +111,39 @@ const GuestPersonalDetailsManagement = ({
       </div>
 
       {/* Guest Table */}
-      <div className="dark:bg-surface-100 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-md transition-colors duration-300 dark:border-slate-800">
-        <div className="custom-scrollbar max-h-[600px] w-full overflow-auto">
+      <div className="dark:bg-surface-100 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/50 transition-colors duration-300 dark:border-slate-800 dark:shadow-none">
+        <div className="scrollbar-hide max-h-[650px] w-full overflow-auto">
           <table className="w-full min-w-[1400px] border-collapse text-left">
-            <thead className="sticky top-0 z-10">
-              <tr className="border-b border-slate-200 bg-[#f8fafc] text-[11px] font-bold tracking-wider text-[#64748b] uppercase dark:border-slate-800 dark:bg-slate-800 dark:text-slate-400">
-                <th className="w-24 border-r border-slate-200 px-8 py-4 text-center dark:border-slate-800">
+            <thead className="sticky top-0 z-10 shadow-[0_4px_12px_-4px_rgba(0,0,0,0.1)]">
+              <tr className="border-b border-slate-200 bg-white/95 text-[11px] font-black tracking-widest text-slate-400 uppercase backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95 dark:text-slate-500">
+                <th className="w-24 border-r border-slate-100 px-8 py-5 text-center dark:border-slate-800">
                   No.
                 </th>
-                <th className="border-r border-slate-200 px-8 py-4 dark:border-slate-800">
+                <th className="border-r border-slate-100 px-8 py-5 dark:border-slate-800">
                   User Name
                 </th>
-                <th className="border-r border-slate-200 px-8 py-4 dark:border-slate-800">
+                <th className="border-r border-slate-100 px-8 py-5 dark:border-slate-800">
                   Email Address
                 </th>
-                <th className="border-r border-slate-200 px-8 py-4 text-center dark:border-slate-800">
+                <th className="border-r border-slate-100 px-8 py-5 text-center dark:border-slate-800">
                   Phone No.
                 </th>
-                <th className="border-r border-slate-200 px-8 py-4 dark:border-slate-800">
+                <th className="border-r border-slate-100 px-8 py-5 dark:border-slate-800">
                   Doc Type
                 </th>
-                <th className="border-r border-slate-200 px-8 py-4 dark:border-slate-800">
+                <th className="border-r border-slate-100 px-8 py-5 dark:border-slate-800">
                   Document No.
                 </th>
-                <th className="border-r border-slate-200 px-8 py-4 text-center dark:border-slate-800">
+                <th className="border-r border-slate-100 px-8 py-5 text-center dark:border-slate-800">
                   Valid Till
                 </th>
-                <th className="border-r border-slate-200 px-8 py-4 text-center dark:border-slate-800">
+                <th className="border-r border-slate-100 px-8 py-5 text-center dark:border-slate-800">
                   Status
                 </th>
-                <th className="border-r border-slate-200 px-8 py-4 text-center dark:border-slate-800">
+                <th className="border-r border-slate-100 px-8 py-5 text-center dark:border-slate-800">
                   Total Rent
                 </th>
-                <th className="px-8 py-4 text-center">Actions</th>
+                <th className="px-8 py-5 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-[13px] dark:divide-slate-800">
@@ -251,51 +251,57 @@ const GuestPersonalDetailsManagement = ({
       </div>
 
       {/* Custom Delete Confirmation Modal */}
-      {deleteTarget && (
-        <div className="fixed inset-0 z-200 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
-            onClick={handleCancelDelete}
-          />
-          <div className="dark:bg-surface-100 relative z-10 w-full max-w-sm rounded-2xl border border-red-100 bg-white p-6 shadow-2xl dark:border-red-900/30">
-            <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-500/10">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">
+      <AnimatePresence>
+        {deleteTarget && (
+          <div className="fixed inset-0 z-200 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+              onClick={handleCancelDelete}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="dark:bg-surface-100 relative z-10 w-full max-w-sm overflow-hidden rounded-[32px] border border-white/20 bg-white p-8 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] dark:border-slate-800"
+            >
+              <div className="mb-6 flex flex-col items-center text-center">
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-500 shadow-inner dark:bg-red-500/10">
+                  <AlertTriangle size={32} />
+                </div>
+                <h3 className="text-xl font-black tracking-tight text-slate-800 uppercase dark:text-white">
                   Delete Profile
                 </h3>
-                <p className="text-xs text-slate-400">This action cannot be undone.</p>
+                <p className="mt-1 text-xs font-bold tracking-wider text-slate-400 uppercase">
+                  This action is permanent
+                </p>
               </div>
-              <button
-                onClick={handleCancelDelete}
-                className="ml-auto rounded-lg p-1 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700"
-              >
-                <X className="h-4 w-4 text-slate-400" />
-              </button>
-            </div>
-            <p className="mb-6 text-sm font-medium text-slate-600 dark:text-slate-300">
-              Are you sure you want to delete profile{' '}
-              <span className="font-bold text-red-500">"{deleteTarget.name}"</span>?
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={handleCancelDelete}
-                className="flex-1 rounded-xl border border-slate-200 py-2.5 text-sm font-bold text-slate-500 transition-all hover:bg-slate-50 hover:text-slate-800 dark:border-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-300"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmDelete}
-                className="flex-2 rounded-xl bg-red-500 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-500/20 transition-all hover:bg-red-600 active:scale-95"
-              >
-                Yes, Delete
-              </button>
-            </div>
+
+              <p className="mb-8 text-center text-sm font-medium leading-relaxed text-slate-600 dark:text-slate-300">
+                Are you sure you want to delete profile for{' '}
+                <span className="block mt-1 font-black text-red-500 uppercase tracking-tight">"{deleteTarget.name}"</span>?
+              </p>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={handleCancelDelete}
+                  className="flex-1 rounded-2xl border border-slate-100 py-3.5 text-[11px] font-black tracking-widest text-slate-400 uppercase transition-all hover:bg-slate-50 hover:text-slate-600 dark:border-slate-800 dark:hover:bg-slate-800 dark:hover:text-slate-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmDelete}
+                  className="flex-2 rounded-2xl bg-linear-to-r from-red-500 to-red-600 py-3.5 text-[11px] font-black tracking-widest text-white shadow-xl shadow-red-500/30 transition-all hover:translate-y-[-2px] hover:shadow-red-500/40 active:translate-y-px"
+                >
+                  Yes, Delete
+                </button>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   )
 }

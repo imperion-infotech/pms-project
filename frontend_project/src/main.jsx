@@ -1,14 +1,14 @@
 /**
- * main.jsx
+ * main.jsx - Application Entry Point
  *
- * Ye app ka entrance hai. React yahan se shuru hota hai.
- * Yahan se app HTML ke 'root' div mein attach hota hai.
- * CSS files bhi yahan import hoti hain.
+ * Yeh poore frontend project ka darwaza (entrance) hai.
+ * React yaha se shuru hota hai aur HTML ke 'root' div mein 
+ * poore app ko load karta hai.
  */
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+import './index.css' // Global styles yaha se aate hain
+import App from './App.jsx' // Main Router/App component
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
