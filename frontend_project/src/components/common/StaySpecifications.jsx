@@ -12,7 +12,7 @@ const StaySpecifications = ({
   floors = [],
   roomTypes = [],
   rooms = [],
-  // roomStatuses = [],
+  roomStatuses = [],
   isDark = false,
 }) => {
   // Shared UI classes
@@ -180,8 +180,6 @@ const StaySpecifications = ({
         </div>
       </div>
 
-      {/* Section 1: Guest Management (Commented out as it's not in the requested JSON) */}
-      {/* 
       <div className="grid grid-cols-1 gap-4">
         <div>
           <label className={labelClass}>Room Status</label>
@@ -202,7 +200,6 @@ const StaySpecifications = ({
           </div>
         </div>
       </div>
-      */}
 
       {/* Required Booking Attributes */}
       <div className="grid grid-cols-2 gap-3">

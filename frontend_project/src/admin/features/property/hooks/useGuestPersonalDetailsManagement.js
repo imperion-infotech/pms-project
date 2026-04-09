@@ -16,17 +16,14 @@ export const useGuestPersonalDetailsManagement = ({
   updateRentDetail,
   toggleModal,
 }) => {
-  // --- Standardized Industrial Stay Defaults ---
   const getIndustrialStayDefaults = useCallback(() => {
     const now = new Date()
-    // Extract YYYY-MM-DD
-    const checkInDate = now.toISOString().split('T')[0]
-    // Extract HH:mm
-    const checkInTime = now.toTimeString().slice(0, 5)
+    const checkInDate = now.toISOString()
+    const checkInTime = now.toTimeString().slice(0, 8)
 
     const tomorrow = new Date(now)
     tomorrow.setDate(now.getDate() + 1)
-    const checkOutDate = tomorrow.toISOString().split('T')[0]
+    const checkOutDate = tomorrow.toISOString()
 
     return {
       checkInDate,
@@ -38,17 +35,6 @@ export const useGuestPersonalDetailsManagement = ({
   }, [])
 
   const defaults = useMemo(() => getIndustrialStayDefaults(), [getIndustrialStayDefaults])
-
-  const parseTimeStringToObj = useCallback((timeStr) => {
-    if (!timeStr) return { hour: 0, minute: 0, second: 0, nano: 0 }
-    const parts = timeStr.split(':').map(Number)
-    return {
-      hour: parts[0] || 0,
-      minute: parts[1] || 0,
-      second: parts[2] || 0,
-      nano: 0,
-    }
-  }, [])
 
   const [personalFormData, setPersonalFormData] = useState({
     firstName: '',
@@ -76,14 +62,14 @@ export const useGuestPersonalDetailsManagement = ({
     comment: '',
     rateTypeEnum: 'RACK',
     noOfGuest: 1,
-    stayStatusEnum: 'CONFIRMED',
+    stayStatusEnum: 'Confirmed',
     deleted: false,
     // Guest Details
     checkInDate: defaults.checkInDate,
     checkOutDate: defaults.checkOutDate,
     checkInTime: defaults.checkInTime,
     checkOutTime: defaults.checkOutTime,
-    guestDetailsStatus: 'RESERVATION',
+    guestDetailsStatus: 'Reservation',
     noOfDays: defaults.noOfDays,
     rentId: '',
     roomStatusId: '',
@@ -215,6 +201,9 @@ export const useGuestPersonalDetailsManagement = ({
           stayStatusEnum: personalFormData.stayStatusEnum || 'Confirmed',
           noOfGuest: Number(personalFormData.noOfGuest) || 1,
           personalDetailsId: personalDetailsId,
+          roomStatusId: personalFormData.roomStatusId
+            ? Number(personalFormData.roomStatusId)
+            : undefined,
           deleted: false,
         }
         console.log('3. Stay Payload:', JSON.stringify(stayPayload, null, 2))
@@ -264,13 +253,21 @@ export const useGuestPersonalDetailsManagement = ({
         rentDetailsId: rentDetailsId,
         stayDetailsId: stayDetailsId,
         checkInDate: personalFormData.checkInDate
-          ? `${personalFormData.checkInDate}T${personalFormData.checkInTime || '00:00'}:00`
+          ? `${personalFormData.checkInDate}T${personalFormData.checkInTime ? (personalFormData.checkInTime.split(':').length === 2 ? personalFormData.checkInTime + ':00' : personalFormData.checkInTime) : '00:00:00'}.000Z`
           : null,
         checkOutDate: personalFormData.checkOutDate
-          ? `${personalFormData.checkOutDate}T${personalFormData.checkOutTime || '00:00'}:00`
+          ? `${personalFormData.checkOutDate}T${personalFormData.checkOutTime ? (personalFormData.checkOutTime.split(':').length === 2 ? personalFormData.checkOutTime + ':00' : personalFormData.checkOutTime) : '00:00:00'}.000Z`
           : null,
-        checkInTime: parseTimeStringToObj(personalFormData.checkInTime),
-        checkOutTime: parseTimeStringToObj(personalFormData.checkOutTime),
+        checkInTime: personalFormData.checkInTime
+          ? personalFormData.checkInTime.split(':').length === 2
+            ? `${personalFormData.checkInTime}:00`
+            : personalFormData.checkInTime
+          : '00:00:00',
+        checkOutTime: personalFormData.checkOutTime
+          ? personalFormData.checkOutTime.split(':').length === 2
+            ? `${personalFormData.checkOutTime}:00`
+            : personalFormData.checkOutTime
+          : '00:00:00',
         noOfDays: personalFormData.noOfDays ? Number(personalFormData.noOfDays) : 1,
         guestDetailsStatus: personalFormData.guestDetailsStatus || 'Reservation',
       }
@@ -349,7 +346,6 @@ export const useGuestPersonalDetailsManagement = ({
     addRentDetail,
     toggleModal,
     defaults,
-    parseTimeStringToObj,
   ])
 
   const handleUpdatePersonalDetail = useCallback(async () => {
@@ -476,6 +472,9 @@ export const useGuestPersonalDetailsManagement = ({
           rateTypeEnum: editPersonalFormData.rateTypeEnum,
           stayStatusEnum: editPersonalFormData.stayStatusEnum,
           noOfGuest: editPersonalFormData.noOfGuest ? Number(editPersonalFormData.noOfGuest) : 1,
+          roomStatusId: editPersonalFormData.roomStatusId
+            ? Number(editPersonalFormData.roomStatusId)
+            : undefined,
           deleted: editPersonalFormData.deleted || false,
         }
         console.log(
@@ -605,15 +604,20 @@ export const useGuestPersonalDetailsManagement = ({
         stayDetailsId: stayId,
         rentDetailsId: rentId,
         checkInDate: editPersonalFormData.checkInDate
-          ? `${editPersonalFormData.checkInDate}T${editPersonalFormData.checkInTime || '00:00'}:00.000Z`
+          ? `${editPersonalFormData.checkInDate}T${editPersonalFormData.checkInTime || '00:00'}`
           : null,
         checkOutDate: editPersonalFormData.checkOutDate
-          ? `${editPersonalFormData.checkOutDate}T${editPersonalFormData.checkOutTime || '00:00'}:00.000Z`
+          ? `${editPersonalFormData.checkOutDate}T${editPersonalFormData.checkOutTime || '00:00'}`
           : null,
-        checkInTime: parseTimeStringToObj(editPersonalFormData.checkInTime),
-        checkOutTime: parseTimeStringToObj(editPersonalFormData.checkOutTime),
+        checkInTime: editPersonalFormData.checkInTime
+          ? `${editPersonalFormData.checkInTime}`
+          : '00:00:00',
+        checkOutTime: editPersonalFormData.checkOutTime
+          ? `${editPersonalFormData.checkOutTime}`
+          : '00:00:00',
         noOfDays: Number(editPersonalFormData.noOfDays),
-        guestDetailsStatus: editPersonalFormData.guestDetailsStatus || 'RESERVATION',
+        guestDetailsStatus: editPersonalFormData.guestDetailsStatus || 'confirmed',
+        deleted: false,
       }
 
       console.log('---------------Guest Payload (Update)---------------', guestPayload)
@@ -667,7 +671,6 @@ export const useGuestPersonalDetailsManagement = ({
     addRentDetail,
     updateRentDetail,
     toggleModal,
-    parseTimeStringToObj,
   ])
 
   const handleEditPersonalDetail = useCallback(
