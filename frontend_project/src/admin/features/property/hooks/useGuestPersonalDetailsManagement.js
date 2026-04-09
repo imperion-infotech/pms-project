@@ -264,10 +264,10 @@ export const useGuestPersonalDetailsManagement = ({
         rentDetailsId: rentDetailsId,
         stayDetailsId: stayDetailsId,
         checkInDate: personalFormData.checkInDate
-          ? `${personalFormData.checkInDate}T${personalFormData.checkInTime || '00:00'}:00.000Z`
+          ? `${personalFormData.checkInDate}T${personalFormData.checkInTime || '00:00'}:00`
           : null,
         checkOutDate: personalFormData.checkOutDate
-          ? `${personalFormData.checkOutDate}T${personalFormData.checkOutTime || '00:00'}:00.000Z`
+          ? `${personalFormData.checkOutDate}T${personalFormData.checkOutTime || '00:00'}:00`
           : null,
         checkInTime: parseTimeStringToObj(personalFormData.checkInTime),
         checkOutTime: parseTimeStringToObj(personalFormData.checkOutTime),
