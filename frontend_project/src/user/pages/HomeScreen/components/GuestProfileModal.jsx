@@ -14,11 +14,15 @@ import {
   ArrowLeftRight,
   CalendarCheck,
   FileText,
-  Plus,
-  Trash2,
   Edit,
   Camera,
   Paperclip,
+  ShieldCheck,
+  Receipt,
+  BedDouble,
+  Pen as SignatureIcon,
+  Plus,
+  Trash2,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import usePmsData from '../../../../hooks/usePmsData'
@@ -74,6 +78,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
     updateRentDetail,
     addGuestDetail,
     updateGuestDetail,
+    fetchFolioNo,
   } = usePmsData()
   const [localPreviews, setLocalPreviews] = useState({ profilePhoto: null, signature: null })
 
@@ -89,6 +94,8 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
     signature: '',
     contactInformationTypeEnum: 'HOME',
     documents: [],
+    folioNo: '',
+    crsFolioNo: '',
     // Stay Details
     stayId: null,
     floorId: '',
@@ -135,7 +142,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
 
     const loadData = async () => {
       const targetId = room?.profile?.id || room?.personalDetailId || room?.profileId
-      
+
       // Base data from room object
       const baseProfile = room?.profile || (room?.firstName ? room : {})
       let fName = baseProfile.firstName || ''
@@ -194,9 +201,9 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
         try {
           const [profileRes] = await Promise.all([
             fetchPersonalDetailById(targetId),
-            fetchDocumentDetailsByPersonalDetailId(targetId)
+            fetchDocumentDetailsByPersonalDetailId(targetId),
           ])
-          
+
           if (profileRes?.data) {
             const p = profileRes.data
             setFormData({
@@ -210,26 +217,39 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
               profilePhoto: p.profilePhoto || initialForm.profilePhoto,
               signature: p.signature || initialForm.signature,
               contactInformationTypeEnum: p.contactInformationTypeEnum || 'HOME',
+              folioNo: p.folioNo || '',
+              crsFolioNo: p.crsFolioNo || '',
             })
-            return // Successfully loaded fresh data
+            return
           }
         } catch (err) {
           console.error('Core Data Load Error:', err)
         }
       } else {
+        // Only fetch folio if we don't have one and we're in creation mode
         setDocumentDetails([])
+        if (!formData.folioNo) {
+          try {
+            const newFolio = await fetchFolioNo()
+            setFormData((prev) => ({ ...prev, ...initialForm, folioNo: newFolio || '' }))
+            return
+          } catch (err) {
+            console.warn('Folio fetch failed', err)
+          }
+        }
       }
 
-      setFormData(initialForm)
+      setFormData((prev) => ({ ...prev, ...initialForm }))
     }
 
     loadData()
-  }, [room, isOpen, fetchPersonalDetailById, fetchDocumentDetailsByPersonalDetailId, setDocumentDetails])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room, isOpen])
 
   // Cleanup previews on modal close
   useEffect(() => {
     if (!isOpen) {
-      Object.values(localPreviews).forEach(p => p && URL.revokeObjectURL(p))
+      Object.values(localPreviews).forEach((p) => p && URL.revokeObjectURL(p))
       setLocalPreviews({ profilePhoto: null, signature: null })
     }
   }, [isOpen, localPreviews])
@@ -243,16 +263,16 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
   const isReserved =
     currentStatusName.includes('reserved') || currentStatusName.includes('reservation')
 
-  // Shared classes for integrated form
-  const inputContainerClass = `flex items-center gap-3 px-3 py-2 rounded-xl border transition-all ${
-    isDark
-      ? 'bg-slate-800/30 border-slate-700 focus-within:border-emerald-500/50'
-      : 'bg-slate-50 border-slate-200 focus-within:border-emerald-500'
-  }`
-  const labelClass =
-    'text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-1'
+  // Shared classes for integrated form (Exactly like Admin Modal)
+  const inputContainerClass = 'group relative'
+  const iconClass =
+    'absolute top-1/2 left-3.5 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-blue-500'
   const inputClass =
-    'bg-transparent border-none outline-none w-full text-xs font-bold text-slate-800 dark:text-slate-100 placeholder:text-slate-300'
+    'w-full rounded-xl border border-slate-200 bg-white py-1.5 pr-4 pl-10 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20 placeholder:text-slate-300'
+  const labelClass =
+    'mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400'
+  const cardClass =
+    'rounded-2xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-700/50 dark:bg-slate-800/50'
 
   // Handle generic input changes with hierarchical resets
   const handleChange = (e) => {
@@ -358,9 +378,9 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
 
   const handleSubmit = async (e, forcedStatusName = null) => {
     if (e) e.preventDefault()
-    
+
     const requiredFields = ['firstName', 'lastName', 'phone', 'email']
-    const missing = requiredFields.filter(f => !formData[f])
+    const missing = requiredFields.filter((f) => !formData[f])
     if (missing.length > 0) {
       alert(`Missing required fields: ${missing.join(', ')}`)
       return
@@ -369,27 +389,32 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
     setIsSubmitting(true)
     try {
       const targetProfileId = profile?.id || room?.personalDetailId || room?.profileId
-      
+
       // 1. Personal Detail
       const personalPayload = {
         ...formData,
         contactInformationTypeEnum: formData.contactInformationTypeEnum || 'HOME',
         phone: formData.phone,
         mobileNumber: formData.phone,
-        id: targetProfileId || 0
+        folioNo: formData.folioNo,
+        crsFolioNo: formData.crsFolioNo,
+        id: targetProfileId || 0,
       }
 
-      const res = isExisting && targetProfileId 
-        ? await updatePersonalDetail(targetProfileId, personalPayload)
-        : await addPersonalDetail(personalPayload)
-      
+      const res =
+        isExisting && targetProfileId
+          ? await updatePersonalDetail(targetProfileId, personalPayload)
+          : await addPersonalDetail(personalPayload)
+
       const finalProfileId = res?.data?.id || res?.data || targetProfileId
 
       // 2. Documents (only for new profiles)
       if (!isExisting && formData.documents?.length > 0 && finalProfileId) {
-        await Promise.all(formData.documents.map(doc => 
-          addDocumentDetail({ ...doc, personalDetailsId: finalProfileId })
-        ))
+        await Promise.all(
+          formData.documents.map((doc) =>
+            addDocumentDetail({ ...doc, personalDetailsId: finalProfileId }),
+          ),
+        )
       }
 
       // 3. Rent Detail
@@ -408,7 +433,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
         deleted: false,
       }
 
-      const rentRes = formData.rentId 
+      const rentRes = formData.rentId
         ? await updateRentDetail(formData.rentId, rentPayload)
         : await addRentDetail(rentPayload)
       const finalRentId = rentRes?.data?.id || rentRes?.data || formData.rentId
@@ -422,7 +447,9 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
         comment: formData.comment || '',
         rateTypeEnum: formData.rateTypeEnum || 'RACK',
         noOfGuest: Number(formData.noOfGuest) || 1,
-        stayStatusEnum: forcedStatusName?.toLowerCase().includes('reserv') ? 'RESERVED' : (formData.stayStatusEnum || 'CONFIRMED'),
+        stayStatusEnum: forcedStatusName?.toLowerCase().includes('reserv')
+          ? 'RESERVED'
+          : formData.stayStatusEnum || 'CONFIRMED',
         personalDetailId: finalProfileId,
       }
       const stayRes = await addStayDetail(stayPayload)
@@ -435,8 +462,16 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
         personalDetailsId: finalProfileId,
         rentDetailsId: finalRentId,
         stayDetailsId: finalStayId,
-        checkInDate: formData.checkInDate ? (formData.checkInDate.includes('T') ? formData.checkInDate : `${formData.checkInDate}T00:00:00.000Z`) : null,
-        checkOutDate: formData.checkOutDate ? (formData.checkOutDate.includes('T') ? formData.checkOutDate : `${formData.checkOutDate}T00:00:00.000Z`) : null,
+        checkInDate: formData.checkInDate
+          ? formData.checkInDate.includes('T')
+            ? formData.checkInDate
+            : `${formData.checkInDate}T00:00:00.000Z`
+          : null,
+        checkOutDate: formData.checkOutDate
+          ? formData.checkOutDate.includes('T')
+            ? formData.checkOutDate
+            : `${formData.checkOutDate}T00:00:00.000Z`
+          : null,
         checkInTime: formData.checkInTime || '00:00:00',
         checkOutTime: formData.checkOutTime || '00:00:00',
         noOfDays: Number(formData.noOfDays) || 1,
@@ -451,15 +486,17 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
 
       // 6. Final Room Status Update
       if (forcedStatusName) {
-        const targetStatus = roomStatuses.find(s => {
+        const targetStatus = roomStatuses.find((s) => {
           const name = (s.roomStatusName || '').toLowerCase()
           const short = (s.shortName || '').toLowerCase()
           const target = forcedStatusName.toLowerCase()
-          return target === 'reservation' ? (name.includes('reserv') || short.includes('res')) : (name.includes(target) || short.includes(target))
+          return target === 'reservation'
+            ? name.includes('reserv') || short.includes('res')
+            : name.includes(target) || short.includes(target)
         })
 
         if (targetStatus) {
-          const originalRoom = rawRooms.find(r => String(r.id) === String(room.id))
+          const originalRoom = rawRooms.find((r) => String(r.id) === String(room.id))
           if (originalRoom) {
             await updateRoom(room.id, {
               ...originalRoom,
@@ -483,287 +520,409 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-100 flex items-center justify-center overflow-y-auto p-4 sm:p-6">
+      <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 lg:p-8">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
           onClick={onClose}
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-md"
-        />
+        ></motion.div>
+
         <motion.div
-          initial={{ scale: 0.95, opacity: 0, y: 30 }}
+          initial={{ scale: 0.95, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.95, opacity: 0, y: 30 }}
-          className={`relative my-auto flex w-full max-w-7xl flex-col overflow-hidden rounded-[40px] border shadow-2xl transition-all duration-300 ${isDark ? 'bg-surface-50 border-slate-800' : 'border-slate-200 bg-white'}`}
+          exit={{ scale: 0.95, opacity: 0, y: 20 }}
+          className="relative z-10 flex h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-[32px] border border-white/20 bg-white shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] dark:bg-slate-900"
         >
-          {/* Header */}
-          <div
-            className={`flex items-center justify-between border-b p-4 sm:px-8 sm:py-5 ${isDark ? 'border-slate-800 bg-slate-800/10' : 'border-slate-50 bg-white'}`}
+          <form
+            id="guestProfileForm"
+            onSubmit={handleSubmit}
+            className="flex h-full flex-col overflow-hidden"
           >
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/20">
-                <User className="h-6 w-6 text-white" />
-              </div>
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-3">
-                  <h2
-                    className={`truncate text-lg font-black transition-colors ${isDark ? 'text-white' : 'text-slate-800'}`}
-                  >
-                    {isExisting ? 'UPDATE' : 'CREATE'}{' '}
-                    <span className="text-emerald-500">PROFILE</span>
+            {/* Header */}
+            <div
+              className={`flex shrink-0 items-center justify-between border-b p-4 sm:px-8 ${isDark ? 'border-slate-800 bg-slate-900/80' : 'border-slate-100 bg-white/80'} backdrop-blur-md`}
+            >
+              <div className="flex items-center gap-5">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-blue-500 to-blue-600 shadow-xl shadow-blue-500/20">
+                  <User className="h-6 w-6 text-white" />
+                </div>
+                <div className="min-w-0 text-left">
+                  <h2 className="text-xl font-black tracking-tight text-slate-800 uppercase dark:text-white">
+                    {isExisting ? 'Update' : 'Create'}{' '}
+                    <span className="text-blue-500">Guest Profile</span>
                   </h2>
-                  <div
-                    className={`shrink-0 rounded-full border px-3 py-1 text-[9px] font-black tracking-widest uppercase ${isDark ? 'border-slate-700 bg-slate-800/50 text-slate-400' : 'border-slate-200 bg-slate-100 text-slate-500'}`}
-                  >
-                    RM {room.roomName}
+                  <div className="mt-0.5 flex items-center gap-2 text-left">
+                    <div className="h-1 w-1 rounded-full bg-blue-500"></div>
+                    <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+                      Comprehensive Check-in & Allotment • RM {room.roomName}
+                    </p>
                   </div>
                 </div>
-                <p
-                  className={`mt-1 text-[8px] font-bold tracking-[0.2em] uppercase ${isDark ? 'text-slate-500' : 'text-slate-400'}`}
+              </div>
+
+              <div className="flex items-center gap-4">
+                <div
+                  className={`flex items-center gap-6 rounded-2xl px-6 py-3 ${isDark ? 'bg-slate-800/50' : 'bg-slate-50'}`}
                 >
-                  PMS Guest Information Core
-                </p>
+                  <div
+                    className="flex cursor-pointer flex-col items-end transition-opacity hover:opacity-80 active:scale-95"
+                    onClick={() => {
+                      const randomFolio =
+                        Math.floor(Math.random() * 900000000000000) + 100000000000000
+                      setFormData((prev) => ({ ...prev, folioNo: String(randomFolio) }))
+                    }}
+                    title="Click to generate random folio"
+                  >
+                    <span className="text-[9px] font-bold tracking-widest text-slate-400 uppercase">
+                      Folio No.
+                    </span>
+                    <input
+                      type="text"
+                      value={formData.folioNo || ''}
+                      readOnly
+                      className="cursor-pointer bg-transparent text-right text-xs font-black text-blue-600 outline-none dark:text-blue-400"
+                      placeholder="—"
+                    />
+                  </div>
+                  <div className={`h-8 w-px ${isDark ? 'bg-slate-700' : 'bg-slate-200'}`}></div>
+                  <div className="flex flex-col items-end">
+                    <span className="text-[9px] font-bold tracking-widest text-slate-400 uppercase">
+                      CRS Folio No.
+                    </span>
+                    <input
+                      type="text"
+                      value={formData.crsFolioNo || ''}
+                      onChange={(e) => setFormData({ ...formData, crsFolioNo: e.target.value })}
+                      className={`w-24 bg-transparent text-right text-xs font-black outline-none focus:text-blue-600 dark:text-white dark:focus:text-blue-400 ${isDark ? 'text-slate-300' : 'text-slate-800'}`}
+                      placeholder="Enter No."
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="group flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-400 transition-all hover:bg-red-50 hover:text-red-500 active:scale-95 dark:bg-slate-800 dark:hover:bg-red-900/20"
+                >
+                  <X size={20} />
+                </button>
               </div>
             </div>
-            <button
-              onClick={onClose}
-              className={`group flex items-center justify-center rounded-xl border p-3 transition-all active:scale-95 ${isDark ? 'border-slate-800 bg-slate-800/50 text-slate-400 hover:border-emerald-400/30 hover:text-emerald-400' : 'border-slate-100 bg-white text-slate-400 hover:text-emerald-500 hover:shadow-md'}`}
-            >
-              <X size={18} />
-            </button>
-          </div>
 
-          <div className="flex-1 overflow-y-auto p-4 sm:px-6 sm:pb-6">
-            <form id="guestProfileForm" onSubmit={handleSubmit} className="flex h-full flex-col overflow-hidden">
-              <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+            <div className="flex-1 overflow-hidden">
+              <div className="flex h-full flex-col overflow-hidden lg:flex-row">
                 {/* Column 1: Identity & Documentation */}
-                <div className="scrollbar-hide flex w-full flex-col border-b border-slate-200 bg-white transition-all lg:w-[32%] lg:border-r lg:border-b-0 dark:border-slate-800 dark:bg-slate-900">
-                  <div className="scrollbar-hide flex-1 space-y-4 overflow-y-auto p-4">
-                    {/* Guest Assets */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <ImageUpload
-                        label="Photo"
-                        value={formData.profilePhoto}
-                        icon={User}
-                        isDark={isDark}
-                        aspect="aspect-[2.5/1]"
-                        onUpload={(file) => handleImageSelect(file, 'profilePhoto')}
-                        onClear={() => handleImageClear('profilePhoto')}
-                        renderCustomPreview={(val) => (
-                          <AuthImage
-                            src={`/user/${cleanImageUrl(val)}`}
-                            alt="Photo"
-                            className="h-full w-full object-cover"
-                          />
-                        )}
-                      />
-                      <ImageUpload
-                        label="Signature"
-                        value={formData.signature}
-                        icon={Save}
-                        isDark={isDark}
-                        aspect="aspect-[2.5/1]"
-                        onUpload={(file) => handleImageSelect(file, 'signature')}
-                        onClear={() => handleImageClear('signature')}
-                        renderCustomPreview={(val) => (
-                          <AuthImage
-                            src={`/user/${cleanImageUrl(val)}`}
-                            alt="Signature"
-                            className="max-h-full"
-                          />
-                        )}
-                      />
+                <div className="flex w-full flex-col border-b border-slate-100 bg-white transition-all lg:w-[32%] lg:border-r lg:border-b-0 dark:border-slate-800 dark:bg-slate-900">
+                  <div className="flex items-center gap-3 px-8 py-5 text-left">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
+                      <ShieldCheck size={16} className="text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <h3 className="text-[11px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
+                      Part 1: Identity & Docs
+                    </h3>
+                  </div>
+                  <div className="custom-scrollbar flex-1 space-y-6 overflow-y-auto px-8 pb-8">
+                    {/* Integrated Asset Capture */}
+                    <div className={cardClass}>
+                      <div className="flex items-start gap-3">
+                        <div className="group relative">
+                          <div className="h-24 w-24 overflow-hidden rounded-[20px] border-4 border-white bg-slate-100 shadow-md dark:border-slate-800 dark:bg-slate-900">
+                            {formData.profilePhoto ? (
+                              <AuthImage
+                                src={`/user/${cleanImageUrl(formData.profilePhoto)}`}
+                                alt="Preview"
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <div className="flex h-full w-full flex-col items-center justify-center text-slate-300 dark:text-slate-600">
+                                <User size={32} />
+                                <span className="mt-1 text-[8px] font-bold tracking-wider uppercase">
+                                  Photo
+                                </span>
+                              </div>
+                            )}
+                            {uploadingType === 'profilePhoto' && (
+                              <div className="absolute inset-0 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm">
+                                <Loader2 className="h-6 w-6 animate-spin text-white" />
+                              </div>
+                            )}
+                          </div>
+                          <label className="absolute -right-2 -bottom-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl bg-blue-500 text-white shadow-lg ring-2 ring-white transition-transform hover:scale-110 dark:ring-slate-900">
+                            <Camera size={14} />
+                            <input
+                              type="file"
+                              className="hidden"
+                              accept="image/*"
+                              onChange={(e) => handleImageSelect(e.target.files[0], 'profilePhoto')}
+                            />
+                          </label>
+                        </div>
+
+                        <div className="flex h-24 flex-1 flex-col justify-end space-y-2">
+                          <div className="relative flex-1 rounded-[18px] border-2 border-dashed border-slate-200 bg-white p-1.5 text-center transition-colors hover:border-blue-400 dark:border-slate-700 dark:bg-slate-800">
+                            {formData.signature ? (
+                              <div className="relative flex h-full items-center justify-center">
+                                <AuthImage
+                                  src={`/user/${cleanImageUrl(formData.signature)}`}
+                                  alt="Signature"
+                                  className="max-h-full object-contain"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleImageClear('signature')}
+                                  className="absolute -top-2 -right-2 rounded-full bg-red-100 p-1.5 text-red-500 shadow-sm transition-colors hover:bg-red-500 hover:text-white"
+                                >
+                                  <X size={12} />
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="flex h-full flex-col items-center justify-center">
+                                <Save size={20} className="mb-1 text-slate-300" />
+                                <p className="text-[9px] font-bold tracking-widest text-slate-400 uppercase">
+                                  Digital Signature
+                                </p>
+                              </div>
+                            )}
+                            <label className="absolute inset-0 cursor-pointer opacity-0">
+                              <input
+                                type="file"
+                                className="hidden"
+                                accept="image/*"
+                                onChange={(e) => handleImageSelect(e.target.files[0], 'signature')}
+                              />
+                            </label>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2 border-l-4 border-emerald-500 pl-3">
-                        <h3 className={`text-[11px] font-black tracking-widest uppercase ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                    {/* Personal Information */}
+                    <div>
+                      <div className="mb-4 flex items-center gap-3">
+                        <span className="text-[10px] font-black tracking-widest text-blue-500 uppercase">
                           Background Info
-                        </h3>
+                        </span>
+                        <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800"></div>
                       </div>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                         <div>
-                          <label className={labelClass}>First Name</label>
+                          <label className={labelClass}>
+                            First Name <span className="text-red-500">*</span>
+                          </label>
                           <div className={inputContainerClass}>
-                            <User size={16} className="text-slate-400" />
+                            <User size={14} className={iconClass} />
                             <input
+                              required
                               type="text"
                               name="firstName"
                               value={formData.firstName}
                               onChange={handleChange}
-                              placeholder="First name"
                               className={inputClass}
-                              required
+                              placeholder="John"
                             />
                           </div>
                         </div>
                         <div>
-                          <label className={labelClass}>Last Name</label>
+                          <label className={labelClass}>
+                            Last Name <span className="text-red-500">*</span>
+                          </label>
                           <div className={inputContainerClass}>
-                            <User size={16} className="text-slate-400" />
+                            <User size={14} className={iconClass} />
                             <input
+                              required
                               type="text"
                               name="lastName"
                               value={formData.lastName}
                               onChange={handleChange}
-                              placeholder="Last name"
                               className={inputClass}
-                              required
+                              placeholder="Doe"
                             />
                           </div>
                         </div>
                         <div className="col-span-2">
                           <label className={labelClass}>Company Name</label>
                           <div className={inputContainerClass}>
-                            <Building size={16} className="text-slate-400" />
+                            <Building size={14} className={iconClass} />
                             <input
                               type="text"
                               name="companyName"
                               value={formData.companyName}
                               onChange={handleChange}
-                              placeholder="Company name"
                               className={inputClass}
+                              placeholder="Inc. Pvt Ltd"
                             />
                           </div>
                         </div>
                         <div className="col-span-2">
-                          <label className={labelClass}>Contact Information Type</label>
-                          <div className={inputContainerClass}>
-                            <ArrowLeftRight size={14} className="text-slate-400" />
-                            <select
-                              name="contactInformationTypeEnum"
-                              value={formData.contactInformationTypeEnum}
-                              onChange={handleChange}
-                              className={inputClass + " cursor-pointer"}
-                            >
-                              <option value="HOME">HOME</option>
-                              <option value="OFFICE">OFFICE</option>
-                              <option value="OTHER">OTHER</option>
-                            </select>
-                          </div>
+                          <label className="text-[9px] font-bold text-slate-400 uppercase">
+                            Contact Info Type
+                          </label>
+                          <select
+                            name="contactInformationTypeEnum"
+                            value={formData.contactInformationTypeEnum}
+                            onChange={handleChange}
+                            className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                          >
+                            <option value="HOME">HOME</option>
+                            <option value="OFFICE">OFFICE</option>
+                            <option value="OTHER">OTHER</option>
+                          </select>
                         </div>
                         <div>
-                          <label className={labelClass}>{formData.contactInformationTypeEnum} Phone Number</label>
+                          <label className={labelClass}>
+                            {formData.contactInformationTypeEnum} Phone{' '}
+                            <span className="text-red-500">*</span>
+                          </label>
                           <div className={inputContainerClass}>
-                            <Phone size={16} className="text-slate-400" />
+                            <Phone size={14} className={iconClass} />
                             <input
+                              required
                               type="tel"
                               name="phone"
                               value={formData.phone}
                               onChange={handleChange}
-                              placeholder={formData.contactInformationTypeEnum === 'HOME' ? "Personal Phone" : "Work Phone"}
                               className={inputClass}
-                              required
+                              placeholder="Phone No."
                             />
                           </div>
                         </div>
                         <div>
-                          <label className={labelClass}>{formData.contactInformationTypeEnum} Email Address</label>
+                          <label className={labelClass}>
+                            {formData.contactInformationTypeEnum} Email{' '}
+                            <span className="text-red-500">*</span>
+                          </label>
                           <div className={inputContainerClass}>
-                            <Mail size={16} className="text-slate-400" />
+                            <Mail size={14} className={iconClass} />
                             <input
+                              required
                               type="email"
                               name="email"
                               value={formData.email}
                               onChange={handleChange}
-                              placeholder={formData.contactInformationTypeEnum === 'HOME' ? "Personal Email" : "Work Email"}
                               className={inputClass}
-                              required
+                              placeholder="Email address"
                             />
                           </div>
                         </div>
                         <div className="col-span-2">
-                          <label className={labelClass}>{formData.contactInformationTypeEnum} Full Address</label>
-                          <div className={inputContainerClass}>
-                            <MapPin size={14} className="text-slate-400" />
-                            <textarea
-                              name="address"
-                              value={formData.address}
-                              onChange={handleChange}
-                              placeholder={formData.contactInformationTypeEnum === 'HOME' ? "Residence Address" : "Office Address"}
-                              className={`${inputClass} min-h-[40px] resize-none`}
-                              required
-                            />
-                          </div>
+                          <label className="text-[9px] font-bold text-slate-400 uppercase">
+                            {formData.contactInformationTypeEnum} Full Address{' '}
+                            <span className="text-red-500">*</span>
+                          </label>
+                          <textarea
+                            required
+                            rows="2"
+                            name="address"
+                            value={formData.address}
+                            onChange={handleChange}
+                            className="mt-1 w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                            placeholder="Address details..."
+                          />
                         </div>
                       </div>
+                    </div>
 
-                      {/* Documentation Section */}
-                      <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-                        <div className="flex items-center justify-between gap-3 border-l-4 border-emerald-500 pl-3">
-                          <h3 className={`text-[11px] font-black tracking-widest uppercase ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                            ID Documents
-                          </h3>
-                          <button
-                            type="button"
-                            onClick={() => toggleDocForm()}
-                            className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-600 active:scale-95"
-                          >
-                            <Plus size={16} />
-                          </button>
-                        </div>
-                        <div className={`overflow-hidden rounded-2xl border ${isDark ? 'border-slate-800 bg-slate-900/30' : 'border-slate-100 bg-white'}`}>
-                          <table className="w-full text-left font-bold">
-                            <thead>
-                              <tr className={`text-[10px] font-black tracking-widest text-slate-400 uppercase ${isDark ? 'bg-slate-900/50' : 'bg-slate-50'}`}>
-                                <th className="px-4 py-3">Action</th>
-                                <th className="px-4 py-3">Details</th>
+                    {/* Documentation Table */}
+                    <div className="rounded-2xl border border-blue-100/50 bg-blue-50/50 p-4 dark:border-blue-900/30 dark:bg-blue-900/10">
+                      <div className="mb-3 flex items-center justify-between">
+                        <span className="text-[10px] font-black tracking-widest text-blue-600 uppercase dark:text-blue-400">
+                          ID Documents
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => toggleDocForm()}
+                          className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500 text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-600 active:scale-95"
+                        >
+                          <Plus size={14} />
+                        </button>
+                      </div>
+                      <div className="overflow-hidden rounded-xl border border-blue-100/50 bg-white dark:border-blue-900/20 dark:bg-slate-900">
+                        <table className="w-full text-left font-bold">
+                          <thead className="bg-blue-50/50 dark:bg-blue-900/20">
+                            <tr className="text-[9px] font-black tracking-wider text-slate-400 uppercase">
+                              <th className="px-3 py-2">Action</th>
+                              <th className="px-3 py-2">Details</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                            {(profile?.id || room?.personalDetailId
+                              ? documentDetails
+                              : formData.documents || []
+                            ).length > 0 ? (
+                              (profile?.id || room?.personalDetailId
+                                ? documentDetails
+                                : formData.documents || []
+                              ).map((doc, idx) => {
+                                const docType = documentTypes.find(
+                                  (t) => String(t.id) === String(doc.documentTypeId),
+                                )
+                                return (
+                                  <tr key={doc.id || idx} className="text-[10px]">
+                                    <td className="px-3 py-2">
+                                      <div className="flex gap-2 text-slate-400">
+                                        <button
+                                          type="button"
+                                          onClick={() => toggleDocForm(idx)}
+                                          className="hover:text-blue-500"
+                                        >
+                                          <Edit size={12} />
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleDeleteDocument(doc, idx)}
+                                          className="hover:text-red-500"
+                                        >
+                                          <Trash2 size={12} />
+                                        </button>
+                                      </div>
+                                    </td>
+                                    <td className="px-3 py-2">
+                                      <div className="font-bold text-slate-700 dark:text-slate-300">
+                                        {docType?.documentTypeName}
+                                      </div>
+                                      <div className="text-[9px] text-slate-400">
+                                        {doc.documentNumber}
+                                      </div>
+                                    </td>
+                                  </tr>
+                                )
+                              })
+                            ) : (
+                              <tr>
+                                <td
+                                  colSpan="2"
+                                  className="px-3 py-4 text-center text-[9px] font-bold text-slate-400"
+                                >
+                                  No Documents
+                                </td>
                               </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                              {(profile?.id || room?.personalDetailId ? documentDetails : formData.documents || []).length > 0 ? (
-                                (profile?.id || room?.personalDetailId ? documentDetails : formData.documents || []).map((doc, idx) => {
-                                  const docType = documentTypes.find((t) => String(t.id) === String(doc.documentTypeId))
-                                  return (
-                                    <tr key={doc.id || idx} className="group transition-colors hover:bg-emerald-50/10">
-                                      <td className="px-4 py-3">
-                                        <div className="flex gap-2">
-                                          <button type="button" onClick={() => toggleDocForm(idx)} className="text-slate-400 hover:text-emerald-500">
-                                            <Edit size={12} />
-                                          </button>
-                                          <button type="button" onClick={() => handleDeleteDocument(doc, idx)} className="text-slate-400 hover:text-red-500">
-                                            <Trash2 size={12} />
-                                          </button>
-                                        </div>
-                                      </td>
-                                      <td className="px-4 py-3">
-                                        <div className="text-[10px] font-black uppercase text-slate-700 dark:text-slate-200">
-                                          {docType?.documentTypeName || 'Unknown'}
-                                        </div>
-                                        <div className="font-mono text-[9px] font-bold text-slate-400">
-                                          {doc.documentNumber}
-                                        </div>
-                                      </td>
-                                    </tr>
-                                  )
-                                })
-                              ) : (
-                                <tr>
-                                  <td colSpan="2" className="px-4 py-6 text-center text-[9px] font-black tracking-widest text-slate-400 uppercase">
-                                    No Documents
-                                  </td>
-                                </tr>
-                              )}
-                            </tbody>
-                          </table>
-                        </div>
+                            )}
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Column 2: Guest Info & Stay Selection */}
-                <div className="scrollbar-hide flex w-full flex-col border-b border-slate-200 bg-slate-50/50 transition-all lg:w-[46%] lg:border-r lg:border-b-0 dark:border-slate-800 dark:bg-slate-800/20">
-                  <div className="scrollbar-hide flex-1 space-y-4 overflow-y-auto p-4">
-                    <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                      <div className="flex items-center gap-3 mb-4">
-                         <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30">
-                           <CalendarCheck size={16} className="text-amber-600 dark:text-amber-400" />
-                         </div>
-                         <h3 className="text-[11px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
-                           Guest Information
-                         </h3>
+                <div className="flex w-full flex-col border-b border-slate-100 bg-slate-50/50 transition-all lg:w-[46%] lg:border-r lg:border-b-0 dark:border-slate-800 dark:bg-slate-800/10">
+                  <div className="flex items-center gap-3 px-8 py-5 text-left">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30">
+                      <CalendarCheck size={16} className="text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <h3 className="text-[11px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
+                      Part 2: Guest Info & Stay Selection
+                    </h3>
+                  </div>
+                  <div className="custom-scrollbar flex-1 space-y-5 overflow-y-auto px-8 pb-8">
+                    <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                      <div className="mb-4 flex items-center gap-3">
+                        <span className="text-[10px] font-black tracking-widest text-amber-500 uppercase">
+                          Guest Details
+                        </span>
+                        <div className="h-px flex-1 bg-amber-50 dark:bg-amber-900/20"></div>
                       </div>
                       <GuestInformation
                         formData={formData}
@@ -771,7 +930,8 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                           const { name, value } = e.target
                           let updated = { ...formData, [name]: value }
                           if (name === 'noOfDays' || name === 'checkInDate') {
-                            const days = parseInt(name === 'noOfDays' ? value : formData.noOfDays || 1) || 1
+                            const days =
+                              parseInt(name === 'noOfDays' ? value : formData.noOfDays || 1) || 1
                             const start = name === 'checkInDate' ? value : formData.checkInDate
                             if (start) {
                               const d = new Date(start)
@@ -793,14 +953,12 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                       />
                     </div>
 
-                    <div className="rounded-2xl border border-amber-100/50 bg-amber-50/50 p-4 dark:border-amber-900/20 dark:bg-amber-900/10">
-                      <div className="flex items-center gap-3 mb-4">
-                         <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30">
-                           <Building size={16} className="text-amber-600 dark:text-amber-400" />
-                         </div>
-                         <h3 className="text-[11px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
-                           Stay Details
-                         </h3>
+                    <div className="rounded-2xl border border-amber-100/50 bg-amber-50/50 p-5 dark:border-amber-900/20 dark:bg-amber-900/5">
+                      <div className="mb-4 flex items-center gap-3">
+                        <span className="text-[10px] font-black tracking-widest text-amber-600 uppercase dark:text-amber-400">
+                          Booking & Unit Allocation
+                        </span>
+                        <div className="h-px flex-1 bg-amber-200/50 dark:bg-amber-800/30"></div>
                       </div>
                       <StaySpecifications
                         formData={formData}
@@ -816,21 +974,23 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                   </div>
                 </div>
 
-                {/* Column 3: Rent / Financial Details */}
-                <div className="scrollbar-hide relative flex w-full flex-col bg-emerald-50/30 transition-all lg:w-[22%] dark:bg-emerald-900/5">
-                  <div className="scrollbar-hide flex-1 overflow-y-auto p-4">
-                    <div className="flex items-center gap-3 mb-4">
-                       <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30">
-                         <FileText size={16} className="text-emerald-600 dark:text-emerald-400" />
-                       </div>
-                       <h3 className="text-[11px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
-                         Rent Details
-                       </h3>
+                {/* Column 3: Rent Details */}
+                <div className="flex w-full flex-col bg-slate-50 transition-all lg:w-[22%] dark:bg-slate-900/50">
+                  <div className="flex items-center gap-3 px-6 py-5 text-left">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30">
+                      <Receipt size={16} className="text-emerald-600 dark:text-emerald-400" />
                     </div>
-                    <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-white p-4 shadow-lg shadow-emerald-500/5 dark:border-emerald-900/30 dark:bg-slate-900">
+                    <h3 className="text-[11px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
+                      Part 3: Rent Details
+                    </h3>
+                  </div>
+                  <div className="custom-scrollbar flex-1 space-y-5 overflow-y-auto px-6 pb-8">
+                    <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-white p-5 shadow-lg shadow-emerald-500/5 dark:border-emerald-900/20 dark:bg-slate-900">
                       <RentDetails
                         formData={formData}
-                        handleChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
+                        handleChange={(e) =>
+                          setFormData({ ...formData, [e.target.name]: e.target.value })
+                        }
                         taxes={taxes}
                         isDark={isDark}
                       />
@@ -838,66 +998,67 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                   </div>
                 </div>
               </div>
-            </form>
-          </div>
-          <div
-            className={`flex items-center justify-end gap-4 border-t p-5 sm:px-8 ${isDark ? 'border-slate-800 bg-slate-900/50' : 'border-slate-50 bg-white'}`}
-          >
-            <button
-              type="button"
-              onClick={(e) => handleSubmit(e, 'Reservation')}
-              disabled={isSubmitting || uploadingType || isReserved}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-[9px] font-black tracking-widest text-white uppercase shadow-lg transition-all active:scale-95 ${isSubmitting || uploadingType || isReserved ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-orange-600 shadow-orange-500/20 hover:bg-orange-700'}`}
-            >
-              <CalendarCheck size={12} />
-              <span>Reservation</span>
-            </button>
+            </div>
 
-            <button
-              type="button"
-              onClick={(e) => handleSubmit(e, 'Occupied')}
-              disabled={isSubmitting || uploadingType}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-[9px] font-black tracking-widest text-white uppercase shadow-lg transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-emerald-600 shadow-emerald-500/20 hover:bg-emerald-700'}`}
-            >
-              <CheckCircle size={12} />
-              <span>Check In</span>
-            </button>
+            {/* Footer */}
+            <div className="flex shrink-0 items-center justify-end gap-3 border-t bg-slate-50/80 px-8 py-5 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/80">
+              <button
+                type="button"
+                onClick={(e) => handleSubmit(e, 'Reservation')}
+                disabled={isSubmitting || uploadingType || isReserved}
+                className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-[10px] font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${isSubmitting || uploadingType || isReserved ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-orange-600 shadow-orange-500/30 hover:bg-orange-700 hover:shadow-orange-500/40'}`}
+              >
+                <CalendarCheck size={14} />
+                <span>Reservation</span>
+              </button>
 
-            <button
-              type="submit"
-              form="guestProfileForm"
-              disabled={isSubmitting || uploadingType}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-[9px] font-black tracking-widest text-white uppercase shadow-lg transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-blue-600 shadow-blue-500/20 hover:bg-blue-700'}`}
-            >
-              <RefreshCw size={12} className={isSubmitting ? 'animate-spin' : ''} />
-              <span>Update</span>
-            </button>
+              <button
+                type="button"
+                onClick={(e) => handleSubmit(e, 'Occupied')}
+                disabled={isSubmitting || uploadingType}
+                className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-[10px] font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-blue-600 shadow-blue-500/30 hover:bg-blue-700 hover:shadow-blue-500/40'}`}
+              >
+                <CheckCircle size={14} />
+                <span>Check In</span>
+              </button>
 
-            <button
-              type="button"
-              className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-[9px] font-black tracking-widest uppercase transition-all active:scale-95 ${isDark ? 'border-slate-700 text-slate-400 hover:bg-slate-800' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
-            >
-              <ArrowLeftRight size={12} />
-              <span>Chg. Room</span>
-            </button>
+              <button
+                type="submit"
+                form="guestProfileForm"
+                disabled={isSubmitting || uploadingType}
+                className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-[10px] font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-indigo-600 shadow-indigo-500/30 hover:bg-indigo-700 hover:shadow-indigo-500/40'}`}
+              >
+                <RefreshCw size={14} className={isSubmitting ? 'animate-spin' : ''} />
+                <span>Update Profile</span>
+              </button>
 
-            <button
-              type="button"
-              onClick={() => window.print()}
-              className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-[9px] font-black tracking-widest uppercase transition-all active:scale-95 ${isDark ? 'border-slate-700 text-slate-400 hover:bg-slate-800' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
-            >
-              <Printer size={12} />
-              <span>Print</span>
-            </button>
+              <div className="mx-2 h-8 w-px bg-slate-200 dark:bg-slate-700"></div>
 
-            <button
-              type="button"
-              onClick={onClose}
-              className={`ml-2 text-[9px] font-black tracking-widest uppercase transition-all ${isDark ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600'}`}
-            >
-              Close
-            </button>
-          </div>
+              <button
+                type="button"
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 shadow-sm transition-all hover:bg-slate-50 hover:text-blue-500 active:scale-95 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+              >
+                <ArrowLeftRight size={14} />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 shadow-sm transition-all hover:bg-slate-50 hover:text-blue-500 active:scale-95 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+              >
+                <Printer size={16} />
+              </button>
+
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 shadow-sm transition-all hover:bg-slate-50 hover:text-red-500 active:scale-95 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          </form>
+
           <DocumentModal
             isOpen={showDocForm}
             onClose={() => setShowDocForm(false)}

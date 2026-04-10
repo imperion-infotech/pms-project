@@ -2,7 +2,7 @@
  * usePmsGuests.js - Guest Data Management Hook
  *
  * Yeh hook Guest ki details (Personal Details) ko handle karta hai.
- * Iska kaam hai data lana (Fetch), naya guest banana (Add), 
+ * Iska kaam hai data lana (Fetch), naya guest banana (Add),
  * update karna, aur delete karna.
  */
 import { useCallback } from 'react'
@@ -14,7 +14,7 @@ const extractData = (res) => res.data?.content || (Array.isArray(res.data) ? res
 
 /**
  * usePmsGuests - Ultra-Professional Data Handling
- * 
+ *
  * Yeh hook Guest profiles ko manage karta hai.
  * React Query ka use karne se background sync aur caching automatic ho jati hai.
  */
@@ -23,10 +23,10 @@ export const usePmsGuests = () => {
   const toast = useToast()
 
   // 1. QUERY: Get all guest profiles
-  const { 
-    data: personalDetails = [], 
-    isLoading, 
-    refetch: fetchPersonalDetails 
+  const {
+    data: personalDetails = [],
+    isLoading,
+    refetch: fetchPersonalDetails,
   } = useQuery({
     queryKey: ['guests'],
     queryFn: async () => {
@@ -45,37 +45,46 @@ export const usePmsGuests = () => {
       if (type === 'delete') return propertyService.deletePersonalDetail(id)
     },
     onSuccess: (res, variables) => {
-      const messages = { 
-        create: 'Guest profile created', 
-        update: 'Guest profile updated', 
-        delete: 'Guest profile deleted' 
+      const messages = {
+        create: 'Guest profile created',
+        update: 'Guest profile updated',
+        delete: 'Guest profile deleted',
       }
       toast.success(messages[variables.type])
       queryClient.invalidateQueries(['guests'])
     },
     onError: (err) => {
       toast.error(err.response?.data?.message || 'Operation failed')
-    }
+    },
   })
 
   const addPersonalDetail = (payload) => guestMutation.mutateAsync({ payload, type: 'create' })
-  const updatePersonalDetail = (id, payload) => guestMutation.mutateAsync({ id, payload, type: 'update' })
+  const updatePersonalDetail = (id, payload) =>
+    guestMutation.mutateAsync({ id, payload, type: 'update' })
   const deletePersonalDetail = (id) => guestMutation.mutateAsync({ id, type: 'delete' })
 
   // Specific fetch logic (not strictly a query if it's one-off, but we can make it one)
-  const fetchPersonalDetailById = useCallback(async (id) => {
-     try {
-       return await propertyService.getPersonalDetailById(id)
-     } catch (err) {
-       toast.error('Failed to fetch guest profile')
-       throw err
-     }
-  }, [toast])
+  const fetchPersonalDetailById = useCallback(
+    async (id) => {
+      try {
+        return await propertyService.getPersonalDetailById(id)
+      } catch (err) {
+        toast.error('Failed to fetch guest profile')
+        throw err
+      }
+    },
+    [toast],
+  )
 
   const searchPersonalDetails = async (query) => {
     const res = await propertyService.searchPersonalDetails(query)
     queryClient.setQueryData(['guests'], extractData(res))
   }
+
+  const fetchFolioNo = useCallback(async () => {
+    const res = await propertyService.getFolioNo()
+    return res.data
+  }, [])
 
   return {
     personalDetails,
@@ -86,10 +95,6 @@ export const usePmsGuests = () => {
     updatePersonalDetail,
     deletePersonalDetail,
     searchPersonalDetails,
-    fetchFolioNo: async () => {
-      const res = await propertyService.getFolioNo()
-      return res.data
-    },
+    fetchFolioNo,
   }
 }
-
