@@ -108,7 +108,7 @@ public class RentDetailsController {
 			existingRentDetails.setCcAuthorized(rentDetails.getCcAuthorized());
 			existingRentDetails.setDeposite(rentDetails.getDeposite());
 			existingRentDetails.setDiscount(rentDetails.getDiscount());
-			existingRentDetails.setOtherChanrges(rentDetails.getOtherChanrges());
+			existingRentDetails.setOtherCharges(rentDetails.getOtherCharges());
 			existingRentDetails.setPayments(rentDetails.getPayments());
 			existingRentDetails.setRent(rentDetails.getRent());
 			existingRentDetails.setTaxId(rentDetails.getTaxId());

@@ -13,18 +13,17 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pms.document.entity.DocumentDetails;
-import com.pms.guestdetails.GuestDetails;
 import com.pms.personaldetails.controller.ContactInformationTypeEnum;
-import com.pms.stay.entity.StayStatusEnum;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -108,6 +107,8 @@ static final Logger logger = LoggerFactory.getLogger(PersonalDetails.class);
     
     private String crsFolioNo;
     
+    @Enumerated(EnumType.STRING)
+    @Column(name = "contact_information_type_enum")
     private ContactInformationTypeEnum contactInformationTypeEnum =ContactInformationTypeEnum.HOME ;
     
 	public ContactInformationTypeEnum getContactInformationTypeEnum() {

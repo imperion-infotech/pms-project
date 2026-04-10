@@ -7,14 +7,16 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.pms.paymentdetails.entity.PaymentDetails;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,7 +36,6 @@ import lombok.Setter;
 @Data
 public class PaymentType implements Serializable{
 	
-static final Logger logger = LoggerFactory.getLogger(PaymentType.class);
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -62,6 +63,10 @@ static final Logger logger = LoggerFactory.getLogger(PaymentType.class);
 	@Column(name="created_on", nullable = false, updatable = false)
 	@CreationTimestamp // Automatically sets value when entity is persisted
 	private Date createdOn;
+	
+	@ManyToOne
+	@JoinColumn(name = "payment_details_id")
+	private PaymentDetails paymentDetails;
 	
 	public Integer getId() {
 		return id;

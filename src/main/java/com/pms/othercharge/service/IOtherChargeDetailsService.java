@@ -1,0 +1,21 @@
+/**
+ * 
+ */
+package com.pms.othercharge.service;
+
+import java.util.List;
+
+import com.pms.othercharge.entity.OtherCharge;
+import com.pms.othercharge.entity.OtherChargeDetails;
+
+/**
+ * 
+ */
+public interface IOtherChargeDetailsService {
+	
+	List<OtherChargeDetails> getAllOtherChargeDetails();
+	OtherChargeDetails createOtherChargeDetails(OtherChargeDetails otherChargeDetails);
+	OtherChargeDetails updateOtherChargeDetails(int otherChargeDetailsId, OtherChargeDetails otherChargeDetails);
+	OtherChargeDetails getOtherChargeDetailsById(Integer id);
+	public boolean deleteOtherChargeDetails(int otherChargeDetailsId);
+}

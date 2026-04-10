@@ -37,7 +37,7 @@ import lombok.Setter;
 @Data
 public class OtherCharge implements Serializable{
 	
-static final Logger logger = LoggerFactory.getLogger(PaymentType.class);
+static final Logger logger = LoggerFactory.getLogger(OtherCharge.class);
 	
 	private static final long serialVersionUID = 1L;
 	

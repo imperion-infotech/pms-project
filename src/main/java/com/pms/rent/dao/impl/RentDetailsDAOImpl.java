@@ -70,7 +70,7 @@ static final Logger logger = LoggerFactory.getLogger(RentDetailsDAOImpl.class);
 		rentDetailsDB.setCcAuthorized(rentDetail.getCcAuthorized());
 		rentDetailsDB.setDeposite(rentDetail.getDeposite());
 		rentDetailsDB.setDiscount(rentDetail.getDiscount());
-		rentDetailsDB.setOtherChanrges(rentDetail.getOtherChanrges());
+		rentDetailsDB.setOtherCharges(rentDetail.getOtherCharges());
 		rentDetailsDB.setPayments(rentDetail.getPayments());
 		rentDetailsDB.setRent(rentDetail.getRent());
 		rentDetailsDB.setTaxMaster(rentDetail.getTaxMaster());

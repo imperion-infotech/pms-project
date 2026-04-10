@@ -31,7 +31,7 @@ import com.pms.util.SnowflakeUtil;
 @RestController
 public class OtherChargeController {
 	
-	private static final Logger logger = LoggerFactory.getLogger(PaymentTypeController.class);
+	private static final Logger logger = LoggerFactory.getLogger(OtherChargeController.class);
 
 	@Autowired
 	private IOtherChargeService service;

@@ -47,8 +47,6 @@ public class PaymentTypeServiceImpl implements IPaymentTypeService {
 	
 	public PaymentType updatePaymentType(int paymentTypeId, PaymentType paymentType) {
 		
-		//First We are taking Book detail from database by given book id and 
-		// then updating detail with provided book object
 		PaymentType paymentTypeFromDB = getPaymentTypeById(paymentTypeId);
 		paymentTypeFromDB.setCategoryName(paymentType.getCategoryName());
 		paymentTypeFromDB.setCreatedOn(paymentType.getCreatedOn());
@@ -57,7 +55,6 @@ public class PaymentTypeServiceImpl implements IPaymentTypeService {
 		paymentTypeFromDB.setCreditCardProcessing(paymentType.isCreditCardProcessing());
 		paymentTypeFromDB.setPaymentTypeShortName(paymentType.getPaymentTypeShortName());
 		paymentTypeRepository.saveAndFlush(paymentTypeFromDB);
-		//again i am taking updated result of book and returning the book object
 		PaymentType updatedPaymentType = getPaymentTypeById(paymentTypeId);
 		return updatedPaymentType;
 	}

@@ -66,7 +66,7 @@ static final Logger logger = LoggerFactory.getLogger(RentDetails.class);
 	private Double totalRental;
 	
 	@Column(name="other_charges")
-	private Double otherChanrges;
+	private Double otherCharges;
 	
 	@Column(name="discount")
 	private Double discount;
@@ -181,12 +181,12 @@ static final Logger logger = LoggerFactory.getLogger(RentDetails.class);
 		this.totalRental = totalRental;
 	}
 
-	public Double getOtherChanrges() {
-		return otherChanrges;
+	public Double getOtherCharges() {
+		return otherCharges;
 	}
 
-	public void setOtherChanrges(Double otherChanrges) {
-		this.otherChanrges = otherChanrges;
+	public void setOtherCharges(Double otherCharges) {
+		this.otherCharges = otherCharges;
 	}
 
 	public Double getDiscount() {
