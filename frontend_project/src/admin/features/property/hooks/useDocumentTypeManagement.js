@@ -1,9 +1,12 @@
 import { useState, useCallback } from 'react'
+import { usePmsDocumentTypes } from '../../../../hooks/usePmsDocumentTypes'
 
 /**
  * useDocumentTypeManagement - Centralized hook for Document Type CRUD operations.
+ * Ported to TanStack Query for industrial stability.
  */
-export const useDocumentTypeManagement = ({ addDocumentType, updateDocumentType, toggleModal }) => {
+export const useDocumentTypeManagement = ({ toggleModal }) => {
+  const { addDocumentType, updateDocumentType } = usePmsDocumentTypes()
   const [newDocumentType, setNewDocumentType] = useState({
     id: 0,
     documentTypeShortName: '',

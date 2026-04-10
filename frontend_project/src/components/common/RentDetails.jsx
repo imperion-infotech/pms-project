@@ -12,9 +12,9 @@ const FieldRow = ({
   options = [],
 }) => {
   const containerClass =
-    'flex items-center justify-between py-2 border-b border-dashed border-slate-200 dark:border-slate-700/50'
+    'flex items-center justify-between py-1.5 border-b border-dashed border-slate-200 dark:border-slate-700/50'
   const labelClass = 'text-[10px] font-bold text-slate-500 uppercase tracking-widest'
-  const inputContainerClass = `flex items-center px-4 py-2 rounded-xl border transition-all w-32 ${
+  const inputContainerClass = `flex items-center px-4 py-1 rounded-xl border transition-all w-32 ${
     isDark
       ? 'bg-slate-800/30 border-slate-700 focus-within:border-blue-500/50'
       : 'bg-white border-slate-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 shadow-sm'
@@ -32,6 +32,7 @@ const FieldRow = ({
       <div className={inputContainerClass}>
         {type === 'select' ? (
           <select
+            required
             name={name}
             value={formData[name] || ''}
             onChange={handleChange}
@@ -46,6 +47,7 @@ const FieldRow = ({
           </select>
         ) : (
           <input
+            required
             type="number"
             name={name}
             value={formData[name] || ''}
@@ -65,7 +67,7 @@ const RentDetails = ({ formData, handleChange, isDark = false, taxes = [] }) => 
     <div className="flex h-full flex-col font-sans">
       <div className="flex-1 space-y-1">
         <FieldRow
-          label="Rent"
+          label={<>Rent <span className="text-red-500">*</span></>}
           name="rent"
           colorClass="text-blue-600 dark:text-blue-400"
           formData={formData}
@@ -80,7 +82,7 @@ const RentDetails = ({ formData, handleChange, isDark = false, taxes = [] }) => 
           isDark={isDark}
         />
         <FieldRow
-          label="Tax"
+          label={<>Tax <span className="text-red-500">*</span></>}
           name="taxId"
           type="select"
           options={taxes.map((t) => ({ id: t.id, name: t.taxMasterName }))}

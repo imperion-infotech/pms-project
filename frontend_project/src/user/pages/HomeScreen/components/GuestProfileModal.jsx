@@ -28,6 +28,8 @@ import { propertyService } from '../../../../services/propertyService'
 import ImageUpload from './roomAction/ImageUpload'
 import DocumentModal from './roomAction/DocumentModal'
 import StaySpecifications from '../../../../components/common/StaySpecifications'
+import GuestInformation from '../../../../components/common/GuestInformation'
+import RentDetails from '../../../../components/common/RentDetails'
 import { AuthImage } from '../../../../admin/components/common/AuthImage'
 
 /**
@@ -67,6 +69,11 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
     buildings,
     floors,
     roomTypes,
+    taxes,
+    addRentDetail,
+    updateRentDetail,
+    addGuestDetail,
+    updateGuestDetail,
   } = usePmsData()
   const [localPreviews, setLocalPreviews] = useState({ profilePhoto: null, signature: null })
 
@@ -80,6 +87,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
     address: '',
     profilePhoto: '',
     signature: '',
+    contactInformationTypeEnum: 'HOME',
     documents: [],
     // Stay Details
     stayId: null,
@@ -91,6 +99,28 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
     rateTypeEnum: 'RACK',
     noOfGuest: 1,
     stayStatusEnum: 'CONFIRMED',
+    // Temporal
+    checkInId: null,
+    guestDetailId: null,
+    checkInDate: '',
+    checkOutDate: '',
+    checkInTime: '',
+    checkOutTime: '',
+    guestDetailsStatus: 'Reservation',
+    noOfDays: 1,
+    // Rent
+    rentId: null,
+    rent: '',
+    basic: '',
+    taxId: '',
+    totalRental: '',
+    otherCharges: '',
+    discount: '',
+    totalCharges: '',
+    payments: '',
+    ccAuthorized: '',
+    deposite: '',
+    balance: '',
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -99,32 +129,35 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
   const [showDocForm, setShowDocForm] = useState(false)
   const [editingDocIndex, setEditingDocIndex] = useState(-1)
 
-  // Synchronize component state with room data when modal opens
+  // 1. Initial Data Fetching & Synchronization
   useEffect(() => {
-    if (room) {
-      // Check for nested profile or flat fields on the room object
-      const p = room.profile || room
+    if (!isOpen) return
 
-      let fName = p.firstName || ''
-      let lName = p.lastName || ''
+    const loadData = async () => {
+      const targetId = room?.profile?.id || room?.personalDetailId || room?.profileId
+      
+      // Base data from room object
+      const baseProfile = room?.profile || (room?.firstName ? room : {})
+      let fName = baseProfile.firstName || ''
+      let lName = baseProfile.lastName || ''
 
-      // Fallback: split personalDetailName if first/last name fields are empty
-      if (!fName && p.personalDetailName) {
-        const parts = p.personalDetailName.split(' ')
+      if (!fName && baseProfile.personalDetailName) {
+        const parts = baseProfile.personalDetailName.split(' ')
         fName = parts[0] || ''
         lName = parts.slice(1).join(' ') || ''
       }
 
-      setFormData({
+      const initialForm = {
         firstName: fName,
         lastName: lName,
-        companyName: p.companyName || '',
-        phone: p.phone || '',
-        email: p.email || '',
-        address: p.address || '',
-        profilePhoto: p.profilePhoto || '',
-        signature: p.signature || '',
-        // Initialize stay fields from the current room
+        companyName: baseProfile.companyName || '',
+        phone: baseProfile.phone || '',
+        email: baseProfile.email || '',
+        address: baseProfile.address || '',
+        profilePhoto: baseProfile.profilePhoto || '',
+        signature: baseProfile.signature || '',
+        contactInformationTypeEnum: baseProfile.contactInformationTypeEnum || 'HOME',
+        // Stay & Temporal
         floorId: room.floorId || '',
         buildingId: room.buildingId || '',
         roomTypeId: room.roomTypeId || '',
@@ -133,87 +166,73 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
         rateTypeEnum: 'RACK',
         noOfGuest: 1,
         stayStatusEnum: 'CONFIRMED',
-      })
-    } else {
-      // Reset form for fresh entry
-      setFormData({
-        firstName: '',
-        lastName: '',
-        companyName: '',
-        phone: '',
-        email: '',
-        address: '',
-        profilePhoto: '',
-        signature: '',
-        documents: [],
-      })
+        checkInId: room.checkInId || null,
+        guestDetailId: room.guestDetailId || null,
+        checkInDate: room.checkInDate ? room.checkInDate.split('T')[0] : '',
+        checkOutDate: room.checkOutDate ? room.checkOutDate.split('T')[0] : '',
+        checkInTime: room.checkInTime || '',
+        checkOutTime: room.checkOutTime || '',
+        guestDetailsStatus: room.guestDetailsStatus || 'Reservation',
+        noOfDays: room.noOfDays || 1,
+        // Rent
+        rentId: room.rentDetailsId || room.rentId || null,
+        rent: room.rentDetails?.rent || '',
+        basic: room.rentDetails?.basic || '',
+        taxId: room.rentDetails?.taxId || '',
+        totalRental: room.rentDetails?.totalRental || '',
+        otherCharges: room.rentDetails?.otherCharges || '',
+        discount: room.rentDetails?.discount || '',
+        totalCharges: room.rentDetails?.totalCharges || '',
+        payments: room.rentDetails?.payments || '',
+        ccAuthorized: room.rentDetails?.ccAuthorized || '',
+        deposite: room.rentDetails?.deposite || '',
+        balance: room.rentDetails?.balance || '',
+      }
+
+      // 2. Fetch Fresh Data if ID exists
+      if (targetId) {
+        try {
+          const [profileRes] = await Promise.all([
+            fetchPersonalDetailById(targetId),
+            fetchDocumentDetailsByPersonalDetailId(targetId)
+          ])
+          
+          if (profileRes?.data) {
+            const p = profileRes.data
+            setFormData({
+              ...initialForm,
+              firstName: p.firstName || fName,
+              lastName: p.lastName || lName,
+              companyName: p.companyName || initialForm.companyName,
+              phone: p.phone || initialForm.phone,
+              email: p.email || initialForm.email,
+              address: p.address || initialForm.address,
+              profilePhoto: p.profilePhoto || initialForm.profilePhoto,
+              signature: p.signature || initialForm.signature,
+              contactInformationTypeEnum: p.contactInformationTypeEnum || 'HOME',
+            })
+            return // Successfully loaded fresh data
+          }
+        } catch (err) {
+          console.error('Core Data Load Error:', err)
+        }
+      } else {
+        setDocumentDetails([])
+      }
+
+      setFormData(initialForm)
     }
-  }, [room, isOpen])
+
+    loadData()
+  }, [room, isOpen, fetchPersonalDetailById, fetchDocumentDetailsByPersonalDetailId, setDocumentDetails])
 
   // Cleanup previews on modal close
   useEffect(() => {
     if (!isOpen) {
-      if (localPreviews.profilePhoto) URL.revokeObjectURL(localPreviews.profilePhoto)
-      if (localPreviews.signature) URL.revokeObjectURL(localPreviews.signature)
+      Object.values(localPreviews).forEach(p => p && URL.revokeObjectURL(p))
       setLocalPreviews({ profilePhoto: null, signature: null })
     }
-  }, [isOpen, localPreviews.profilePhoto, localPreviews.signature])
-
-  // FETCH FRESH DATA: Ensure we have the latest details from the API when opening
-  useEffect(() => {
-    const fetchLatestDetails = async () => {
-      // Find the ID to fetch from multiple sources
-      // FIXED: Removed room?.id fallback because room ID is not a personal detail ID
-      const targetId = room?.profile?.id || room?.personalDetailId || room?.profileId
-
-      if (isOpen && targetId) {
-        try {
-          const response = await fetchPersonalDetailById(targetId)
-          const p = response.data
-
-          if (p) {
-            setFormData({
-              firstName: p.firstName || '',
-              lastName: p.lastName || '',
-              companyName: p.companyName || '',
-              phone: p.phone || '',
-              email: p.email || '',
-              address: p.address || '',
-              profilePhoto: p.profilePhoto || '',
-              signature: p.signature || '',
-            })
-          }
-        } catch (err) {
-          console.error('API Fetch Error:', err)
-        }
-      } else if (isOpen && room?.profile) {
-        // Fallback to profile data from HomeScreen if API fetch target not found
-        const p = room.profile
-        setFormData({
-          firstName: p.firstName || '',
-          lastName: p.lastName || '',
-          companyName: p.companyName || '',
-          phone: p.phone || '',
-          email: p.email || '',
-          address: p.address || '',
-          profilePhoto: p.profilePhoto || '',
-          signature: p.signature || '',
-        })
-      }
-    }
-
-    fetchLatestDetails()
-  }, [room, isOpen, fetchPersonalDetailById])
-
-  // NEW: Synchronize document details when profile is loaded
-  useEffect(() => {
-    const targetId = room?.profile?.id || room?.personalDetailId || room?.profileId
-    if (isOpen && targetId) {
-      fetchDocumentDetailsByPersonalDetailId(targetId)
-    } else if (isOpen) {
-      setDocumentDetails([])
-    }
-  }, [room, isOpen, fetchDocumentDetailsByPersonalDetailId, setDocumentDetails])
+  }, [isOpen, localPreviews])
 
   if (!isOpen || !room) return null
 
@@ -339,84 +358,124 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
 
   const handleSubmit = async (e, forcedStatusName = null) => {
     if (e) e.preventDefault()
-    if (!formData.firstName || !formData.lastName || !formData.phone || !formData.email) {
-      alert('Missing required fields: Name, Phone, and Email are mandatory.')
+    
+    const requiredFields = ['firstName', 'lastName', 'phone', 'email']
+    const missing = requiredFields.filter(f => !formData[f])
+    if (missing.length > 0) {
+      alert(`Missing required fields: ${missing.join(', ')}`)
       return
     }
+
     setIsSubmitting(true)
     try {
-      const targetProfileId = profile?.id || room?.personalDetailId
-      const payload = {
+      const targetProfileId = profile?.id || room?.personalDetailId || room?.profileId
+      
+      // 1. Personal Detail
+      const personalPayload = {
         ...formData,
-        mobileNumber: formData.phone, // Map phone to mobileNumber for backend consistency
-        id: isExisting ? targetProfileId : 0,
-        roomId: room.id,
-        roomName: room.roomName,
+        contactInformationTypeEnum: formData.contactInformationTypeEnum || 'HOME',
+        phone: formData.phone,
+        mobileNumber: formData.phone,
+        id: targetProfileId || 0
       }
 
-      let finalProfileId = targetProfileId
-      if (isExisting && targetProfileId) {
-        await updatePersonalDetail(targetProfileId, payload)
-      } else {
-        const result = await addPersonalDetail(payload)
-        // Link the newly created profile ID back to the room
-        finalProfileId = result?.data?.id || result?.data
-      }
+      const res = isExisting && targetProfileId 
+        ? await updatePersonalDetail(targetProfileId, personalPayload)
+        : await addPersonalDetail(personalPayload)
+      
+      const finalProfileId = res?.data?.id || res?.data || targetProfileId
 
-      // 2. Save local documents if this was a new profile
+      // 2. Documents (only for new profiles)
       if (!isExisting && formData.documents?.length > 0 && finalProfileId) {
-        for (const doc of formData.documents) {
-          await addDocumentDetail({
-            ...doc,
-            personalDetailsId: finalProfileId,
-          })
-        }
+        await Promise.all(formData.documents.map(doc => 
+          addDocumentDetail({ ...doc, personalDetailsId: finalProfileId })
+        ))
       }
 
-      // 3. Create Stay Detail
+      // 3. Rent Detail
+      const rentPayload = {
+        rent: Number(formData.rent) || 0,
+        basic: Number(formData.basic) || 0,
+        taxId: formData.taxId ? Number(formData.taxId) : undefined,
+        totalRental: Number(formData.totalRental) || 0,
+        otherCharges: Number(formData.otherCharges) || 0,
+        discount: Number(formData.discount) || 0,
+        totalCharges: Number(formData.totalCharges) || 0,
+        payments: Number(formData.payments) || 0,
+        ccAuthorized: Number(formData.ccAuthorized) || 0,
+        deposite: Number(formData.deposite) || 0,
+        balance: Number(formData.balance) || 0,
+        deleted: false,
+      }
+
+      const rentRes = formData.rentId 
+        ? await updateRentDetail(formData.rentId, rentPayload)
+        : await addRentDetail(rentPayload)
+      const finalRentId = rentRes?.data?.id || rentRes?.data || formData.rentId
+
+      // 4. Stay Detail
       const stayPayload = {
-        floorId: formData.floorId ? Number(formData.floorId) : undefined,
-        buildingId: formData.buildingId ? Number(formData.buildingId) : undefined,
-        roomTypeId: formData.roomTypeId ? Number(formData.roomTypeId) : undefined,
-        roomMasterId: formData.roomMasterId ? Number(formData.roomMasterId) : Number(room.id),
-        comment: formData.comment,
+        floorId: Number(formData.floorId) || undefined,
+        buildingId: Number(formData.buildingId) || undefined,
+        roomTypeId: Number(formData.roomTypeId) || undefined,
+        roomMasterId: Number(formData.roomMasterId || room.id),
+        comment: formData.comment || '',
         rateTypeEnum: formData.rateTypeEnum || 'RACK',
         noOfGuest: Number(formData.noOfGuest) || 1,
-        stayStatusEnum: forcedStatusName
-          ? forcedStatusName.toLowerCase().includes('reserv')
-            ? 'RESERVED'
-            : 'CONFIRMED'
-          : formData.stayStatusEnum,
+        stayStatusEnum: forcedStatusName?.toLowerCase().includes('reserv') ? 'RESERVED' : (formData.stayStatusEnum || 'CONFIRMED'),
         personalDetailId: finalProfileId,
       }
-      await addStayDetail(stayPayload)
+      const stayRes = await addStayDetail(stayPayload)
+      const finalStayId = stayRes?.data?.id || stayRes?.data
 
+      // 5. Guest Detail Integration
+      const guestStatusValue = forcedStatusName || formData.guestDetailsStatus || 'Reservation'
+      const guestPayload = {
+        roomMasterId: Number(formData.roomMasterId || room.id),
+        personalDetailsId: finalProfileId,
+        rentDetailsId: finalRentId,
+        stayDetailsId: finalStayId,
+        checkInDate: formData.checkInDate ? (formData.checkInDate.includes('T') ? formData.checkInDate : `${formData.checkInDate}T00:00:00.000Z`) : null,
+        checkOutDate: formData.checkOutDate ? (formData.checkOutDate.includes('T') ? formData.checkOutDate : `${formData.checkOutDate}T00:00:00.000Z`) : null,
+        checkInTime: formData.checkInTime || '00:00:00',
+        checkOutTime: formData.checkOutTime || '00:00:00',
+        noOfDays: Number(formData.noOfDays) || 1,
+        guestDetailsStatus: guestStatusValue,
+      }
+
+      if (formData.guestDetailId) {
+        await updateGuestDetail(formData.guestDetailId, guestPayload)
+      } else {
+        await addGuestDetail(guestPayload)
+      }
+
+      // 6. Final Room Status Update
       if (forcedStatusName) {
-        const targetStatus = roomStatuses.find((s) => {
+        const targetStatus = roomStatuses.find(s => {
           const name = (s.roomStatusName || '').toLowerCase()
           const short = (s.shortName || '').toLowerCase()
           const target = forcedStatusName.toLowerCase()
-          if (target === 'reservation') return name.includes('reserv') || short.includes('res')
-          return name.includes(target) || short.includes(target)
+          return target === 'reservation' ? (name.includes('reserv') || short.includes('res')) : (name.includes(target) || short.includes(target))
         })
 
         if (targetStatus) {
-          const originalRoom = rawRooms.find((r) => String(r.id) === String(room.id))
+          const originalRoom = rawRooms.find(r => String(r.id) === String(room.id))
           if (originalRoom) {
             await updateRoom(room.id, {
               ...originalRoom,
               roomStatusTableId: targetStatus.id,
               roomStatusId: targetStatus.id,
-              // ENHANCEMENT: Explicitly link guest to room for high-precision mapping
               personalDetailId: finalProfileId,
             })
           }
         }
       }
+
       if (onRefresh) onRefresh()
       onClose()
     } catch (err) {
-      console.error('Operation failed:', err)
+      console.error('Submission failed:', err)
+      alert(err.response?.data?.message || 'Update failed.')
     } finally {
       setIsSubmitting(false)
     }
@@ -436,7 +495,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
           initial={{ scale: 0.95, opacity: 0, y: 30 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0, y: 30 }}
-          className={`relative my-auto flex w-full max-w-5xl flex-col overflow-hidden rounded-[25px] border shadow-2xl transition-all duration-300 ${isDark ? 'bg-surface-50 border-slate-800' : 'border-slate-200 bg-white'}`}
+          className={`relative my-auto flex w-full max-w-7xl flex-col overflow-hidden rounded-[40px] border shadow-2xl transition-all duration-300 ${isDark ? 'bg-surface-50 border-slate-800' : 'border-slate-200 bg-white'}`}
         >
           {/* Header */}
           <div
@@ -476,12 +535,12 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 sm:px-6 sm:pb-6">
-            <form id="guestProfileForm" onSubmit={handleSubmit}>
-              <div className="flex flex-col gap-5 md:flex-row">
-                {/* Left Side: Guest Details & Documents */}
-                <div className="flex-1 space-y-4">
-                  <div className="space-y-4">
-                    {/* Guest Assets: Smaller and Horizontal */}
+            <form id="guestProfileForm" onSubmit={handleSubmit} className="flex h-full flex-col overflow-hidden">
+              <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+                {/* Column 1: Identity & Documentation */}
+                <div className="scrollbar-hide flex w-full flex-col border-b border-slate-200 bg-white transition-all lg:w-[32%] lg:border-r lg:border-b-0 dark:border-slate-800 dark:bg-slate-900">
+                  <div className="scrollbar-hide flex-1 space-y-4 overflow-y-auto p-4">
+                    {/* Guest Assets */}
                     <div className="grid grid-cols-2 gap-3">
                       <ImageUpload
                         label="Photo"
@@ -517,22 +576,15 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                       />
                     </div>
 
-                    <div className="flex items-center gap-2 border-l-4 border-emerald-500 pl-3">
-                      <div>
-                        <h3
-                          className={`text-[11px] font-black tracking-widest uppercase ${isDark ? 'text-slate-200' : 'text-slate-800'}`}
-                        >
-                          Guest Details
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2 border-l-4 border-emerald-500 pl-3">
+                        <h3 className={`text-[11px] font-black tracking-widest uppercase ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                          Background Info
                         </h3>
-                        <p className="mt-0.5 text-[8px] font-bold tracking-widest text-slate-400 uppercase">
-                          Please provide accurate information
-                        </p>
                       </div>
-                    </div>
-                    <div className="space-y-3">
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className={labelClass}>First Name :</label>
+                          <label className={labelClass}>First Name</label>
                           <div className={inputContainerClass}>
                             <User size={16} className="text-slate-400" />
                             <input
@@ -561,24 +613,38 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                             />
                           </div>
                         </div>
-                      </div>
-                      <div>
-                        <label className={labelClass}>Company Name</label>
-                        <div className={inputContainerClass}>
-                          <Building size={16} className="text-slate-400" />
-                          <input
-                            type="text"
-                            name="companyName"
-                            value={formData.companyName}
-                            onChange={handleChange}
-                            placeholder="Company name"
-                            className={inputClass}
-                          />
+                        <div className="col-span-2">
+                          <label className={labelClass}>Company Name</label>
+                          <div className={inputContainerClass}>
+                            <Building size={16} className="text-slate-400" />
+                            <input
+                              type="text"
+                              name="companyName"
+                              value={formData.companyName}
+                              onChange={handleChange}
+                              placeholder="Company name"
+                              className={inputClass}
+                            />
+                          </div>
                         </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
+                        <div className="col-span-2">
+                          <label className={labelClass}>Contact Information Type</label>
+                          <div className={inputContainerClass}>
+                            <ArrowLeftRight size={14} className="text-slate-400" />
+                            <select
+                              name="contactInformationTypeEnum"
+                              value={formData.contactInformationTypeEnum}
+                              onChange={handleChange}
+                              className={inputClass + " cursor-pointer"}
+                            >
+                              <option value="HOME">HOME</option>
+                              <option value="OFFICE">OFFICE</option>
+                              <option value="OTHER">OTHER</option>
+                            </select>
+                          </div>
+                        </div>
                         <div>
-                          <label className={labelClass}>Phone Number</label>
+                          <label className={labelClass}>{formData.contactInformationTypeEnum} Phone Number</label>
                           <div className={inputContainerClass}>
                             <Phone size={16} className="text-slate-400" />
                             <input
@@ -586,14 +652,14 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                               name="phone"
                               value={formData.phone}
                               onChange={handleChange}
-                              placeholder="Phone"
+                              placeholder={formData.contactInformationTypeEnum === 'HOME' ? "Personal Phone" : "Work Phone"}
                               className={inputClass}
                               required
                             />
                           </div>
                         </div>
                         <div>
-                          <label className={labelClass}>Email Address</label>
+                          <label className={labelClass}>{formData.contactInformationTypeEnum} Email Address</label>
                           <div className={inputContainerClass}>
                             <Mail size={16} className="text-slate-400" />
                             <input
@@ -601,175 +667,175 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                               name="email"
                               value={formData.email}
                               onChange={handleChange}
-                              placeholder="Email"
+                              placeholder={formData.contactInformationTypeEnum === 'HOME' ? "Personal Email" : "Work Email"}
                               className={inputClass}
                               required
                             />
                           </div>
                         </div>
-                      </div>
-                      <div>
-                        <label className={labelClass}>Permanent Address</label>
-                        <div className={inputContainerClass}>
-                          <MapPin size={14} className="text-slate-400" />
-                          <textarea
-                            name="address"
-                            value={formData.address}
-                            onChange={handleChange}
-                            placeholder="Address"
-                            className={`${inputClass} min-h-[40px] resize-none`}
-                            required
-                          />
+                        <div className="col-span-2">
+                          <label className={labelClass}>{formData.contactInformationTypeEnum} Full Address</label>
+                          <div className={inputContainerClass}>
+                            <MapPin size={14} className="text-slate-400" />
+                            <textarea
+                              name="address"
+                              value={formData.address}
+                              onChange={handleChange}
+                              placeholder={formData.contactInformationTypeEnum === 'HOME' ? "Residence Address" : "Office Address"}
+                              className={`${inputClass} min-h-[40px] resize-none`}
+                              required
+                            />
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between gap-3 border-l-4 border-emerald-500 pl-3">
-                        <div>
-                          <h3
-                            className={`text-[11px] font-black tracking-widest uppercase ${isDark ? 'text-slate-200' : 'text-slate-800'}`}
-                          >
-                            Documentation
+                      {/* Documentation Section */}
+                      <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center justify-between gap-3 border-l-4 border-emerald-500 pl-3">
+                          <h3 className={`text-[11px] font-black tracking-widest uppercase ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                            ID Documents
                           </h3>
-                          <p className="mt-0.5 text-[8px] font-bold tracking-widest text-slate-400 uppercase">
-                            Identification cards
-                          </p>
+                          <button
+                            type="button"
+                            onClick={() => toggleDocForm()}
+                            className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-600 active:scale-95"
+                          >
+                            <Plus size={16} />
+                          </button>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => toggleDocForm()}
-                          className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-600 active:scale-95"
-                        >
-                          <Plus size={18} />
-                        </button>
-                      </div>
-                      <div
-                        className={`overflow-hidden rounded-2xl border ${isDark ? 'border-slate-800 bg-slate-900/30' : 'border-slate-100 bg-white'}`}
-                      >
-                        <table className="w-full text-left font-bold">
-                          <thead>
-                            <tr
-                              className={`text-[10px] font-black tracking-widest text-slate-400 uppercase ${isDark ? 'bg-slate-900/50' : 'bg-slate-50'}`}
-                            >
-                              <th className="px-4 py-3">Action</th>
-                              <th className="px-4 py-3">Doc & Images</th>
-                              <th className="px-4 py-3">Number & Details</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                            {(profile?.id || room?.personalDetailId
-                              ? documentDetails
-                              : formData.documents || []
-                            ).length > 0 ? (
-                              (profile?.id || room?.personalDetailId
-                                ? documentDetails
-                                : formData.documents || []
-                              ).map((doc, idx) => {
-                                const docType = documentTypes.find(
-                                  (t) => String(t.id) === String(doc.documentTypeId),
-                                )
-                                return (
-                                  <tr
-                                    key={doc.id || idx}
-                                    className="group transition-colors hover:bg-emerald-50/10"
-                                  >
-                                    <td className="px-4 py-3">
-                                      <div className="flex gap-3">
-                                        <button
-                                          type="button"
-                                          onClick={() => toggleDocForm(idx)}
-                                          className="text-slate-400 hover:text-emerald-500"
-                                        >
-                                          <Edit size={12} />
-                                        </button>
-                                        <button
-                                          type="button"
-                                          onClick={() => handleDeleteDocument(doc, idx)}
-                                          className="text-slate-400 hover:text-red-500"
-                                        >
-                                          <Trash2 size={12} />
-                                        </button>
-                                      </div>
-                                    </td>
-                                    <td className="px-4 py-3">
-                                      <div className="flex items-center gap-2">
-                                        <div className="flex gap-1">
-                                          <div className="h-7 w-10 overflow-hidden rounded-md border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
-                                            {doc.frontImagePath ? (
-                                              <AuthImage
-                                                src={`/user/${cleanImageUrl(doc.frontImagePath)}`}
-                                                alt="Front"
-                                                className="h-full w-full object-cover"
-                                              />
-                                            ) : (
-                                              <div className="flex h-full w-full items-center justify-center text-slate-300">
-                                                <Camera size={10} />
-                                              </div>
-                                            )}
-                                          </div>
-                                          <div className="h-7 w-10 overflow-hidden rounded-md border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
-                                            {doc.backImagePath ? (
-                                              <AuthImage
-                                                src={`/user/${cleanImageUrl(doc.backImagePath)}`}
-                                                alt="Back"
-                                                className="h-full w-full object-cover"
-                                              />
-                                            ) : (
-                                              <div className="flex h-full w-full items-center justify-center text-slate-300">
-                                                <Camera size={10} />
-                                              </div>
-                                            )}
-                                          </div>
-                                        </div>
-                                        <div>
-                                          <div className="text-[10px] font-black uppercase">
-                                            {docType?.documentTypeName || 'Unknown'}
-                                          </div>
-                                          {doc.validTill && (
-                                            <div className="text-[7px] font-bold text-slate-400">
-                                              Exp: {doc.validTill}
-                                            </div>
-                                          )}
-                                        </div>
-                                      </div>
-                                    </td>
-                                    <td className="px-4 py-3">
-                                      <div className="font-mono text-[10px] font-bold text-slate-600 dark:text-slate-300">
-                                        {doc.documentNumber}
-                                      </div>
-                                    </td>
-                                  </tr>
-                                )
-                              })
-                            ) : (
-                              <tr>
-                                <td
-                                  colSpan="3"
-                                  className="px-4 py-6 text-center text-[9px] font-black tracking-widest text-slate-400 uppercase"
-                                >
-                                  No Documents
-                                </td>
+                        <div className={`overflow-hidden rounded-2xl border ${isDark ? 'border-slate-800 bg-slate-900/30' : 'border-slate-100 bg-white'}`}>
+                          <table className="w-full text-left font-bold">
+                            <thead>
+                              <tr className={`text-[10px] font-black tracking-widest text-slate-400 uppercase ${isDark ? 'bg-slate-900/50' : 'bg-slate-50'}`}>
+                                <th className="px-4 py-3">Action</th>
+                                <th className="px-4 py-3">Details</th>
                               </tr>
-                            )}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                              {(profile?.id || room?.personalDetailId ? documentDetails : formData.documents || []).length > 0 ? (
+                                (profile?.id || room?.personalDetailId ? documentDetails : formData.documents || []).map((doc, idx) => {
+                                  const docType = documentTypes.find((t) => String(t.id) === String(doc.documentTypeId))
+                                  return (
+                                    <tr key={doc.id || idx} className="group transition-colors hover:bg-emerald-50/10">
+                                      <td className="px-4 py-3">
+                                        <div className="flex gap-2">
+                                          <button type="button" onClick={() => toggleDocForm(idx)} className="text-slate-400 hover:text-emerald-500">
+                                            <Edit size={12} />
+                                          </button>
+                                          <button type="button" onClick={() => handleDeleteDocument(doc, idx)} className="text-slate-400 hover:text-red-500">
+                                            <Trash2 size={12} />
+                                          </button>
+                                        </div>
+                                      </td>
+                                      <td className="px-4 py-3">
+                                        <div className="text-[10px] font-black uppercase text-slate-700 dark:text-slate-200">
+                                          {docType?.documentTypeName || 'Unknown'}
+                                        </div>
+                                        <div className="font-mono text-[9px] font-bold text-slate-400">
+                                          {doc.documentNumber}
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  )
+                                })
+                              ) : (
+                                <tr>
+                                  <td colSpan="2" className="px-4 py-6 text-center text-[9px] font-black tracking-widest text-slate-400 uppercase">
+                                    No Documents
+                                  </td>
+                                </tr>
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Right Side: Stay Specifications */}
-                <div className="w-full md:w-[300px]">
-                  <StaySpecifications
-                    formData={formData}
-                    handleChange={handleChange}
-                    buildings={buildings}
-                    floors={floors}
-                    roomTypes={roomTypes}
-                    rooms={rawRooms}
-                    isDark={isDark}
-                  />
+                {/* Column 2: Guest Info & Stay Selection */}
+                <div className="scrollbar-hide flex w-full flex-col border-b border-slate-200 bg-slate-50/50 transition-all lg:w-[46%] lg:border-r lg:border-b-0 dark:border-slate-800 dark:bg-slate-800/20">
+                  <div className="scrollbar-hide flex-1 space-y-4 overflow-y-auto p-4">
+                    <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                      <div className="flex items-center gap-3 mb-4">
+                         <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30">
+                           <CalendarCheck size={16} className="text-amber-600 dark:text-amber-400" />
+                         </div>
+                         <h3 className="text-[11px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
+                           Guest Information
+                         </h3>
+                      </div>
+                      <GuestInformation
+                        formData={formData}
+                        handleChange={(e) => {
+                          const { name, value } = e.target
+                          let updated = { ...formData, [name]: value }
+                          if (name === 'noOfDays' || name === 'checkInDate') {
+                            const days = parseInt(name === 'noOfDays' ? value : formData.noOfDays || 1) || 1
+                            const start = name === 'checkInDate' ? value : formData.checkInDate
+                            if (start) {
+                              const d = new Date(start)
+                              d.setDate(d.getDate() + days)
+                              updated.checkOutDate = d.toISOString().split('T')[0]
+                              updated.noOfDays = days
+                            }
+                          } else if (name === 'checkOutDate') {
+                            if (formData.checkInDate && value) {
+                              const start = new Date(formData.checkInDate)
+                              const end = new Date(value)
+                              const diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24))
+                              updated.noOfDays = diff >= 0 ? diff : 0
+                            }
+                          }
+                          setFormData(updated)
+                        }}
+                        isDark={isDark}
+                      />
+                    </div>
+
+                    <div className="rounded-2xl border border-amber-100/50 bg-amber-50/50 p-4 dark:border-amber-900/20 dark:bg-amber-900/10">
+                      <div className="flex items-center gap-3 mb-4">
+                         <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30">
+                           <Building size={16} className="text-amber-600 dark:text-amber-400" />
+                         </div>
+                         <h3 className="text-[11px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
+                           Stay Details
+                         </h3>
+                      </div>
+                      <StaySpecifications
+                        formData={formData}
+                        handleChange={handleChange}
+                        buildings={buildings}
+                        floors={floors}
+                        roomTypes={roomTypes}
+                        rooms={rawRooms}
+                        isDark={isDark}
+                        showStatus={true}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 3: Rent / Financial Details */}
+                <div className="scrollbar-hide relative flex w-full flex-col bg-emerald-50/30 transition-all lg:w-[22%] dark:bg-emerald-900/5">
+                  <div className="scrollbar-hide flex-1 overflow-y-auto p-4">
+                    <div className="flex items-center gap-3 mb-4">
+                       <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30">
+                         <FileText size={16} className="text-emerald-600 dark:text-emerald-400" />
+                       </div>
+                       <h3 className="text-[11px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
+                         Rent Details
+                       </h3>
+                    </div>
+                    <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-white p-4 shadow-lg shadow-emerald-500/5 dark:border-emerald-900/30 dark:bg-slate-900">
+                      <RentDetails
+                        formData={formData}
+                        handleChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
+                        taxes={taxes}
+                        isDark={isDark}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </form>

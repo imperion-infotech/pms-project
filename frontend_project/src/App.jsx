@@ -11,6 +11,7 @@ import LoadingProcess from './components/common/LoadingProcess'
 import { ThemeProvider } from './context/ThemeContext'
 import { SidebarProvider } from './context/SidebarContext'
 import { NotificationProvider } from './context/NotificationContext'
+import ErrorBoundary from './components/common/ErrorBoundary' // Added for Industrial Stability
 
 // Components ko lazy-load kiya gaya hai taaki app fast load ho
 const PmsDashboard = lazy(() => import('./admin/pages/PropertyMaster/PmsDashboard'))
@@ -98,52 +99,54 @@ const RootRoute = () => {
 
 function App() {
   return (
-    <NotificationProvider>
-      <ThemeProvider>
-        <SidebarProvider>
-          <BrowserRouter>
-            {/* Suspense: Jab tak page load ho raha hai, tab tak loader dikhata hai */}
-            <Suspense
-              fallback={<LoadingProcess isLoading={true} spinnerOnly={true} fullScreen={true} />}
-            >
-              <Routes>
-                {/* PUBLIC ROUTES - Sab ke liye open hain */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
+    <ErrorBoundary>
+      <NotificationProvider>
+        <ThemeProvider>
+          <SidebarProvider>
+            <BrowserRouter>
+              {/* Suspense: Jab tak page load ho raha hai, tab tak loader dikhata hai */}
+              <Suspense
+                fallback={<LoadingProcess isLoading={true} spinnerOnly={true} fullScreen={true} />}
+              >
+                <Routes>
+                  {/* PUBLIC ROUTES - Sab ke liye open hain */}
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
 
-                {/* SMART ROOT ROUTE - Role check karke sahi jagah bhejta hai */}
-                <Route path="/" element={<RootRoute />} />
+                  {/* SMART ROOT ROUTE - Role check karke sahi jagah bhejta hai */}
+                  <Route path="/" element={<RootRoute />} />
 
-                {/* PROTECTED ADMIN ROUTES - Sirf admin ke liye */}
-                <Route
-                  path="/dashboard"
-                  element={
-                    <AdminRoute>
-                      <PmsDashboard />
-                    </AdminRoute>
-                  }
-                />
+                  {/* PROTECTED ADMIN ROUTES - Sirf admin ke liye */}
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <AdminRoute>
+                        <PmsDashboard />
+                      </AdminRoute>
+                    }
+                  />
 
-                {/* PROTECTED USER ROUTES - Logged-in users ke liye */}
-                <Route
-                  path="/home"
-                  element={
-                    <UserRoute>
-                      <HomeScreen />
-                    </UserRoute>
-                  }
-                />
+                  {/* PROTECTED USER ROUTES - Logged-in users ke liye */}
+                  <Route
+                    path="/home"
+                    element={
+                      <UserRoute>
+                        <HomeScreen />
+                      </UserRoute>
+                    }
+                  />
 
-                {/* 404 FALLBACK - Agar link galat hai toh home par bhej do */}
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
-        </SidebarProvider>
-      </ThemeProvider>
-    </NotificationProvider>
+                  {/* 404 FALLBACK - Agar link galat hai toh home par bhej do */}
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+          </SidebarProvider>
+        </ThemeProvider>
+      </NotificationProvider>
+    </ErrorBoundary>
   )
 }
 

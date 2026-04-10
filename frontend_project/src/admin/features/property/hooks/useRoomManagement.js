@@ -1,21 +1,19 @@
 import { useState } from 'react'
+import { usePmsRooms } from '../../../../hooks/usePmsRooms'
 import { useToast } from '../../../../context/NotificationContext'
 
 /**
  * useRoomManagement - Room se judi saari logic aur state ko handle karne ke liye.
- *
- * Ye hook Room create karne, update karne aur form state manage karne ka kaam karta hai.
- * Isse PmsDashboard.jsx ki complexity kam ho jati hai.
+ * Ported to TanStack Query for industrial stability.
  */
 export const useRoomManagement = ({
   floors,
   roomTypes = [],
   roomStatuses = [],
-  addRoom,
-  updateRoom,
   toggleModal,
 }) => {
   const toast = useToast()
+  const { addRoom, updateRoom } = usePmsRooms()
 
   // Naya Room banane ka state
   const [newRoom, setNewRoom] = useState({
@@ -50,10 +48,10 @@ export const useRoomManagement = ({
    * handleAddRoom - Naya room backend pe save karne ke liye.
    */
   const handleAddRoom = async (e) => {
-    e.preventDefault()
+    if (e) e.preventDefault()
     const isNonRoom = Boolean(newRoom.nonRoom)
 
-    // Validation: Required fields check
+    // Validation
     if (
       !newRoom.roomName ||
       !newRoom.floorId ||
@@ -66,7 +64,6 @@ export const useRoomManagement = ({
 
     const selectedFloor = floors.find((f) => String(f.id) === String(newRoom.floorId))
 
-    // Find fallback IDs for Non-room utility spaces if none selected
     const nonRoomType =
       roomTypes.find(
         (rt) =>
@@ -80,7 +77,6 @@ export const useRoomManagement = ({
           (rs.roomStatusName || '').toLowerCase().includes('n/a'),
       ) || roomStatuses[0]
 
-    // Prepare payload matching the backend schema
     const payload = {
       roomName: newRoom.roomName,
       roomShortName: newRoom.roomName,
@@ -99,7 +95,6 @@ export const useRoomManagement = ({
 
     try {
       await addRoom(payload)
-      // Clear form after success
       setNewRoom({
         roomName: '',
         roomShortName: '',
@@ -121,10 +116,9 @@ export const useRoomManagement = ({
    * handleUpdateRoom - Existing room ko backend pe update karne ke liye.
    */
   const handleUpdateRoom = async (e) => {
-    e.preventDefault()
+    if (e) e.preventDefault()
     const isNonRoom = Boolean(editRoom.nonRoom)
 
-    // Validation
     if (
       !editRoom.roomName ||
       !editRoom.floorId ||
@@ -166,10 +160,9 @@ export const useRoomManagement = ({
   }
 
   /**
-   * handleEditRoom - Raw room data ko form-friendly format mein convert karke edit state mein save karta hai.
+   * handleEditRoom - edit state mein save karta hai.
    */
   const handleEditRoom = (r, allRoomTypes, allRoomStatuses) => {
-    // Robust lookup for IDs supporting multiple backend naming conventions
     const rTypeId = r.roomTypeId || r.room_type_id || r.roomType?.id || r.roomType
     const rStatusId =
       r.roomStatusTableId ||
@@ -177,7 +170,6 @@ export const useRoomManagement = ({
       r.roomStatusTable?.id ||
       r.room_status_table?.id
 
-    // If IDs are missing, attempt lookup by name strings
     const finalTypeId =
       rTypeId ||
       allRoomTypes.find(

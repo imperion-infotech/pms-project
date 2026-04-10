@@ -1,9 +1,12 @@
 import { useState, useCallback } from 'react'
+import { usePmsTaxes } from '../../../../hooks/usePmsTaxes'
 
 /**
  * useTaxManagement - Centralized hook for Tax CRUD operations.
+ * Ported to TanStack Query for industrial stability.
  */
-export const useTaxManagement = ({ addTax, updateTax, toggleModal }) => {
+export const useTaxManagement = ({ toggleModal }) => {
+  const { addTax, updateTax } = usePmsTaxes()
   const [newTax, setNewTax] = useState({
     taxMasterName: '',
     taxTypeEnum: 'Occupancy_tax',

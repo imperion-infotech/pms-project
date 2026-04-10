@@ -19,6 +19,7 @@ import usePmsData from '../../../hooks/usePmsData'
 import { useTheme } from '../../../context/ThemeContext'
 import { useSidebar } from '../../../context/SidebarContext'
 import LoadingProcess from '../../../components/common/LoadingProcess'
+import { RoomCardSkeleton } from '../../../components/common/Skeleton' // Industrial Skeletons
 
 // Layout & UI Components
 import UserSidebar from '../../components/layout/UserSidebar'
@@ -186,7 +187,6 @@ const HomeScreen = () => {
         buildings={buildings}
         roomTypes={roomTypes}
         roomStatuses={roomStatuses}
-        onGoToPms={() => navigate('/')}
       />
 
       <LoadingProcess isLoading={isLoading} barOnly={true} />
@@ -210,12 +210,17 @@ const HomeScreen = () => {
         {/* 3. Main Data Visualization Grid */}
         <main className="custom-scrollbar relative flex-1 overflow-x-hidden overflow-y-auto bg-[#f8fafc] dark:bg-slate-950">
           <div className="mx-auto max-w-[1700px] px-6 py-8">
-            <LoadingProcess
-              isLoading={isLoading}
-              spinnerOnly={true}
-              fullScreen={false}
-              message="Synchronizing property data..."
-            />
+            {/* Industrial Skeleton View - Jab data fetch hota hai */}
+            {isLoading && (
+              <div className="space-y-12">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="space-y-6">
+                    <div className="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded-full" />
+                    <RoomCardSkeleton repeat={12} />
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* ERROR HANDLING UI */}
             {!isLoading && error && (

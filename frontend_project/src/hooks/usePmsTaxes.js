@@ -1,111 +1,55 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { propertyService } from '../services/propertyService'
 import { useToast } from '../context/NotificationContext'
 
 const extractData = (res) => res.data?.content || (Array.isArray(res.data) ? res.data : [])
 
 export const usePmsTaxes = () => {
-  const [taxes, setTaxes] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
+  const queryClient = useQueryClient()
   const toast = useToast()
 
-  const fetchTaxes = useCallback(async () => {
-    setIsLoading(true)
-    try {
+  const { data: taxes = [], isLoading, refetch } = useQuery({
+    queryKey: ['taxes'],
+    queryFn: async () => {
       const res = await propertyService.getTaxMasters()
-      setTaxes(extractData(res))
+      return extractData(res)
+    },
+    staleTime: 1000 * 60 * 15 // Taxes don't change often
+  })
+
+  const mutation = useMutation({
+    mutationFn: ({ id, payload, type }) => {
+      if (type === 'create') return propertyService.createTaxMaster(payload)
+      if (type === 'update') return propertyService.updateTaxMaster(id, payload)
+      if (type === 'delete') return propertyService.deleteTaxMaster(id)
+    },
+    onSuccess: (_, variables) => {
+      const msgs = { create: 'Tax record created', update: 'Tax record updated', delete: 'Tax record deleted' }
+      toast.success(msgs[variables.type])
+      queryClient.invalidateQueries(['taxes'])
+    },
+    onError: (err) => toast.error(err.response?.data?.message || 'Operation failed')
+  })
+
+  const addTax = (payload) => mutation.mutateAsync({ payload, type: 'create' })
+  const updateTax = (id, payload) => mutation.mutateAsync({ id, payload, type: 'update' })
+  const deleteTax = (id) => mutation.mutateAsync({ id, type: 'delete' })
+
+  const getTaxMasterById = useCallback(async (id) => {
+    try {
+      const res = await propertyService.getTaxMasterById(id)
+      return res.data
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to fetch taxes')
-    } finally {
-      setIsLoading(false)
+      toast.error('Failed to fetch tax details')
+      throw err
     }
   }, [toast])
 
-  useEffect(() => {
-    fetchTaxes()
-  }, [fetchTaxes])
-
-  const addTax = useCallback(
-    async (payload) => {
-      try {
-        const res = await propertyService.createTaxMaster(payload)
-        toast.success('Tax record created successfully')
-        fetchTaxes()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to create tax record')
-        throw err
-      }
-    },
-    [fetchTaxes, toast],
-  )
-
-  const updateTax = useCallback(
-    async (id, payload) => {
-      try {
-        const res = await propertyService.updateTaxMaster(id, payload)
-        toast.success('Tax record updated successfully')
-        fetchTaxes()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to update tax record')
-        throw err
-      }
-    },
-    [fetchTaxes, toast],
-  )
-
-  const deleteTax = useCallback(
-    async (id) => {
-      try {
-        const res = await propertyService.deleteTaxMaster(id)
-        toast.success('Tax record deleted successfully')
-        fetchTaxes()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to delete tax record')
-        throw err
-      }
-    },
-    [fetchTaxes, toast],
-  )
-
-  const getTaxMasterById = useCallback(
-    async (id) => {
-      try {
-        const res = await propertyService.getTaxMasterById(id)
-        return res.data
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to fetch tax details')
-        throw err
-      }
-    },
-    [toast],
-  )
-
-  const searchTaxMasters = useCallback(
-    async (query) => {
-      setIsLoading(true)
-      try {
-        const res = await propertyService.searchTaxMasters(query)
-        setTaxes(extractData(res))
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Tax search failed')
-      } finally {
-        setIsLoading(false)
-      }
-    },
-    [toast],
-  )
-
-  return {
-    taxes,
-    isLoading,
-    fetchTaxes,
-    getTaxMasterById,
-    addTax,
-    updateTax,
-    deleteTax,
-    searchTaxMasters,
+  const searchTaxMasters = async (query) => {
+    const res = await propertyService.searchTaxMasters(query)
+    queryClient.setQueryData(['taxes'], extractData(res))
   }
+
+  return { taxes, isLoading, fetchTaxes: refetch, getTaxMasterById, addTax, updateTax, deleteTax, searchTaxMasters }
 }

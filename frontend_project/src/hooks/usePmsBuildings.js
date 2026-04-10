@@ -1,94 +1,59 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { propertyService } from '../services/propertyService'
 import { useToast } from '../context/NotificationContext'
 
 const extractData = (res) => res.data?.content || (Array.isArray(res.data) ? res.data : [])
 
 export const usePmsBuildings = () => {
-  const [buildings, setBuildings] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
+  const queryClient = useQueryClient()
   const toast = useToast()
 
-  const fetchBuildings = useCallback(async () => {
-    setIsLoading(true)
-    try {
+  const {
+    data: buildings = [],
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ['buildings'],
+    queryFn: async () => {
       const res = await propertyService.getBuildings()
-      setBuildings(extractData(res))
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to fetch buildings')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [toast])
-
-  useEffect(() => {
-    fetchBuildings()
-  }, [fetchBuildings])
-
-  const addBuilding = useCallback(
-    async (payload) => {
-      try {
-        const res = await propertyService.createBuilding(payload)
-        toast.success('Building created successfully')
-        fetchBuildings()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to create building')
-        throw err
-      }
+      return extractData(res)
     },
-    [fetchBuildings, toast],
-  )
+    staleTime: 1000 * 60 * 10,
+  })
 
-  const updateBuilding = useCallback(
-    async (id, payload) => {
-      try {
-        const res = await propertyService.updateBuilding(id, payload)
-        toast.success('Building updated successfully')
-        fetchBuildings()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to update building')
-        throw err
-      }
+  const buildingMutation = useMutation({
+    mutationFn: (args) => {
+      const { id, payload, type } = args
+      if (type === 'create') return propertyService.createBuilding(payload)
+      if (type === 'update') return propertyService.updateBuilding(id, payload)
+      if (type === 'delete') return propertyService.deleteBuilding(id)
     },
-    [fetchBuildings, toast],
-  )
+    onSuccess: (res, variables) => {
+      const msgs = {
+        create: 'Building created',
+        update: 'Building updated',
+        delete: 'Building deleted',
+      }
+      toast.success(msgs[variables.type])
+      queryClient.invalidateQueries(['buildings'])
+    },
+    onError: (err) => toast.error(err.response?.data?.message || 'Operation failed'),
+  })
 
-  const deleteBuilding = useCallback(
-    async (id) => {
-      try {
-        const res = await propertyService.deleteBuilding(id)
-        toast.success('Building deleted successfully')
-        fetchBuildings()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to delete building')
-        throw err
-      }
-    },
-    [fetchBuildings, toast],
-  )
+  const addBuilding = (payload) => buildingMutation.mutateAsync({ payload, type: 'create' })
+  const updateBuilding = (id, payload) =>
+    buildingMutation.mutateAsync({ id, payload, type: 'update' })
+  const deleteBuilding = (id) => buildingMutation.mutateAsync({ id, type: 'delete' })
 
-  const searchBuildings = useCallback(
-    async (query) => {
-      setIsLoading(true)
-      try {
-        const res = await propertyService.searchBuildings(query)
-        setBuildings(extractData(res))
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Building search failed')
-      } finally {
-        setIsLoading(false)
-      }
-    },
-    [toast],
-  )
+  const searchBuildings = async (query) => {
+    const res = await propertyService.searchBuildings(query)
+    queryClient.setQueryData(['buildings'], extractData(res))
+  }
 
   return {
     buildings,
     isLoading,
-    fetchBuildings,
+    fetchBuildings: refetch,
     addBuilding,
     updateBuilding,
     deleteBuilding,

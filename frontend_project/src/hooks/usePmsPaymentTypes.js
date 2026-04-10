@@ -1,97 +1,44 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { propertyService } from '../services/propertyService'
 import { useToast } from '../context/NotificationContext'
 
 const extractData = (res) => res.data?.content || (Array.isArray(res.data) ? res.data : [])
 
 export const usePmsPaymentTypes = () => {
-  const [paymentTypes, setPaymentTypes] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
+  const queryClient = useQueryClient()
   const toast = useToast()
 
-  const fetchPaymentTypes = useCallback(async () => {
-    setIsLoading(true)
-    try {
+  const { data: paymentTypes = [], isLoading, refetch } = useQuery({
+    queryKey: ['paymentTypes'],
+    queryFn: async () => {
       const res = await propertyService.getPaymentTypes()
-      setPaymentTypes(extractData(res))
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to fetch payment types')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [toast])
-
-  useEffect(() => {
-    fetchPaymentTypes()
-  }, [fetchPaymentTypes])
-
-  const addPaymentType = useCallback(
-    async (payload) => {
-      try {
-        const res = await propertyService.createPaymentType(payload)
-        toast.success('Payment Type created!')
-        fetchPaymentTypes()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to create payment type')
-        throw err
-      }
+      return extractData(res)
     },
-    [fetchPaymentTypes, toast],
-  )
+    staleTime: 1000 * 60 * 30 // Rare changes
+  })
 
-  const updatePaymentType = useCallback(
-    async (id, payload) => {
-      try {
-        const res = await propertyService.updatePaymentType(id, payload)
-        toast.success('Payment Type updated!')
-        fetchPaymentTypes()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to update payment type')
-        throw err
-      }
+  const mutation = useMutation({
+    mutationFn: ({ id, payload, type }) => {
+      if (type === 'create') return propertyService.createPaymentType(payload)
+      if (type === 'update') return propertyService.updatePaymentType(id, payload)
+      if (type === 'delete') return propertyService.deletePaymentType(id)
     },
-    [fetchPaymentTypes, toast],
-  )
-
-  const deletePaymentType = useCallback(
-    async (id) => {
-      try {
-        const res = await propertyService.deletePaymentType(id)
-        toast.success('Payment Type deleted successfully')
-        fetchPaymentTypes()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to delete payment type')
-        throw err
-      }
+    onSuccess: (_, variables) => {
+      const msgs = { create: 'Payment Type created!', update: 'Payment Type updated!', delete: 'Payment Type deleted' }
+      toast.success(msgs[variables.type])
+      queryClient.invalidateQueries(['paymentTypes'])
     },
-    [fetchPaymentTypes, toast],
-  )
+    onError: (err) => toast.error(err.response?.data?.message || 'Operation failed')
+  })
 
-  const searchPaymentTypes = useCallback(
-    async (query) => {
-      setIsLoading(true)
-      try {
-        const res = await propertyService.searchPaymentTypes(query)
-        setPaymentTypes(extractData(res))
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Payment search failed')
-      } finally {
-        setIsLoading(false)
-      }
-    },
-    [toast],
-  )
+  const addPaymentType = (payload) => mutation.mutateAsync({ payload, type: 'create' })
+  const updatePaymentType = (id, payload) => mutation.mutateAsync({ id, payload, type: 'update' })
+  const deletePaymentType = (id) => mutation.mutateAsync({ id, type: 'delete' })
 
-  return {
-    paymentTypes,
-    isLoading,
-    fetchPaymentTypes,
-    addPaymentType,
-    updatePaymentType,
-    deletePaymentType,
-    searchPaymentTypes,
+  const searchPaymentTypes = async (query) => {
+    const res = await propertyService.searchPaymentTypes(query)
+    queryClient.setQueryData(['paymentTypes'], extractData(res))
   }
+
+  return { paymentTypes, isLoading, fetchPaymentTypes: refetch, addPaymentType, updatePaymentType, deletePaymentType, searchPaymentTypes }
 }

@@ -101,6 +101,9 @@ export const propertyService = {
   searchPersonalDetails: (query) =>
     handleResponse(() => api.get(`/user/personaldetails/search`, { params: { query } })),
 
+  // --- FOLIO NO ---
+  getFolioNo: () => handleResponse(() => api.get('/user/getfoliono')),
+
   // --- DOCUMENT TYPE (Aadhar, PAN, Passport types) ---
   getDocumentTypes: () => handleResponse(() => api.get('/user/getdocumenttypes')),
   getDocumentTypeById: (id) => handleResponse(() => api.get(`/user/getdocumenttypes/${id}`)),

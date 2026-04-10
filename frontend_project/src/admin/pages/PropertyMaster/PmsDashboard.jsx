@@ -58,73 +58,45 @@ const PmsDashboard = () => {
     }
   })
 
-  // Centralized data fetching hook
+  // Centralized data fetching hook (Now minimal due to specialty hooks)
   const {
     floors,
     buildings,
     roomTypes,
     roomStatuses,
     rooms,
-    isLoading,
-    fetchData,
-    addFloor,
-    updateFloor,
-    deleteFloor,
-    addBuilding,
-    updateBuilding,
-    deleteBuilding,
-    addRoomType,
-    updateRoomType,
-    deleteRoomType,
-    addRoomStatus,
-    updateRoomStatus: hookUpdateRoomStatus,
-    deleteRoomStatus,
-    addRoom,
-    updateRoom: hookUpdateRoom,
-    deleteRoom,
-    taxes,
-    addTax,
-    updateTax,
-    deleteTax,
     personalDetails,
-    addPersonalDetail,
-    updatePersonalDetail,
-    deletePersonalDetail,
+    taxes,
     documentTypes,
-    addDocumentType,
-    updateDocumentType,
-    deleteDocumentType,
-    addDocumentDetail,
-    updateDocumentDetail,
-    deleteDocumentDetail,
     documentDetails,
     stayDetails,
-    addStayDetail,
-    updateStayDetail,
-    deleteStayDetail,
     rentDetails,
-    addRentDetail,
-    updateRentDetail,
-    deleteRentDetail,
     guestDetails,
-    addGuestDetail,
-    updateGuestDetail,
+    paymentTypes,
+    otherCharges,
+    isLoading,
+    fetchData,
+    deleteFloor,
+    deleteBuilding,
+    deleteRoomType,
+    deleteRoomStatus,
+    deleteRoom,
+    deleteTax,
+    deletePersonalDetail,
+    deleteDocumentType,
+    deleteDocumentDetail,
+    deleteStayDetail,
+    deleteRentDetail,
     deleteGuestDetail,
+    deletePaymentType,
+    deleteOtherCharge,
     searchRooms,
     searchFloors,
     searchBuildings,
     searchRoomTypes,
     searchRoomStatuses,
     searchDocumentTypes,
-    paymentTypes,
-    addPaymentType,
-    updatePaymentType,
-    deletePaymentType,
     searchPaymentTypes,
-    otherCharges,
-    addOtherCharge,
-    updateOtherCharge,
-    deleteOtherCharge,
     searchOtherCharges,
   } = usePmsData()
 
@@ -160,7 +132,7 @@ const PmsDashboard = () => {
     setModals((prev) => ({ ...prev, [modalName]: isOpen }))
   }, [])
 
-  // Module Logic Hooks
+  // Module Logic Hooks - Ported to autonomous TanStack Query versions
   const {
     newBuilding,
     setNewBuilding,
@@ -169,7 +141,7 @@ const PmsDashboard = () => {
     handleAddBuilding,
     handleUpdateBuilding,
     handleEditBuilding,
-  } = useBuildingManagement({ addBuilding, updateBuilding, toggleModal })
+  } = useBuildingManagement({ toggleModal })
 
   const {
     newFloor,
@@ -179,7 +151,7 @@ const PmsDashboard = () => {
     handleAddFloor,
     handleUpdateFloor,
     handleEditFloor,
-  } = useFloorManagement({ addFloor, updateFloor, toggleModal })
+  } = useFloorManagement({ toggleModal })
 
   const {
     newRoomType,
@@ -189,7 +161,7 @@ const PmsDashboard = () => {
     handleAddRoomType,
     handleUpdateRoomType,
     handleEditRoomType,
-  } = useRoomTypeManagement({ addRoomType, updateRoomType, toggleModal })
+  } = useRoomTypeManagement({ toggleModal })
 
   const {
     newRoomStatus,
@@ -199,11 +171,7 @@ const PmsDashboard = () => {
     handleAddRoomStatus,
     handleUpdateRoomStatus,
     handleEditRoomStatus,
-  } = useRoomStatusManagement({
-    addRoomStatus,
-    updateRoomStatus: hookUpdateRoomStatus,
-    toggleModal,
-  })
+  } = useRoomStatusManagement({ toggleModal })
 
   const {
     newRoom,
@@ -217,13 +185,11 @@ const PmsDashboard = () => {
     floors,
     roomTypes,
     roomStatuses,
-    addRoom,
-    updateRoom: hookUpdateRoom,
     toggleModal,
   })
 
   const { newTax, setNewTax, editTax, setEditTax, handleAddTax, handleUpdateTax, handleEditTax } =
-    useTaxManagement({ addTax, updateTax, toggleModal })
+    useTaxManagement({ toggleModal })
 
   const {
     newDocumentType,
@@ -233,7 +199,7 @@ const PmsDashboard = () => {
     handleAddDocumentType,
     handleUpdateDocumentType,
     handleEditDocumentType,
-  } = useDocumentTypeManagement({ addDocumentType, updateDocumentType, toggleModal })
+  } = useDocumentTypeManagement({ toggleModal })
 
   const {
     newPaymentType,
@@ -243,7 +209,7 @@ const PmsDashboard = () => {
     handleAddPaymentType,
     handleUpdatePaymentType,
     handleEditPaymentType,
-  } = usePaymentTypeManagement({ addPaymentType, updatePaymentType, toggleModal })
+  } = usePaymentTypeManagement({ toggleModal })
 
   const {
     newOtherCharge,
@@ -253,7 +219,7 @@ const PmsDashboard = () => {
     handleAddOtherCharge,
     handleUpdateOtherCharge,
     handleEditOtherCharge,
-  } = useOtherChargeManagement({ addOtherCharge, updateOtherCharge, toggleModal })
+  } = useOtherChargeManagement({ toggleModal })
 
   const {
     personalFormData,
@@ -264,19 +230,7 @@ const PmsDashboard = () => {
     handleUpdatePersonalDetail,
     handleEditPersonalDetail,
     handleAddNewPersonalDetail,
-  } = useGuestPersonalDetailsManagement({
-    addPersonalDetail,
-    updatePersonalDetail,
-    addDocumentDetail,
-    updateDocumentDetail,
-    addStayDetail,
-    updateStayDetail,
-    addGuestDetail,
-    updateGuestDetail,
-    addRentDetail,
-    updateRentDetail,
-    toggleModal,
-  })
+  } = useGuestPersonalDetailsManagement({ toggleModal })
 
   const [uploadingType, setUploadingType] = useState(null)
 
@@ -381,39 +335,38 @@ const PmsDashboard = () => {
 
   // Global Server-side Search implementation
   React.useEffect(() => {
+    // Agar search term khali hai, toh hume manual fetchData ki zaroorat nahi hai
+    // kyunki TanStack Query (useQuery) hooks apne aap initial data fetch kar lete hain.
+    if (!searchTerm.trim()) return
+
     const delayDebounce = setTimeout(() => {
-      if (searchTerm.trim()) {
-        switch (activeItem) {
-          case 'Building':
-            searchBuildings(searchTerm)
-            break
-          case 'Floor':
-            searchFloors(searchTerm)
-            break
-          case 'Room Type':
-            searchRoomTypes(searchTerm)
-            break
-          case 'Room':
-            searchRooms(searchTerm)
-            break
-          case 'Room Status':
-            searchRoomStatuses(searchTerm)
-            break
-          case 'Document Type':
-            searchDocumentTypes(searchTerm)
-            break
-          case 'Payment Type':
-            searchPaymentTypes(searchTerm)
-            break
-          case 'Other Charge':
-            searchOtherCharges(searchTerm)
-            break
-          default:
-            break
-        }
-      } else {
-        // Reset to full list if search is cleared
-        fetchData()
+      switch (activeItem) {
+        case 'Building':
+          searchBuildings(searchTerm)
+          break
+        case 'Floor':
+          searchFloors(searchTerm)
+          break
+        case 'Room Type':
+          searchRoomTypes(searchTerm)
+          break
+        case 'Room':
+          searchRooms(searchTerm)
+          break
+        case 'Room Status':
+          searchRoomStatuses(searchTerm)
+          break
+        case 'Document Type':
+          searchDocumentTypes(searchTerm)
+          break
+        case 'Payment Type':
+          searchPaymentTypes(searchTerm)
+          break
+        case 'Other Charge':
+          searchOtherCharges(searchTerm)
+          break
+        default:
+          break
       }
     }, 600) // 600ms debounce
 
@@ -421,7 +374,6 @@ const PmsDashboard = () => {
   }, [
     searchTerm,
     activeItem,
-    fetchData,
     searchBuildings,
     searchFloors,
     searchRoomStatuses,

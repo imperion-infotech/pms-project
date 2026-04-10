@@ -1,123 +1,64 @@
-import { useState, useCallback } from 'react'
+import { useCallback } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { propertyService } from '../services/propertyService'
 import { useToast } from '../context/NotificationContext'
 
 const extractData = (res) => res.data?.content || (Array.isArray(res.data) ? res.data : [])
 
 export const usePmsDocumentDetails = () => {
-  const [documentDetails, setDocumentDetails] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
+  const queryClient = useQueryClient()
   const toast = useToast()
 
-  const fetchDocumentDetails = useCallback(async () => {
-    setIsLoading(true)
-    try {
+  const { data: documentDetails = [], isLoading, refetch } = useQuery({
+    queryKey: ['documentDetails'],
+    queryFn: async () => {
       const res = await propertyService.getDocumentDetails()
-      const rawData = extractData(res)
-      setDocumentDetails(rawData)
-      return rawData
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to fetch all document details')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [toast])
-
-  const fetchDocumentDetailsByPersonalDetailId = useCallback(
-    async (personalDetailId) => {
-      setIsLoading(true)
-      try {
-        const res = await propertyService.getDocumentDetails()
-        const rawData = extractData(res)
-        const guestDocs = rawData.filter(
-          (item) =>
-            String(item.personalDetails?.id || item.personalDetailsId) === String(personalDetailId),
-        )
-        setDocumentDetails(guestDocs)
-        return guestDocs
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to fetch document details')
-      } finally {
-        setIsLoading(false)
-      }
+      return extractData(res)
     },
-    [toast],
-  )
+    staleTime: 1000 * 60 * 5
+  })
 
-  const addDocumentDetail = useCallback(
-    async (payload) => {
-      console.log('--- Creating Document (Payload) ---:', payload)
-      try {
-        const res = await propertyService.createDocumentDetail(payload)
-        console.log('--- Create Document Success ---:', res.data)
-        toast.success('Document added!')
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to add document')
-        throw err
-      }
+  const mutation = useMutation({
+    mutationFn: ({ id, payload, type }) => {
+      if (type === 'create') return propertyService.createDocumentDetail(payload)
+      if (type === 'update') return propertyService.updateDocumentDetail(id, payload)
+      if (type === 'delete') return propertyService.deleteDocumentDetail(id)
     },
-    [toast],
-  )
-
-  const updateDocumentDetail = useCallback(
-    async (id, payload) => {
-      console.log(`--- Updating Document ID ${id} (Payload) ---:`, payload)
-      try {
-        const res = await propertyService.updateDocumentDetail(id, payload)
-        console.log('--- Update Document Success ---:', res.data)
-        toast.success('Document updated!')
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to update document')
-        throw err
-      }
+    onSuccess: (_, variables) => {
+      const msgs = { create: 'Document added!', update: 'Document updated!', delete: 'Document deleted' }
+      toast.success(msgs[variables.type])
+      queryClient.invalidateQueries(['documentDetails'])
     },
-    [toast],
-  )
+    onError: (err) => toast.error(err.response?.data?.message || 'Operation failed')
+  })
 
-  const deleteDocumentDetail = useCallback(
-    async (id) => {
-      console.log(`--- Deleting Document ID ${id} ---`)
-      try {
-        const res = await propertyService.deleteDocumentDetail(id)
-        console.log('--- Delete Document Success ---:', res.data)
-        toast.success('Document deleted successfully')
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to delete document')
-        throw err
-      }
-    },
-    [toast],
-  )
+  const addDocumentDetail = (payload) => mutation.mutateAsync({ payload, type: 'create' })
+  const updateDocumentDetail = (id, payload) => mutation.mutateAsync({ id, payload, type: 'update' })
+  const deleteDocumentDetail = (id) => mutation.mutateAsync({ id, type: 'delete' })
 
-  const searchDocumentDetails = useCallback(
-    async (query) => {
-      setIsLoading(true)
-      try {
-        const res = await propertyService.searchDocumentDetails(query)
-        const rawData = extractData(res)
-        setDocumentDetails(rawData)
-        return rawData
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Document search failed')
-      } finally {
-        setIsLoading(false)
-      }
-    },
-    [toast],
-  )
+  const fetchDocumentDetailsByPersonalDetailId = useCallback(async (personalDetailId) => {
+    const rawData = await queryClient.fetchQuery({
+      queryKey: ['documentDetails'],
+      queryFn: async () => extractData(await propertyService.getDocumentDetails())
+    })
+    return rawData.filter(
+      (item) => String(item.personalDetails?.id || item.personalDetailsId) === String(personalDetailId)
+    )
+  }, [queryClient])
 
-  return {
-    documentDetails,
-    isLoading,
-    fetchDocumentDetails,
-    fetchDocumentDetailsByPersonalDetailId,
-    addDocumentDetail,
-    updateDocumentDetail,
-    deleteDocumentDetail,
-    searchDocumentDetails,
-    setDocumentDetails,
+  const searchDocumentDetails = async (query) => {
+    const res = await propertyService.searchDocumentDetails(query)
+    queryClient.setQueryData(['documentDetails'], extractData(res))
+  }
+
+  return { 
+    documentDetails, 
+    isLoading, 
+    fetchDocumentDetails: refetch, 
+    fetchDocumentDetailsByPersonalDetailId, 
+    addDocumentDetail, 
+    updateDocumentDetail, 
+    deleteDocumentDetail, 
+    searchDocumentDetails 
   }
 }

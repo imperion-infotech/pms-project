@@ -1,93 +1,76 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { propertyService } from '../services/propertyService'
 import { useToast } from '../context/NotificationContext'
 
 const extractData = (res) => res.data?.content || (Array.isArray(res.data) ? res.data : [])
 
+/**
+ * usePmsRooms - Enterprise Data Management
+ * 
+ * Yeh hook ab TanStack Query use karta hai jo data caching,
+ * auto-refresh aur performance ko industrial level par le jata hai.
+ */
 export const usePmsRooms = () => {
-  const [rooms, setRooms] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
+  const queryClient = useQueryClient()
   const toast = useToast()
 
-  const fetchRooms = useCallback(async () => {
-    setIsLoading(true)
-    try {
+  // 1. QUERY: Fetch Rooms with caching
+  const { 
+    data: rooms = [], 
+    isLoading, 
+    error, 
+    refetch 
+  } = useQuery({
+    queryKey: ['rooms'],
+    queryFn: async () => {
       const res = await propertyService.getRooms()
-      setRooms(extractData(res))
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to fetch rooms')
-    } finally {
-      setIsLoading(false)
+      return extractData(res)
+    },
+    staleTime: 1000 * 60 * 5, // 5 minute caching
+  })
+
+  // 2. MUTATIONS: Data changes logic
+  const roomMutation = useMutation({
+    mutationFn: (args) => {
+      const { id, payload, type } = args
+      if (type === 'create') return propertyService.createRoom(payload)
+      if (type === 'update') return propertyService.updateRoom(id, payload)
+      if (type === 'delete') return propertyService.deleteRoom(id)
+    },
+    onSuccess: (res, variables) => {
+      const message = {
+        create: 'Room created successfully',
+        update: 'Room updated successfully',
+        delete: 'Room deleted successfully'
+      }[variables.type]
+      
+      toast.success(message)
+      // Invalidating 'rooms' cache taaki data refresh ho jaye
+      queryClient.invalidateQueries(['rooms'])
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || 'Operation failed')
     }
-  }, [toast])
+  })
 
-  useEffect(() => {
-    fetchRooms()
-  }, [fetchRooms])
+  const addRoom = (payload) => roomMutation.mutateAsync({ payload, type: 'create' })
+  const updateRoom = (id, payload) => roomMutation.mutateAsync({ id, payload, type: 'update' })
+  const deleteRoom = (id) => roomMutation.mutateAsync({ id, type: 'delete' })
 
-  const addRoom = useCallback(
-    async (payload) => {
-      try {
-        const res = await propertyService.createRoom(payload)
-        toast.success('Room created successfully')
-        fetchRooms()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to create room')
-        throw err
-      }
-    },
-    [fetchRooms, toast],
-  )
+  const searchRooms = async (query) => {
+    // Search usually doesn't need long caching
+    const res = await propertyService.searchRooms(query)
+    queryClient.setQueryData(['rooms'], extractData(res))
+  }
 
-  const updateRoom = useCallback(
-    async (id, payload) => {
-      // Optimistic update
-      setRooms((prev) => prev.map((r) => (String(r.id) === String(id) ? { ...r, ...payload } : r)))
-
-      try {
-        const res = await propertyService.updateRoom(id, payload)
-        toast.success('Room updated successfully')
-        fetchRooms()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to update room')
-        fetchRooms() // Rollback
-        throw err
-      }
-    },
-    [fetchRooms, toast],
-  )
-
-  const deleteRoom = useCallback(
-    async (id) => {
-      try {
-        const res = await propertyService.deleteRoom(id)
-        toast.success('Room deleted successfully')
-        fetchRooms()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to delete room')
-        throw err
-      }
-    },
-    [fetchRooms, toast],
-  )
-
-  const searchRooms = useCallback(
-    async (query) => {
-      setIsLoading(true)
-      try {
-        const res = await propertyService.searchRooms(query)
-        setRooms(extractData(res))
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Room search failed')
-      } finally {
-        setIsLoading(false)
-      }
-    },
-    [toast],
-  )
-
-  return { rooms, isLoading, fetchRooms, addRoom, updateRoom, deleteRoom, searchRooms }
+  return { 
+    rooms, 
+    isLoading, 
+    fetchRooms: refetch, 
+    addRoom, 
+    updateRoom, 
+    deleteRoom, 
+    searchRooms,
+    error 
+  }
 }

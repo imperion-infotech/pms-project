@@ -1,97 +1,44 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { propertyService } from '../services/propertyService'
 import { useToast } from '../context/NotificationContext'
 
 const extractData = (res) => res.data?.content || (Array.isArray(res.data) ? res.data : [])
 
 export const usePmsOtherCharges = () => {
-  const [otherCharges, setOtherCharges] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
+  const queryClient = useQueryClient()
   const toast = useToast()
 
-  const fetchOtherCharges = useCallback(async () => {
-    setIsLoading(true)
-    try {
+  const { data: otherCharges = [], isLoading, refetch } = useQuery({
+    queryKey: ['otherCharges'],
+    queryFn: async () => {
       const res = await propertyService.getOtherCharges()
-      setOtherCharges(extractData(res))
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to fetch other charges')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [toast])
-
-  useEffect(() => {
-    fetchOtherCharges()
-  }, [fetchOtherCharges])
-
-  const addOtherCharge = useCallback(
-    async (payload) => {
-      try {
-        const res = await propertyService.createOtherCharge(payload)
-        toast.success('Other Charge created!')
-        fetchOtherCharges()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to create other charge')
-        throw err
-      }
+      return extractData(res)
     },
-    [fetchOtherCharges, toast],
-  )
+    staleTime: 1000 * 60 * 15
+  })
 
-  const updateOtherCharge = useCallback(
-    async (id, payload) => {
-      try {
-        const res = await propertyService.updateOtherCharge(id, payload)
-        toast.success('Other Charge updated!')
-        fetchOtherCharges()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to update other charge')
-        throw err
-      }
+  const mutation = useMutation({
+    mutationFn: ({ id, payload, type }) => {
+      if (type === 'create') return propertyService.createOtherCharge(payload)
+      if (type === 'update') return propertyService.updateOtherCharge(id, payload)
+      if (type === 'delete') return propertyService.deleteOtherCharge(id)
     },
-    [fetchOtherCharges, toast],
-  )
-
-  const deleteOtherCharge = useCallback(
-    async (id) => {
-      try {
-        const res = await propertyService.deleteOtherCharge(id)
-        toast.success('Other Charge deleted successfully')
-        fetchOtherCharges()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to delete other charge')
-        throw err
-      }
+    onSuccess: (_, variables) => {
+      const msgs = { create: 'Other Charge created!', update: 'Other Charge updated!', delete: 'Other Charge deleted' }
+      toast.success(msgs[variables.type])
+      queryClient.invalidateQueries(['otherCharges'])
     },
-    [fetchOtherCharges, toast],
-  )
+    onError: (err) => toast.error(err.response?.data?.message || 'Operation failed')
+  })
 
-  const searchOtherCharges = useCallback(
-    async (query) => {
-      setIsLoading(true)
-      try {
-        const res = await propertyService.searchOtherCharges(query)
-        setOtherCharges(extractData(res))
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Other charge search failed')
-      } finally {
-        setIsLoading(false)
-      }
-    },
-    [toast],
-  )
+  const addOtherCharge = (payload) => mutation.mutateAsync({ payload, type: 'create' })
+  const updateOtherCharge = (id, payload) => mutation.mutateAsync({ id, payload, type: 'update' })
+  const deleteOtherCharge = (id) => mutation.mutateAsync({ id, type: 'delete' })
 
-  return {
-    otherCharges,
-    isLoading,
-    fetchOtherCharges,
-    addOtherCharge,
-    updateOtherCharge,
-    deleteOtherCharge,
-    searchOtherCharges,
+  const searchOtherCharges = async (query) => {
+    const res = await propertyService.searchOtherCharges(query)
+    queryClient.setQueryData(['otherCharges'], extractData(res))
   }
+
+  return { otherCharges, isLoading, fetchOtherCharges: refetch, addOtherCharge, updateOtherCharge, deleteOtherCharge, searchOtherCharges }
 }

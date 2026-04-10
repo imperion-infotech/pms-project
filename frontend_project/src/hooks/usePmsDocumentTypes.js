@@ -1,82 +1,44 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { propertyService } from '../services/propertyService'
 import { useToast } from '../context/NotificationContext'
 
 const extractData = (res) => res.data?.content || (Array.isArray(res.data) ? res.data : [])
 
 export const usePmsDocumentTypes = () => {
-  const [documentTypes, setDocumentTypes] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
+  const queryClient = useQueryClient()
   const toast = useToast()
 
-  const fetchDocumentTypes = useCallback(async () => {
-    setIsLoading(true)
-    try {
+  const { data: documentTypes = [], isLoading, refetch } = useQuery({
+    queryKey: ['documentTypes'],
+    queryFn: async () => {
       const res = await propertyService.getDocumentTypes()
-      console.log('--- API Response (Document Types) ---:', res.data)
-      setDocumentTypes(extractData(res))
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to fetch document types')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [toast])
-
-  useEffect(() => {
-    fetchDocumentTypes()
-  }, [fetchDocumentTypes])
-
-  const addDocumentType = useCallback(
-    async (payload) => {
-      try {
-        const res = await propertyService.createDocumentType(payload)
-        toast.success('Document Type created!')
-        fetchDocumentTypes()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to create document type')
-        throw err
-      }
+      return extractData(res)
     },
-    [fetchDocumentTypes, toast],
-  )
+    staleTime: 1000 * 60 * 30 // Constant types
+  })
 
-  const updateDocumentType = useCallback(
-    async (id, payload) => {
-      try {
-        const res = await propertyService.updateDocumentType(id, payload)
-        toast.success('Document Type updated!')
-        fetchDocumentTypes()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to update document type')
-        throw err
-      }
+  const mutation = useMutation({
+    mutationFn: ({ id, payload, type }) => {
+      if (type === 'create') return propertyService.createDocumentType(payload)
+      if (type === 'update') return propertyService.updateDocumentType(id, payload)
+      if (type === 'delete') return propertyService.deleteDocumentType(id)
     },
-    [fetchDocumentTypes, toast],
-  )
-
-  const deleteDocumentType = useCallback(
-    async (id) => {
-      try {
-        const res = await propertyService.deleteDocumentType(id)
-        toast.success('Document Type deleted successfully')
-        fetchDocumentTypes()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to delete document type')
-        throw err
-      }
+    onSuccess: (_, variables) => {
+      const msgs = { create: 'Document Type created!', update: 'Document Type updated!', delete: 'Document Type deleted' }
+      toast.success(msgs[variables.type])
+      queryClient.invalidateQueries(['documentTypes'])
     },
-    [fetchDocumentTypes, toast],
-  )
+    onError: (err) => toast.error(err.response?.data?.message || 'Operation failed')
+  })
 
-  return {
-    documentTypes,
-    isLoading,
-    fetchDocumentTypes,
-    addDocumentType,
-    updateDocumentType,
-    deleteDocumentType,
+  const addDocumentType = (payload) => mutation.mutateAsync({ payload, type: 'create' })
+  const updateDocumentType = (id, payload) => mutation.mutateAsync({ id, payload, type: 'update' })
+  const deleteDocumentType = (id) => mutation.mutateAsync({ id, type: 'delete' })
+
+  const searchDocumentTypes = async (query) => {
+    const res = await propertyService.searchDocumentTypes(query)
+    queryClient.setQueryData(['documentTypes'], extractData(res))
   }
+
+  return { documentTypes, isLoading, fetchDocumentTypes: refetch, addDocumentType, updateDocumentType, deleteDocumentType, searchDocumentTypes }
 }

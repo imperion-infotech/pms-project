@@ -1,111 +1,64 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { propertyService } from '../services/propertyService'
 import { useToast } from '../context/NotificationContext'
 
 const extractData = (res) => res.data?.content || (Array.isArray(res.data) ? res.data : [])
 
 export const usePmsRoomStatus = () => {
-  const [roomStatuses, setRoomStatuses] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
+  const queryClient = useQueryClient()
   const toast = useToast()
 
-  const fetchRoomStatuses = useCallback(async () => {
-    setIsLoading(true)
-    try {
+  const { data: roomStatuses = [], isLoading, refetch } = useQuery({
+    queryKey: ['roomStatuses'],
+    queryFn: async () => {
       const res = await propertyService.getRoomStatuses()
-      setRoomStatuses(extractData(res))
+      return extractData(res)
+    },
+    staleTime: 1000 * 60 * 10
+  })
+
+  const mutation = useMutation({
+    mutationFn: ({ id, payload, type }) => {
+      if (type === 'create') return propertyService.createRoomStatus(payload)
+      if (type === 'update') return propertyService.updateRoomStatus(id, payload)
+      if (type === 'delete') return propertyService.deleteRoomStatus(id)
+    },
+    onSuccess: (_, variables) => {
+      const msgs = { create: 'Room status created', update: 'Room status updated', delete: 'Room status deleted' }
+      toast.success(msgs[variables.type])
+      queryClient.invalidateQueries(['roomStatuses'])
+    },
+    onError: (err) => toast.error(err.response?.data?.message || 'Operation failed')
+  })
+
+  const addRoomStatus = (payload) => mutation.mutateAsync({ payload, type: 'create' })
+  const updateRoomStatus = (id, payload) => mutation.mutateAsync({ id, payload, type: 'update' })
+  const deleteRoomStatus = (id) => mutation.mutateAsync({ id, type: 'delete' })
+
+  const getRoomStatusById = useCallback(async (id) => {
+    try {
+      const res = await propertyService.getRoomStatusById(id)
+      return res.data
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to fetch room statuses')
-    } finally {
-      setIsLoading(false)
+      toast.error('Failed to fetch room status details')
+      throw err
     }
   }, [toast])
 
-  useEffect(() => {
-    fetchRoomStatuses()
-  }, [fetchRoomStatuses])
+  const searchRoomStatuses = async (query) => {
+    const res = await propertyService.searchRoomStatuses(query)
+    queryClient.setQueryData(['roomStatuses'], extractData(res))
+  }
 
-  const addRoomStatus = useCallback(
-    async (payload) => {
-      try {
-        const res = await propertyService.createRoomStatus(payload)
-        toast.success('Room status created successfully')
-        fetchRoomStatuses()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to create room status')
-        throw err
-      }
-    },
-    [fetchRoomStatuses, toast],
-  )
-
-  const updateRoomStatus = useCallback(
-    async (id, payload) => {
-      try {
-        const res = await propertyService.updateRoomStatus(id, payload)
-        toast.success('Room status updated successfully')
-        fetchRoomStatuses()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to update room status')
-        throw err
-      }
-    },
-    [fetchRoomStatuses, toast],
-  )
-
-  const getRoomStatusById = useCallback(
-    async (id) => {
-      try {
-        const res = await propertyService.getRoomStatusById(id)
-        return res.data
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to fetch room status details')
-        throw err
-      }
-    },
-    [toast],
-  )
-
-  const deleteRoomStatus = useCallback(
-    async (id) => {
-      try {
-        const res = await propertyService.deleteRoomStatus(id)
-        toast.success('Room status deleted successfully')
-        fetchRoomStatuses()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to delete room status')
-        throw err
-      }
-    },
-    [fetchRoomStatuses, toast],
-  )
-
-  const searchRoomStatuses = useCallback(
-    async (query) => {
-      setIsLoading(true)
-      try {
-        const res = await propertyService.searchRoomStatuses(query)
-        setRoomStatuses(extractData(res))
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Room status search failed')
-      } finally {
-        setIsLoading(false)
-      }
-    },
-    [toast],
-  )
-
-  return {
-    roomStatuses,
-    isLoading,
-    fetchRoomStatuses,
+  return { 
+    roomStatuses, 
+    isLoading, 
+    fetchRoomStatuses: refetch, 
+    addRoomStatus, 
+    updateRoomStatus, 
+    deleteRoomStatus, 
     getRoomStatusById,
-    addRoomStatus,
-    updateRoomStatus,
-    deleteRoomStatus,
-    searchRoomStatuses,
+    searchRoomStatuses 
   }
 }

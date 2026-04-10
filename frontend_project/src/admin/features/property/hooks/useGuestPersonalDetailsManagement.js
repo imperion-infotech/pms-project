@@ -1,23 +1,25 @@
 import { useState, useCallback, useMemo } from 'react'
 import { useToast } from '../../../../context/NotificationContext'
+import { usePmsGuests } from '../../../../hooks/usePmsGuests'
+import { usePmsDocumentDetails } from '../../../../hooks/usePmsDocumentDetails'
+import { usePmsStayDetails } from '../../../../hooks/usePmsStayDetails'
+import { usePmsGuestDetails } from '../../../../hooks/usePmsGuestDetails'
+import { usePmsRentDetails } from '../../../../hooks/usePmsRentDetails'
 
 /**
- * usePersonalDetailManagement - Centralized hook for Guest Personal Detail CRUD operations.
+ * useGuestPersonalDetailsManagement - Centralized hook for Guest Personal Detail CRUD operations.
+ * Ported to TanStack Query for industrial stability and orchestration.
  */
-export const useGuestPersonalDetailsManagement = ({
-  addPersonalDetail,
-  updatePersonalDetail,
-  addDocumentDetail,
-  updateDocumentDetail,
-  addStayDetail,
-  updateStayDetail,
-  addGuestDetail,
-  updateGuestDetail,
-  addRentDetail,
-  updateRentDetail,
-  toggleModal,
-}) => {
+export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
   const toast = useToast()
+
+  // Inject Specialty Hooks
+  const { addPersonalDetail, updatePersonalDetail, fetchFolioNo } = usePmsGuests()
+  const { addDocumentDetail, updateDocumentDetail } = usePmsDocumentDetails()
+  const { addStayDetail, updateStayDetail } = usePmsStayDetails()
+  const { addGuestDetail, updateGuestDetail } = usePmsGuestDetails()
+  const { addRentDetail, updateRentDetail } = usePmsRentDetails()
+
   const getIndustrialStayDefaults = useCallback(() => {
     const now = new Date()
     const checkInDate = now.toISOString()
@@ -48,7 +50,10 @@ export const useGuestPersonalDetailsManagement = ({
     companyName: '',
     profilePhoto: '',
     signature: '',
+    contactInformationTypeEnum: 'HOME',
     isDeleted: false,
+    folioNo: '',
+    crsFolioNo: '',
     // Document Details
     documentNumber: '',
     validTill: '',
@@ -100,7 +105,10 @@ export const useGuestPersonalDetailsManagement = ({
     companyName: '',
     profilePhoto: '',
     signature: '',
+    contactInformationTypeEnum: 'HOME',
     isDeleted: false,
+    folioNo: '',
+    crsFolioNo: '',
     // Document Details
     documentId: null,
     documentNumber: '',
@@ -123,8 +131,8 @@ export const useGuestPersonalDetailsManagement = ({
     // Guest Details
     checkInId: null,
     guestDetailId: null,
-    checkInDate: defaults.checkInDate,
-    checkOutDate: defaults.checkOutDate,
+    checkInDate: defaults.checkInDate.split('T')[0],
+    checkOutDate: defaults.checkOutDate.split('T')[0],
     checkInTime: defaults.checkInTime,
     checkOutTime: defaults.checkOutTime,
     guestDetailsStatus: 'Reservation',
@@ -158,18 +166,19 @@ export const useGuestPersonalDetailsManagement = ({
         address: personalFormData.address,
         profilePhoto: personalFormData.profilePhoto || null,
         signature: personalFormData.signature || null,
+        contactInformationTypeEnum: personalFormData.contactInformationTypeEnum || 'HOME',
         isDeleted: false,
+        folioNo: personalFormData.folioNo,
+        crsFolioNo: personalFormData.crsFolioNo,
       }
-      console.log('1. Personal Payload:', JSON.stringify(personalPayload, null, 2))
       const res = await addPersonalDetail(personalPayload)
-      console.log('---------------Personal Details API Response---------------', res)
-
       const personalDetailsId = res.data.id || res.data
+
       let documentDetailsId = null
       let stayDetailsId = null
       let rentDetailsId = null
 
-      // 2. Create Document Detail if info provided
+      // 2. Create Document Detail
       if (personalFormData.documentNumber || personalFormData.documentTypeId) {
         const docPayload = {
           documentNumber: personalFormData.documentNumber,
@@ -185,13 +194,11 @@ export const useGuestPersonalDetailsManagement = ({
             : undefined,
           deleted: false,
         }
-        console.log('2. Document Payload:', JSON.stringify(docPayload, null, 2))
         const docRes = await addDocumentDetail(docPayload)
-        console.log('---------------Document Details API Response---------------', docRes)
         documentDetailsId = docRes.data.id || docRes.data
       }
 
-      // 3. Create Stay Detail if info provided
+      // 3. Create Stay Detail
       if (personalFormData.buildingId || personalFormData.roomMasterId) {
         const stayPayload = {
           floorId: Number(personalFormData.floorId) || 1,
@@ -208,18 +215,7 @@ export const useGuestPersonalDetailsManagement = ({
             : undefined,
           deleted: false,
         }
-        console.log('3. Stay Payload:', JSON.stringify(stayPayload, null, 2))
         const stayRes = await addStayDetail(stayPayload)
-        console.log('---------------Stay Payload (Create)---------------')
-        console.log('floor id:', stayPayload.floorId)
-        console.log('building id:', stayPayload.buildingId)
-        console.log('room type id:', stayPayload.roomTypeId)
-        console.log('room master id:', stayPayload.roomMasterId)
-        console.log('rate type:', stayPayload.rateTypeEnum)
-        console.log('stay status:', stayPayload.stayStatusEnum)
-        console.log('no of guest:', stayPayload.noOfGuest)
-        console.log('comment:', stayPayload.comment)
-        console.log('---------------Stay Details API Response---------------', stayRes)
         stayDetailsId = stayRes.data.id || stayRes.data
       }
 
@@ -239,9 +235,7 @@ export const useGuestPersonalDetailsManagement = ({
           balance: personalFormData.balance ? Number(personalFormData.balance) : 0,
           deleted: false,
         }
-        console.log('4. Rent Payload:', JSON.stringify(rentPayload, null, 2))
         const rentRes = await addRentDetail(rentPayload)
-        console.log('---------------Rent Details API Response---------------', rentRes)
         rentDetailsId = rentRes.data.id || rentRes.data
       }
 
@@ -255,10 +249,10 @@ export const useGuestPersonalDetailsManagement = ({
         rentDetailsId: rentDetailsId,
         stayDetailsId: stayDetailsId,
         checkInDate: personalFormData.checkInDate
-          ? `${personalFormData.checkInDate}T${personalFormData.checkInTime ? (personalFormData.checkInTime.split(':').length === 2 ? personalFormData.checkInTime + ':00' : personalFormData.checkInTime) : '00:00:00'}.000`
+          ? `${personalFormData.checkInDate}T${personalFormData.checkInTime ? (personalFormData.checkInTime.split(':').length === 2 ? personalFormData.checkInTime + ':00' : personalFormData.checkInTime) : '00:00:00.000'}`
           : null,
         checkOutDate: personalFormData.checkOutDate
-          ? `${personalFormData.checkOutDate}T${personalFormData.checkOutTime ? (personalFormData.checkOutTime.split(':').length === 2 ? personalFormData.checkOutTime + ':00' : personalFormData.checkOutTime) : '00:00:00'}.000`
+          ? `${personalFormData.checkOutDate}T${personalFormData.checkOutTime ? (personalFormData.checkOutTime.split(':').length === 2 ? personalFormData.checkOutTime + ':00' : personalFormData.checkOutTime) : '00:00:00.000'}`
           : null,
         checkInTime: personalFormData.checkInTime
           ? personalFormData.checkInTime.split(':').length === 2
@@ -273,19 +267,8 @@ export const useGuestPersonalDetailsManagement = ({
         noOfDays: personalFormData.noOfDays ? Number(personalFormData.noOfDays) : 1,
         guestDetailsStatus: personalFormData.guestDetailsStatus || 'Reservation',
       }
-      await addGuestDetail(guestPayload)
-      console.log('---------------Guest Payload (Create)---------------')
-      console.log('room master id:', guestPayload.roomMasterId)
-      console.log('personal id:', guestPayload.personalDetailsId)
-      console.log('doc id:', guestPayload.documentDetailsId)
-      console.log('rent id:', guestPayload.rentDetailsId)
-      console.log('stay id:', guestPayload.stayDetailsId)
-      console.log('checkin date:', guestPayload.checkInDate)
-      console.log('checkout date:', guestPayload.checkOutDate)
-      console.log('checkin time:', guestPayload.checkInTime)
-      console.log('checkout time:', guestPayload.checkOutTime)
-      console.log('status:', guestPayload.guestDetailsStatus)
-      console.log('no of days:', guestPayload.noOfDays)
+
+      console.log('Final Guest Payload:', guestPayload)
       await addGuestDetail(guestPayload)
 
       setPersonalFormData({
@@ -298,7 +281,10 @@ export const useGuestPersonalDetailsManagement = ({
         companyName: '',
         profilePhoto: '',
         signature: '',
+        contactInformationTypeEnum: 'HOME',
         isDeleted: false,
+        folioNo: '',
+        crsFolioNo: '',
         documentNumber: '',
         validTill: '',
         remark: '',
@@ -314,8 +300,8 @@ export const useGuestPersonalDetailsManagement = ({
         noOfGuest: 1,
         stayStatusEnum: 'Confirmed',
         deleted: false,
-        checkInDate: defaults.checkInDate,
-        checkOutDate: defaults.checkOutDate,
+        checkInDate: defaults.checkInDate.split('T')[0],
+        checkOutDate: defaults.checkOutDate.split('T')[0],
         checkInTime: defaults.checkInTime,
         checkOutTime: defaults.checkOutTime,
         guestDetailsStatus: 'Reservation',
@@ -365,36 +351,11 @@ export const useGuestPersonalDetailsManagement = ({
         address: editPersonalFormData.address,
         profilePhoto: editPersonalFormData.profilePhoto || null,
         signature: editPersonalFormData.signature || null,
+        contactInformationTypeEnum: editPersonalFormData.contactInformationTypeEnum || 'HOME',
         isDeleted: editPersonalFormData.isDeleted || false,
+        folioNo: editPersonalFormData.folioNo,
+        crsFolioNo: editPersonalFormData.crsFolioNo,
       }
-      console.log(
-        '---------------Personal Payload (Update)---------------',
-        updatePayload.firstName,
-      )
-      console.log('---------------Personal Payload (Update)---------------', updatePayload.lastName)
-
-      console.log(
-        '---------------Personal Payload (Update)---------------',
-        updatePayload.companyName,
-      )
-      console.log('---------------Personal Payload (Update)---------------', updatePayload.phone)
-
-      console.log('---------------Personal Payload (Update)---------------', updatePayload.email)
-      console.log('---------------Personal Payload (Update)---------------', updatePayload.address)
-
-      console.log(
-        '---------------Personal Payload (Update)---------------',
-        updatePayload.profilePhoto,
-      )
-      console.log(
-        '---------------Personal Payload (Update)---------------',
-        updatePayload.signature,
-      )
-      console.log(
-        '---------------Personal Payload (Update)---------------',
-        updatePayload.isDeleted,
-      )
-
       await updatePersonalDetail(editPersonalFormData.id, updatePayload)
 
       // 2. Update or Create Document Detail
@@ -402,11 +363,9 @@ export const useGuestPersonalDetailsManagement = ({
       if (editPersonalFormData.documentNumber || editPersonalFormData.documentTypeId) {
         const docPayload = {
           documentNumber: editPersonalFormData.documentNumber,
-          validTill: editPersonalFormData.validTill
-            ? editPersonalFormData.validTill.includes('T')
-              ? editPersonalFormData.validTill
-              : `${editPersonalFormData.validTill}T00:00:00.000Z`
-            : null,
+          validTill: editPersonalFormData.validTill?.includes('T')
+            ? editPersonalFormData.validTill
+            : `${editPersonalFormData.validTill}T00:00:00.000Z`,
           frontImagePath: editPersonalFormData.frontImagePath,
           backImagePath: editPersonalFormData.backImagePath,
           remark: editPersonalFormData.remark,
@@ -416,39 +375,6 @@ export const useGuestPersonalDetailsManagement = ({
             : undefined,
           deleted: false,
         }
-        console.log(
-          '---------------Document Payload (Update/Create)---------------',
-          docPayload.documentNumber,
-        )
-        console.log(
-          '---------------Document Payload (Update/Create)---------------',
-          docPayload.validTill,
-        )
-        console.log(
-          '---------------Document Payload (Update/Create)---------------',
-          docPayload.frontImagePath,
-        )
-        console.log(
-          '---------------Document Payload (Update/Create)---------------',
-          docPayload.backImagePath,
-        )
-        console.log(
-          '---------------Document Payload (Update/Create)---------------',
-          docPayload.remark,
-        )
-        console.log(
-          '---------------Document Payload (Update/Create)---------------',
-          docPayload.personalDetails,
-        )
-        console.log(
-          '---------------Document Payload (Update/Create)---------------',
-          docPayload.documentType,
-        )
-        console.log(
-          '---------------Document Payload (Update/Create)---------------',
-          docPayload.deleted,
-        )
-
         if (editPersonalFormData.documentId) {
           await updateDocumentDetail(editPersonalFormData.documentId, docPayload)
         } else {
@@ -471,59 +397,19 @@ export const useGuestPersonalDetailsManagement = ({
           noOfGuest: Number(editPersonalFormData.noOfGuest) || 1,
           deleted: editPersonalFormData.deleted || false,
         }
-        console.log(
-          '---------------Stay Payload (Update/Create)---------------',
-          stayPayload.floorId,
-        )
-        console.log(
-          '---------------Stay Payload (Update/Create)---------------',
-          stayPayload.buildingId,
-        )
-        console.log(
-          '---------------Stay Payload (Update/Create)---------------',
-          stayPayload.roomTypeId,
-        )
-        console.log(
-          '---------------Stay Payload (Update/Create)---------------',
-          stayPayload.roomMasterId,
-        )
-        console.log(
-          '---------------Stay Payload (Update/Create)---------------',
-          stayPayload.comment,
-        )
-        console.log(
-          '---------------Stay Payload (Update/Create)---------------',
-          stayPayload.rateTypeEnum,
-        )
-        console.log(
-          '---------------Stay Payload (Update/Create)---------------',
-          stayPayload.stayStatusEnum,
-        )
-        console.log(
-          '---------------Stay Payload (Update/Create)---------------',
-          stayPayload.noOfGuest,
-        )
-        console.log(
-          '---------------Stay Payload (Update/Create)---------------',
-          stayPayload.deleted,
-        )
-
         if (editPersonalFormData.stayId) {
           await updateStayDetail(editPersonalFormData.stayId, stayPayload)
         } else {
-          // If creating a new stay during update, we must link it to the personal detail
-          const createStayPayload = {
+          const stayRes = await addStayDetail({
             ...stayPayload,
             personalDetailsId: editPersonalFormData.id,
-          }
-          const stayRes = await addStayDetail(createStayPayload)
+          })
           stayId = stayRes.data.id || stayRes.data
         }
       }
 
       // 4. Update or Create Rent Details
       let rentId = editPersonalFormData.rentId
-      console.log('--------------------Rent ID-----------------', rentId)
       if (editPersonalFormData.rent !== '' || editPersonalFormData.basic !== '') {
         const rentPayload = {
           rent: editPersonalFormData.rent ? Number(editPersonalFormData.rent) : 0,
@@ -547,46 +433,6 @@ export const useGuestPersonalDetailsManagement = ({
           balance: editPersonalFormData.balance ? Number(editPersonalFormData.balance) : 0,
           deleted: false,
         }
-        console.log('---------------Rent Payload (Update/Create)---------------', rentPayload.rent)
-        console.log('---------------Rent Payload (Update/Create)---------------', rentPayload.basic)
-        console.log('---------------Rent Payload (Update/Create)---------------', rentPayload.taxId)
-        console.log(
-          '---------------Rent Payload (Update/Create)---------------',
-          rentPayload.totalRental,
-        )
-        console.log(
-          '---------------Rent Payload (Update/Create)---------------',
-          rentPayload.otherCharges,
-        )
-        console.log(
-          '---------------Rent Payload (Update/Create)---------------',
-          rentPayload.discount,
-        )
-        console.log(
-          '---------------Rent Payload (Update/Create)---------------',
-          rentPayload.totalCharges,
-        )
-        console.log(
-          '---------------Rent Payload (Update/Create)---------------',
-          rentPayload.payments,
-        )
-        console.log(
-          '---------------Rent Payload (Update/Create)---------------',
-          rentPayload.ccAuthorized,
-        )
-        console.log(
-          '---------------Rent Payload (Update/Create)---------------',
-          rentPayload.deposite,
-        )
-        console.log(
-          '---------------Rent Payload (Update/Create)---------------',
-          rentPayload.balance,
-        )
-        console.log(
-          '---------------Rent Payload (Update/Create)---------------',
-          rentPayload.deleted,
-        )
-
         if (rentId) {
           await updateRentDetail(rentId, rentPayload)
         } else {
@@ -625,34 +471,6 @@ export const useGuestPersonalDetailsManagement = ({
         deleted: false,
       }
 
-      console.log('---------------Guest Payload (Update)---------------', guestPayload)
-      console.log('---------------Guest Payload (Update)---------------', guestPayload.roomMasterId)
-      console.log(
-        '---------------Guest Payload (Update)---------------',
-        guestPayload.personalDetailsId,
-      )
-      console.log(
-        '---------------Guest Payload (Update)---------------',
-        guestPayload.documentDetailsId,
-      )
-      console.log(
-        '---------------Guest Payload (Update)---------------',
-        guestPayload.stayDetailsId,
-      )
-      console.log(
-        '---------------Guest Payload (Update)---------------',
-        guestPayload.rentDetailsId,
-      )
-      console.log('---------------Guest Payload (Update)---------------', guestPayload.checkInDate)
-      console.log('---------------Guest Payload (Update)---------------', guestPayload.checkOutDate)
-      console.log('---------------Guest Payload (Update)---------------', guestPayload.checkInTime)
-      console.log('---------------Guest Payload (Update)---------------', guestPayload.checkOutTime)
-      console.log('---------------Guest Payload (Update)---------------', guestPayload.noOfDays)
-      console.log(
-        '---------------Guest Payload (Update)---------------',
-        guestPayload.guestDetailsStatus,
-      )
-
       if (editPersonalFormData.guestDetailId) {
         await updateGuestDetail(editPersonalFormData.guestDetailId, guestPayload)
       } else {
@@ -683,84 +501,47 @@ export const useGuestPersonalDetailsManagement = ({
 
   const handleEditPersonalDetail = useCallback(
     (detail, document = null, stay = null, guest = null, rentDetailObj = null) => {
-      // Helper to clean ISO date time for input fields
-      const formatDate = (dateStr) => {
-        if (!dateStr) return ''
-        return dateStr.includes('T') ? dateStr.split('T')[0] : dateStr
-      }
-
-      const formatTime = (timeStr) => {
-        if (!timeStr) return ''
-        return timeStr.includes(':') ? timeStr.split('.')[0] : timeStr
-      }
-
-      // Helper to match string values with dropdown options (case-insensitive)
-      const normalizeDropdown = (val, options = []) => {
-        if (!val) return ''
-        const found = options.find((opt) => String(opt).toLowerCase() === String(val).toLowerCase())
-        return found || val
-      }
+      const formatDate = (dateStr) =>
+        dateStr?.includes('T') ? dateStr.split('T')[0] : dateStr || ''
+      const formatTime = (timeStr) =>
+        timeStr?.includes(':') ? timeStr.split('.')[0] : timeStr || ''
+      const normalizeDropdown = (val, options = []) =>
+        options.find((opt) => String(opt).toLowerCase() === String(val).toLowerCase()) || val || ''
 
       setEditPersonalFormData({
         ...detail,
+        contactInformationTypeEnum: detail.contactInformationTypeEnum || 'HOME',
+        folioNo: detail.folioNo || '',
+        crsFolioNo: detail.crsFolioNo || '',
         documentId: document?.id || null,
         documentNumber: document?.documentNumber || '',
-        validTill: formatDate(document?.validTill) || '',
+        validTill: formatDate(document?.validTill),
         remark: document?.remark || '',
         documentTypeId: document?.documentType?.id || document?.documentTypeId || '',
         frontImagePath: document?.frontImagePath || '',
         backImagePath: document?.backImagePath || '',
-
-        // Stay Details Mapping - Robust against various naming conventions
         stayId: stay?.id || guest?.stayDetailsId || null,
-        floorId: stay?.floorId || stay?.floor?.id || stay?.floor_id || '',
-        buildingId: stay?.buildingId || stay?.building?.id || stay?.building_id || '',
-        roomTypeId: stay?.roomTypeId || stay?.roomType?.id || stay?.room_type_id || '',
-        roomMasterId:
-          stay?.roomMasterId ||
-          stay?.roomMaster?.id ||
-          stay?.room_master_id ||
-          guest?.room_master_id ||
-          guest?.roomMasterId ||
-          '',
-
-        // Handle all possible comment fields
-        comment:
-          stay?.comment ||
-          stay?.comments ||
-          stay?.specialComment ||
-          stay?.special_comment ||
-          stay?.specialComments ||
-          stay?.remarks ||
-          stay?.remark ||
-          stay?.description ||
-          guest?.comment ||
-          guest?.remarks ||
-          guest?.remark ||
-          guest?.description ||
-          '',
+        floorId: stay?.floorId || stay?.floor?.id || '',
+        buildingId: stay?.buildingId || stay?.building?.id || '',
+        roomTypeId: stay?.roomTypeId || stay?.roomType?.id || '',
+        roomMasterId: stay?.roomMasterId || stay?.roomMaster?.id || guest?.roomMasterId || '',
+        comment: stay?.comment || stay?.remarks || guest?.comment || '',
         rateTypeEnum: normalizeDropdown(stay?.rateTypeEnum || 'RACK', [
           'RACK',
           'WEEKLY_RATE_TEST',
           'YEARLY_RATE',
         ]),
-        noOfGuest:
-          stay?.noOfGuest || stay?.noOfGuests || guest?.noOfGuest || guest?.noOfGuests || 1,
-
-        // Normalize Status for Dropdowns in StaySpecifications.jsx
+        noOfGuest: stay?.noOfGuest || guest?.noOfGuest || 1,
         stayStatusEnum: normalizeDropdown(stay?.stayStatusEnum || 'Confirmed', [
           'Confirmed',
           'Unconfirmed',
         ]),
         deleted: stay?.deleted || false,
-
-        // Guest Details / Temporal Logistics
         guestDetailId: guest?.id || null,
         checkInDate: formatDate(guest?.checkInDate) || formatDate(defaults.checkInDate),
         checkOutDate: formatDate(guest?.checkOutDate) || formatDate(defaults.checkOutDate),
         checkInTime: formatTime(guest?.checkInTime) || formatTime(defaults.checkInTime),
         checkOutTime: formatTime(guest?.checkOutTime) || formatTime(defaults.checkOutTime),
-
         guestDetailsStatus: normalizeDropdown(guest?.guestDetailsStatus || 'Reservation', [
           'Reservation',
           'Check-In',
@@ -769,17 +550,7 @@ export const useGuestPersonalDetailsManagement = ({
         ]),
         noOfDays: guest?.noOfDays || defaults.noOfDays,
         rentId: guest?.rentDetailsId || guest?.rentId || '',
-
-        // Room Status
-        roomStatusId:
-          stay?.roomStatusId ||
-          stay?.roomStatus?.id ||
-          stay?.room_status_id ||
-          guest?.roomStatusId ||
-          guest?.room_status_id ||
-          '',
-
-        // Rent Detail Populate
+        roomStatusId: stay?.roomStatusId || guest?.roomStatusId || '',
         rent: rentDetailObj?.rent || '',
         basic: rentDetailObj?.basic || '',
         taxId: rentDetailObj?.taxId || rentDetailObj?.taxMaster?.id || '',
@@ -797,11 +568,14 @@ export const useGuestPersonalDetailsManagement = ({
     [toggleModal, defaults],
   )
 
-  /**
-   * handleAddNewPersonalDetail - Resets the form with industrial defaults for a new guest.
-   */
-  const handleAddNewPersonalDetail = useCallback(() => {
+  const handleAddNewPersonalDetail = useCallback(async () => {
     const newDefaults = getIndustrialStayDefaults()
+    let initialFolio = ''
+    try {
+      initialFolio = await fetchFolioNo()
+    } catch (err) {
+      console.warn('Could not fetch folio number automatically', err)
+    }
 
     setPersonalFormData({
       firstName: '',
@@ -813,6 +587,7 @@ export const useGuestPersonalDetailsManagement = ({
       companyName: '',
       profilePhoto: '',
       signature: '',
+      contactInformationTypeEnum: 'HOME',
       isDeleted: false,
       documentNumber: '',
       validTill: '',
@@ -829,9 +604,8 @@ export const useGuestPersonalDetailsManagement = ({
       noOfGuest: 1,
       stayStatusEnum: 'Confirmed',
       deleted: false,
-      // Dynamic Defaults
-      checkInDate: newDefaults.checkInDate,
-      checkOutDate: newDefaults.checkOutDate,
+      checkInDate: newDefaults.checkInDate.split('T')[0],
+      checkOutDate: newDefaults.checkOutDate.split('T')[0],
       checkInTime: newDefaults.checkInTime,
       checkOutTime: newDefaults.checkOutTime,
       guestDetailsStatus: 'Reservation',
@@ -849,13 +623,16 @@ export const useGuestPersonalDetailsManagement = ({
       ccAuthorized: '',
       deposite: '',
       balance: '',
+      folioNo: initialFolio || '',
+      crsFolioNo: '',
     })
     toggleModal('personalDetail', true)
-  }, [toggleModal, getIndustrialStayDefaults])
+  }, [toggleModal, getIndustrialStayDefaults, fetchFolioNo])
 
   return {
     personalFormData,
     setPersonalFormData,
+    setNewPersonalDetail: setPersonalFormData, // Compatibility alias
     editPersonalFormData,
     setEditPersonalFormData,
     handleAddPersonalDetail,

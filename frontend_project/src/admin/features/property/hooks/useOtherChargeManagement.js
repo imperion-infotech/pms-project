@@ -1,6 +1,12 @@
 import { useState, useCallback } from 'react'
+import { usePmsOtherCharges } from '../../../../hooks/usePmsOtherCharges'
 
-export const useOtherChargeManagement = ({ addOtherCharge, updateOtherCharge, toggleModal }) => {
+/**
+ * useOtherChargeManagement - Centralized hook for Other Charge CRUD operations.
+ * Ported to TanStack Query for industrial stability.
+ */
+export const useOtherChargeManagement = ({ toggleModal }) => {
+  const { addOtherCharge, updateOtherCharge } = usePmsOtherCharges()
   const [newOtherCharge, setNewOtherCharge] = useState({
     otherChargeShortName: '',
     otherChargeName: '',

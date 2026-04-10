@@ -1,9 +1,12 @@
 import { useState, useCallback } from 'react'
+import { usePmsFloors } from '../../../../hooks/usePmsFloors'
 
 /**
  * useFloorManagement - Centralized hook for Floor CRUD operations.
+ * Ported to TanStack Query for industrial stability.
  */
-export const useFloorManagement = ({ addFloor, updateFloor, toggleModal }) => {
+export const useFloorManagement = ({ toggleModal }) => {
+  const { addFloor, updateFloor } = usePmsFloors()
   const [newFloor, setNewFloor] = useState({ name: '', description: '' })
   const [editFloor, setEditFloor] = useState({ id: null, name: '', description: '' })
 

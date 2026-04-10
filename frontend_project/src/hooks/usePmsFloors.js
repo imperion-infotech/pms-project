@@ -1,89 +1,57 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { propertyService } from '../services/propertyService'
 import { useToast } from '../context/NotificationContext'
 
 const extractData = (res) => res.data?.content || (Array.isArray(res.data) ? res.data : [])
 
 export const usePmsFloors = () => {
-  const [floors, setFloors] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
+  const queryClient = useQueryClient()
   const toast = useToast()
 
-  const fetchFloors = useCallback(async () => {
-    setIsLoading(true)
-    try {
+  const {
+    data: floors = [],
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ['floors'],
+    queryFn: async () => {
       const res = await propertyService.getFloors()
-      setFloors(extractData(res))
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to fetch floors')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [toast])
-
-  useEffect(() => {
-    fetchFloors()
-  }, [fetchFloors])
-
-  const addFloor = useCallback(
-    async (payload) => {
-      try {
-        const res = await propertyService.createFloor(payload)
-        toast.success('Floor created successfully')
-        fetchFloors()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to create floor')
-        throw err
-      }
+      return extractData(res)
     },
-    [fetchFloors, toast],
-  )
+    staleTime: 1000 * 60 * 10,
+  })
 
-  const updateFloor = useCallback(
-    async (id, payload) => {
-      try {
-        const res = await propertyService.updateFloor(id, payload)
-        toast.success('Floor updated successfully')
-        fetchFloors()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to update floor')
-        throw err
-      }
+  const floorMutation = useMutation({
+    mutationFn: (args) => {
+      const { id, payload, type } = args
+      if (type === 'create') return propertyService.createFloor(payload)
+      if (type === 'update') return propertyService.updateFloor(id, payload)
+      if (type === 'delete') return propertyService.deleteFloor(id)
     },
-    [fetchFloors, toast],
-  )
-
-  const deleteFloor = useCallback(
-    async (id) => {
-      try {
-        const res = await propertyService.deleteFloor(id)
-        toast.success('Floor deleted successfully')
-        fetchFloors()
-        return res
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Failed to delete floor')
-        throw err
-      }
+    onSuccess: (res, variables) => {
+      const msgs = { create: 'Floor created', update: 'Floor updated', delete: 'Floor deleted' }
+      toast.success(msgs[variables.type])
+      queryClient.invalidateQueries(['floors'])
     },
-    [fetchFloors, toast],
-  )
+    onError: (err) => toast.error(err.response?.data?.message || 'Operation failed'),
+  })
 
-  const searchFloors = useCallback(
-    async (query) => {
-      setIsLoading(true)
-      try {
-        const res = await propertyService.searchFloors(query)
-        setFloors(extractData(res))
-      } catch (err) {
-        toast.error(err.response?.data?.message || 'Floor search failed')
-      } finally {
-        setIsLoading(false)
-      }
-    },
-    [toast],
-  )
+  const addFloor = (payload) => floorMutation.mutateAsync({ payload, type: 'create' })
+  const updateFloor = (id, payload) => floorMutation.mutateAsync({ id, payload, type: 'update' })
+  const deleteFloor = (id) => floorMutation.mutateAsync({ id, type: 'delete' })
 
-  return { floors, isLoading, fetchFloors, addFloor, updateFloor, deleteFloor, searchFloors }
+  const searchFloors = async (query) => {
+    const res = await propertyService.searchFloors(query)
+    queryClient.setQueryData(['floors'], extractData(res))
+  }
+
+  return {
+    floors,
+    isLoading,
+    fetchFloors: refetch,
+    addFloor,
+    updateFloor,
+    deleteFloor,
+    searchFloors,
+  }
 }

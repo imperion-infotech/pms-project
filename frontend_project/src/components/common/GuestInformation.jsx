@@ -4,7 +4,7 @@ import CheckInOutDetails from './CheckInOutDetails'
 const GuestInformation = ({ formData, handleChange, isDark = false }) => {
   const labelClass =
     'text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block'
-  const inputContainerClass = `flex items-center gap-3 px-3 py-2 rounded-xl border transition-all ${
+  const inputContainerClass = `flex items-center gap-3 px-3 py-1.5 rounded-xl border transition-all ${
     isDark
       ? 'bg-slate-800/30 border-slate-700 focus-within:border-blue-500/50'
       : 'bg-white border-slate-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 shadow-sm'
@@ -16,9 +16,10 @@ const GuestInformation = ({ formData, handleChange, isDark = false }) => {
     <div className="space-y-4 text-left">
       <div className="grid grid-cols-1 gap-4">
         <div>
-          <label className={labelClass}>Guest Status</label>
+          <label className={labelClass}>Guest Status <span className="text-red-500">*</span></label>
           <div className={inputContainerClass}>
             <select
+              required
               name="guestDetailsStatus"
               value={formData.guestDetailsStatus}
               onChange={handleChange}

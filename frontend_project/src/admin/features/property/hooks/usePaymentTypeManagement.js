@@ -1,9 +1,12 @@
 import { useState, useCallback } from 'react'
+import { usePmsPaymentTypes } from '../../../../hooks/usePmsPaymentTypes'
 
 /**
  * usePaymentTypeManagement - Centralized hook for Payment Type CRUD operations.
+ * Ported to TanStack Query for industrial stability.
  */
-export const usePaymentTypeManagement = ({ addPaymentType, updatePaymentType, toggleModal }) => {
+export const usePaymentTypeManagement = ({ toggleModal }) => {
+  const { addPaymentType, updatePaymentType } = usePmsPaymentTypes()
   const [newPaymentType, setNewPaymentType] = useState({
     id: 0,
     paymentTypeName: '',

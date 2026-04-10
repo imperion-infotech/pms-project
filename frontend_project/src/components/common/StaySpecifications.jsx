@@ -17,7 +17,7 @@ const StaySpecifications = ({
 }) => {
   // Shared UI classes
   const labelClass = 'text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block'
-  const inputContainerClass = `flex items-center gap-3 px-3 py-2 rounded-xl border transition-all ${
+  const inputContainerClass = `flex items-center gap-3 px-3 py-1.5 rounded-xl border transition-all ${
     isDark
       ? 'bg-slate-800/30 border-slate-700 focus-within:border-blue-500/50'
       : 'bg-white border-slate-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 shadow-sm'
@@ -28,7 +28,7 @@ const StaySpecifications = ({
     'bg-transparent border-none outline-none w-full text-xs font-semibold text-slate-800 dark:text-slate-100'
 
   return (
-    <div className="mt-4 space-y-4 text-left">
+    <div className="mt-3 space-y-4 text-left">
       <div className="flex items-center gap-3 border-l-4 border-blue-500 pl-4">
         <div>
           <h3
@@ -45,10 +45,11 @@ const StaySpecifications = ({
       {/* Row 1: Building & Floor */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className={labelClass}>Building</label>
+          <label className={labelClass}>Building <span className="text-red-500">*</span></label>
           <div className={inputContainerClass}>
             <Building size={14} className="text-slate-300" />
             <select
+              required
               name="buildingId"
               value={formData.buildingId}
               onChange={handleChange}
@@ -64,10 +65,11 @@ const StaySpecifications = ({
           </div>
         </div>
         <div>
-          <label className={labelClass}>Floor</label>
+          <label className={labelClass}>Floor <span className="text-red-500">*</span></label>
           <div className={inputContainerClass}>
             <Building size={14} className="text-slate-300" />
             <select
+              required
               name="floorId"
               value={formData.floorId}
               onChange={handleChange}
@@ -99,9 +101,10 @@ const StaySpecifications = ({
       {/* Row 2: Room Type & Room */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className={labelClass}>Room Type</label>
+          <label className={labelClass}>Room Type <span className="text-red-500">*</span></label>
           <div className={inputContainerClass}>
             <select
+              required
               name="roomTypeId"
               value={formData.roomTypeId}
               onChange={handleChange}
@@ -134,9 +137,10 @@ const StaySpecifications = ({
           </div>
         </div>
         <div>
-          <label className={labelClass}>Room (Unit)</label>
+          <label className={labelClass}>Room (Unit) <span className="text-red-500">*</span></label>
           <div className={inputContainerClass}>
             <select
+              required
               name="roomMasterId"
               value={formData.roomMasterId}
               onChange={handleChange}
@@ -185,9 +189,10 @@ const StaySpecifications = ({
 
       <div className="grid grid-cols-1 gap-4">
         <div>
-          <label className={labelClass}>Room Status</label>
+          <label className={labelClass}>Room Status <span className="text-red-500">*</span></label>
           <div className={inputContainerClass}>
             <select
+              required
               name="roomStatusId"
               value={formData.roomStatusId}
               onChange={handleChange}
@@ -207,9 +212,10 @@ const StaySpecifications = ({
       {/* Required Booking Attributes */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className={labelClass}>Rate Type*</label>
+          <label className={labelClass}>Rate Type <span className="text-red-500">*</span></label>
           <div className={inputContainerClass}>
             <select
+              required
               name="rateTypeEnum"
               value={formData.rateTypeEnum || 'RACK'}
               onChange={handleChange}
@@ -223,9 +229,10 @@ const StaySpecifications = ({
           </div>
         </div>
         <div>
-          <label className={labelClass}>No. Of Guests*</label>
+          <label className={labelClass}>No. Of Guests <span className="text-red-500">*</span></label>
           <div className={inputContainerClass}>
             <input
+              required
               type="number"
               name="noOfGuest"
               value={formData.noOfGuest || 1}
@@ -236,9 +243,10 @@ const StaySpecifications = ({
           </div>
         </div>
         <div>
-          <label className={labelClass}>Stay Status*</label>
+          <label className={labelClass}>Stay Status <span className="text-red-500">*</span></label>
           <div className={inputContainerClass}>
             <select
+              required
               name="stayStatusEnum"
               value={formData.stayStatusEnum || 'Confirmed'}
               onChange={handleChange}

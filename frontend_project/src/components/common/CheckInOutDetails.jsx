@@ -4,13 +4,14 @@ const CheckInOutDetails = ({ formData, handleChange }) => {
   const today = new Date().toISOString().split('T')[0]
 
   return (
-    <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-800/40 grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+    <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3 dark:border-slate-800 dark:bg-slate-800/40 grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
       
       {/* CHECK-IN */}
       <div>
-        <label className="mb-1.5 block text-[9px] font-bold tracking-widest text-slate-500 uppercase">Check-In</label>
-        <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition-all focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50">
+        <label className="mb-1.5 block text-[9px] font-bold tracking-widest text-slate-500 uppercase">Check-In <span className="text-red-500">*</span></label>
+        <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-1.5 shadow-sm transition-all focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50">
           <input
+            required
             type="date"
             name="checkInDate"
             value={formData.checkInDate ? (formData.checkInDate.includes('T') ? formData.checkInDate.split('T')[0] : formData.checkInDate) : ''}
@@ -20,6 +21,7 @@ const CheckInOutDetails = ({ formData, handleChange }) => {
           />
           <div className="mx-2 h-4 w-px shrink-0 bg-slate-100 dark:bg-slate-700"></div>
           <input
+            required
             type="time"
             name="checkInTime"
             value={formData.checkInTime}
@@ -33,7 +35,7 @@ const CheckInOutDetails = ({ formData, handleChange }) => {
       {/* CHECK-OUT & DURATION */}
       <div>
         <div className="flex items-center justify-between mb-1.5">
-          <label className="block text-[9px] font-bold tracking-widest text-slate-500 uppercase">Check-Out</label>
+          <label className="block text-[9px] font-bold tracking-widest text-slate-500 uppercase">Check-Out <span className="text-red-500">*</span></label>
           <div className="flex items-center gap-1.5">
             <span className="text-[8px] font-black tracking-widest text-blue-500 uppercase">Days</span>
             <input
@@ -46,8 +48,9 @@ const CheckInOutDetails = ({ formData, handleChange }) => {
             />
           </div>
         </div>
-        <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition-all focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50">
+        <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-1.5 shadow-sm transition-all focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50">
           <input
+            required
             type="date"
             name="checkOutDate"
             value={formData.checkOutDate ? (formData.checkOutDate.includes('T') ? formData.checkOutDate.split('T')[0] : formData.checkOutDate) : ''}
@@ -57,6 +60,7 @@ const CheckInOutDetails = ({ formData, handleChange }) => {
           />
           <div className="mx-2 h-4 w-px shrink-0 bg-slate-100 dark:bg-slate-700"></div>
           <input
+            required
             type="time"
             name="checkOutTime"
             value={formData.checkOutTime}

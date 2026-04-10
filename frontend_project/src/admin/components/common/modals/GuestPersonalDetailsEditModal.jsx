@@ -121,14 +121,20 @@ export const GuestPersonalDetailsEditModal = ({
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+       <style>
+        {`
+          .no-scrollbar::-webkit-scrollbar { display: none; }
+          .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        `}
+      </style>
       <div
         className="animate-in fade-in absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
         onClick={() => setIsOpen(false)}
       ></div>
-      <div className="animate-in zoom-in-95 relative z-10 flex h-[95vh] w-full max-w-7xl flex-col overflow-hidden rounded-[40px] border border-white/20 bg-white shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] dark:bg-slate-900">
+      <div className="animate-in zoom-in-95 relative z-10 flex h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-[32px] border border-white/20 bg-white shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] dark:bg-slate-900">
         <form onSubmit={handleSubmit} className="flex h-full flex-col overflow-hidden">
           {/* Header */}
-          <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-white/80 px-10 py-5 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/80">
+          <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-white/80 px-8 py-4 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/80">
             <div className="flex items-center gap-5">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-blue-500 to-blue-600 shadow-xl shadow-blue-500/20">
                 <User className="h-6 w-6 text-white" />
@@ -145,18 +151,48 @@ export const GuestPersonalDetailsEditModal = ({
                 </div>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => setIsOpen(false)}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-400 transition-all hover:rotate-90 hover:bg-red-50 hover:text-red-500 dark:bg-slate-800 dark:hover:bg-red-900/30"
-            >
-              <X size={20} />
-            </button>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-6 rounded-2xl bg-slate-50 px-6 py-3 dark:bg-slate-800/50">
+                <div className="flex flex-col items-end">
+                  <span className="text-[9px] font-bold tracking-widest text-slate-400 uppercase">
+                    Folio No.
+                  </span>
+                  <input
+                    type="text"
+                    value={formData.folioNo || ''}
+                    readOnly
+                    className="bg-transparent text-right text-xs font-black text-blue-600 outline-none dark:text-blue-400"
+                    placeholder="—"
+                  />
+                </div>
+                <div className="h-8 w-px bg-slate-200 dark:bg-slate-700"></div>
+                <div className="flex flex-col items-end">
+                  <span className="text-[9px] font-bold tracking-widest text-slate-400 uppercase">
+                    CRS Folio No.
+                  </span>
+                  <input
+                    type="text"
+                    value={formData.crsFolioNo || ''}
+                    onChange={(e) => setFormData({ ...formData, crsFolioNo: e.target.value })}
+                    className="w-24 bg-transparent text-right text-xs font-black text-slate-800 outline-none focus:text-blue-600 dark:text-white dark:focus:text-blue-400"
+                    placeholder="Enter No."
+                  />
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-400 transition-all hover:rotate-90 hover:bg-red-50 hover:text-red-500 dark:bg-slate-800 dark:hover:bg-red-900/30"
+              >
+                <X size={20} />
+              </button>
+            </div>
           </div>
 
           <div className="flex flex-1 flex-col overflow-hidden bg-slate-50/50 lg:flex-row dark:bg-slate-900">
             {/* Column 1: Identity & Documentation */}
-            <div className="scrollbar-hide flex w-full flex-col border-b border-slate-200 bg-white transition-all lg:w-[32%] lg:border-r lg:border-b-0 dark:border-slate-800 dark:bg-slate-900">
+            <div className="no-scrollbar flex w-full flex-col border-b border-slate-200 bg-white transition-all lg:w-[32%] lg:border-r lg:border-b-0 dark:border-slate-800 dark:bg-slate-900">
               <div className="flex items-center gap-3 p-4 pb-0">
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
                   <User size={16} className="text-blue-600 dark:text-blue-400" />
@@ -165,7 +201,7 @@ export const GuestPersonalDetailsEditModal = ({
                   Part 1: Identity & Docs
                 </h3>
               </div>
-              <div className="scrollbar-hide flex-1 space-y-4 overflow-y-auto p-4">
+              <div className="no-scrollbar flex-1 space-y-4 overflow-y-auto p-4">
                 {/* Asset Capture */}
                 <div className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-700/50 dark:bg-slate-800/50">
                   <div className="group relative">
@@ -247,27 +283,27 @@ export const GuestPersonalDetailsEditModal = ({
                 <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                   <div>
                     <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                      First Name
+                      First Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       required
                       type="text"
                       value={formData.firstName}
                       onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-1.5 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
                       placeholder="First Name"
                     />
                   </div>
                   <div>
                     <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                      Last Name
+                      Last Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       required
                       type="text"
                       value={formData.lastName}
                       onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-1.5 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
                       placeholder="Last Name"
                     />
                   </div>
@@ -284,68 +320,93 @@ export const GuestPersonalDetailsEditModal = ({
                         type="text"
                         value={formData.companyName}
                         onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white py-2 pr-4 pl-10 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white py-1.5 pr-4 pl-10 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
                         placeholder="Company"
                       />
                     </div>
                   </div>
-                  <div>
-                    <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                      Phone Number
-                    </label>
-                    <div className="group relative">
-                      <Phone
-                        size={14}
-                        className="absolute top-1/2 left-3.5 -translate-y-1/2 text-slate-300 transition-colors group-focus-within:text-blue-500"
-                      />
-                      <input
-                        required
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            phone: e.target.value,
-                            mobileNumber: e.target.value,
-                          })
-                        }
-                        className="w-full rounded-xl border border-slate-200 bg-white py-2 pr-4 pl-10 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
-                        placeholder="Phone"
-                      />
+                    <div className="col-span-2">
+                       <div className="mb-3 flex items-center gap-3">
+                         <span className="text-[10px] font-black tracking-widest text-blue-500 uppercase">
+                           Contact Channels
+                         </span>
+                         <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800"></div>
+                       </div>
+                       <div className="mb-4">
+                         <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+                           Contact Information Type
+                         </label>
+                         <select
+                           value={formData.contactInformationTypeEnum}
+                           onChange={(e) =>
+                             setFormData({ ...formData, contactInformationTypeEnum: e.target.value })
+                           }
+                           className="w-full rounded-xl border border-slate-200 bg-white px-4 py-1.5 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
+                         >
+                           <option value="HOME">HOME</option>
+                           <option value="OFFICE">OFFICE</option>
+                           <option value="OTHER">OTHER</option>
+                         </select>
+                       </div>
+                     </div>
+
+                    <div>
+                      <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+                        {formData.contactInformationTypeEnum} Phone Number <span className="text-red-500">*</span>
+                      </label>
+                      <div className="group relative">
+                        <Phone
+                          size={14}
+                          className="absolute top-1/2 left-3.5 -translate-y-1/2 text-slate-300 transition-colors group-focus-within:text-blue-500"
+                        />
+                        <input
+                          required
+                          type="tel"
+                          value={formData.phone}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              phone: e.target.value,
+                              mobileNumber: e.target.value,
+                            })
+                          }
+                          className="w-full rounded-xl border border-slate-200 bg-white py-1.5 pr-4 pl-10 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
+                          placeholder={formData.contactInformationTypeEnum === 'HOME' ? "Personal Phone" : "Work Phone"}
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                      Email Address
-                    </label>
-                    <div className="group relative">
-                      <Mail
-                        size={14}
-                        className="absolute top-1/2 left-3.5 -translate-y-1/2 text-slate-300 transition-colors group-focus-within:text-blue-500"
-                      />
-                      <input
-                        required
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white py-2 pr-4 pl-10 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
-                        placeholder="Email"
-                      />
+                    <div>
+                      <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+                        {formData.contactInformationTypeEnum} Email Address <span className="text-red-500">*</span>
+                      </label>
+                      <div className="group relative">
+                        <Mail
+                          size={14}
+                          className="absolute top-1/2 left-3.5 -translate-y-1/2 text-slate-300 transition-colors group-focus-within:text-blue-500"
+                        />
+                        <input
+                          required
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          className="w-full rounded-xl border border-slate-200 bg-white py-1.5 pr-4 pl-10 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
+                          placeholder={formData.contactInformationTypeEnum === 'HOME' ? "Personal Email" : "Work Email"}
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div className="col-span-2">
-                    <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                      Full Address
-                    </label>
-                    <textarea
-                      required
-                      rows="1"
-                      value={formData.address}
-                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      className="scrollbar-hide w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
-                      placeholder="Address"
-                    ></textarea>
-                  </div>
+                    <div className="col-span-2">
+                      <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+                        {formData.contactInformationTypeEnum} Full Address <span className="text-red-500">*</span>
+                      </label>
+                      <textarea
+                        required
+                        rows="1"
+                        value={formData.address}
+                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                        className="no-scrollbar w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-1.5 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20"
+                        placeholder={formData.contactInformationTypeEnum === 'HOME' ? "Residence Address" : "Office Address"}
+                      ></textarea>
+                    </div>
                 </div>
 
                 {/* Verification Documents */}
@@ -359,14 +420,15 @@ export const GuestPersonalDetailsEditModal = ({
                   <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                     <div>
                       <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                        Doc Type
+                        Doc Type <span className="text-red-500">*</span>
                       </label>
                       <select
+                        required
                         value={formData.documentTypeId}
                         onChange={(e) =>
                           setFormData({ ...formData, documentTypeId: e.target.value })
                         }
-                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
                       >
                         <option value="">Type</option>
                         {documentTypes?.map((type) => (
@@ -378,15 +440,16 @@ export const GuestPersonalDetailsEditModal = ({
                     </div>
                     <div>
                       <label className="mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                        Number
+                        Number <span className="text-red-500">*</span>
                       </label>
                       <input
+                        required
                         type="text"
                         value={formData.documentNumber}
                         onChange={(e) =>
                           setFormData({ ...formData, documentNumber: e.target.value })
                         }
-                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
                         placeholder="ID number"
                       />
                     </div>
@@ -398,7 +461,7 @@ export const GuestPersonalDetailsEditModal = ({
                         type="date"
                         value={formData.validTill}
                         onChange={(e) => setFormData({ ...formData, validTill: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
                       />
                     </div>
                     <div>
@@ -409,7 +472,7 @@ export const GuestPersonalDetailsEditModal = ({
                         type="text"
                         value={formData.remark}
                         onChange={(e) => setFormData({ ...formData, remark: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-blue-900/20"
                         placeholder="Remarks"
                       />
                     </div>
@@ -469,7 +532,7 @@ export const GuestPersonalDetailsEditModal = ({
             </div>
 
             {/* Column 2: Stay & Room Allocation */}
-            <div className="scrollbar-hide flex w-full flex-col border-b border-slate-200 bg-slate-50/50 transition-all lg:w-[46%] lg:border-r lg:border-b-0 dark:border-slate-800 dark:bg-slate-800/20">
+            <div className="no-scrollbar flex w-full flex-col border-b border-slate-200 bg-slate-50/50 transition-all lg:w-[46%] lg:border-r lg:border-b-0 dark:border-slate-800 dark:bg-slate-800/20">
               <div className="flex items-center gap-3 p-4 pb-0 text-left">
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30">
                   <BedDouble size={16} className="text-amber-600 dark:text-amber-400" />
@@ -479,7 +542,7 @@ export const GuestPersonalDetailsEditModal = ({
                 </h3>
               </div>
 
-              <div className="scrollbar-hide flex-1 space-y-4 overflow-y-auto p-4 text-left">
+              <div className="no-scrollbar flex-1 space-y-4 overflow-y-auto p-4 text-left">
                 <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                   <GuestInformation
                     formData={formData}
@@ -536,7 +599,7 @@ export const GuestPersonalDetailsEditModal = ({
             </div>
 
             {/* Column 3: Ledger */}
-            <div className="scrollbar-hide relative flex w-full flex-col bg-emerald-50/30 transition-all lg:w-[22%] dark:bg-emerald-900/5">
+            <div className="no-scrollbar relative flex w-full flex-col bg-emerald-50/30 transition-all lg:w-[22%] dark:bg-emerald-900/5">
               <div className="absolute inset-y-0 left-0 hidden w-px bg-linear-to-b from-transparent via-emerald-200 to-transparent lg:block dark:via-emerald-500/20"></div>
 
               <div className="flex items-center gap-3 p-4 pb-0 text-left">
@@ -548,7 +611,7 @@ export const GuestPersonalDetailsEditModal = ({
                 </h3>
               </div>
 
-              <div className="scrollbar-hide flex-1 overflow-y-auto p-4 text-left">
+              <div className="no-scrollbar flex-1 overflow-y-auto p-4 text-left">
                 <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-white p-4 shadow-lg shadow-emerald-500/5 dark:border-emerald-900/30 dark:bg-slate-900">
                   <RentDetails
                     formData={formData}
@@ -564,7 +627,7 @@ export const GuestPersonalDetailsEditModal = ({
           </div>
 
           {/* Footer */}
-          <div className="flex w-full shrink-0 items-center justify-between border-t border-slate-100 bg-white/95 px-10 py-5 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95">
+          <div className="flex w-full shrink-0 items-center justify-between border-t border-slate-100 bg-white/95 px-8 py-4 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95">
             <button
               type="button"
               onClick={() => setIsOpen(false)}

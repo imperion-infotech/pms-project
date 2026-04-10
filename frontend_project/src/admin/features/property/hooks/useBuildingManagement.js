@@ -1,9 +1,12 @@
 import { useState, useCallback } from 'react'
+import { usePmsBuildings } from '../../../../hooks/usePmsBuildings'
 
 /**
  * useBuildingManagement - Centralized hook for Building CRUD operations.
+ * Ported to TanStack Query for industrial stability.
  */
-export const useBuildingManagement = ({ addBuilding, updateBuilding, toggleModal }) => {
+export const useBuildingManagement = ({ toggleModal }) => {
+  const { addBuilding, updateBuilding } = usePmsBuildings()
   const [newBuilding, setNewBuilding] = useState({ name: '', description: '' })
   const [editBuilding, setEditBuilding] = useState({ id: null, name: '', description: '' })
 

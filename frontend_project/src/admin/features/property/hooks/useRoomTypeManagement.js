@@ -1,9 +1,12 @@
 import { useState, useCallback } from 'react'
+import { usePmsRoomTypes } from '../../../../hooks/usePmsRoomTypes'
 
 /**
  * useRoomTypeManagement - Centralized hook for Room Type CRUD operations.
+ * Ported to TanStack Query for industrial stability.
  */
-export const useRoomTypeManagement = ({ addRoomType, updateRoomType, toggleModal }) => {
+export const useRoomTypeManagement = ({ toggleModal }) => {
+  const { addRoomType, updateRoomType } = usePmsRoomTypes()
   const [newRoomType, setNewRoomType] = useState({ shortName: '', roomTypeName: '', price: '' })
   const [editRoomType, setEditRoomType] = useState({
     id: null,

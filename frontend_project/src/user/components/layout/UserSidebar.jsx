@@ -17,7 +17,7 @@ import { useSidebar } from '../../../context/SidebarContext'
  * UserSidebar component - Matches exactly with the Admin Dashboard Sidebar.
  * Displays fetched room types and room statuses as nested accordion lists.
  */
-const UserSidebar = ({ buildings = [], roomTypes = [], roomStatuses = [], onGoToPms }) => {
+const UserSidebar = ({ buildings = [], roomTypes = [], roomStatuses = [] }) => {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
   const [isBuildingMenuOpen, setIsBuildingMenuOpen] = React.useState(true)
   const [isTypeMenuOpen, setIsTypeMenuOpen] = React.useState(true)
@@ -55,7 +55,11 @@ const UserSidebar = ({ buildings = [], roomTypes = [], roomStatuses = [], onGoTo
           <div className="custom-scrollbar flex-1 overflow-y-auto py-4">
             {/* Go to Dashboard Button */}
             <button
-              onClick={onGoToPms}
+              type="button"
+              onDoubleClick={() => {
+                console.log('Double click triggered');
+                navigate('/');
+              }}
               className={`relative mb-1 flex w-full items-center gap-3 px-4 py-3 text-sm font-semibold text-slate-300 transition-all hover:bg-slate-700/60 hover:text-white`}
               style={{ borderRadius: '0' }}
             >

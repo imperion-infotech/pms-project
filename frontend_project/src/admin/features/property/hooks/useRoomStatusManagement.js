@@ -1,9 +1,12 @@
 import { useState, useCallback } from 'react'
+import { usePmsRoomStatus } from '../../../../hooks/usePmsRoomStatus'
 
 /**
  * useRoomStatusManagement - Centralized hook for Room Status CRUD operations.
+ * Ported to TanStack Query for industrial stability.
  */
-export const useRoomStatusManagement = ({ addRoomStatus, updateRoomStatus, toggleModal }) => {
+export const useRoomStatusManagement = ({ toggleModal }) => {
+  const { addRoomStatus, updateRoomStatus } = usePmsRoomStatus()
   const [newRoomStatus, setNewRoomStatus] = useState({
     roomStatusName: '',
     roomStatusTitle: '',
