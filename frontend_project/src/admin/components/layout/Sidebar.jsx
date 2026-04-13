@@ -105,7 +105,7 @@ const SubItem = ({ item, isActive, color, onClick, isLast }) => {
 
       {/* Label */}
       <span
-        className={`capitalize tracking-wide transition-colors duration-200 ${
+        className={`tracking-wide capitalize transition-colors duration-200 ${
           isActive ? c.textActive : 'text-slate-400 group-hover:text-slate-200'
         }`}
       >
@@ -191,6 +191,7 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
 
   const propertyItems = [
+    { name: 'Property Details', icon: Home },
     { name: 'Building', icon: Building },
     { name: 'Floor', icon: Layers },
     { name: 'Room Type', icon: LayoutDashboard },
@@ -252,7 +253,7 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
           <div className="custom-scrollbar flex-1 overflow-y-auto py-4">
             {/* Go to Home */}
             <button
-              onClick={() => {
+              onDoubleClick={() => {
                 navigate('/home', { state: { initialFloor: 'All' } })
                 if (window.innerWidth < 1024) setIsSidebarOpen(false)
               }}
@@ -285,10 +286,7 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
                 color="emerald"
               />
               {isPropertyOpen && (
-                <div
-                  className="bg-surface-50 py-1"
-                  style={expandedContainer}
-                >
+                <div className="bg-surface-50 py-1" style={expandedContainer}>
                   {propertyItems.map((item, idx) => (
                     <SubItem
                       key={item.name}
@@ -298,6 +296,7 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
                       isLast={idx === propertyItems.length - 1}
                       onClick={() => {
                         setActiveItem(item.name)
+                        navigate(`?tab=${item.name.replace(/\s+/g, '')}`)
                         if (window.innerWidth < 1024) setIsSidebarOpen(false)
                       }}
                     />
@@ -319,10 +318,7 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
                 color="blue"
               />
               {isProfileOpen && (
-                <div
-                  className="bg-surface-50 py-1"
-                  style={expandedContainer}
-                >
+                <div className="bg-surface-50 py-1" style={expandedContainer}>
                   {profileItems.map((item, idx) => (
                     <SubItem
                       key={item.name}
@@ -332,6 +328,7 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
                       isLast={idx === profileItems.length - 1}
                       onClick={() => {
                         setActiveItem(item.name)
+                        navigate(`?tab=${item.name.replace(/\s+/g, '')}`)
                         if (window.innerWidth < 1024) setIsSidebarOpen(false)
                       }}
                     />
@@ -353,10 +350,7 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
                 color="orange"
               />
               {isConfigOpen && (
-                <div
-                  className="bg-surface-50 py-1"
-                  style={expandedContainer}
-                >
+                <div className="bg-surface-50 py-1" style={expandedContainer}>
                   {configurationItems.map((item, idx) => (
                     <SubItem
                       key={item.name}
@@ -366,6 +360,7 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
                       isLast={idx === configurationItems.length - 1}
                       onClick={() => {
                         setActiveItem(item.name)
+                        navigate(`?tab=${item.name.replace(/\s+/g, '')}`)
                         if (window.innerWidth < 1024) setIsSidebarOpen(false)
                       }}
                     />

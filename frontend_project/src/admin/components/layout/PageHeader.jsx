@@ -37,7 +37,11 @@ const PageHeader = ({ activeItem, onRefresh, isLoading, searchTerm, setSearchTer
       </div>
       <div className="flex w-full items-center gap-3 sm:w-auto">
         <button
-          onClick={onRefresh}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault()
+            if (onRefresh) onRefresh()
+          }}
           disabled={isLoading}
           className={`rounded-lg border p-2 ${isDark ? 'border-slate-700 hover:bg-slate-800' : 'border-slate-200 hover:bg-slate-50'} transition-all ${isLoading ? 'cursor-not-allowed opacity-50' : 'active:scale-95'}`}
           title="Refresh Data"

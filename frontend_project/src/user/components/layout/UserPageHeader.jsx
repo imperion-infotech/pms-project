@@ -25,7 +25,7 @@ const UserPageHeader = ({
     >
       {/* ─── TOP TIER: Context, Stats, Tools ─── */}
       <div
-        className={`flex min-h-[4rem] flex-col items-center justify-between gap-4 border-b px-4 py-3 sm:flex-row sm:gap-0 sm:py-0 md:px-6 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}
+        className={`flex min-h-16 flex-col items-center justify-between gap-4 border-b px-4 py-3 sm:flex-row sm:gap-0 sm:py-0 md:px-6 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}
       >
         {/* Context Breadcrumb */}
         <div className="flex w-full shrink-0 items-center gap-3 sm:w-auto">
@@ -109,7 +109,11 @@ const UserPageHeader = ({
             </div>
 
             <button
-              onClick={onRefresh}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                if (onRefresh) onRefresh()
+              }}
               disabled={isLoading}
               className={`flex h-9 w-9 items-center justify-center rounded-xl border p-2 transition-all ${
                 isDark

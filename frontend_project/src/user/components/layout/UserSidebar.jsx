@@ -57,8 +57,8 @@ const UserSidebar = ({ buildings = [], roomTypes = [], roomStatuses = [] }) => {
             <button
               type="button"
               onDoubleClick={() => {
-                console.log('Double click triggered');
-                navigate('/');
+                navigate('/dashboard')
+                if (window.innerWidth < 1024) setIsSidebarOpen(false)
               }}
               className={`relative mb-1 flex w-full items-center gap-3 px-4 py-3 text-sm font-semibold text-slate-300 transition-all hover:bg-slate-700/60 hover:text-white`}
               style={{ borderRadius: '0' }}
