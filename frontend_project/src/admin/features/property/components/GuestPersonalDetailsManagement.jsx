@@ -1,22 +1,16 @@
 import React from 'react'
 import {
-  Building,
   Mail,
   Phone,
-  MapPin,
   Trash2,
   Plus,
   User,
   AlertTriangle,
   X,
-  Search,
-  ShieldCheck,
   UserCircle2,
-  Edit3,
   PlusCircle,
   Pencil,
 } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
 import useGuestPersonalDetailsController from '../controllers/useGuestPersonalDetailsController'
 import { AuthImage } from '../../../components/common/AuthImage'
 
@@ -63,76 +57,61 @@ const GuestPersonalDetailsManagement = ({
   /* ... skipping unchanged ... */
 
   return (
-    <div className="space-y-6">
-      {/* Search and Action Bar */}
-      <div className="dark:bg-surface-100 flex flex-col items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-md transition-colors duration-300 sm:flex-row sm:p-6 dark:border-slate-800">
-        <div className="text-center sm:text-left">
-          <h2 className="font-heading text-lg font-bold tracking-tight text-[#1a2b4b] md:text-xl dark:text-slate-100">
-            User Personal Details
-          </h2>
-          <p className="text-xs font-medium text-slate-400 md:text-sm">
-            Manage and organize user profile information
-          </p>
+    <div className="animate-in fade-in slide-in-from-bottom-4 space-y-6 duration-700">
+      {/* Header & Action Bar */}
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <div className="flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-500 shadow-sm transition-all hover:scale-110">
+            <UserCircle2 className="h-6 w-6" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white">
+              User Personal Details
+            </h2>
+            <p className="text-xs font-medium text-slate-400">
+              Manage and organize user profile information
+            </p>
+          </div>
         </div>
 
         <button
           onClick={onAdd}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 px-5 py-2.5 text-[11px] font-black tracking-wider text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-600 active:scale-95 sm:w-auto md:px-6 md:text-xs"
+          className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-700 hover:shadow-blue-500/40 active:scale-95"
         >
-          <PlusCircle size={18} />
-          ADD NEW PROFILE
+          <PlusCircle className="h-4 w-4" />
+          <span>Add New Profile</span>
         </button>
       </div>
 
 
-      {/* Guest Table */}
-      <div className="dark:bg-surface-100 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/50 transition-colors duration-300 dark:border-slate-800 dark:shadow-none">
+      {/* Main Table Layer */}
+      <div className="overflow-hidden rounded-3xl border border-slate-200/60 bg-white/80 shadow-2xl shadow-slate-200/40 backdrop-blur-xl transition-all hover:shadow-slate-300/50 dark:border-slate-800/50 dark:bg-slate-900/80">
         <div className="scrollbar-hide max-h-[650px] w-full overflow-auto">
-          <table className="w-full min-w-[1400px] border-collapse text-left">
-            <thead className="sticky top-0 z-10 shadow-[0_4px_12px_-4px_rgba(0,0,0,0.1)]">
-              <tr className="border-b border-slate-200 bg-white/95 text-[11px] font-bold tracking-widest text-[#a0aec0] uppercase backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95 dark:text-slate-500">
-                <th className="w-24 px-8 py-5 text-center">
-                  NO.
-                </th>
-                <th className="px-8 py-5">
-                  USER NAME
-                </th>
-                <th className="px-8 py-5">
-                  EMAIL ADDRESS
-                </th>
-                <th className="px-8 py-5 text-center">
-                  PHONE NO.
-                </th>
-                <th className="px-8 py-5 text-center">
-                  DOC TYPE
-                </th>
-                <th className="px-8 py-5">
-                  DOCUMENT NO.
-                </th>
-                <th className="px-8 py-5 text-center">
-                  VALID TILL
-                </th>
-                <th className="px-8 py-5 text-center">
-                  STATUS
-                </th>
-                <th className="px-8 py-5 text-center">
-                  TOTAL RENT
-                </th>
-                <th className="px-8 py-5 text-center">ACTIONS</th>
+          <table className="w-full border-collapse text-left">
+            <thead className="sticky top-0 z-10">
+              <tr className="border-b border-slate-100 bg-slate-50/50 dark:border-slate-800/50 dark:bg-slate-800/30">
+                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">No.</th>
+                <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">User Name</th>
+                <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">Email Address</th>
+                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Phone No.</th>
+                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Doc Type</th>
+                <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">Document No.</th>
+                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Valid Till</th>
+                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Status</th>
+                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Total Rent</th>
+                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-[13px] dark:divide-slate-800">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
               {processedDetails.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan="10"
-                    className="px-8 py-20 text-center text-slate-400 dark:text-slate-500"
-                  >
-                    <div className="flex flex-col items-center justify-center space-y-2">
-                      <AlertTriangle className="h-10 w-10 opacity-20" />
-                      <p className="text-[10px] font-medium tracking-widest uppercase">
-                        No guest profiles defined
-                      </p>
+                  <td colSpan="10" className="px-6 py-20 text-center">
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 dark:bg-slate-800/20">
+                        <UserCircle2 className="h-8 w-8 text-slate-200 dark:text-slate-700" />
+                      </div>
+                      <p className="text-sm font-medium text-slate-400">No guest profiles defined</p>
+                      <button onClick={onAdd} className="text-xs font-bold text-blue-500 hover:underline">Add your first profile</button>
                     </div>
                   </td>
                 </tr>
@@ -202,21 +181,13 @@ const GuestPersonalDetailsManagement = ({
                       <td className="px-8 py-2 text-center font-mono font-bold text-[#1a2b4b] dark:text-slate-300">
                         {rent?.totalCharges ? `₹${rent.totalCharges}` : '—'}
                       </td>
-                      <td className="px-8 py-2 text-center">
-                        <div className="flex items-center justify-center gap-4">
-                          <button
-                            onClick={() => onEdit(guest, guestDocument, guestStay, guestDetail, rent)}
-                            className="rounded-lg p-1.5 text-blue-400 transition-colors hover:bg-blue-50 dark:hover:bg-blue-500/10"
-                            title="Edit Profile"
-                          >
-                            <Pencil className="h-5 w-5" />
+                      <td className="px-6 py-4 text-center">
+                        <div className="flex items-center justify-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+                          <button onClick={() => onEdit(guest, guestDocument, guestStay, guestDetail, rent)} className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 shadow-sm transition-all hover:scale-110 hover:border-blue-200 hover:text-blue-500 hover:shadow-blue-100 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-blue-900 dark:hover:shadow-none" title="Edit Profile">
+                            <Pencil className="h-4 w-4" />
                           </button>
-                          <button
-                            onClick={() => handleDeleteClick(guest)}
-                            className="rounded-lg p-1.5 text-red-400 transition-colors hover:bg-red-50 dark:hover:bg-red-500/10"
-                            title="Delete Profile"
-                          >
-                            <Trash2 className="h-5 w-5" />
+                          <button onClick={() => handleDeleteClick(guest)} className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 shadow-sm transition-all hover:scale-110 hover:border-red-200 hover:text-red-500 hover:shadow-red-100 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-red-900 dark:hover:shadow-none" title="Delete Profile">
+                            <Trash2 className="h-4 w-4" />
                           </button>
                         </div>
                       </td>
@@ -229,58 +200,34 @@ const GuestPersonalDetailsManagement = ({
         </div>
       </div>
 
-      {/* Custom Delete Confirmation Modal */}
-      <AnimatePresence>
-        {deleteTarget && (
-          <div className="fixed inset-0 z-200 flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
-              onClick={handleCancelDelete}
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="dark:bg-surface-100 relative z-10 w-full max-w-sm overflow-hidden rounded-[32px] border border-white/20 bg-white p-8 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] dark:border-slate-800"
-            >
-              <div className="mb-6 flex flex-col items-center text-center">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-500 shadow-inner dark:bg-red-500/10">
-                  <AlertTriangle size={32} />
-                </div>
-                <h3 className="text-xl font-black tracking-tight text-slate-800 uppercase dark:text-white">
-                  Delete Profile
-                </h3>
-                <p className="mt-1 text-xs font-bold tracking-wider text-slate-400 uppercase">
-                  This action is permanent
-                </p>
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-200 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={handleCancelDelete} />
+          <div className="animate-in zoom-in-95 relative z-10 w-full max-w-sm overflow-hidden rounded-3xl border border-red-100 bg-white p-6 shadow-2xl transition-all dark:border-red-900/30 dark:bg-slate-900">
+            <div className="mb-4 flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-red-500 dark:bg-red-500/10">
+                <AlertTriangle className="h-6 w-6" />
               </div>
-
-              <p className="mb-8 text-center text-sm font-medium leading-relaxed text-slate-600 dark:text-slate-300">
-                Are you sure you want to delete profile for{' '}
-                <span className="block mt-1 font-black text-red-500 uppercase tracking-tight">"{deleteTarget.name}"</span>?
-              </p>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={handleCancelDelete}
-                  className="flex-1 rounded-2xl border border-slate-100 py-3.5 text-[11px] font-black tracking-widest text-slate-400 uppercase transition-all hover:bg-slate-50 hover:text-slate-600 dark:border-slate-800 dark:hover:bg-slate-800 dark:hover:text-slate-300"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleConfirmDelete}
-                  className="flex-2 rounded-2xl bg-linear-to-r from-red-500 to-red-600 py-3.5 text-[11px] font-black tracking-widest text-white shadow-xl shadow-red-500/30 transition-all hover:translate-y-[-2px] hover:shadow-red-500/40 active:translate-y-px"
-                >
-                  Yes, Delete
-                </button>
+              <div>
+                <h3 className="text-lg font-bold text-slate-800 dark:text-white">Delete Profile</h3>
+                <p className="text-xs font-medium tracking-widest text-slate-400 uppercase">Permanent Action</p>
               </div>
-            </motion.div>
+              <button onClick={handleCancelDelete} className="ml-auto rounded-lg p-1 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700">
+                <X className="h-4 w-4 text-slate-400" />
+              </button>
+            </div>
+            <p className="mb-8 text-sm leading-relaxed font-medium text-slate-500 dark:text-slate-400">
+              Are you sure you want to delete profile for{' '}
+              <span className="font-bold text-slate-800 dark:text-slate-100">"{deleteTarget.name}"</span>? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={handleCancelDelete} className="flex-1 rounded-xl border border-slate-200 py-3 text-sm font-bold text-slate-400 transition-all hover:bg-slate-50 hover:text-slate-600 dark:border-slate-800 dark:hover:bg-slate-800">Cancel</button>
+              <button onClick={handleConfirmDelete} className="flex-1 rounded-xl bg-red-500 py-3 text-sm font-bold text-white shadow-lg shadow-red-500/20 transition-all hover:bg-red-600 active:scale-95">Delete Now</button>
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </div>
   )
 }

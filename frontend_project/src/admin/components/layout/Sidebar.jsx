@@ -21,37 +21,43 @@ import { useNavigate } from 'react-router-dom'
 import { useSidebar } from '../../../context/SidebarContext'
 
 /* ─── Reusable Sub-Item Button ──────────────────────────────── */
-const SubItem = ({ item, isActive, color, onClick }) => {
+const SubItem = ({ item, isActive, color, onClick, isLast }) => {
   const colorMap = {
     emerald: {
-      activeBg: 'rgba(16, 185, 129, 0.1)',
-      activeGlow: '0 0 12px rgba(52,211,153,0.35), inset 0 0 20px rgba(52,211,153,0.05)',
-      borderGlow: '0 0 12px rgba(52,211,153,0.8), 0 0 24px rgba(52,211,153,0.4)',
-      iconActive: 'text-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.9)]',
-      iconHover: 'group-hover:text-emerald-400',
-      bar: 'bg-emerald-400',
-      textActive: 'text-emerald-100',
-      badgeBg: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
+      activeBg: 'rgba(16, 185, 129, 0.12)',
+      activeBoxShadow: '0 0 16px rgba(52,211,153,0.25), inset 0 0 24px rgba(52,211,153,0.06)',
+      barGlow: '0 0 10px rgba(52,211,153,0.9), 0 0 20px rgba(52,211,153,0.5)',
+      barColor: 'bg-emerald-400',
+      iconActive: 'text-emerald-400 drop-shadow-[0_0_5px_rgba(52,211,153,1)]',
+      iconDefault: 'text-slate-500 group-hover:text-emerald-400',
+      dotGlow: '0 0 8px rgba(52,211,153,0.9), 0 0 16px rgba(52,211,153,0.5)',
+      dotColor: 'bg-emerald-400',
+      textActive: 'text-emerald-100 font-semibold',
+      rowBorder: 'rgba(52,211,153,0.08)',
     },
     blue: {
-      activeBg: 'rgba(59, 130, 246, 0.1)',
-      activeGlow: '0 0 12px rgba(96,165,250,0.35), inset 0 0 20px rgba(96,165,250,0.05)',
-      borderGlow: '0 0 12px rgba(96,165,250,0.8), 0 0 24px rgba(96,165,250,0.4)',
-      iconActive: 'text-blue-400 drop-shadow-[0_0_6px_rgba(96,165,250,0.9)]',
-      iconHover: 'group-hover:text-blue-400',
-      bar: 'bg-blue-400',
-      textActive: 'text-blue-100',
-      badgeBg: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
+      activeBg: 'rgba(59, 130, 246, 0.12)',
+      activeBoxShadow: '0 0 16px rgba(96,165,250,0.25), inset 0 0 24px rgba(96,165,250,0.06)',
+      barGlow: '0 0 10px rgba(96,165,250,0.9), 0 0 20px rgba(96,165,250,0.5)',
+      barColor: 'bg-blue-400',
+      iconActive: 'text-blue-400 drop-shadow-[0_0_5px_rgba(96,165,250,1)]',
+      iconDefault: 'text-slate-500 group-hover:text-blue-400',
+      dotGlow: '0 0 8px rgba(96,165,250,0.9), 0 0 16px rgba(96,165,250,0.5)',
+      dotColor: 'bg-blue-400',
+      textActive: 'text-blue-100 font-semibold',
+      rowBorder: 'rgba(96,165,250,0.08)',
     },
     orange: {
-      activeBg: 'rgba(251, 146, 60, 0.1)',
-      activeGlow: '0 0 12px rgba(251,146,60,0.35), inset 0 0 20px rgba(251,146,60,0.05)',
-      borderGlow: '0 0 12px rgba(251,146,60,0.8), 0 0 24px rgba(251,146,60,0.4)',
-      iconActive: 'text-orange-400 drop-shadow-[0_0_6px_rgba(251,146,60,0.9)]',
-      iconHover: 'group-hover:text-orange-400',
-      bar: 'bg-orange-400',
-      textActive: 'text-orange-100',
-      badgeBg: 'bg-orange-500/20 text-orange-400 border border-orange-500/30',
+      activeBg: 'rgba(251, 146, 60, 0.12)',
+      activeBoxShadow: '0 0 16px rgba(251,146,60,0.25), inset 0 0 24px rgba(251,146,60,0.06)',
+      barGlow: '0 0 10px rgba(251,146,60,0.9), 0 0 20px rgba(251,146,60,0.5)',
+      barColor: 'bg-orange-400',
+      iconActive: 'text-orange-400 drop-shadow-[0_0_5px_rgba(251,146,60,1)]',
+      iconDefault: 'text-slate-500 group-hover:text-orange-400',
+      dotGlow: '0 0 8px rgba(251,146,60,0.9), 0 0 16px rgba(251,146,60,0.5)',
+      dotColor: 'bg-orange-400',
+      textActive: 'text-orange-100 font-semibold',
+      rowBorder: 'rgba(251,146,60,0.08)',
     },
   }
 
@@ -60,62 +66,58 @@ const SubItem = ({ item, isActive, color, onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="group relative mx-2 my-[3px] flex w-[calc(100%-16px)] items-center gap-3 rounded-lg px-3 py-2 text-xs font-medium transition-all duration-200"
+      className="group relative flex w-full items-center gap-3 px-4 py-2.5 text-xs font-medium transition-all duration-200"
       style={
         isActive
           ? {
               background: c.activeBg,
-              boxShadow: c.activeGlow,
-              border: '1px solid rgba(255,255,255,0.06)',
+              boxShadow: c.activeBoxShadow,
+              borderBottom: isLast ? 'none' : `1px solid ${c.rowBorder}`,
             }
           : {
               background: 'transparent',
-              border: '1px solid transparent',
+              borderBottom: isLast ? 'none' : '1px solid rgba(255,255,255,0.04)',
             }
       }
       onMouseEnter={(e) => {
         if (!isActive) {
-          e.currentTarget.style.background = 'rgba(255,255,255,0.04)'
-          e.currentTarget.style.border = '1px solid rgba(255,255,255,0.06)'
+          e.currentTarget.style.background = 'rgba(255,255,255,0.03)'
         }
       }}
       onMouseLeave={(e) => {
-        if (!isActive) {
-          e.currentTarget.style.background = 'transparent'
-          e.currentTarget.style.border = '1px solid transparent'
-        }
+        if (!isActive) e.currentTarget.style.background = 'transparent'
       }}
     >
-      {/* Left glow bar */}
+      {/* Left glow bar — full height, flush left */}
       {isActive && (
         <div
-          className={`absolute top-1/2 left-0 h-[70%] w-[3px] -translate-y-1/2 rounded-r-full ${c.bar}`}
-          style={{ boxShadow: c.borderGlow }}
+          className={`absolute top-0 bottom-0 left-0 w-[3px] ${c.barColor}`}
+          style={{ boxShadow: c.barGlow }}
         />
       )}
 
-      {/* Icon */}
+      {/* Icon with drop-shadow when active */}
       <item.icon
         className={`h-3.5 w-3.5 shrink-0 transition-all duration-200 ${
-          isActive ? c.iconActive : `text-slate-500 ${c.iconHover}`
+          isActive ? c.iconActive : c.iconDefault
         }`}
       />
 
       {/* Label */}
       <span
-        className={`capitalize transition-colors duration-200 ${
-          isActive ? `font-semibold ${c.textActive}` : 'text-slate-400 group-hover:text-slate-200'
+        className={`capitalize tracking-wide transition-colors duration-200 ${
+          isActive ? c.textActive : 'text-slate-400 group-hover:text-slate-200'
         }`}
       >
         {item.name}
       </span>
 
-      {/* Active glowing dot indicator */}
+      {/* Active glowing dot — right side */}
       {isActive && (
-        <span className="ml-auto flex items-center">
+        <span className="ml-auto flex items-center pr-1">
           <span
-            className={`h-1.5 w-1.5 rounded-full ${c.bar}`}
-            style={{ boxShadow: c.borderGlow }}
+            className={`h-[6px] w-[6px] rounded-full ${c.dotColor}`}
+            style={{ boxShadow: c.dotGlow }}
           />
         </span>
       )}
@@ -213,7 +215,9 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
   const isConfigActive = configurationItems.some((i) => i.name === activeItem)
 
   const expandedContainer = {
-    boxShadow: 'inset 0 4px 12px rgba(0,0,0,0.4), inset 0 -2px 8px rgba(0,0,0,0.3)',
+    boxShadow:
+      'inset 0 4px 16px rgba(0,0,0,0.5), inset 0 -4px 12px rgba(0,0,0,0.3), 0 1px 0 rgba(255,255,255,0.03)',
+    border: '1px solid rgba(255,255,255,0.05)',
   }
 
   return (
@@ -282,15 +286,16 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
               />
               {isPropertyOpen && (
                 <div
-                  className="border-y border-slate-800/50 bg-surface-50 py-2"
+                  className="bg-surface-50 py-1"
                   style={expandedContainer}
                 >
-                  {propertyItems.map((item) => (
+                  {propertyItems.map((item, idx) => (
                     <SubItem
                       key={item.name}
                       item={item}
                       isActive={activeItem === item.name}
                       color="emerald"
+                      isLast={idx === propertyItems.length - 1}
                       onClick={() => {
                         setActiveItem(item.name)
                         if (window.innerWidth < 1024) setIsSidebarOpen(false)
@@ -315,15 +320,16 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
               />
               {isProfileOpen && (
                 <div
-                  className="border-y border-slate-800/50 bg-surface-50 py-2"
+                  className="bg-surface-50 py-1"
                   style={expandedContainer}
                 >
-                  {profileItems.map((item) => (
+                  {profileItems.map((item, idx) => (
                     <SubItem
                       key={item.name}
                       item={item}
                       isActive={activeItem === item.name}
                       color="blue"
+                      isLast={idx === profileItems.length - 1}
                       onClick={() => {
                         setActiveItem(item.name)
                         if (window.innerWidth < 1024) setIsSidebarOpen(false)
@@ -348,15 +354,16 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
               />
               {isConfigOpen && (
                 <div
-                  className="border-y border-slate-800/50 bg-surface-50 py-2"
+                  className="bg-surface-50 py-1"
                   style={expandedContainer}
                 >
-                  {configurationItems.map((item) => (
+                  {configurationItems.map((item, idx) => (
                     <SubItem
                       key={item.name}
                       item={item}
                       isActive={activeItem === item.name}
                       color="orange"
+                      isLast={idx === configurationItems.length - 1}
                       onClick={() => {
                         setActiveItem(item.name)
                         if (window.innerWidth < 1024) setIsSidebarOpen(false)

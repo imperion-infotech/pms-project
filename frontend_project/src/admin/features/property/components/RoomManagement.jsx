@@ -45,77 +45,68 @@ const RoomManagement = ({
   } = useRoomController({ rooms, searchTerm, onDelete, currentPage, itemsPerPage })
 
   return (
-    <div className="dark:bg-surface-100 rounded-xl border border-slate-200 bg-white shadow-md transition-colors duration-300 dark:border-slate-800">
-      {/* Room Type Action Bar */}
-      <div className="flex flex-col items-center justify-between gap-4 border-b border-slate-100 p-4 sm:p-6 lg:flex-row dark:border-slate-800">
-        <div className="text-center sm:text-left">
-          <h2 className="font-heading text-lg font-bold tracking-tight text-[#1a2b4b] md:text-xl dark:text-slate-100">
-            Rooms
-          </h2>
-          <p className="text-xs font-medium text-slate-400 md:text-sm">
-            Manage and organize physical property rooms
-          </p>
+    <div className="animate-in fade-in slide-in-from-bottom-4 space-y-6 duration-700">
+      {/* Header & Action Bar */}
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <div className="flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500 shadow-sm transition-all hover:scale-110">
+            <CloudCog className="h-6 w-6" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white">
+              Rooms
+            </h2>
+            <p className="text-xs font-medium text-slate-400">
+              Manage and organize physical property rooms
+            </p>
+          </div>
         </div>
 
         <button
           onClick={() => setIsRoomModalOpen(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-[11px] font-black tracking-wider text-white shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-600 active:scale-95 sm:w-auto md:px-6 md:text-xs"
+          className="flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-700 hover:shadow-emerald-500/40 active:scale-95"
         >
-          <PlusCircle className="h-5 w-5" />
-          ADD NEW ROOM
+          <PlusCircle className="h-4 w-4" />
+          <span>Add New Room</span>
         </button>
       </div>
 
-      {/* Room Table */}
-      <div className="custom-scrollbar max-h-[600px] w-full overflow-auto">
-        <table className="w-full min-w-[1200px] border-collapse text-left">
-          <thead className="sticky top-0 z-10">
-            <tr className="border-b border-slate-200 bg-[#f8fafc] text-[11px] font-bold tracking-wider text-[#64748b] uppercase dark:border-slate-800 dark:bg-slate-800 dark:text-slate-400">
-              <th className="w-16 border-r border-slate-200 px-6 py-4 text-center dark:border-slate-800">
-                No.
-              </th>
-              <th className="w-32 border-r border-slate-200 px-6 py-4 dark:border-slate-800">
-                Room Name
-              </th>
-              <th className="w-36 border-r border-slate-200 px-6 py-4 dark:border-slate-800">
-                Building Name
-              </th>
-              <th className="w-36 border-r border-slate-200 px-6 py-4 dark:border-slate-800">
-                Room Type Name
-              </th>
-              <th className="w-36 border-r border-slate-200 px-6 py-4 dark:border-slate-800">
-                Floor Name
-              </th>
-              <th className="w-32 border-r border-slate-200 px-6 py-4 text-center dark:border-slate-800">
-                Status
-              </th>
-              <th className="w-36 border-r border-slate-200 px-6 py-4 text-center dark:border-slate-800">
-                Operational Status
-              </th>
-              <th className="w-24 border-r border-slate-200 px-4 py-4 text-center text-orange-600 dark:border-slate-800">
-                Smoking
-              </th>
-              <th className="w-24 border-r border-slate-200 px-4 py-4 text-center text-blue-600 dark:border-slate-800">
-                Handicap
-              </th>
-              <th className="w-24 border-r border-slate-200 px-4 py-4 text-center text-red-600 dark:border-slate-800">
-                Non-room
-              </th>
-              <th className="w-28 px-4 py-4 text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100 text-[13px] dark:divide-slate-800">
-            {processedRooms.length === 0 ? (
-              <tr>
-                <td
-                  colSpan="10"
-                  className="px-6 py-10 text-center text-slate-400 italic dark:text-slate-500"
-                >
-                  {searchTerm
-                    ? 'No rooms match your search.'
-                    : 'No rooms available. Add your first room.'}
-                </td>
+      {/* Main Table Layer */}
+      <div className="overflow-hidden rounded-3xl border border-slate-200/60 bg-white/80 shadow-2xl shadow-slate-200/40 backdrop-blur-xl transition-all hover:shadow-slate-300/50 dark:border-slate-800/50 dark:bg-slate-900/80">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-left">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50/50 dark:border-slate-800/50 dark:bg-slate-800/30">
+                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">No.</th>
+                <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">Room Name</th>
+                <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">Building</th>
+                <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">Room Type</th>
+                <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">Floor</th>
+                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Status</th>
+                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Operational</th>
+                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-orange-500 uppercase">Smoking</th>
+                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-blue-500 uppercase">Handicap</th>
+                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-red-500 uppercase">Non-room</th>
+                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Action</th>
               </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+              {processedRooms.length === 0 ? (
+                <tr>
+                  <td colSpan="11" className="px-6 py-20 text-center">
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 dark:bg-slate-800/20">
+                        <CloudCog className="h-8 w-8 text-slate-200 dark:text-slate-700" />
+                      </div>
+                      <p className="text-sm font-medium text-slate-400">
+                        {searchTerm ? 'No rooms match your search.' : 'No rooms available.'}
+                      </p>
+                      <button onClick={() => setIsRoomModalOpen(true)} className="text-xs font-bold text-emerald-500 hover:underline">
+                        Add your first room
+                      </button>
+                    </div>
+                  </td>
+                </tr>
             ) : (
               processedRooms.map((room, index) => {
                 // Extract fields from room object
@@ -255,74 +246,49 @@ const RoomManagement = ({
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-center gap-3">
-                        <button
-                          onClick={() => onEdit(room)}
-                          className="rounded-lg p-1.5 text-blue-500 transition-colors hover:bg-blue-50 dark:hover:bg-blue-500/10"
-                          title="Edit"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteClick(room)}
-                          className="rounded-lg p-1.5 text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-500/10"
-                          title="Delete"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex items-center justify-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+                      <button onClick={() => onEdit(room)} className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 shadow-sm transition-all hover:scale-110 hover:border-emerald-200 hover:text-emerald-500 hover:shadow-emerald-100 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-emerald-900 dark:hover:shadow-none" title="Edit">
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button onClick={() => handleDeleteClick(room)} className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 shadow-sm transition-all hover:scale-110 hover:border-red-200 hover:text-red-500 hover:shadow-red-100 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-red-900 dark:hover:shadow-none" title="Delete">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              )
+            })
+          )}
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-      {/* Custom Delete Confirmation Modal */}
+      {/* Delete Confirmation Modal */}
       {deleteTarget && (
         <div className="fixed inset-0 z-200 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
-            onClick={handleCancelDelete}
-          />
-          <div className="dark:bg-surface-100 relative z-10 w-full max-w-sm rounded-2xl border border-red-100 bg-white p-6 shadow-2xl dark:border-red-900/30">
-            <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-500/10">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={handleCancelDelete} />
+          <div className="animate-in zoom-in-95 relative z-10 w-full max-w-sm overflow-hidden rounded-3xl border border-red-100 bg-white p-6 shadow-2xl transition-all dark:border-red-900/30 dark:bg-slate-900">
+            <div className="mb-4 flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-red-500 dark:bg-red-500/10">
+                <AlertTriangle className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">
-                  Delete Room
-                </h3>
-                <p className="text-xs text-slate-400">This action cannot be undone.</p>
+                <h3 className="text-lg font-bold text-slate-800 dark:text-white">Delete Room</h3>
+                <p className="text-xs font-medium tracking-widest text-slate-400 uppercase">Permanent Action</p>
               </div>
-              <button
-                onClick={handleCancelDelete}
-                className="ml-auto rounded-lg p-1 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700"
-              >
+              <button onClick={handleCancelDelete} className="ml-auto rounded-lg p-1 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700">
                 <X className="h-4 w-4 text-slate-400" />
               </button>
             </div>
-            <p className="mb-6 text-sm text-slate-600 dark:text-slate-300">
+            <p className="mb-8 text-sm leading-relaxed font-medium text-slate-500 dark:text-slate-400">
               Are you sure you want to delete room{' '}
-              <span className="font-bold text-red-500">"{deleteTarget.name}"</span>?
+              <span className="font-bold text-slate-800 dark:text-slate-100">"{deleteTarget.name}"</span>? This action cannot be undone.
             </p>
             <div className="flex gap-3">
-              <button
-                onClick={handleCancelDelete}
-                className="flex-1 rounded-xl border border-slate-200 py-2.5 text-sm font-bold text-slate-500 transition-all hover:bg-slate-50 hover:text-slate-800 dark:border-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-300"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmDelete}
-                className="flex-2 rounded-xl bg-red-500 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-500/20 transition-all hover:bg-red-600 active:scale-95"
-              >
-                Yes, Delete
-              </button>
+              <button onClick={handleCancelDelete} className="flex-1 rounded-xl border border-slate-200 py-3 text-sm font-bold text-slate-400 transition-all hover:bg-slate-50 hover:text-slate-600 dark:border-slate-800 dark:hover:bg-slate-800">Cancel</button>
+              <button onClick={handleConfirmDelete} className="flex-1 rounded-xl bg-red-500 py-3 text-sm font-bold text-white shadow-lg shadow-red-500/20 transition-all hover:bg-red-600 active:scale-95">Delete Now</button>
             </div>
           </div>
         </div>
