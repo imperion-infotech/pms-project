@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pms.paymentdetails.entity.PaymentDetails;
+import com.pms.paymentdetails.entity.PaymentDetailsResponseDTO;
 import com.pms.paymentdetails.service.IPaymentDetailsService;
 
 /**
@@ -48,12 +49,20 @@ public class PaymentDetailsController {
 	@PostMapping("/admin/createpaymentdetails")
 	public ResponseEntity<?> createPaymentDetails(@RequestBody PaymentDetails paymentDetails) {
 		// Validate input
-		if (paymentDetails == null || paymentDetails.getPaymentTypes()== null ) {
+		if (paymentDetails == null || paymentDetails.getPaymentType()== null ) {
 			return ResponseEntity.badRequest().body("PaymentDetails PaymentType must not be null or empty");
 		}
 		
 		if (paymentDetails == null || paymentDetails.getCurrencySymbol() == null || paymentDetails.getCurrencySymbol().toString().trim().isEmpty()) {
 			return ResponseEntity.badRequest().body("PaymentDetails CurrencySymbol must not be null or empty");
+		}
+		
+		if (paymentDetails == null || paymentDetails.getPaymentDate() == null) {
+			return ResponseEntity.badRequest().body("PaymentDetails payment date must not be null or empty");
+		}
+		
+		if (paymentDetails == null || paymentDetails.getGuestDetails() == null) {
+			return ResponseEntity.badRequest().body("PaymentDetails guestdetails id must not be null or empty");
 		}
 		
 		try {
@@ -70,7 +79,7 @@ public class PaymentDetailsController {
 	@PutMapping("/admin/updatepaymentdetails/{id}")
 	public ResponseEntity<?> updatePaymentDetails(@PathVariable Integer id, @RequestBody PaymentDetails paymentDetails) {
 		// Validate input
-		if (paymentDetails == null || paymentDetails.getPaymentTypes()== null ) {
+		if (paymentDetails == null || paymentDetails.getPaymentType()== null ) {
 			return ResponseEntity.badRequest().body("PaymentDetails PaymentType must not be null or empty");
 		}
 		
@@ -89,10 +98,12 @@ public class PaymentDetailsController {
 			existingPaymentDetails.setAuthorizationNo(paymentDetails.getAuthorizationNo());
 			existingPaymentDetails.setCardNo(paymentDetails.getCardNo());
 			existingPaymentDetails.setCurrencySymbol(paymentDetails.getCurrencySymbol());
-			existingPaymentDetails.setPaymentTypes(paymentDetails.getPaymentTypes());
+			existingPaymentDetails.setPaymentType(paymentDetails.getPaymentType());
 			existingPaymentDetails.setReceiptNo(paymentDetails.getReceiptNo());
 			existingPaymentDetails.setRemark(paymentDetails.getRemark());
 			existingPaymentDetails.setValidTill(paymentDetails.getValidTill());
+			existingPaymentDetails.setGuestDetails(paymentDetails.getGuestDetails());
+			
 
 			PaymentDetails updatedPaymentDetails = service.updatePaymentDetails(existingPaymentDetails.getId(), existingPaymentDetails);
 
@@ -115,5 +126,15 @@ public class PaymentDetailsController {
 		String error = "Error while deleting PaymentDetails from database";
 		return new ResponseEntity<String>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	 @GetMapping("/user/guest/{guestId}")
+	    public ResponseEntity<List<PaymentDetailsResponseDTO>> getPaymentsByGuest(
+	            @PathVariable Long guestId) {
+
+	        List<PaymentDetailsResponseDTO> response =
+	        		service.getPaymentsByGuestId(guestId);
+
+	        return ResponseEntity.ok(response);
+	    }
 
 }

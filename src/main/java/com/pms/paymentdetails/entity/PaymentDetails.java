@@ -4,20 +4,24 @@
 package com.pms.paymentdetails.entity;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pms.guestdetails.GuestDetails;
 import com.pms.paymenttype.entity.PaymentType;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -54,12 +58,11 @@ public class PaymentDetails implements Serializable{
 	@Column(name="amount")
 	private Double amount;
 	
-	@OneToMany(mappedBy = "paymentDetails", cascade = CascadeType.ALL)
-//    @JsonIgnore
-    private List<PaymentType> paymentTypes;
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "payment_type_id")
+	private PaymentType paymentType;
 	
-	@Column(name="payment_types_id")
-	private String paymentTypesId;
+	private Double totalAmount;
 	
 	@Column(name="card_no")
 	private String cardNo;
@@ -79,14 +82,48 @@ public class PaymentDetails implements Serializable{
 	@Column(name="currency_symbol")
 	private String currencySymbol;
 	
-
-	public String getPaymentTypesId() {
-		return paymentTypesId;
+	@Column(name="payment_date")
+	private LocalDate paymentDate;
+	
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "guest_id")
+	private GuestDetails guestDetails;
+	
+//	private Integer guestDetailsId;
+	
+	public GuestDetails getGuestDetails() {
+		return guestDetails;
 	}
 
-	public void setPaymentTypesId(String paymentTypesId) {
-		this.paymentTypesId = paymentTypesId;
+	public Double getTotalAmount() {
+		return totalAmount;
 	}
+
+	public void setTotalAmount(Double totalAmount) {
+		this.totalAmount = totalAmount;
+	}
+
+	public void setGuestDetails(GuestDetails guestDetails) {
+		this.guestDetails = guestDetails;
+	}
+
+	public Date getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(Date createdOn) {
+		this.createdOn = createdOn;
+	}
+
+	public LocalDate getPaymentDate() {
+		return paymentDate;
+	}
+
+	public void setPaymentDate(LocalDate paymentDate) {
+		this.paymentDate = paymentDate;
+	}
+
 
 	public Integer getId() {
 		return id;
@@ -104,12 +141,12 @@ public class PaymentDetails implements Serializable{
 		this.amount = amount;
 	}
 
-	public List<PaymentType> getPaymentTypes() {
-		return paymentTypes;
+	public PaymentType getPaymentType() {
+		return paymentType;
 	}
 
-	public void setPaymentTypes(List<PaymentType> paymentTypes) {
-		this.paymentTypes = paymentTypes;
+	public void setPaymentType(PaymentType paymentType) {
+		this.paymentType = paymentType;
 	}
 
 	public String getCardNo() {

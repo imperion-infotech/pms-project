@@ -6,12 +6,16 @@ package com.pms.guestdetails;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pms.paymentdetails.entity.PaymentDetails;
+import com.pms.personaldetails.PersonalDetails;
 import com.pms.room.entity.RoomMaster;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,6 +23,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -61,6 +66,10 @@ public class GuestDetails {
 //    @ManyToOne
 //    @JoinColumn(name = "personal_details_id")
 //    private PersonalDetails personalDetails;
+	
+//	@OneToMany(mappedBy = "guestDetails", cascade = CascadeType.ALL)
+////    @JsonIgnore
+//    private List<PaymentDetails> paymentDetails;
     
     @Column(name="personal_details_id")
     private Integer personalDetailsId;
@@ -74,6 +83,8 @@ public class GuestDetails {
     @Column(name="stay_details_id")
     private Integer stayDetailsId;
     
+    @OneToMany(mappedBy = "guestDetails", cascade = CascadeType.ALL)
+    private List<PaymentDetails> paymentDetails;
     
 
     // ✅ FIX: One guest → many documents
@@ -95,7 +106,17 @@ public class GuestDetails {
 //    @JsonIgnore
 //    private StayDetails stayDetails;
     
-	
+	public List<PaymentDetails> getPaymentDetails() {
+		return paymentDetails;
+	}
+
+	public void setPaymentDetails(List<PaymentDetails> paymentDetails) {
+		this.paymentDetails = paymentDetails;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
 	@Column(name="check_in_date")
 	private LocalDateTime checkInDate;
