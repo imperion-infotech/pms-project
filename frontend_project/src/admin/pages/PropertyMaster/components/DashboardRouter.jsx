@@ -10,6 +10,7 @@ import TaxManagement from '../../../features/property/components/TaxManagement'
 import DocumentTypeManagement from '../../../features/property/components/DocumentTypeManagement'
 import PaymentTypeManagement from '../../../features/property/components/PaymentTypeManagement'
 import OtherChargeManagement from '../../../features/property/components/OtherChargeManagement'
+import PropertyDetails from '../../../features/property/components/PropertyDetails'
 
 /**
  * DashboardRouter - Ye file 'Traffic Inspector' ka kaam karti hai.
@@ -193,6 +194,8 @@ const DashboardRouter = ({
           itemsPerPage={itemsPerPage}
         />
       )
+    case 'Property Details':
+      return <PropertyDetails />
     default:
       return (
         <div className="animate-in fade-in flex min-h-[300px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center duration-500 dark:border-slate-700 dark:bg-slate-900">

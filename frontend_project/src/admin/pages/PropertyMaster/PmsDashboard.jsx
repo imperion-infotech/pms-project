@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Sidebar from '../../components/layout/Sidebar'
 import Navbar from '../../components/layout/Navbar'
 import { propertyService } from '../../../services/propertyService'
@@ -10,6 +10,7 @@ import LoadingProcess from '../../../components/common/LoadingProcess'
 import usePmsData from '../../../hooks/usePmsData'
 import { useTheme } from '../../../context/ThemeContext'
 import { useSidebar } from '../../../context/SidebarContext'
+import { useSearchParams } from 'react-router-dom'
 
 // Sub-components (Refactored for maintainability)
 import DashboardRouter from './components/DashboardRouter'
@@ -26,6 +27,21 @@ import { useGuestPersonalDetailsManagement } from '../../features/property/hooks
 import { useDocumentTypeManagement } from '../../features/property/hooks/useDocumentTypeManagement'
 import { usePaymentTypeManagement } from '../../features/property/hooks/usePaymentTypeManagement'
 import { useOtherChargeManagement } from '../../features/property/hooks/useOtherChargeManagement'
+
+// Map URL tab values to internal activeItem names (Static mapping outside component to avoid hook dependency issues)
+const tabToItemMap = {
+  PropertyDetails: 'Property Details',
+  Building: 'Building',
+  Floor: 'Floor',
+  RoomType: 'Room Type',
+  Room: 'Room',
+  RoomStatus: 'Room Status',
+  Tax: 'Tax',
+  PersonalDetail: 'Personal Detail',
+  DocumentType: 'Document Type',
+  PaymentType: 'Payment Type',
+  OtherCharge: 'Other Charge',
+}
 
 /**
  * PmsDashboard (Admin Dashboard Root)
@@ -101,8 +117,22 @@ const PmsDashboard = () => {
   } = usePmsData()
 
   // Dashboard navigation state
-  const [activeItem, setActiveItem] = useState('Building')
+  const [searchParams] = useSearchParams()
+  const currentTab = searchParams.get('tab')
+
+  // Set initial activeItem from URL or default to 'Building'
+  const [activeItem, setActiveItem] = useState(() => {
+    return tabToItemMap[currentTab] || 'Building'
+  })
+
   const [isPropertyOpen, setIsPropertyOpen] = useState(true)
+
+  // Sync activeItem with URL when URL changes
+  useEffect(() => {
+    if (currentTab && tabToItemMap[currentTab]) {
+      setActiveItem(tabToItemMap[currentTab])
+    }
+  }, [currentTab])
 
   // Grouped modal visibility states
   const [modals, setModals] = useState({

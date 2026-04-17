@@ -58,40 +58,92 @@ const useGuestPersonalDetailsController = ({
     setDeleteTarget(null)
   }
 
-  const getGuestDocument = (personalDetailsId) => {
-    return documentDetails.find(
-      (doc) =>
-        String(
-          doc.personalDetails?.id ||
-            doc.personalDetail?.id ||
-            doc.personalDetailsId ||
-            doc.personalDetailId,
-        ) === String(personalDetailsId),
-    )
-  }
-
-  const getGuestStay = (personalDetailId) => {
-    return stayDetails.find(
-      (stay) =>
-        String(
-          stay.personalDetails?.id ||
-            stay.personalDetail?.id ||
-            stay.personalDetailId ||
-            stay.personalDetailsId,
-        ) === String(personalDetailId),
-    )
+  // Helper: Safely extract a numeric/string ID from multiple possible field paths
+  const extractId = (...sources) => {
+    for (const src of sources) {
+      if (src !== null && src !== undefined && src !== '') return String(src)
+    }
+    return null
   }
 
   const getGuestDetail = (personalDetailsId) => {
-    return guestDetails.find(
-      (gd) =>
-        String(
-          gd.personalDetails?.id ||
-            gd.personalDetail?.id ||
-            gd.personalDetailsId ||
-            gd.personalDetailId,
-        ) === String(personalDetailsId),
+    const targetId = String(personalDetailsId)
+    const found = guestDetails.find((gd) => {
+      const gdPersonalId = extractId(
+        gd.personalDetails?.id,
+        gd.personalDetail?.id,
+        gd.personalDetailsId,
+        gd.personalDetailId,
+      )
+      return gdPersonalId === targetId
+    })
+    return found
+  }
+
+  const getGuestDocument = (personalDetailsId, guestDetail) => {
+    const targetId = String(personalDetailsId)
+    const found = documentDetails.find((doc) => {
+      // Match 1: document's personalDetails reference matches
+      const docPersonalId = extractId(
+        doc.personalDetails?.id,
+        doc.personalDetail?.id,
+        doc.personalDetailsId,
+        doc.personalDetailId,
+      )
+      if (docPersonalId === targetId) return true
+
+      // Match 2: guestDetail's documentDetails reference matches this doc
+      const gdDocId = extractId(
+        guestDetail?.documentDetails?.id,
+        guestDetail?.documentDetailsId,
+        guestDetail?.documentDetailId,
+        guestDetail?.document_details_id,
+      )
+      if (gdDocId && String(doc.id) === gdDocId) return true
+
+      return false
+    })
+    return found
+  }
+
+  const getGuestStay = (personalDetailId, guestDetail) => {
+    const targetId = String(personalDetailId)
+    const found = stayDetails.find((stay) => {
+      // Match 1: stay's personalDetails reference matches
+      const stayPersonalId = extractId(
+        stay.personalDetails?.id,
+        stay.personalDetail?.id,
+        stay.personalDetailId,
+        stay.personalDetailsId,
+      )
+      if (stayPersonalId === targetId) return true
+
+      // Match 2: guestDetail's stayDetails reference matches this stay
+      const gdStayId = extractId(
+        guestDetail?.stayDetails?.id,
+        guestDetail?.stayDetailsId,
+        guestDetail?.stayDetailId,
+        guestDetail?.stay_details_id,
+      )
+      if (gdStayId && String(stay.id) === gdStayId) return true
+
+      return false
+    })
+    return found
+  }
+
+  const getRentDetail = (guestDetail) => {
+    if (!guestDetail) return null
+    const rentId = extractId(
+      guestDetail.rentDetails?.id,
+      guestDetail.rentDetailsId,
+      guestDetail.rentDetailId,
+      guestDetail.rent_details_id,
+      guestDetail.rentId,
     )
+    if (!rentId) return null
+    // Note: rentDetails array not passed to controller - lookup done in component
+    return rentId
   }
 
   const getDocumentTypeName = (documentTypeId) => {
@@ -112,6 +164,7 @@ const useGuestPersonalDetailsController = ({
     getGuestDocument,
     getGuestStay,
     getGuestDetail,
+    getRentDetail,
     getDocumentTypeName,
   }
 }

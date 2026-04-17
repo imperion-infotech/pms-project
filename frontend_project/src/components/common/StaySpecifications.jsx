@@ -16,31 +16,19 @@ const StaySpecifications = ({
   isDark = false,
 }) => {
   // Shared UI classes
-  const labelClass = 'text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block'
-  const inputContainerClass = `flex items-center gap-3 px-3 py-1.5 rounded-xl border transition-all ${
+  const labelClass = 'text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1 block'
+  const inputContainerClass = `flex items-center gap-2 px-3 py-1 rounded-lg border transition-all ${
     isDark
-      ? 'bg-slate-800/30 border-slate-700 focus-within:border-blue-500/50'
-      : 'bg-white border-slate-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 shadow-sm'
+      ? 'bg-slate-900/50 border-slate-700/50 focus-within:border-amber-500/50'
+      : 'bg-white border-slate-200 focus-within:border-amber-500 focus-within:ring-4 focus-within:ring-amber-500/10 shadow-xs'
   }`
   const inputClass =
-    'bg-transparent border-none outline-none w-full text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder:text-slate-400'
+    'bg-transparent border-none outline-none w-full text-[11px] font-bold text-slate-700 dark:text-white placeholder:text-slate-300'
   const selectClass =
-    'bg-transparent border-none outline-none w-full text-xs font-semibold text-slate-800 dark:text-slate-100'
+    'bg-transparent border-none outline-none w-full text-[11px] font-bold text-slate-700 dark:text-white cursor-pointer'
 
   return (
-    <div className="mt-3 space-y-4 text-left">
-      <div className="flex items-center gap-3 border-l-4 border-blue-500 pl-4">
-        <div>
-          <h3
-            className={`text-xs font-black tracking-[0.2em] uppercase ${isDark ? 'text-slate-200' : 'text-slate-800'}`}
-          >
-            Stay Details
-          </h3>
-          <p className="mt-0.5 text-[9px] font-bold tracking-widest text-slate-400 uppercase">
-            Booking & Unit Allocation
-          </p>
-        </div>
-      </div>
+    <div className="mt-0 space-y-3 text-left">
 
       {/* Row 1: Building & Floor */}
       <div className="grid grid-cols-2 gap-3">
@@ -55,10 +43,10 @@ const StaySpecifications = ({
               onChange={handleChange}
               className={selectClass}
             >
-              {/* <option value="1">Main</option> */}
+              <option value="">Select Building</option>
               {buildings?.map((b) => (
                 <option key={b.id} value={b.id}>
-                  {b.name}
+                  {b.name || b.buildingName}
                 </option>
               ))}
             </select>
@@ -224,7 +212,6 @@ const StaySpecifications = ({
               <option value="RACK">RACK</option>
               <option value="WEEKLY_RATE_TEST">Weekly Rate Test</option>
               <option value="YEARLY_RATE">Yearly Rate</option>
-              {/* <option value="COMPLIMENTARY">Complimentary</option> */}
             </select>
           </div>
         </div>
@@ -242,7 +229,7 @@ const StaySpecifications = ({
             />
           </div>
         </div>
-        <div>
+        <div className="col-span-2">
           <label className={labelClass}>Stay Status <span className="text-red-500">*</span></label>
           <div className={inputContainerClass}>
             <select
@@ -253,7 +240,7 @@ const StaySpecifications = ({
               className={selectClass}
             >
               <option value="Confirmed">Confirmed</option>
-              <option value="Unconfirmed">Unconfirmed</option>
+              <option value="UnConfirmed">UnConfirmed</option>
             </select>
           </div>
         </div>

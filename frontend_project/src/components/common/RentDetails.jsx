@@ -12,13 +12,13 @@ const FieldRow = ({
   options = [],
 }) => {
   const containerClass =
-    'flex items-center justify-between py-1.5 border-b border-dashed border-slate-200 dark:border-slate-700/50'
-  const labelClass = 'text-[10px] font-bold text-slate-500 uppercase tracking-widest'
-  const inputContainerClass = `flex items-center px-4 py-1 rounded-xl border transition-all w-32 ${
+    'flex items-center justify-between py-1.5 border-b border-dashed border-slate-100 dark:border-slate-800'
+  const labelClass = 'text-[9px] font-black text-slate-500 uppercase tracking-widest'
+  const inputContainerClass = `flex items-center px-3 py-1 rounded-lg border transition-all w-32 ${
     isDark
-      ? 'bg-slate-800/30 border-slate-700 focus-within:border-blue-500/50'
-      : 'bg-white border-slate-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 shadow-sm'
-  } ${highlight ? 'border-blue-400/50 ring-4 ring-blue-500/5 shadow-blue-500/10' : ''}`
+      ? 'bg-slate-900/50 border-slate-700/50 focus-within:border-emerald-500/50'
+      : 'bg-white border-slate-200 focus-within:border-emerald-500 focus-within:ring-4 focus-within:ring-emerald-500/10 shadow-sm'
+  } ${highlight ? 'border-emerald-400/50 ring-4 ring-emerald-500/5 bg-emerald-50/20' : ''}`
   const inputClass =
     'bg-transparent border-none outline-none w-full text-xs font-black text-right text-slate-800 dark:text-slate-100 placeholder:text-slate-400'
 
@@ -65,11 +65,15 @@ const FieldRow = ({
 const RentDetails = ({ formData, handleChange, isDark = false, taxes = [] }) => {
   return (
     <div className="flex h-full flex-col font-sans">
-      <div className="flex-1 space-y-1">
+      <div className="flex flex-1 flex-col justify-between">
         <FieldRow
-          label={<>Rent <span className="text-red-500">*</span></>}
+          label={
+            <>
+              Rent <span className="text-red-500">*</span>
+            </>
+          }
           name="rent"
-          colorClass="text-blue-600 dark:text-blue-400"
+          colorClass="text-emerald-600 dark:text-emerald-400"
           formData={formData}
           handleChange={handleChange}
           isDark={isDark}
@@ -82,7 +86,11 @@ const RentDetails = ({ formData, handleChange, isDark = false, taxes = [] }) => 
           isDark={isDark}
         />
         <FieldRow
-          label={<>Tax <span className="text-red-500">*</span></>}
+          label={
+            <>
+              Tax <span className="text-red-500">*</span>
+            </>
+          }
           name="taxId"
           type="select"
           options={taxes.map((t) => ({ id: t.id, name: t.taxMasterName }))}
@@ -98,11 +106,11 @@ const RentDetails = ({ formData, handleChange, isDark = false, taxes = [] }) => 
           handleChange={handleChange}
           isDark={isDark}
         />
-        <div className="my-2 h-px bg-transparent"></div> {/* Spacing */}
+        <div className="my-1 h-px bg-transparent"></div> {/* Spacing */}
         <FieldRow
           label="Other Charges"
           name="otherCharges"
-          colorClass="text-blue-600 dark:text-blue-400"
+          colorClass="text-emerald-600 dark:text-emerald-400"
           formData={formData}
           handleChange={handleChange}
           isDark={isDark}
@@ -110,7 +118,7 @@ const RentDetails = ({ formData, handleChange, isDark = false, taxes = [] }) => 
         <FieldRow
           label="Discount"
           name="discount"
-          colorClass="text-blue-600 dark:text-blue-400"
+          colorClass="text-emerald-600 dark:text-emerald-400"
           formData={formData}
           handleChange={handleChange}
           isDark={isDark}
@@ -123,11 +131,11 @@ const RentDetails = ({ formData, handleChange, isDark = false, taxes = [] }) => 
           handleChange={handleChange}
           isDark={isDark}
         />
-        <div className="my-2 h-px bg-transparent"></div>
+        <div className="my-1 h-px bg-transparent"></div>
         <FieldRow
           label="Payments"
           name="payments"
-          colorClass="text-blue-600 dark:text-blue-400"
+          colorClass="text-emerald-600 dark:text-emerald-400"
           formData={formData}
           handleChange={handleChange}
           isDark={isDark}

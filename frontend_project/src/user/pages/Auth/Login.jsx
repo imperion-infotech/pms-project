@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Lock, Eye, EyeOff, BedDouble, ArrowRight, Loader2, User } from 'lucide-react'
 import LoadingProcess from '../../../components/common/LoadingProcess'
+import api from '../../../services/api'
 
 const Login = () => {
   const navigate = useNavigate()
@@ -25,67 +26,39 @@ const Login = () => {
     setError(null)
 
     try {
-      const response = await fetch('/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          username: username,
-          password: password,
-        }),
+      // Optimized: Using centralized api (axios) instead of fetch
+      const response = await api.post('/auth/login', {
+        username: username,
+        password: password
       })
 
-      if (!response.ok) {
-        throw new Error('Invalid username or password.')
+      const data = response.data
+      
+      // 1. Token Handling
+      const token = data.token || data.access_token || data.accessToken || (typeof data === 'string' ? data : null)
+      if (token) {
+        localStorage.setItem('access_token', token)
+        localStorage.setItem('username', username)
       }
 
-      const rawText = await response.text()
-      // alert("Raw Text...", rawText)
-
-      try {
-        // Attempt to parse as JSON if the backend wrapped it
-        const data = JSON.parse(rawText)
-
-        // Extract token from multiple possible keys, including nested 'data'
-        const token =
-          data.access_token ||
-          data.accessToken ||
-          data.token ||
-          data.jwt ||
-          (data.data && typeof data.data === 'string' ? data.data : null) ||
-          (data.data && (data.data.token || data.data.accessToken || data.data.access_token))
-
-        const refreshToken =
-          data.refresh_token || data.refreshToken || (data.data && data.data.refreshToken)
-
-        if (token) {
-          localStorage.setItem('access_token', token)
-        } else {
-          // If JSON but no token key found, only fallback if rawText looks like a token
-          if (rawText.length > 50 && rawText.includes('.')) {
-            localStorage.setItem('access_token', rawText)
-          }
-        }
-
-        if (refreshToken) {
-          localStorage.setItem('refresh_token', refreshToken)
-        }
-      } catch {
-        // If parsing fails, the response is likely a raw JWT string (e.g. "eyJ...")
-        localStorage.setItem('access_token', rawText.trim())
+      // 2. Hotels Extraction
+      const hotelsList = data.hotels || (data.data && data.data.hotels)
+      if (hotelsList && Array.isArray(hotelsList)) {
+        localStorage.setItem('adminHotels', JSON.stringify(hotelsList))
       }
 
-      // --- DEMO LOGIC MATCHING ---
-      let demoRole = localStorage.getItem('demo_role') || 'ROLE_USER'
-      if (username.toLowerCase().includes('admin')) demoRole = 'ROLE_ADMIN'
-      if (username.toLowerCase().includes('manager')) demoRole = 'ROLE_MANAGER'
-      localStorage.setItem('user_role', demoRole)
-      // ---------------------------
+      // 3. User Role Extraction
+      let userRole = 'ROLE_USER'
+      const roles = data.roles || (data.data && data.data.roles)
+      if (roles && Array.isArray(roles) && roles.length > 0) {
+        userRole = roles[0].name || roles[0]
+      }
+      localStorage.setItem('user_role', String(userRole))
 
       navigate('/')
     } catch (err) {
-      setError(err.message || 'Login failed. Please try again.')
+      const msg = err.response?.data?.message || err.message || 'Login failed.'
+      setError(msg === '401' ? 'Invalid credentials' : msg)
     } finally {
       setLoading(false)
     }

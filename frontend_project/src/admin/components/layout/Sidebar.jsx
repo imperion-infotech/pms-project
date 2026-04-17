@@ -370,18 +370,35 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
             </div>
           </div>
 
-          {/* Log Out */}
-          <div className="mt-auto border-t border-slate-700/50 p-4">
+          {/* Property Actions */}
+          <div className="mt-auto space-y-1 border-t border-slate-700/50 p-3">
+            {/* 1. Switch Hotel Button (Requested by User) */}
             <button
               onClick={() => {
-                localStorage.removeItem('access_token')
-                localStorage.removeItem('refresh_token')
+                // Sirf Hotel specific data clear kar rahe hain, Token nahi!
+                localStorage.removeItem('activeHotelId')
+                localStorage.removeItem('activeHotelName')
+                navigate('/property-selection')
+              }}
+              className="group flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-slate-300 transition-colors hover:bg-blue-500/10 hover:text-blue-400"
+              title="Exit current hotel and select another one"
+            >
+              <Building className="h-4.5 w-4.5 text-slate-400 transition-colors group-hover:text-blue-400" />
+              <span className="text-sm font-semibold">Switch Hotel</span>
+            </button>
+
+            {/* 2. Full Log Out Button */}
+            <button
+              onClick={() => {
+                localStorage.clear() // Poora data saaf!
                 navigate('/login')
               }}
-              className="group flex w-full items-center gap-3 rounded-xl px-4 py-3 text-slate-300 transition-colors hover:bg-red-500/10 hover:text-red-400"
+              className="group flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-slate-400 transition-colors hover:bg-red-500/10 hover:text-red-400"
             >
-              <LogOut className="h-5 w-5 text-slate-400 transition-colors group-hover:text-red-400" />
-              <span className="text-sm font-semibold">Log Out</span>
+              <LogOut className="h-4.5 w-4.5 text-slate-500 transition-colors group-hover:text-red-400" />
+              <span className="text-sm font-semibold text-slate-500 group-hover:text-red-400">
+                Log Out
+              </span>
             </button>
           </div>
         </nav>

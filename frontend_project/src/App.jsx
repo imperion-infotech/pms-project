@@ -20,35 +20,39 @@ const Login = lazy(() => import('./user/pages/Auth/Login'))
 const Register = lazy(() => import('./user/pages/Auth/Register'))
 const ForgotPassword = lazy(() => import('./user/pages/Auth/ForgotPassword'))
 const ResetPassword = lazy(() => import('./user/pages/Auth/ResetPassword'))
+const PropertySelection = lazy(() => import('./admin/pages/PropertySelection/PropertySelection'))
 
 /**
  * getRoleFromToken()
- * Token se user ka role (ADMIN/USER) nikalta hai.
+ * Token se user ka role (ADMIN/USER) nikalta hai safely.
  */
 const getRoleFromToken = () => {
-  let token = localStorage.getItem('access_token')
+  const token = localStorage.getItem('access_token')
   if (!token) return null
 
-  token = token.trim().replace(/^"|"$/g, '')
-
   try {
-    const payload = JSON.parse(atob(token.split('.')[1]))
-    if (payload.role) return payload.role
-    if (payload.roles) return Array.isArray(payload.roles) ? payload.roles[0] : payload.roles
-    if (payload.authorities)
-      return Array.isArray(payload.authorities)
-        ? payload.authorities[0]?.authority || payload.authorities[0]
-        : payload.authorities
-
-    const localRole = localStorage.getItem('user_role')
-    if (localRole) return localRole
-
-    return 'ROLE_USER'
+    const cleanToken = token.trim().replace(/^"|"$/g, '')
+    const payload = JSON.parse(atob(cleanToken.split('.')[1]))
+    
+    // Sabse pehle roles array check karein
+    if (payload.roles && payload.roles.length > 0) {
+      const role = payload.roles[0].name || payload.roles[0]
+      return typeof role === 'object' ? role.name : role
+    }
+    
+    // Fallback keys
+    return payload.role || payload.authority || localStorage.getItem('user_role') || 'ROLE_USER'
   } catch {
-    const localRole = localStorage.getItem('user_role')
-    if (localRole) return localRole
-    return 'ROLE_ADMIN'
+    return localStorage.getItem('user_role') || 'ROLE_USER'
   }
+}
+
+/**
+ * checkIsAdmin: Helper to determine if user has elevated privileges
+ */
+const checkIsAdmin = () => {
+  const role = String(getRoleFromToken() || '').toUpperCase()
+  return ['ROLE_ADMIN', 'ADMIN', 'ROLE_MANAGER', 'MANAGER'].some(r => role.includes(r))
 }
 
 /**
@@ -58,14 +62,22 @@ const AdminRoute = ({ children }) => {
   const token = localStorage.getItem('access_token')
   if (!token) return <Navigate to="/login" replace />
 
-  const role = getRoleFromToken() || ''
-  const isAdminOrManager = ['ROLE_ADMIN', 'ADMIN', 'ROLE_MANAGER', 'MANAGER'].includes(
-    role.toUpperCase(),
-  )
-
-  if (isAdminOrManager) {
+  if (checkIsAdmin()) {
+    const activeHotelId = localStorage.getItem('activeHotelId')
+    if (!activeHotelId) return <Navigate to="/property-selection" replace />
     return children
   }
+  return <Navigate to="/home" replace />
+}
+
+/**
+ * PropertySelectionRoute: Selection page security check
+ */
+const PropertySelectionRoute = ({ children }) => {
+  const token = localStorage.getItem('access_token')
+  if (!token) return <Navigate to="/login" replace />
+
+  if (checkIsAdmin()) return children
   return <Navigate to="/home" replace />
 }
 
@@ -73,27 +85,18 @@ const AdminRoute = ({ children }) => {
  * UserRoute: Sirf logged-in users ko entry deta hai.
  */
 const UserRoute = ({ children }) => {
-  const token = localStorage.getItem('access_token')
-  if (!token) return <Navigate to="/login" replace />
+  if (!localStorage.getItem('access_token')) return <Navigate to="/login" replace />
   return children
 }
 
 /**
- * RootRoute: Decide karta hai ki "/" path par Admin Dashboard dikhega ya User Home.
+ * RootRoute: Decide karta hai ki "/" path par kahan bhejna hai.
  */
 const RootRoute = () => {
   const token = localStorage.getItem('access_token')
   if (!token) return <Navigate to="/login" replace />
 
-  const role = getRoleFromToken() || ''
-  const isAdminOrManager = ['ROLE_ADMIN', 'ADMIN', 'ROLE_MANAGER', 'MANAGER'].includes(
-    role.toUpperCase(),
-  )
-
-  if (isAdminOrManager) {
-    return <PmsDashboard />
-  }
-
+  if (checkIsAdmin()) return <Navigate to="/property-selection" replace />
   return <Navigate to="/home" replace />
 }
 
@@ -119,6 +122,15 @@ function App() {
                   <Route path="/" element={<RootRoute />} />
 
                   {/* PROTECTED ADMIN ROUTES - Sirf admin ke liye */}
+                  <Route
+                    path="/property-selection"
+                    element={
+                      <PropertySelectionRoute>
+                        <PropertySelection />
+                      </PropertySelectionRoute>
+                    }
+                  />
+
                   <Route
                     path="/dashboard"
                     element={

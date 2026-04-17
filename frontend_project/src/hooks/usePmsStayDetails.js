@@ -8,13 +8,17 @@ export const usePmsStayDetails = () => {
   const queryClient = useQueryClient()
   const toast = useToast()
 
-  const { data: stayDetails = [], isLoading, refetch } = useQuery({
+  const {
+    data: stayDetails = [],
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ['stayDetails'],
     queryFn: async () => {
       const res = await propertyService.getStayDetails()
       return extractData(res)
     },
-    staleTime: 1000 * 60 * 5
+    staleTime: 1000 * 60 * 5,
   })
 
   const mutation = useMutation({
@@ -28,12 +32,19 @@ export const usePmsStayDetails = () => {
       toast.success(msgs[variables.type])
       queryClient.invalidateQueries(['stayDetails'])
     },
-    onError: (err) => toast.error(err.response?.data?.message || 'Operation failed')
+    onError: (err) => toast.error(err.response?.data?.message || 'Operation failed'),
   })
 
   const addStayDetail = (payload) => mutation.mutateAsync({ payload, type: 'create' })
   const updateStayDetail = (id, payload) => mutation.mutateAsync({ id, payload, type: 'update' })
   const deleteStayDetail = (id) => mutation.mutateAsync({ id, type: 'delete' })
 
-  return { stayDetails, isLoading, fetchStayDetails: refetch, addStayDetail, updateStayDetail, deleteStayDetail }
+  return {
+    stayDetails,
+    isLoading,
+    fetchStayDetails: refetch,
+    addStayDetail,
+    updateStayDetail,
+    deleteStayDetail,
+  }
 }

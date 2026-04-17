@@ -5,6 +5,7 @@ import { usePmsDocumentDetails } from '../../../../hooks/usePmsDocumentDetails'
 import { usePmsStayDetails } from '../../../../hooks/usePmsStayDetails'
 import { usePmsGuestDetails } from '../../../../hooks/usePmsGuestDetails'
 import { usePmsRentDetails } from '../../../../hooks/usePmsRentDetails'
+import { usePmsRooms } from '../../../../hooks/usePmsRooms'
 
 /**
  * useGuestPersonalDetailsManagement - Centralized hook for Guest Personal Detail CRUD operations.
@@ -19,6 +20,7 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
   const { addStayDetail, updateStayDetail } = usePmsStayDetails()
   const { addGuestDetail, updateGuestDetail } = usePmsGuestDetails()
   const { addRentDetail, updateRentDetail } = usePmsRentDetails()
+  const { rooms, updateRoom } = usePmsRooms()
 
   const getIndustrialStayDefaults = useCallback(() => {
     const now = new Date()
@@ -171,6 +173,7 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
         folioNo: personalFormData.folioNo,
         crsFolioNo: personalFormData.crsFolioNo,
       }
+      console.log('1. [Add] Personal Payload:', personalPayload)
       const res = await addPersonalDetail(personalPayload)
       const personalDetailsId = res.data.id || res.data
 
@@ -194,6 +197,7 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
             : undefined,
           deleted: false,
         }
+        console.log('2. [Add] Document Payload:', docPayload)
         const docRes = await addDocumentDetail(docPayload)
         documentDetailsId = docRes.data.id || docRes.data
       }
@@ -213,8 +217,10 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
           roomStatusId: personalFormData.roomStatusId
             ? Number(personalFormData.roomStatusId)
             : undefined,
+          color: personalFormData.color || '#2F8B2C',
           deleted: false,
         }
+        console.log('3. [Add] Stay Payload:', stayPayload)
         const stayRes = await addStayDetail(stayPayload)
         stayDetailsId = stayRes.data.id || stayRes.data
       }
@@ -235,6 +241,7 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
           balance: personalFormData.balance ? Number(personalFormData.balance) : 0,
           deleted: false,
         }
+        console.log('4. [Add] Rent Payload:', rentPayload)
         const rentRes = await addRentDetail(rentPayload)
         rentDetailsId = rentRes.data.id || rentRes.data
       }
@@ -268,8 +275,27 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
         guestDetailsStatus: personalFormData.guestDetailsStatus || 'Reservation',
       }
 
-      console.log('Final Guest Payload:', guestPayload)
+      console.log('5. [Add] Guest Payload:', guestPayload)
       await addGuestDetail(guestPayload)
+
+      // Sync Room Management Status
+      if (personalFormData.roomMasterId && personalFormData.roomStatusId) {
+        const originalRoom = rooms.find(
+          (r) => String(r.id) === String(personalFormData.roomMasterId),
+        )
+        if (originalRoom) {
+          try {
+            await updateRoom(originalRoom.id, {
+              ...originalRoom,
+              roomStatusTableId: Number(personalFormData.roomStatusId),
+              roomStatusId: Number(personalFormData.roomStatusId),
+              personalDetailId: personalDetailsId,
+            })
+          } catch (err) {
+            console.error('Failed to update room status:', err)
+          }
+        }
+      }
 
       setPersonalFormData({
         firstName: '',
@@ -336,6 +362,8 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
     toggleModal,
     defaults,
     toast,
+    rooms,
+    updateRoom,
   ])
 
   const handleUpdatePersonalDetail = useCallback(async () => {
@@ -356,6 +384,7 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
         folioNo: editPersonalFormData.folioNo,
         crsFolioNo: editPersonalFormData.crsFolioNo,
       }
+      console.log('1. [Update] Personal Payload:', updatePayload)
       await updatePersonalDetail(editPersonalFormData.id, updatePayload)
 
       // 2. Update or Create Document Detail
@@ -375,6 +404,7 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
             : undefined,
           deleted: false,
         }
+        console.log('2. [Update] Document Payload:', docPayload)
         if (editPersonalFormData.documentId) {
           await updateDocumentDetail(editPersonalFormData.documentId, docPayload)
         } else {
@@ -395,8 +425,10 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
           rateTypeEnum: editPersonalFormData.rateTypeEnum || 'RACK',
           stayStatusEnum: editPersonalFormData.stayStatusEnum || 'Confirmed',
           noOfGuest: Number(editPersonalFormData.noOfGuest) || 1,
+          color: editPersonalFormData.color || '#2F8B2C',
           deleted: editPersonalFormData.deleted || false,
         }
+        console.log('3. [Update] Stay Payload:', stayPayload)
         if (editPersonalFormData.stayId) {
           await updateStayDetail(editPersonalFormData.stayId, stayPayload)
         } else {
@@ -433,6 +465,7 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
           balance: editPersonalFormData.balance ? Number(editPersonalFormData.balance) : 0,
           deleted: false,
         }
+        console.log('4. [Update] Rent Payload:', rentPayload)
         if (rentId) {
           await updateRentDetail(rentId, rentPayload)
         } else {
@@ -471,10 +504,31 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
         deleted: false,
       }
 
+      console.log('5. [Update] Guest Payload:', guestPayload)
+
       if (editPersonalFormData.guestDetailId) {
         await updateGuestDetail(editPersonalFormData.guestDetailId, guestPayload)
       } else {
         await addGuestDetail(guestPayload)
+      }
+
+      // Sync Room Management Status
+      if (editPersonalFormData.roomMasterId && editPersonalFormData.roomStatusId) {
+        const originalRoom = rooms.find(
+          (r) => String(r.id) === String(editPersonalFormData.roomMasterId),
+        )
+        if (originalRoom) {
+          try {
+            await updateRoom(originalRoom.id, {
+              ...originalRoom,
+              roomStatusTableId: Number(editPersonalFormData.roomStatusId),
+              roomStatusId: Number(editPersonalFormData.roomStatusId),
+              personalDetailId: editPersonalFormData.id,
+            })
+          } catch (err) {
+            console.error('Failed to update room status:', err)
+          }
+        }
       }
 
       setEditPersonalFormData({ id: null, isDeleted: false })
@@ -497,6 +551,8 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
     updateRentDetail,
     toggleModal,
     toast,
+    rooms,
+    updateRoom,
   ])
 
   const handleEditPersonalDetail = useCallback(
@@ -520,11 +576,17 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
         documentTypeId: document?.documentType?.id || document?.documentTypeId || '',
         frontImagePath: document?.frontImagePath || '',
         backImagePath: document?.backImagePath || '',
-        stayId: stay?.id || guest?.stayDetailsId || null,
-        floorId: stay?.floorId || stay?.floor?.id || '',
-        buildingId: stay?.buildingId || stay?.building?.id || '',
-        roomTypeId: stay?.roomTypeId || stay?.roomType?.id || '',
-        roomMasterId: stay?.roomMasterId || stay?.roomMaster?.id || guest?.roomMasterId || '',
+        stayId: stay?.id || guest?.stayDetailsId || guest?.stay_details_id || null,
+        floorId: stay?.floorId || stay?.floor?.id || stay?.floor_id || '',
+        buildingId: stay?.buildingId || stay?.building?.id || stay?.building_id || '',
+        roomTypeId: stay?.roomTypeId || stay?.roomType?.id || stay?.room_type_id || '',
+        roomMasterId:
+          stay?.roomMasterId ||
+          stay?.roomMaster?.id ||
+          stay?.room_master_id ||
+          guest?.roomMasterId ||
+          guest?.room_master_id ||
+          '',
         comment: stay?.comment || stay?.remarks || guest?.comment || '',
         rateTypeEnum: normalizeDropdown(stay?.rateTypeEnum || 'RACK', [
           'RACK',
@@ -532,11 +594,11 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
           'YEARLY_RATE',
         ]),
         noOfGuest: stay?.noOfGuest || guest?.noOfGuest || 1,
-        stayStatusEnum: normalizeDropdown(stay?.stayStatusEnum || 'Confirmed', [
-          'Confirmed',
-          'Unconfirmed',
-        ]),
-        deleted: stay?.deleted || false,
+        stayStatusEnum: normalizeDropdown(
+          stay?.stayStatusEnum || stay?.stay_status_enum || 'Confirmed',
+          ['Confirmed', 'Unconfirmed'],
+        ),
+        deleted: stay?.deleted || stay?.is_deleted || false,
         guestDetailId: guest?.id || null,
         checkInDate: formatDate(guest?.checkInDate) || formatDate(defaults.checkInDate),
         checkOutDate: formatDate(guest?.checkOutDate) || formatDate(defaults.checkOutDate),
@@ -548,19 +610,25 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
           'In-House',
           'Check-Out',
         ]),
-        noOfDays: guest?.noOfDays || defaults.noOfDays,
-        rentId: guest?.rentDetailsId || guest?.rentId || '',
-        roomStatusId: stay?.roomStatusId || guest?.roomStatusId || '',
+        noOfDays: guest?.noOfDays || guest?.no_of_days || defaults.noOfDays,
+        rentId: guest?.rentDetailsId || guest?.rent_details_id || guest?.rentId || '',
+        roomStatusId:
+          stay?.roomStatusId ||
+          stay?.roomStatus?.id ||
+          stay?.room_status_id ||
+          guest?.roomStatusId ||
+          guest?.room_status_id ||
+          '',
         rent: rentDetailObj?.rent || '',
         basic: rentDetailObj?.basic || '',
         taxId: rentDetailObj?.taxId || rentDetailObj?.taxMaster?.id || '',
-        totalRental: rentDetailObj?.totalRental || '',
-        otherCharges: rentDetailObj?.otherCharges || '',
+        totalRental: rentDetailObj?.totalRental || rentDetailObj?.total_rental || '',
+        otherCharges: rentDetailObj?.otherCharges || rentDetailObj?.other_charges || '',
         discount: rentDetailObj?.discount || '',
-        totalCharges: rentDetailObj?.totalCharges || '',
+        totalCharges: rentDetailObj?.totalCharges || rentDetailObj?.total_charges || '',
         payments: rentDetailObj?.payments || '',
-        ccAuthorized: rentDetailObj?.ccAuthorized || '',
-        deposite: rentDetailObj?.deposite || '',
+        ccAuthorized: rentDetailObj?.ccAuthorized || rentDetailObj?.cc_authorized || '',
+        deposite: rentDetailObj?.deposite || rentDetailObj?.deposit || '',
         balance: rentDetailObj?.balance || '',
       })
       toggleModal('personalDetailEdit', true)

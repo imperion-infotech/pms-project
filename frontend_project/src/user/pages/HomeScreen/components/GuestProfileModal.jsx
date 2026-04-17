@@ -48,6 +48,25 @@ const cleanImageUrl = (path) => {
   return parts[parts.length - 1]
 }
 
+// Local-timezone date/time helpers (avoids UTC vs IST mismatch)
+const localDateStr = (offsetDays = 0) => {
+  const d = new Date()
+  d.setDate(d.getDate() + offsetDays)
+  return [
+    d.getFullYear(),
+    String(d.getMonth() + 1).padStart(2, '0'),
+    String(d.getDate()).padStart(2, '0'),
+  ].join('-')
+}
+const localTimeStr = () => {
+  const d = new Date()
+  return [
+    String(d.getHours()).padStart(2, '0'),
+    String(d.getMinutes()).padStart(2, '0'),
+    String(d.getSeconds()).padStart(2, '0'),
+  ].join(':')
+}
+
 /**
  * GuestProfileModal Component
  *
@@ -79,6 +98,9 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
     addGuestDetail,
     updateGuestDetail,
     fetchFolioNo,
+    guestDetails = [],
+    rentDetails = [],
+    stayDetails = [],
   } = usePmsData()
   const [localPreviews, setLocalPreviews] = useState({ profilePhoto: null, signature: null })
 
@@ -105,16 +127,18 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
     comment: '',
     rateTypeEnum: 'RACK',
     noOfGuest: 1,
-    stayStatusEnum: 'CONFIRMED',
+    stayStatusEnum: 'Confirmed',
     // Temporal
     checkInId: null,
     guestDetailId: null,
-    checkInDate: '',
-    checkOutDate: '',
-    checkInTime: '',
-    checkOutTime: '',
+    checkInDate: localDateStr(0),
+    checkOutDate: localDateStr(1),
+    checkInTime: localTimeStr(),
+    checkOutTime: localTimeStr(),
     guestDetailsStatus: 'Reservation',
     noOfDays: 1,
+    roomStatusId: '',
+    // Stay Details (stayStatusEnum backend accepts: 'Confirmed' | 'UnConfirmed' ONLY)
     // Rent
     rentId: null,
     rent: '',
@@ -154,6 +178,17 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
         lName = parts.slice(1).join(' ') || ''
       }
 
+      // Robust ID extraction (Handles both primitives and objects)
+      const getID = (val) => (val && typeof val === 'object' ? val.id || val : val)
+
+      const bId = getID(
+        room.buildingId || room.building_id || room.building || room.buildings || '',
+      )
+      const fId = getID(room.floorId || room.floor_id || room.floor || room.floors || '')
+      const rtId = getID(
+        room.roomTypeId || room.room_type_id || room.roomType || room.room_type || '',
+      )
+
       const initialForm = {
         firstName: fName,
         lastName: lName,
@@ -165,20 +200,21 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
         signature: baseProfile.signature || '',
         contactInformationTypeEnum: baseProfile.contactInformationTypeEnum || 'HOME',
         // Stay & Temporal
-        floorId: room.floorId || '',
-        buildingId: room.buildingId || '',
-        roomTypeId: room.roomTypeId || '',
+        floorId: fId,
+        buildingId: bId,
+        roomTypeId: rtId,
         roomMasterId: room.id || '',
         comment: '',
         rateTypeEnum: 'RACK',
         noOfGuest: 1,
-        stayStatusEnum: 'CONFIRMED',
+        stayStatusEnum: 'Confirmed',
         checkInId: room.checkInId || null,
         guestDetailId: room.guestDetailId || null,
-        checkInDate: room.checkInDate ? room.checkInDate.split('T')[0] : '',
-        checkOutDate: room.checkOutDate ? room.checkOutDate.split('T')[0] : '',
-        checkInTime: room.checkInTime || '',
-        checkOutTime: room.checkOutTime || '',
+        checkInDate: room.checkInDate ? room.checkInDate.split('T')[0] : localDateStr(0),
+        checkOutDate: room.checkOutDate ? room.checkOutDate.split('T')[0] : localDateStr(1),
+        checkInTime: room.checkInTime || localTimeStr(),
+        checkOutTime: room.checkOutTime || localTimeStr(),
+        roomStatusId: room.roomStatusTableId || room.roomStatusId || '',
         guestDetailsStatus: room.guestDetailsStatus || 'Reservation',
         noOfDays: room.noOfDays || 1,
         // Rent
@@ -195,7 +231,16 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
         deposite: room.rentDetails?.deposite || '',
         balance: room.rentDetails?.balance || '',
       }
-
+      console.log('-------------------Initial Form-------------------', initialForm)
+      console.log(
+        '-------------------Initial Form buildingId-------------------',
+        initialForm.buildingId,
+      )
+      console.log('-------------------Initial Form floorId-------------------', initialForm.floorId)
+      console.log(
+        '-------------------Initial Form roomTypeId-------------------',
+        initialForm.roomTypeId,
+      )
       // 2. Fetch Fresh Data if ID exists
       if (targetId) {
         try {
@@ -206,6 +251,62 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
 
           if (profileRes?.data) {
             const p = profileRes.data
+
+            const matchedGuest = guestDetails.find(
+              (g) =>
+                String(g.personalDetailsId) === String(targetId) &&
+                String(g.roomMasterId) === String(room.id),
+            )
+
+            let extraData = {}
+            if (matchedGuest) {
+              const matchedRent = rentDetails.find(
+                (r) => String(r.id) === String(matchedGuest.rentDetailsId),
+              )
+              const matchedStay = stayDetails.find(
+                (s) => String(s.id) === String(matchedGuest.stayDetailsId),
+              )
+
+              extraData = {
+                guestDetailId: matchedGuest.id,
+                checkInDate: matchedGuest.checkInDate
+                  ? matchedGuest.checkInDate.split('T')[0]
+                  : initialForm.checkInDate,
+                checkOutDate: matchedGuest.checkOutDate
+                  ? matchedGuest.checkOutDate.split('T')[0]
+                  : initialForm.checkOutDate,
+                checkInTime: matchedGuest.checkInTime || initialForm.checkInTime,
+                checkOutTime: matchedGuest.checkOutTime || initialForm.checkOutTime,
+                noOfDays: matchedGuest.noOfDays || initialForm.noOfDays,
+                guestDetailsStatus:
+                  matchedGuest.guestDetailsStatus || initialForm.guestDetailsStatus,
+
+                // Rent
+                rentId: matchedRent?.id || initialForm.rentId,
+                rent: matchedRent?.rent || initialForm.rent,
+                basic: matchedRent?.basic || initialForm.basic,
+                taxId: matchedRent?.taxId || initialForm.taxId,
+                totalRental: matchedRent?.totalRental || initialForm.totalRental,
+                otherCharges: matchedRent?.otherCharges || initialForm.otherCharges,
+                discount: matchedRent?.discount || initialForm.discount,
+                totalCharges: matchedRent?.totalCharges || initialForm.totalCharges,
+                payments: matchedRent?.payments || initialForm.payments,
+                ccAuthorized: matchedRent?.ccAuthorized || initialForm.ccAuthorized,
+                deposite: matchedRent?.deposite || initialForm.deposite,
+                balance: matchedRent?.balance || initialForm.balance,
+
+                // Stay
+                stayId: matchedStay?.id || initialForm.stayId,
+                floorId: matchedStay?.floorId || initialForm.floorId,
+                buildingId: matchedStay?.buildingId || initialForm.buildingId,
+                roomTypeId: matchedStay?.roomTypeId || initialForm.roomTypeId,
+                comment: matchedStay?.comment || initialForm.comment,
+                rateTypeEnum: matchedStay?.rateTypeEnum || initialForm.rateTypeEnum,
+                noOfGuest: matchedStay?.noOfGuest || initialForm.noOfGuest,
+                stayStatusEnum: matchedStay?.stayStatusEnum || initialForm.stayStatusEnum,
+              }
+            }
+
             setFormData({
               ...initialForm,
               firstName: p.firstName || fName,
@@ -219,6 +320,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
               contactInformationTypeEnum: p.contactInformationTypeEnum || 'HOME',
               folioNo: p.folioNo || '',
               crsFolioNo: p.crsFolioNo || '',
+              ...extraData,
             })
             return
           }
@@ -249,15 +351,31 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
   // Cleanup previews on modal close
   useEffect(() => {
     if (!isOpen) {
-      Object.values(localPreviews).forEach((p) => p && URL.revokeObjectURL(p))
-      setLocalPreviews({ profilePhoto: null, signature: null })
+      setLocalPreviews((prev) => {
+        Object.values(prev).forEach((p) => p && URL.revokeObjectURL(p))
+        return { profilePhoto: null, signature: null }
+      })
     }
-  }, [isOpen, localPreviews])
+  }, [isOpen])
 
   if (!isOpen || !room) return null
 
   const profile = room.profile || (room.firstName ? room : {})
   const isExisting = !!(profile.id || room.profile || room.firstName)
+
+  const reservationStatus = roomStatuses.find(
+    (s) =>
+      s.roomStatusName?.toLowerCase().includes('reserv') ||
+      s.shortName?.toLowerCase().includes('res'),
+  )
+  const reservationColor = reservationStatus?.roomStatusColor?.trim() || '#2F8B2C'
+
+  const occupiedStatus = roomStatuses.find(
+    (s) =>
+      s.roomStatusName?.toLowerCase().includes('occupied') ||
+      s.shortName?.toLowerCase().includes('occ'),
+  )
+  const occupiedColor = occupiedStatus?.roomStatusColor?.trim() || '#2563eb' // fallback blue-600
 
   const currentStatusName = (room.statusDetails?.roomStatusName || '').toLowerCase()
   const isReserved =
@@ -268,11 +386,11 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
   const iconClass =
     'absolute top-1/2 left-3.5 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-blue-500'
   const inputClass =
-    'w-full rounded-xl border border-slate-200 bg-white py-1.5 pr-4 pl-10 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20 placeholder:text-slate-300'
+    'w-full rounded-md border border-slate-200 bg-white py-1.5 pr-4 pl-10 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20 placeholder:text-slate-300'
   const labelClass =
-    'mb-1.5 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400'
+    'mb-1 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400'
   const cardClass =
-    'rounded-2xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-700/50 dark:bg-slate-800/50'
+    'rounded-lg border border-slate-100 bg-slate-50 p-2.5 dark:border-slate-700/50 dark:bg-slate-800/50'
 
   // Handle generic input changes with hierarchical resets
   const handleChange = (e) => {
@@ -390,6 +508,41 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
     try {
       const targetProfileId = profile?.id || room?.personalDetailId || room?.profileId
 
+      // Handle the case where forcedStatusName might be an event or null
+      let targetStatusName =
+        (typeof forcedStatusName === 'string' ? forcedStatusName : null) ||
+        formData.guestDetailsStatus ||
+        'Reservation'
+
+      // 0. Find Target Status ID and Color early for consistent mapping
+      const targetStatus = roomStatuses.find((s) => {
+        const name = (s.roomStatusName || '').toLowerCase()
+        const short = (s.shortName || '').toLowerCase()
+        const matchStr = targetStatusName.toLowerCase()
+        if (matchStr.includes('reserv')) return name.includes('reserv') || short.includes('res')
+        if (matchStr.includes('check in') || matchStr.includes('occup'))
+          return name.includes('occup') || short.includes('occ')
+        return name.includes(matchStr) || short.includes(matchStr)
+      })
+
+      const finalStatusId = targetStatus?.id
+
+      // Extremely defensive color resolution to prevent "null or empty" backend errors
+      let finalStatusColor = '#2F8B2C' // Default PMS Green
+      if (targetStatus) {
+        finalStatusColor = (
+          targetStatus.roomStatusColor ||
+          targetStatus.bgColor ||
+          targetStatus.color ||
+          ''
+        ).trim()
+      }
+
+      // Fallback if targetStatus didn't have a color or wasn't found
+      if (!finalStatusColor) {
+        finalStatusColor = targetStatusName.toLowerCase().includes('reserv') ? '#2F8B2C' : '#2798e8'
+      }
+
       // 1. Personal Detail
       const personalPayload = {
         ...formData,
@@ -400,6 +553,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
         crsFolioNo: formData.crsFolioNo,
         id: targetProfileId || 0,
       }
+      console.log('1. [Home] Personal Payload:', personalPayload)
 
       const res =
         isExisting && targetProfileId
@@ -407,14 +561,29 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
           : await addPersonalDetail(personalPayload)
 
       const finalProfileId = res?.data?.id || res?.data || targetProfileId
+      console.log('--------------------Final Profile ID-----------------', finalProfileId)
 
-      // 2. Documents (only for new profiles)
-      if (!isExisting && formData.documents?.length > 0 && finalProfileId) {
-        await Promise.all(
-          formData.documents.map((doc) =>
-            addDocumentDetail({ ...doc, personalDetailsId: finalProfileId }),
-          ),
-        )
+      // 2. Documents Logic (Sequential Linking)
+      let finalDocId = null
+
+      // If there are documents in the list (new or newly added)
+      if (formData.documents?.length > 0 && finalProfileId) {
+        const docPromises = formData.documents.map(async (doc) => {
+          // Use nested object for personal detail linkage as per Admin side success
+          const docPayload = {
+            ...doc,
+            personalDetails: { id: finalProfileId },
+            personalDetailsId: finalProfileId, // Adding flat ID too for safety
+          }
+          console.log('2. [Home] Document Payload:', docPayload)
+          const dRes = await addDocumentDetail(docPayload)
+          return dRes?.data?.id || dRes?.data
+        })
+        const docIds = await Promise.all(docPromises)
+        finalDocId = docIds[0] // Taking first doc ID for guest linkage
+      } else if (isExisting && documentDetails?.length > 0) {
+        // Use existing document ID if already available
+        finalDocId = documentDetails[0]?.id
       }
 
       // 3. Rent Detail
@@ -432,7 +601,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
         balance: Number(formData.balance) || 0,
         deleted: false,
       }
-
+      console.log('3. [Home] Rent Payload:', rentPayload)
       const rentRes = formData.rentId
         ? await updateRentDetail(formData.rentId, rentPayload)
         : await addRentDetail(rentPayload)
@@ -447,36 +616,43 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
         comment: formData.comment || '',
         rateTypeEnum: formData.rateTypeEnum || 'RACK',
         noOfGuest: Number(formData.noOfGuest) || 1,
-        stayStatusEnum: forcedStatusName?.toLowerCase().includes('reserv')
-          ? 'RESERVED'
-          : formData.stayStatusEnum || 'CONFIRMED',
+        stayStatusEnum: targetStatusName?.toLowerCase().includes('reserv')
+          ? 'UnConfirmed'
+          : formData.stayStatusEnum === 'UnConfirmed'
+            ? 'UnConfirmed'
+            : 'Confirmed',
+        color: finalStatusColor,
         personalDetailId: finalProfileId,
+        personalDetailsId: finalProfileId, // Backup flat ID
+        roomStatusId: finalStatusId,
       }
+      console.log('4. [Home] Stay Payload:', stayPayload)
       const stayRes = await addStayDetail(stayPayload)
       const finalStayId = stayRes?.data?.id || stayRes?.data
 
-      // 5. Guest Detail Integration
-      const guestStatusValue = forcedStatusName || formData.guestDetailsStatus || 'Reservation'
+      // 5. Guest Detail Integration (LINKING EVERYTHING)
       const guestPayload = {
         roomMasterId: Number(formData.roomMasterId || room.id),
         personalDetailsId: finalProfileId,
+        documentDetailsId: finalDocId, // CRITICAL: This was missing!
         rentDetailsId: finalRentId,
         stayDetailsId: finalStayId,
         checkInDate: formData.checkInDate
           ? formData.checkInDate.includes('T')
             ? formData.checkInDate
-            : `${formData.checkInDate}T00:00:00.000Z`
+            : `${formData.checkInDate}T00:00:00.000`
           : null,
         checkOutDate: formData.checkOutDate
           ? formData.checkOutDate.includes('T')
             ? formData.checkOutDate
-            : `${formData.checkOutDate}T00:00:00.000Z`
+            : `${formData.checkOutDate}T00:00:00.000`
           : null,
         checkInTime: formData.checkInTime || '00:00:00',
         checkOutTime: formData.checkOutTime || '00:00:00',
         noOfDays: Number(formData.noOfDays) || 1,
-        guestDetailsStatus: guestStatusValue,
+        guestDetailsStatus: targetStatusName,
       }
+      console.log('5. [Home] Guest Payload:', guestPayload)
 
       if (formData.guestDetailId) {
         await updateGuestDetail(formData.guestDetailId, guestPayload)
@@ -484,27 +660,17 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
         await addGuestDetail(guestPayload)
       }
 
-      // 6. Final Room Status Update
-      if (forcedStatusName) {
-        const targetStatus = roomStatuses.find((s) => {
-          const name = (s.roomStatusName || '').toLowerCase()
-          const short = (s.shortName || '').toLowerCase()
-          const target = forcedStatusName.toLowerCase()
-          return target === 'reservation'
-            ? name.includes('reserv') || short.includes('res')
-            : name.includes(target) || short.includes(target)
-        })
-
-        if (targetStatus) {
-          const originalRoom = rawRooms.find((r) => String(r.id) === String(room.id))
-          if (originalRoom) {
-            await updateRoom(room.id, {
-              ...originalRoom,
-              roomStatusTableId: targetStatus.id,
-              roomStatusId: targetStatus.id,
-              personalDetailId: finalProfileId,
-            })
-          }
+      // 6. Final Room Status Update (Triggers Home Screen Color Change)
+      if (finalStatusId) {
+        const originalRoom =
+          rawRooms.find((r) => String(r.id) === String(room.id)) || (room.roomName ? room : null)
+        if (originalRoom) {
+          await updateRoom(room.id, {
+            ...originalRoom,
+            roomStatusTableId: finalStatusId,
+            roomStatusId: finalStatusId,
+            personalDetailId: finalProfileId,
+          })
         }
       }
 
@@ -530,10 +696,11 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
         ></motion.div>
 
         <motion.div
-          initial={{ scale: 0.95, opacity: 0, y: 20 }}
+          initial={{ scale: 0.9, opacity: 0, y: 40 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.95, opacity: 0, y: 20 }}
-          className="relative z-10 flex h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-[32px] border border-white/20 bg-white shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] dark:bg-slate-900"
+          exit={{ scale: 0.9, opacity: 0, y: 40 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          className="relative z-10 flex h-[95vh] w-full max-w-6xl flex-col overflow-hidden rounded-xl border border-white/20 bg-white/95 shadow-[0_48px_100px_-12px_rgba(0,0,0,0.3)] backdrop-blur-xl dark:bg-slate-900/95"
         >
           <form
             id="guestProfileForm"
@@ -542,15 +709,15 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
           >
             {/* Header */}
             <div
-              className={`flex shrink-0 items-center justify-between border-b p-4 sm:px-8 ${isDark ? 'border-slate-800 bg-slate-900/80' : 'border-slate-100 bg-white/80'} backdrop-blur-md`}
+              className={`flex shrink-0 items-center justify-between border-b p-4 shadow-sm sm:px-8 ${isDark ? 'border-slate-800 bg-slate-900/40' : 'border-slate-100 bg-white/40'} backdrop-blur-xl`}
             >
               <div className="flex items-center gap-5">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-blue-500 to-blue-600 shadow-xl shadow-blue-500/20">
-                  <User className="h-6 w-6 text-white" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-blue-500 to-blue-600 shadow-xl shadow-blue-500/20">
+                  <User className="h-5 w-5 text-white" />
                 </div>
                 <div className="min-w-0 text-left">
                   <h2 className="text-xl font-black tracking-tight text-slate-800 uppercase dark:text-white">
-                    {isExisting ? 'Update' : 'Create'}{' '}
+                    {/* {isExisting ? 'Update' : 'Create'}{' '} */}
                     <span className="text-blue-500">Guest Profile</span>
                   </h2>
                   <div className="mt-0.5 flex items-center gap-2 text-left">
@@ -564,7 +731,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
 
               <div className="flex items-center gap-4">
                 <div
-                  className={`flex items-center gap-6 rounded-2xl px-6 py-3 ${isDark ? 'bg-slate-800/50' : 'bg-slate-50'}`}
+                  className={`flex items-center gap-6 rounded-lg px-4 py-2 ${isDark ? 'bg-slate-800/50' : 'bg-slate-50'}`}
                 >
                   <div
                     className="flex cursor-pointer flex-col items-end transition-opacity hover:opacity-80 active:scale-95"
@@ -615,15 +782,15 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
               <div className="flex h-full flex-col overflow-hidden lg:flex-row">
                 {/* Column 1: Identity & Documentation */}
                 <div className="flex w-full flex-col border-b border-slate-100 bg-white transition-all lg:w-[32%] lg:border-r lg:border-b-0 dark:border-slate-800 dark:bg-slate-900">
-                  <div className="flex items-center gap-3 px-8 py-5 text-left">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
-                      <ShieldCheck size={16} className="text-blue-600 dark:text-blue-400" />
+                  <div className="flex items-center gap-2 px-3 py-1.5 text-left">
+                    <div className="flex h-5 w-5 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                      <ShieldCheck size={10} className="text-blue-600 dark:text-blue-400" />
                     </div>
-                    <h3 className="text-[11px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
-                      Part 1: Identity & Docs
+                    <h3 className="text-[9px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
+                      Personal Information
                     </h3>
                   </div>
-                  <div className="custom-scrollbar flex-1 space-y-6 overflow-y-auto px-8 pb-8">
+                  <div className="flex-1 space-y-2 overflow-y-auto px-3 pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     {/* Integrated Asset Capture */}
                     <div className={cardClass}>
                       <div className="flex items-start gap-3">
@@ -763,7 +930,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                             name="contactInformationTypeEnum"
                             value={formData.contactInformationTypeEnum}
                             onChange={handleChange}
-                            className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                            className="mt-1 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                           >
                             <option value="HOME">HOME</option>
                             <option value="OFFICE">OFFICE</option>
@@ -817,7 +984,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                             name="address"
                             value={formData.address}
                             onChange={handleChange}
-                            className="mt-1 w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                            className="mt-1 w-full resize-none rounded-md border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                             placeholder="Address details..."
                           />
                         </div>
@@ -825,7 +992,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                     </div>
 
                     {/* Documentation Table */}
-                    <div className="rounded-2xl border border-blue-100/50 bg-blue-50/50 p-4 dark:border-blue-900/30 dark:bg-blue-900/10">
+                    <div className="rounded-lg border border-blue-100/50 bg-blue-50/50 p-4 dark:border-blue-900/30 dark:bg-blue-900/10">
                       <div className="mb-3 flex items-center justify-between">
                         <span className="text-[10px] font-black tracking-widest text-blue-600 uppercase dark:text-blue-400">
                           ID Documents
@@ -838,7 +1005,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                           <Plus size={14} />
                         </button>
                       </div>
-                      <div className="overflow-hidden rounded-xl border border-blue-100/50 bg-white dark:border-blue-900/20 dark:bg-slate-900">
+                      <div className="overflow-hidden rounded-lg border border-blue-100/50 bg-white dark:border-blue-900/20 dark:bg-slate-900">
                         <table className="w-full text-left font-bold">
                           <thead className="bg-blue-50/50 dark:bg-blue-900/20">
                             <tr className="text-[9px] font-black tracking-wider text-slate-400 uppercase">
@@ -908,16 +1075,18 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
 
                 {/* Column 2: Guest Info & Stay Selection */}
                 <div className="flex w-full flex-col border-b border-slate-100 bg-slate-50/50 transition-all lg:w-[46%] lg:border-r lg:border-b-0 dark:border-slate-800 dark:bg-slate-800/10">
-                  <div className="flex items-center gap-3 px-8 py-5 text-left">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30">
-                      <CalendarCheck size={16} className="text-amber-600 dark:text-amber-400" />
+                  <div
+                    className={`flex items-center gap-2 border-b px-4 py-3 text-left ${isDark ? 'border-slate-800' : 'border-slate-100'}`}
+                  >
+                    <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-amber-500 shadow-lg shadow-amber-500/20">
+                      <CalendarCheck size={12} className="text-white" />
                     </div>
-                    <h3 className="text-[11px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
-                      Part 2: Guest Info & Stay Selection
+                    <h3 className="text-[10px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
+                      Accomodation Information
                     </h3>
                   </div>
-                  <div className="custom-scrollbar flex-1 space-y-5 overflow-y-auto px-8 pb-8">
-                    <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                  <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    <div className="rounded-xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                       <div className="mb-4 flex items-center gap-3">
                         <span className="text-[10px] font-black tracking-widest text-amber-500 uppercase">
                           Guest Details
@@ -934,16 +1103,23 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                               parseInt(name === 'noOfDays' ? value : formData.noOfDays || 1) || 1
                             const start = name === 'checkInDate' ? value : formData.checkInDate
                             if (start) {
-                              const d = new Date(start)
-                              d.setDate(d.getDate() + days)
-                              updated.checkOutDate = d.toISOString().split('T')[0]
+                              const [y, m, d] = start.split('-').map(Number)
+                              const date = new Date(y, m - 1, d)
+                              date.setDate(date.getDate() + days)
+                              updated.checkOutDate = [
+                                date.getFullYear(),
+                                String(date.getMonth() + 1).padStart(2, '0'),
+                                String(date.getDate()).padStart(2, '0'),
+                              ].join('-')
                               updated.noOfDays = days
                             }
                           } else if (name === 'checkOutDate') {
                             if (formData.checkInDate && value) {
-                              const start = new Date(formData.checkInDate)
-                              const end = new Date(value)
-                              const diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24))
+                              const [y1, m1, d1] = formData.checkInDate.split('-').map(Number)
+                              const [y2, m2, d2] = value.split('-').map(Number)
+                              const start = new Date(y1, m1 - 1, d1)
+                              const end = new Date(y2, m2 - 1, d2)
+                              const diff = Math.round((end - start) / (1000 * 60 * 60 * 24))
                               updated.noOfDays = diff >= 0 ? diff : 0
                             }
                           }
@@ -953,9 +1129,9 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                       />
                     </div>
 
-                    <div className="rounded-2xl border border-amber-100/50 bg-amber-50/50 p-5 dark:border-amber-900/20 dark:bg-amber-900/5">
-                      <div className="mb-4 flex items-center gap-3">
-                        <span className="text-[10px] font-black tracking-widest text-amber-600 uppercase dark:text-amber-400">
+                    <div className="rounded-lg border border-amber-100/50 bg-amber-50/50 p-2 dark:border-amber-900/20 dark:bg-amber-900/5">
+                      <div className="mb-1.5 flex items-center gap-3">
+                        <span className="text-[8px] font-black tracking-widest text-amber-600 uppercase dark:text-amber-400">
                           Booking & Unit Allocation
                         </span>
                         <div className="h-px flex-1 bg-amber-200/50 dark:bg-amber-800/30"></div>
@@ -967,6 +1143,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                         floors={floors}
                         roomTypes={roomTypes}
                         rooms={rawRooms}
+                        roomStatuses={roomStatuses}
                         isDark={isDark}
                         showStatus={true}
                       />
@@ -976,16 +1153,16 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
 
                 {/* Column 3: Rent Details */}
                 <div className="flex w-full flex-col bg-slate-50 transition-all lg:w-[22%] dark:bg-slate-900/50">
-                  <div className="flex items-center gap-3 px-6 py-5 text-left">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30">
-                      <Receipt size={16} className="text-emerald-600 dark:text-emerald-400" />
+                  <div className="flex items-center gap-2 px-3 py-1.5 text-left">
+                    <div className="flex h-5 w-5 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
+                      <Receipt size={10} className="text-emerald-600 dark:text-emerald-400" />
                     </div>
-                    <h3 className="text-[11px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
-                      Part 3: Rent Details
+                    <h3 className="text-[9px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
+                      Rent Information
                     </h3>
                   </div>
-                  <div className="custom-scrollbar flex-1 space-y-5 overflow-y-auto px-6 pb-8">
-                    <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-white p-5 shadow-lg shadow-emerald-500/5 dark:border-emerald-900/20 dark:bg-slate-900">
+                  <div className="flex flex-1 flex-col overflow-y-auto px-3 pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    <div className="flex h-full flex-col overflow-hidden rounded-xl border border-emerald-100 bg-white p-4 shadow-xl shadow-emerald-500/5 transition-all hover:shadow-emerald-500/10 dark:border-emerald-900/20 dark:bg-slate-900">
                       <RentDetails
                         formData={formData}
                         handleChange={(e) =>
@@ -1006,7 +1183,19 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                 type="button"
                 onClick={(e) => handleSubmit(e, 'Reservation')}
                 disabled={isSubmitting || uploadingType || isReserved}
-                className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-[10px] font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${isSubmitting || uploadingType || isReserved ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-orange-600 shadow-orange-500/30 hover:bg-orange-700 hover:shadow-orange-500/40'}`}
+                className={`flex items-center gap-2 rounded-lg px-5 py-2.5 text-[10px] font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${
+                  isSubmitting || uploadingType || isReserved
+                    ? 'cursor-not-allowed bg-slate-400 shadow-none'
+                    : 'hover:opacity-90'
+                }`}
+                style={{
+                  backgroundColor:
+                    isSubmitting || uploadingType || isReserved ? undefined : reservationColor,
+                  boxShadow:
+                    isSubmitting || uploadingType || isReserved
+                      ? undefined
+                      : `0 20px 25px -5px ${reservationColor}4d, 0 8px 10px -6px ${reservationColor}4d`,
+                }}
               >
                 <CalendarCheck size={14} />
                 <span>Reservation</span>
@@ -1016,7 +1205,18 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                 type="button"
                 onClick={(e) => handleSubmit(e, 'Occupied')}
                 disabled={isSubmitting || uploadingType}
-                className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-[10px] font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-blue-600 shadow-blue-500/30 hover:bg-blue-700 hover:shadow-blue-500/40'}`}
+                className={`flex items-center gap-2 rounded-lg px-5 py-2.5 text-[10px] font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${
+                  isSubmitting || uploadingType
+                    ? 'cursor-not-allowed bg-slate-400 shadow-none'
+                    : 'hover:opacity-90'
+                }`}
+                style={{
+                  backgroundColor: isSubmitting || uploadingType ? undefined : occupiedColor,
+                  boxShadow:
+                    isSubmitting || uploadingType
+                      ? undefined
+                      : `0 20px 25px -5px ${occupiedColor}4d, 0 8px 10px -6px ${occupiedColor}4d`,
+                }}
               >
                 <CheckCircle size={14} />
                 <span>Check In</span>
@@ -1026,7 +1226,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                 type="submit"
                 form="guestProfileForm"
                 disabled={isSubmitting || uploadingType}
-                className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-[10px] font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-indigo-600 shadow-indigo-500/30 hover:bg-indigo-700 hover:shadow-indigo-500/40'}`}
+                className={`flex items-center gap-2 rounded-lg px-5 py-2.5 text-[10px] font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-indigo-600 shadow-indigo-500/30 hover:bg-indigo-700 hover:shadow-indigo-500/40'}`}
               >
                 <RefreshCw size={14} className={isSubmitting ? 'animate-spin' : ''} />
                 <span>Update Profile</span>
@@ -1036,7 +1236,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
 
               <button
                 type="button"
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 shadow-sm transition-all hover:bg-slate-50 hover:text-blue-500 active:scale-95 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400 shadow-sm transition-all hover:bg-slate-50 hover:text-blue-500 active:scale-95 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
               >
                 <ArrowLeftRight size={14} />
               </button>
@@ -1044,7 +1244,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 shadow-sm transition-all hover:bg-slate-50 hover:text-blue-500 active:scale-95 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400 shadow-sm transition-all hover:bg-slate-50 hover:text-blue-500 active:scale-95 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
               >
                 <Printer size={16} />
               </button>
@@ -1052,7 +1252,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 shadow-sm transition-all hover:bg-slate-50 hover:text-red-500 active:scale-95 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400 shadow-sm transition-all hover:bg-slate-50 hover:text-red-500 active:scale-95 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
               >
                 <X size={16} />
               </button>

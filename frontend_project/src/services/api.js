@@ -1,42 +1,45 @@
-/**
- * api.js
- *
- * Centralized Axios instance for making API calls to the Spring Boot backend.
- * Includes request/response interceptors to easily attach auth tokens and handle global API errors.
- * Relies on vite server proxy (since baseURL is empty) to avoid CORS issues.
- */
 import axios from 'axios'
 
-// Axios instance - requests go through Vite proxy to Spring Boot
-// Vite proxy forwards /auth/* → http://192.168.1.5:9091/auth/*
-// This avoids CORS issues in the browser
+/**
+ * api.js - Optimized Axios Instance
+ */
 const api = axios.create({
-  baseURL: '', // Empty = uses Vite proxy (do NOT put direct IP here)
+  baseURL: '', // Vite proxy handles this
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // 10 seconds timeout
+  timeout: 15000,
 })
 
-// Request Interceptor - runs before every request
+// Request Interceptor: Token aur Hotel ID attach karne ke liye
 api.interceptors.request.use(
   (config) => {
-    let token = localStorage.getItem('access_token')
+    const token = localStorage.getItem('access_token')
     if (token) {
-      token = token.trim().replace(/^"|"$/g, '')
-      config.headers.Authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`
+      const cleanToken = token.trim().replace(/^"|"$/g, '')
+      config.headers.Authorization = cleanToken.startsWith('Bearer ') ? cleanToken : `Bearer ${cleanToken}`
+    }
+
+    const activeHotelId = localStorage.getItem('activeHotelId')
+    if (activeHotelId && !config.url.includes('/auth/')) {
+      config.headers['X-Hotel-Id'] = activeHotelId
     }
     return config
   },
-  (error) => Promise.reject(error),
+  (error) => Promise.reject(error)
 )
 
-// Response Interceptor - runs after every response
+// Response Interceptor: Global Error Handling (Logout on 401)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (error.response && error.response.status === 401) {
+      console.warn('Session expired or unauthorized. Logging out...')
+      localStorage.clear()
+      window.location.href = '/login'
+    }
     return Promise.reject(error)
-  },
+  }
 )
 
 export default api

@@ -42,6 +42,7 @@ const GuestPersonalDetailsManagement = ({
     getGuestDocument,
     getGuestStay,
     getGuestDetail, // New
+    getRentDetail,
     getDocumentTypeName,
   } = useGuestPersonalDetailsController({
     details,
@@ -117,10 +118,12 @@ const GuestPersonalDetailsManagement = ({
                 </tr>
               ) : (
                 processedDetails.map((guest, idx) => {
-                  const guestDocument = getGuestDocument(guest.id)
-                  const guestStay = getGuestStay(guest.id)
                   const guestDetail = getGuestDetail(guest.id)
-                  const rent = guestDetail && rentDetails ? rentDetails.find((r) => String(r.id) === String(guestDetail.rentDetailsId || guestDetail.rentId)) : null
+                  const guestDocument = getGuestDocument(guest.id, guestDetail)
+                  const guestStay = getGuestStay(guest.id, guestDetail)
+                  // Improved rent lookup: use controller's robust ID extraction
+                  const rentId = getRentDetail(guestDetail)
+                  const rent = rentId && rentDetails ? rentDetails.find((r) => String(r.id) === rentId) : null
                   return (
                     <tr
                       key={guest.id}
@@ -183,7 +186,20 @@ const GuestPersonalDetailsManagement = ({
                       </td>
                       <td className="px-6 py-4 text-center">
                         <div className="flex items-center justify-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-                          <button onClick={() => onEdit(guest, guestDocument, guestStay, guestDetail, rent)} className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 shadow-sm transition-all hover:scale-110 hover:border-blue-200 hover:text-blue-500 hover:shadow-blue-100 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-blue-900 dark:hover:shadow-none" title="Edit Profile">
+                          <button onClick={() => {
+                            console.log('[DEBUG] ===== EDIT BUTTON CLICKED =====')
+                            console.log('[DEBUG] guest (personalDetail):', guest)
+                            console.log('[DEBUG] guestDocument:', guestDocument)
+                            console.log('[DEBUG] guestStay:', guestStay)
+                            console.log('[DEBUG] guestDetail:', guestDetail)
+                            console.log('[DEBUG] rent:', rent)
+                            console.log('[DEBUG] All guestDetails:', guestDetails)
+                            console.log('[DEBUG] All stayDetails:', stayDetails)
+                            console.log('[DEBUG] All documentDetails:', documentDetails)
+                            console.log('[DEBUG] All rentDetails:', rentDetails)
+                            console.log('[DEBUG] ================================')
+                            onEdit(guest, guestDocument, guestStay, guestDetail, rent)
+                          }} className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 shadow-sm transition-all hover:scale-110 hover:border-blue-200 hover:text-blue-500 hover:shadow-blue-100 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-blue-900 dark:hover:shadow-none" title="Edit Profile">
                             <Pencil className="h-4 w-4" />
                           </button>
                           <button onClick={() => handleDeleteClick(guest)} className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 shadow-sm transition-all hover:scale-110 hover:border-red-200 hover:text-red-500 hover:shadow-red-100 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-red-900 dark:hover:shadow-none" title="Delete Profile">
