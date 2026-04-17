@@ -25,6 +25,9 @@
 
   --shadow-premium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+  /* Custom Grid Columns */
+  --grid-template-columns-15: repeat(15, minmax(0, 1fr));
 }
 
 html {

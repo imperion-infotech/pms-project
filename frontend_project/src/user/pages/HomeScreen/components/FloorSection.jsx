@@ -93,7 +93,7 @@ const FloorSection = ({ floorName, rooms = [], isDark, onRoomClick, onContextMen
             transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
           >
             <div
-              className={`relative grid grid-cols-1 gap-5 px-6 py-8 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 ${
+              className={`relative grid grid-cols-2 gap-3 px-4 py-6 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-15 ${
                 isDark ? 'bg-slate-900/20' : 'bg-slate-50/30'
               }`}
             >

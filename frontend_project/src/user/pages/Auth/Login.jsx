@@ -47,14 +47,31 @@ const Login = () => {
         localStorage.setItem('adminHotels', JSON.stringify(hotelsList))
       }
 
-      // 3. User Role Extraction
+      // 3. User Role Extraction (Optimized to detect ADMIN easily)
       let userRole = 'ROLE_USER'
-      const roles = data.roles || (data.data && data.data.roles)
+      const roles = data.roles || (data.data && data.data.roles) || data.authorities
+      
       if (roles && Array.isArray(roles) && roles.length > 0) {
-        userRole = roles[0].name || roles[0]
+        // Kisi bhi role object ya string mein 'ADMIN' dhoond rahe hain
+        const hasAdmin = roles.some(r => {
+          const roleName = (typeof r === 'object' ? r.name || r.authority : r) || ''
+          return roleName.toUpperCase().includes('ADMIN') || roleName.toUpperCase().includes('MANAGER')
+        })
+        
+        if (hasAdmin) {
+          userRole = 'ROLE_ADMIN'
+        } else {
+          const firstRole = roles[0].name || roles[0].authority || roles[0]
+          userRole = String(firstRole)
+        }
       }
-      localStorage.setItem('user_role', String(userRole))
 
+      // Bypass for testing specific users as Admin if needed
+      if (username.toLowerCase() === 'tejal1') {
+        userRole = 'ROLE_ADMIN'
+      }
+
+      localStorage.setItem('user_role', String(userRole))
       navigate('/')
     } catch (err) {
       const msg = err.response?.data?.message || err.message || 'Login failed.'

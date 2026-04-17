@@ -209,14 +209,14 @@ const HomeScreen = () => {
 
         {/* 3. Main Data Visualization Grid */}
         <main className="custom-scrollbar relative flex-1 overflow-x-hidden overflow-y-auto bg-[#f8fafc] dark:bg-slate-950">
-          <div className="mx-auto max-w-[1700px] px-6 py-8">
+          <div className="mx-auto max-w-[1900px] px-4 py-8">
             {/* Industrial Skeleton View - Jab data fetch hota hai */}
             {isLoading && (
               <div className="space-y-12">
                 {[1, 2, 3].map(i => (
                   <div key={i} className="space-y-6">
                     <div className="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded-full" />
-                    <RoomCardSkeleton repeat={12} />
+                    <RoomCardSkeleton repeat={15} />
                   </div>
                 ))}
               </div>

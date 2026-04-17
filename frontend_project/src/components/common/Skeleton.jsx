@@ -55,7 +55,7 @@ export const ProfileSkeleton = () => (
  * RoomCardSkeleton - Loader for PMS Dashboard rooms
  */
 export const RoomCardSkeleton = ({ repeat = 8 }) => (
-  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-15">
     <Skeleton className="h-24 w-full" repeat={repeat} />
   </div>
 )

@@ -4,13 +4,7 @@ import { useState, useMemo } from 'react'
  * Controller: useRoomTypeController
  * Logic for managing room categories.
  */
-const useRoomTypeController = ({
-  roomTypes,
-  onDelete,
-  userRole,
-  currentPage = 1,
-  itemsPerPage = 8,
-}) => {
+const useRoomTypeController = ({ roomTypes, onDelete, currentPage = 1, itemsPerPage = 8 }) => {
   const [deleteTarget, setDeleteTarget] = useState(null)
 
   const processedRoomTypes = useMemo(() => {
@@ -20,10 +14,6 @@ const useRoomTypeController = ({
   }, [roomTypes, currentPage, itemsPerPage])
 
   const getIndex = (idx) => (currentPage - 1) * itemsPerPage + idx + 1
-
-  const isAdmin = useMemo(() => {
-    return userRole === 'ROLE_ADMIN' || userRole === 'ADMIN'
-  }, [userRole])
 
   const handleDeleteClick = (room) => {
     setDeleteTarget({ id: room.id, name: room.roomTypeName })
@@ -43,7 +33,6 @@ const useRoomTypeController = ({
   return {
     processedRoomTypes,
     getIndex,
-    isAdmin,
     deleteTarget,
     handleDeleteClick,
     handleConfirmDelete,

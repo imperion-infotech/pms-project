@@ -20,7 +20,7 @@ const RoomCard = ({ room, onClick, onContextMenu }) => {
       whileHover="hover"
       initial="initial"
       animate="initial"
-      className="group relative w-full cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 sm:w-[165px] dark:border-slate-700/50 dark:bg-slate-800"
+      className="group relative w-full cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 dark:border-slate-700/50 dark:bg-slate-800"
     >
       {/* Tooltip Overlay (Appears on Hover) */}
       {(room.guestName || room.firstName || room.profile) && (
@@ -60,12 +60,12 @@ const RoomCard = ({ room, onClick, onContextMenu }) => {
         style={{ backgroundColor: statusColor }}
       />
 
-      <div className="p-3.5 pl-5">
+      <div className="p-2.5 pl-4">
         {/* Top Header Row */}
         <div className="mb-2 flex items-start justify-between">
           <div className="flex flex-col">
             <span
-              className="mb-1 text-[17px] leading-none font-black tracking-tight"
+              className="mb-1 text-[15px] leading-none font-black tracking-tight"
               style={{ color: statusColor }}
             >
               {room.roomName}

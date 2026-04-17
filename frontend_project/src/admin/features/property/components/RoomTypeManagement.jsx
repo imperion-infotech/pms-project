@@ -18,7 +18,6 @@ const RoomTypeManagement = ({
   const {
     processedRoomTypes,
     getIndex,
-    isAdmin,
     deleteTarget,
     handleDeleteClick,
     handleConfirmDelete,
@@ -43,15 +42,13 @@ const RoomTypeManagement = ({
           </div>
         </div>
 
-        {isAdmin && (
-          <button
-            onClick={() => setIsRoomTypeModalOpen(true)}
-            className="flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-700 hover:shadow-emerald-500/40 active:scale-95"
-          >
-            <PlusCircle className="h-4 w-4" />
-            <span>Add New Category</span>
-          </button>
-        )}
+        <button
+          onClick={() => setIsRoomTypeModalOpen(true)}
+          className="flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-700 hover:shadow-emerald-500/40 active:scale-95"
+        >
+          <PlusCircle className="h-4 w-4" />
+          <span>Add Room Type</span>
+        </button>
       </div>
 
       {/* Main Table Layer */}
@@ -86,14 +83,12 @@ const RoomTypeManagement = ({
                         <LayoutDashboard className="h-8 w-8 text-slate-200 dark:text-slate-700" />
                       </div>
                       <p className="text-sm font-medium text-slate-400">No categories defined</p>
-                      {isAdmin && (
-                        <button
-                          onClick={() => setIsRoomTypeModalOpen(true)}
-                          className="text-xs font-bold text-emerald-500 hover:underline"
-                        >
-                          Add your first category
-                        </button>
-                      )}
+                      <button
+                        onClick={() => setIsRoomTypeModalOpen(true)}
+                        className="text-xs font-bold text-emerald-500 hover:underline"
+                      >
+                        Add your first Room Type
+                      </button>
                     </div>
                   </td>
                 </tr>

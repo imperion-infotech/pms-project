@@ -27,20 +27,26 @@ const PropertySelection = () => {
     try {
       const username = localStorage.getItem('username')
 
-      const response = await api.post('/auth/select-hotel', null, {
-        params: {
-          hotelId: String(hotelId),
-          username: username,
+      // Industrial Fix: Spring Security endpoints often prefer form-urlencoded
+      // instead of JSON for auth-related selection calls.
+      const params = new URLSearchParams()
+      params.append('hotelId', hotelId)
+      params.append('username', username)
+
+      const response = await api.post('/auth/select-hotel', params, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
       })
 
       let newToken = null
       const data = response.data
 
+      // Optimized token extraction
       if (typeof data === 'string') {
         newToken = data.trim()
       } else if (data) {
-        newToken = data.token || data.access_token || data.jwt || JSON.stringify(data)
+        newToken = data.token || data.access_token || data.jwt || data.accessToken
       }
 
       if (newToken) {
