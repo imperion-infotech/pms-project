@@ -33,7 +33,7 @@ export const FloorModal = ({
             <PlusCircle className="h-6 w-6 text-emerald-400" />
             <div>
               <h3 className="text-lg font-bold">Add New Floor</h3>
-              <p className="text-[10px] tracking-widest text-slate-400 uppercase">
+              <p className="text-pms-tiny tracking-widest text-slate-400 uppercase">
                 Master Data Entry
               </p>
             </div>
@@ -60,7 +60,7 @@ export const FloorModal = ({
               className={`w-full border bg-slate-50 px-4 py-2.5 dark:bg-slate-800/50 ${isDuplicate ? 'border-red-500 text-red-500 ring-2 ring-red-500/20' : 'border-slate-200 text-slate-800 dark:border-slate-700 dark:text-slate-200'} rounded-xl text-sm shadow-inner transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none`}
             />
             {isDuplicate && (
-              <p className="animate-in slide-in-from-top-1 mt-1.5 text-[10px] font-bold text-red-500 sm:text-xs">
+              <p className="animate-in slide-in-from-top-1 mt-1.5 text-pms-tiny font-bold text-red-500 sm:text-xs">
                 Floor Name already exists!
               </p>
             )}

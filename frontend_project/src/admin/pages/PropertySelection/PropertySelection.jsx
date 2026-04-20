@@ -338,7 +338,7 @@ const PropertySelection = () => {
           </div>
           <div>
             <h1 className="text-xl font-black tracking-tight text-slate-900">Imperion PMS</h1>
-            <p className="text-[10px] font-black tracking-[0.2em] text-emerald-500 uppercase opacity-90">
+            <p className="text-pms-tiny font-black tracking-[0.2em] text-emerald-500 uppercase opacity-90">
               Property Management
             </p>
           </div>
@@ -536,7 +536,7 @@ const PropertySelection = () => {
                     </div>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                       <div>
-                        <label className="mb-2 block text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                        <label className="mb-2 block text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
                           Admin Username
                         </label>
                         <input
@@ -550,7 +550,7 @@ const PropertySelection = () => {
                         />
                       </div>
                       <div>
-                        <label className="mb-2 block text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                        <label className="mb-2 block text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
                           Admin Password
                         </label>
                         <input
@@ -564,7 +564,7 @@ const PropertySelection = () => {
                         />
                       </div>
                       <div>
-                        <label className="mb-2 block text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                        <label className="mb-2 block text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
                           Admin Email
                         </label>
                         <input
@@ -607,7 +607,7 @@ const PropertySelection = () => {
                           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-emerald-500 shadow-sm">
                             <UploadCloud size={20} />
                           </div>
-                          <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">
+                          <span className="text-pms-tiny font-black tracking-widest text-slate-500 uppercase">
                             Upload Logo
                           </span>
                         </>
@@ -641,7 +641,7 @@ const PropertySelection = () => {
                           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-blue-500 shadow-sm">
                             <UploadCloud size={20} />
                           </div>
-                          <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">
+                          <span className="text-pms-tiny font-black tracking-widest text-slate-500 uppercase">
                             Upload Cover
                           </span>
                         </>
@@ -735,10 +735,10 @@ const PropertySelection = () => {
                         {hotel.hotelName || hotel.name}
                       </h3>
                       <div className="mt-1 flex items-center gap-2">
-                        <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-[9px] font-black tracking-widest text-emerald-700 uppercase">
+                        <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-pms-micro font-black tracking-widest text-emerald-700 uppercase">
                           ID: {hotel.id}
                         </span>
-                        <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-[9px] font-black tracking-widest text-emerald-700 uppercase">
+                        <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-pms-micro font-black tracking-widest text-emerald-700 uppercase">
                           Active
                         </span>
                       </div>
@@ -769,13 +769,13 @@ const PropertySelection = () => {
                   </div>
  
                   <div className="mt-1 flex flex-col gap-1">
-                    <p className="flex items-center gap-1.5 text-[10px] font-medium text-slate-400">
+                    <p className="flex items-center gap-1.5 text-pms-tiny font-medium text-slate-400">
                       <MapPin size={10} /> {hotel.city || 'Location N/A'}, {hotel.state1 || ''}
                     </p>
                   </div>
  
                   <div className="mt-2 flex items-center justify-between border-t border-slate-50 pt-4">
-                    <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase transition-colors group-hover:text-emerald-600">
+                    <span className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase transition-colors group-hover:text-emerald-600">
                       Manage Dashboard
                     </span>
                     <div className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-50 text-slate-300 transition-all group-hover:bg-emerald-600 group-hover:text-white">

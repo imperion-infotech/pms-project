@@ -77,7 +77,7 @@ const ContextMenu = ({ x, y, room, onClose, onStatusUpdate, roomStatuses }) => {
         style={{ top: y, left: x }}
       >
         <div className="mb-1 border-b border-slate-100 px-4 py-2 dark:border-slate-700/50">
-          <p className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+          <p className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
             Room {room.roomName} Actions
           </p>
         </div>

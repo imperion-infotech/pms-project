@@ -43,7 +43,7 @@ const ImageUpload = ({
     <div className="w-full">
       <div className={containerClass}>
         <div className="mb-3 flex items-center justify-between">
-          <h4 className="flex items-center gap-2 text-[10px] leading-none font-black tracking-widest text-emerald-500 uppercase">
+          <h4 className="flex items-center gap-2 text-pms-tiny leading-none font-black tracking-widest text-emerald-500 uppercase">
             {Icon && <Icon size={14} />} {label}
           </h4>
           {value && onClear && (
@@ -83,7 +83,7 @@ const ImageUpload = ({
                   className="text-slate-400 transition-colors duration-300 group-hover:text-emerald-500"
                 />
               </div>
-              <span className="text-[8px] leading-none font-black tracking-widest text-slate-400 uppercase transition-colors duration-300 group-hover:text-emerald-500">
+              <span className="text-pms-micro leading-none font-black tracking-widest text-slate-400 uppercase transition-colors duration-300 group-hover:text-emerald-500">
                 Upload {label}
               </span>
             </>

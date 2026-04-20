@@ -108,7 +108,7 @@ const UserNavbar = () => {
           <h1 className="text-base leading-tight font-black tracking-tight text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] uppercase">
             {activeHotel?.hotelName || 'IMPERION'}
           </h1>
-          <p className="mt-0.5 text-[10px] leading-none font-black tracking-[0.4em] text-emerald-400 uppercase opacity-90">
+          <p className="mt-0.5 text-pms-tiny leading-none font-black tracking-[0.4em] text-emerald-400 uppercase opacity-90">
             Engine
           </p>
         </div>
@@ -128,7 +128,7 @@ const UserNavbar = () => {
               )}
               <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-transparent to-transparent"></div>
               <div className="absolute bottom-3 left-4">
-                <span className="inline-flex items-center rounded-full bg-emerald-500 px-2.5 py-0.5 text-[10px] font-black tracking-widest text-white uppercase">
+                <span className="inline-flex items-center rounded-full bg-emerald-500 px-2.5 py-0.5 text-pms-tiny font-black tracking-widest text-white uppercase">
                   Property Info
                 </span>
               </div>
@@ -141,7 +141,7 @@ const UserNavbar = () => {
                 {activeHotel.address && (
                   <div className="flex items-start gap-2.5">
                     <MapPin size={14} className="mt-0.5 shrink-0 text-emerald-500" />
-                    <p className="text-[11px] font-bold leading-tight text-slate-300">
+                    <p className="text-pms-mini font-bold leading-tight text-slate-300">
                       {activeHotel.address}, {activeHotel.city}, {activeHotel.state1}
                     </p>
                   </div>
@@ -149,7 +149,7 @@ const UserNavbar = () => {
                 {activeHotel.contactNumber && (
                   <div className="flex items-center gap-2.5">
                     <Phone size={14} className="shrink-0 text-emerald-500" />
-                    <p className="text-[11px] font-bold text-slate-300">
+                    <p className="text-pms-mini font-bold text-slate-300">
                       {activeHotel.contactNumber}
                     </p>
                   </div>
@@ -157,7 +157,7 @@ const UserNavbar = () => {
                 {activeHotel.email && (
                   <div className="flex items-center gap-2.5">
                     <Mail size={14} className="shrink-0 text-emerald-500" />
-                    <p className="text-[11px] font-bold text-slate-300 break-all">
+                    <p className="text-pms-mini font-bold text-slate-300 break-all">
                       {activeHotel.email}
                     </p>
                   </div>
@@ -165,7 +165,7 @@ const UserNavbar = () => {
                 {activeHotel.url && (
                   <div className="flex items-center gap-2.5">
                     <Globe size={14} className="shrink-0 text-emerald-500" />
-                    <p className="text-[11px] font-bold text-slate-300 break-all cursor-pointer hover:text-emerald-400">
+                    <p className="text-pms-mini font-bold text-slate-300 break-all cursor-pointer hover:text-emerald-400">
                       {activeHotel.url.replace(/^https?:\/\//, '')}
                     </p>
                   </div>
@@ -175,11 +175,11 @@ const UserNavbar = () => {
               <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-4">
                 <div className="flex items-center gap-1.5">
                   <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                  <span className="text-[10px] font-black tracking-widest text-emerald-500 uppercase">
+                  <span className="text-pms-tiny font-black tracking-widest text-emerald-500 uppercase">
                     System Active
                   </span>
                 </div>
-                <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">
+                <span className="text-pms-tiny font-black tracking-widest text-slate-500 uppercase">
                   ID: {activeHotel.id}
                 </span>
               </div>
@@ -214,7 +214,7 @@ const UserNavbar = () => {
               <div className="animate-in fade-in slide-in-from-top-4 absolute right-0 z-50 mt-3 w-80 overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)]">
                 <div className="flex items-center justify-between border-b border-slate-700/50 bg-slate-800/95 p-4 backdrop-blur-sm">
                   <h3 className="text-sm font-bold text-white">Notifications</h3>
-                  <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
+                  <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-pms-tiny font-bold text-emerald-400">
                     1 New
                   </span>
                 </div>
@@ -227,7 +227,7 @@ const UserNavbar = () => {
                       Your role has been verified as{' '}
                       <span className="font-semibold text-emerald-400">{userDetails.role}</span>.
                     </p>
-                    <p className="mt-2 text-[10px] font-medium text-slate-500">Just now</p>
+                    <p className="mt-2 text-pms-tiny font-medium text-slate-500">Just now</p>
                   </div>
                 </div>
               </div>
@@ -245,7 +245,7 @@ const UserNavbar = () => {
             <p className="mb-1 text-[13px] leading-none font-bold text-slate-200 capitalize transition-colors group-hover:text-white">
               {userDetails.username}
             </p>
-            <p className="text-[9px] leading-none font-bold tracking-widest text-emerald-500/80 uppercase">
+            <p className="text-pms-micro leading-none font-bold tracking-widest text-emerald-500/80 uppercase">
               {userDetails.role}
             </p>
           </div>

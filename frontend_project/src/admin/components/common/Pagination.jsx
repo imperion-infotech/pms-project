@@ -85,7 +85,7 @@ const Pagination = ({
             <button
               onClick={handlePrevious}
               disabled={currentPage === 1}
-              className="rounded-lg bg-slate-100 px-5 py-2 text-[10px] font-black tracking-tighter text-slate-500 transition-all hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-30 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+              className="rounded-lg bg-slate-100 px-5 py-2 text-pms-tiny font-black tracking-tighter text-slate-500 transition-all hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-30 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
             >
               PREVIOUS
             </button>
@@ -93,14 +93,14 @@ const Pagination = ({
               <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500 text-xs font-black text-white shadow-lg shadow-emerald-500/20">
                 {currentPage}
               </span>
-              <span className="px-2 text-[10px] font-bold text-slate-400">
+              <span className="px-2 text-pms-tiny font-bold text-slate-400">
                 OF {totalPages || 1}
               </span>
             </div>
             <button
               onClick={handleNext}
               disabled={currentPage >= totalPages}
-              className="rounded-lg bg-slate-100 px-5 py-2 text-[10px] font-black tracking-tighter text-slate-500 transition-all hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-30 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+              className="rounded-lg bg-slate-100 px-5 py-2 text-pms-tiny font-black tracking-tighter text-slate-500 transition-all hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-30 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
             >
               NEXT
             </button>

@@ -263,7 +263,7 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
               onClick={() => setIsSidebarOpen(false)}
             />
             <div className="flex flex-col">
-              <span className="text-[10px] font-black tracking-[0.2em] text-emerald-500 uppercase opacity-90">
+              <span className="text-pms-tiny font-black tracking-[0.2em] text-emerald-500 uppercase opacity-90">
                 Admin Center
               </span>
               <span className="text-[13px] font-black leading-tight tracking-wide text-white uppercase line-clamp-1">

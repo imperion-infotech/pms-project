@@ -40,7 +40,7 @@ export const PaymentTypeModal = ({
             </div>
             <div>
               <h3 className="text-xl font-extrabold tracking-tight">New Payment Type</h3>
-              <p className="text-[10px] font-bold tracking-[0.2em] text-orange-200 uppercase">
+              <p className="text-pms-tiny font-bold tracking-[0.2em] text-orange-200 uppercase">
                 Configuration Portal
               </p>
             </div>
@@ -55,7 +55,7 @@ export const PaymentTypeModal = ({
         <form onSubmit={onSubmit} className="space-y-6 p-8">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-1">
-              <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+              <label className="mb-2 block px-1 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
                 Short Name
               </label>
               <input
@@ -70,7 +70,7 @@ export const PaymentTypeModal = ({
               />
             </div>
             <div className="col-span-1">
-              <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+              <label className="mb-2 block px-1 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
                 Category
               </label>
               <select
@@ -93,7 +93,7 @@ export const PaymentTypeModal = ({
           </div>
 
           <div>
-            <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+            <label className="mb-2 block px-1 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
               Payment Type Name
             </label>
             <input
@@ -108,14 +108,14 @@ export const PaymentTypeModal = ({
               className={`w-full border bg-slate-50 px-4 py-3 dark:bg-slate-800/50 ${isDuplicate ? 'border-red-500 ring-4 ring-red-500/10' : 'border-slate-200 dark:border-slate-700'} rounded-2xl text-sm font-medium text-slate-800 transition-all focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 focus:outline-none dark:text-slate-200`}
             />
             {isDuplicate && (
-              <p className="mt-2 flex items-center gap-1 text-[10px] font-bold text-red-500">
+              <p className="mt-2 flex items-center gap-1 text-pms-tiny font-bold text-red-500">
                 <X className="h-3 w-3" /> This payment type already exists!
               </p>
             )}
           </div>
 
           <div>
-            <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+            <label className="mb-2 block px-1 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
               Description
             </label>
             <textarea
@@ -140,7 +140,7 @@ export const PaymentTypeModal = ({
                 <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300">
                   Credit Card Processing
                 </h4>
-                <p className="text-[10px] text-slate-400">Enable online card verification</p>
+                <p className="text-pms-tiny text-slate-400">Enable online card verification</p>
               </div>
             </div>
             <label className="relative inline-flex cursor-pointer items-center">

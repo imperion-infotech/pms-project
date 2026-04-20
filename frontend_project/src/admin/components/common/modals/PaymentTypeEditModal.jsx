@@ -32,7 +32,7 @@ export const PaymentTypeEditModal = ({
             </div>
             <div>
               <h3 className="text-xl font-extrabold tracking-tight">Edit Payment Type</h3>
-              <p className="text-[10px] font-bold tracking-[0.2em] text-orange-200 uppercase">
+              <p className="text-pms-tiny font-bold tracking-[0.2em] text-orange-200 uppercase">
                 ID: {editPaymentType.id}
               </p>
             </div>
@@ -47,7 +47,7 @@ export const PaymentTypeEditModal = ({
         <form onSubmit={onSubmit} className="space-y-6 p-8">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-1">
-              <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+              <label className="mb-2 block px-1 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
                 Short Name
               </label>
               <input
@@ -61,7 +61,7 @@ export const PaymentTypeEditModal = ({
               />
             </div>
             <div className="col-span-1">
-              <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+              <label className="mb-2 block px-1 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
                 Category
               </label>
               <select
@@ -83,7 +83,7 @@ export const PaymentTypeEditModal = ({
           </div>
 
           <div>
-            <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+            <label className="mb-2 block px-1 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
               Payment Method Name
             </label>
             <input
@@ -98,7 +98,7 @@ export const PaymentTypeEditModal = ({
           </div>
 
           <div>
-            <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+            <label className="mb-2 block px-1 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
               Description
             </label>
             <textarea
@@ -122,7 +122,7 @@ export const PaymentTypeEditModal = ({
                 <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300">
                   Credit Card Processing
                 </h4>
-                <p className="text-[10px] text-slate-400">Enable online card verification</p>
+                <p className="text-pms-tiny text-slate-400">Enable online card verification</p>
               </div>
             </div>
             <label className="relative inline-flex cursor-pointer items-center">

@@ -92,7 +92,7 @@ const Navbar = () => {
           <h1 className="text-base leading-tight font-black tracking-tight text-white uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
             {activeHotel?.hotelName || 'IMPERION'}
           </h1>
-          <p className="mt-0.5 text-[9px] leading-none font-black tracking-[0.4em] text-emerald-400 uppercase opacity-90">
+          <p className="mt-0.5 text-pms-micro leading-none font-black tracking-[0.4em] text-emerald-400 uppercase opacity-90">
             Admin Console
           </p>
         </div>
@@ -116,7 +116,7 @@ const Navbar = () => {
               <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
               <div className="absolute bottom-3 left-4 flex items-center gap-2">
                 <div className="flex h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
-                <span className="text-[10px] font-bold tracking-widest text-emerald-400 uppercase opacity-80">
+                <span className="text-pms-tiny font-bold tracking-widest text-emerald-400 uppercase opacity-80">
                   Property Active
                 </span>
               </div>
@@ -129,7 +129,7 @@ const Navbar = () => {
                   <h3 className="text-lg leading-tight font-black text-white uppercase">
                     {activeHotel.hotelName}
                   </h3>
-                  <p className="mt-1 flex items-center gap-1.5 text-[11px] font-medium text-slate-400">
+                  <p className="mt-1 flex items-center gap-1.5 text-pms-mini font-medium text-slate-400">
                     <MapPin className="h-3 w-3 text-emerald-400" />
                     {activeHotel.city}, {activeHotel.state1}
                   </p>
@@ -163,7 +163,7 @@ const Navbar = () => {
               </div>
 
               <div className="mt-5 rounded-xl border border-emerald-500/10 bg-emerald-500/5 px-4 py-3 text-center">
-                <p className="text-[10px] font-bold tracking-widest text-emerald-500 uppercase">
+                <p className="text-pms-tiny font-bold tracking-widest text-emerald-500 uppercase">
                   Connected via {activeHotel.timezone || 'Main Terminal'}
                 </p>
               </div>
@@ -198,7 +198,7 @@ const Navbar = () => {
                 <div className="bg-surface-100 animate-in fade-in slide-in-from-top-4 absolute right-0 z-50 mt-3 w-80 overflow-hidden rounded-2xl border border-slate-700/80 shadow-[0_10px_40px_-5px_rgba(0,0,0,0.6)]">
                   <div className="bg-surface-100/95 flex items-center justify-between border-b border-slate-700/80 p-4 backdrop-blur-sm">
                     <h3 className="text-sm font-bold text-white">Dashboard Alerts</h3>
-                    <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
+                    <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-pms-tiny font-bold text-emerald-400">
                       1 New
                     </span>
                   </div>
@@ -208,7 +208,7 @@ const Navbar = () => {
                         Welcome back, {userDetails.username}!
                       </p>
                       <p className="text-xs text-slate-400">Admin session started successfully.</p>
-                      <p className="mt-2 text-[10px] font-medium text-slate-500">Just now</p>
+                      <p className="mt-2 text-pms-tiny font-medium text-slate-500">Just now</p>
                     </div>
                   </div>
                   <div className="bg-surface-100/95 border-t border-slate-700/80 p-3 backdrop-blur-sm">
@@ -225,7 +225,7 @@ const Navbar = () => {
           </div>
           <div className="hidden text-right sm:block">
             <p className="text-xs font-bold text-white capitalize">{userDetails.username}</p>
-            <p className="text-[10px] tracking-wider text-emerald-400 uppercase">
+            <p className="text-pms-tiny tracking-wider text-emerald-400 uppercase">
               {userDetails.role}
             </p>
           </div>

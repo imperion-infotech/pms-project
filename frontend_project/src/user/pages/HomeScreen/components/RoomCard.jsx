@@ -36,17 +36,17 @@ const RoomCard = ({ room, onClick, onContextMenu }) => {
             <User size={18} />
           </div>
           <div className="flex w-full flex-col gap-1">
-            <span className="text-[12px] leading-tight font-black tracking-tight text-white uppercase">
+            <span className="text-pms-compact leading-tight font-black tracking-tight text-white uppercase">
               {room.guestName ||
                 (room.profile ? `${room.profile.firstName} ${room.profile.lastName}` : 'GUEST')}
             </span>
             {(room.profile?.phone || room.phone) && (
-              <span className="text-[10px] font-bold text-slate-300">
+              <span className="text-pms-tiny font-bold text-slate-300">
                 {room.profile?.phone || room.phone}
               </span>
             )}
             {(room.profile?.email || room.email) && (
-              <span className="truncate text-[9px] font-medium text-slate-400">
+              <span className="truncate text-pms-micro font-medium text-slate-400">
                 {room.profile?.email || room.email}
               </span>
             )}
@@ -65,7 +65,7 @@ const RoomCard = ({ room, onClick, onContextMenu }) => {
         <div className="mb-2 flex items-start justify-between">
           <div className="flex flex-col">
             <span
-              className="mb-1 text-[15px] leading-none font-black tracking-tight"
+              className="mb-1 text-pms-card leading-none font-black tracking-tight"
               style={{ color: statusColor }}
             >
               {room.roomName}
@@ -75,7 +75,7 @@ const RoomCard = ({ room, onClick, onContextMenu }) => {
 
             {!room.isNonRoom && (
               <span
-                className="mt-1 block text-[9px] font-bold tracking-widest uppercase"
+                className="mt-1 block text-pms-micro font-bold tracking-widest uppercase"
                 style={{ color: statusColor }}
               >
                 {statusName}
@@ -84,7 +84,7 @@ const RoomCard = ({ room, onClick, onContextMenu }) => {
           </div>
 
           <div className="flex flex-col items-end text-right">
-            <span className="text-[10px] leading-none font-black tracking-widest text-slate-900 uppercase dark:text-white">
+            <span className="text-pms-tiny leading-none font-black tracking-widest text-slate-900 uppercase dark:text-white">
               {room.shortName || 'STD'}
             </span>
           </div>

@@ -16,16 +16,16 @@ const StaySpecifications = ({
   isDark = false,
 }) => {
   // Shared UI classes
-  const labelClass = 'text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1 block'
+  const labelClass = 'text-pms-micro font-black text-slate-500 uppercase tracking-widest mb-1 block'
   const inputContainerClass = `flex items-center gap-2 px-3 py-1 rounded-lg border transition-all ${
     isDark
       ? 'bg-slate-900/50 border-slate-700/50 focus-within:border-amber-500/50'
       : 'bg-white border-slate-200 focus-within:border-amber-500 focus-within:ring-4 focus-within:ring-amber-500/10 shadow-xs'
   }`
   const inputClass =
-    'bg-transparent border-none outline-none w-full text-[11px] font-bold text-slate-700 dark:text-white placeholder:text-slate-300'
+    'bg-transparent border-none outline-none w-full text-pms-mini font-bold text-slate-700 dark:text-white placeholder:text-slate-300'
   const selectClass =
-    'bg-transparent border-none outline-none w-full text-[11px] font-bold text-slate-700 dark:text-white cursor-pointer'
+    'bg-transparent border-none outline-none w-full text-pms-mini font-bold text-slate-700 dark:text-white cursor-pointer'
 
   return (
     <div className="mt-0 space-y-3 text-left">

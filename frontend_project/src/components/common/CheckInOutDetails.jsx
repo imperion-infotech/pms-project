@@ -24,7 +24,7 @@ const CheckInOutDetails = ({ formData, handleChange }) => {
       
       {/* CHECK-IN */}
       <div>
-        <label className="mb-1.5 flex items-center gap-1.5 text-[9px] font-black tracking-widest text-slate-500 uppercase">
+        <label className="mb-1.5 flex items-center gap-1.5 text-pms-micro font-black tracking-widest text-slate-500 uppercase">
           Check-In <span className="text-red-500">*</span>
         </label>
         <div className="group flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-1.5 shadow-xs transition-all duration-300 focus-within:border-amber-500/50 focus-within:ring-[6px] focus-within:ring-amber-500/5 dark:border-slate-700 dark:bg-slate-900/50">
@@ -37,7 +37,7 @@ const CheckInOutDetails = ({ formData, handleChange }) => {
               value={formData.checkInDate ? (formData.checkInDate.includes('T') ? formData.checkInDate.split('T')[0] : formData.checkInDate) : ''}
               onChange={handleChange}
               min={today}
-              className="w-full min-w-0 bg-transparent text-[11px] font-bold text-slate-700 outline-none dark:text-slate-100 appearance-none [&::-webkit-calendar-picker-indicator]:hidden"
+              className="w-full min-w-0 bg-transparent text-pms-mini font-bold text-slate-700 outline-none dark:text-slate-100 appearance-none [&::-webkit-calendar-picker-indicator]:hidden"
             />
             <Calendar
               size={11}
@@ -54,7 +54,7 @@ const CheckInOutDetails = ({ formData, handleChange }) => {
               name="checkInTime"
               value={formData.checkInTime}
               onChange={handleChange}
-              className="w-auto shrink-0 bg-transparent text-[11px] font-bold text-slate-700 outline-none dark:text-slate-100 appearance-none [&::-webkit-calendar-picker-indicator]:hidden"
+              className="w-auto shrink-0 bg-transparent text-pms-mini font-bold text-slate-700 outline-none dark:text-slate-100 appearance-none [&::-webkit-calendar-picker-indicator]:hidden"
               step="1"
             />
             <Clock
@@ -69,15 +69,15 @@ const CheckInOutDetails = ({ formData, handleChange }) => {
       {/* CHECK-OUT & DURATION */}
       <div>
         <div className="flex items-center justify-between mb-1.5">
-          <label className="block text-[9px] font-black tracking-widest text-slate-500 uppercase">Check-Out <span className="text-red-500">*</span></label>
+          <label className="block text-pms-micro font-black tracking-widest text-slate-500 uppercase">Check-Out <span className="text-red-500">*</span></label>
           <div className="flex items-center gap-1.5">
-            <span className="text-[8px] font-black tracking-widest text-amber-500 uppercase">Days</span>
+            <span className="text-pms-micro font-black tracking-widest text-amber-500 uppercase">Days</span>
             <input
               type="number"
               name="noOfDays"
               value={formData.noOfDays}
               onChange={handleChange}
-              className="w-10 rounded-lg bg-amber-100/40 px-1 py-0.5 text-center text-[10px] font-black text-amber-700 outline-none transition-all dark:bg-amber-900/40 dark:text-amber-400 focus:ring-4 focus:ring-amber-500/10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="w-10 rounded-lg bg-amber-100/40 px-1 py-0.5 text-center text-pms-tiny font-black text-amber-700 outline-none transition-all dark:bg-amber-900/40 dark:text-amber-400 focus:ring-4 focus:ring-amber-500/10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               min="1"
             />
           </div>
@@ -92,7 +92,7 @@ const CheckInOutDetails = ({ formData, handleChange }) => {
               value={formData.checkOutDate ? (formData.checkOutDate.includes('T') ? formData.checkOutDate.split('T')[0] : formData.checkOutDate) : ''}
               onChange={handleChange}
               min={formData.checkInDate ? (formData.checkInDate.includes('T') ? formData.checkInDate.split('T')[0] : formData.checkInDate) : today}
-              className="w-full min-w-0 bg-transparent text-[11px] font-bold text-slate-700 outline-none dark:text-slate-100 appearance-none [&::-webkit-calendar-picker-indicator]:hidden"
+              className="w-full min-w-0 bg-transparent text-pms-mini font-bold text-slate-700 outline-none dark:text-slate-100 appearance-none [&::-webkit-calendar-picker-indicator]:hidden"
             />
             <Calendar
               size={11}
@@ -109,7 +109,7 @@ const CheckInOutDetails = ({ formData, handleChange }) => {
               name="checkOutTime"
               value={formData.checkOutTime}
               onChange={handleChange}
-              className="w-auto shrink-0 bg-transparent text-[11px] font-bold text-slate-700 outline-none dark:text-slate-100 appearance-none [&::-webkit-calendar-picker-indicator]:hidden"
+              className="w-auto shrink-0 bg-transparent text-pms-mini font-bold text-slate-700 outline-none dark:text-slate-100 appearance-none [&::-webkit-calendar-picker-indicator]:hidden"
               step="1"
             />
             <Clock

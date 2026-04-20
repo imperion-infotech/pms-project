@@ -13,7 +13,7 @@ const FieldRow = ({
 }) => {
   const containerClass =
     'flex items-center justify-between py-1.5 border-b border-dashed border-slate-100 dark:border-slate-800'
-  const labelClass = 'text-[9px] font-black text-slate-500 uppercase tracking-widest'
+  const labelClass = 'text-pms-micro font-black text-slate-500 uppercase tracking-widest'
   const inputContainerClass = `flex items-center px-3 py-1 rounded-lg border transition-all w-32 ${
     isDark
       ? 'bg-slate-900/50 border-slate-700/50 focus-within:border-emerald-500/50'

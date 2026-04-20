@@ -40,7 +40,7 @@ export const DocumentTypeModal = ({
             </div>
             <div>
               <h3 className="text-xl font-extrabold tracking-tight">New Document Type</h3>
-              <p className="text-[10px] font-bold tracking-[0.2em] text-orange-200 uppercase">
+              <p className="text-pms-tiny font-bold tracking-[0.2em] text-orange-200 uppercase">
                 Configuration Portal
               </p>
             </div>
@@ -55,7 +55,7 @@ export const DocumentTypeModal = ({
         <form onSubmit={onSubmit} className="space-y-6 p-8">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-1">
-              <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+              <label className="mb-2 block px-1 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
                 Short Name
               </label>
               <input
@@ -70,7 +70,7 @@ export const DocumentTypeModal = ({
               />
             </div>
             <div className="col-span-1">
-              <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+              <label className="mb-2 block px-1 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
                 Category
               </label>
               <select
@@ -92,7 +92,7 @@ export const DocumentTypeModal = ({
           </div>
 
           <div>
-            <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+            <label className="mb-2 block px-1 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
               Document Name
             </label>
             <input
@@ -105,14 +105,14 @@ export const DocumentTypeModal = ({
               className={`w-full border bg-slate-50 px-4 py-3 dark:bg-slate-800/50 ${isDuplicate ? 'border-red-500 ring-4 ring-red-500/10' : 'border-slate-200 dark:border-slate-700'} rounded-2xl text-sm font-medium text-slate-800 transition-all focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 focus:outline-none dark:text-slate-200`}
             />
             {isDuplicate && (
-              <p className="mt-2 flex items-center gap-1 text-[10px] font-bold text-red-500">
+              <p className="mt-2 flex items-center gap-1 text-pms-tiny font-bold text-red-500">
                 <X className="h-3 w-3" /> This document name already exists!
               </p>
             )}
           </div>
 
           <div>
-            <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+            <label className="mb-2 block px-1 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
               Description
             </label>
             <textarea
@@ -137,7 +137,7 @@ export const DocumentTypeModal = ({
                 <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300">
                   Set as Default
                 </h4>
-                <p className="text-[10px] text-slate-400">Mark this as the primary document type</p>
+                <p className="text-pms-tiny text-slate-400">Mark this as the primary document type</p>
               </div>
             </div>
             <label className="relative inline-flex cursor-pointer items-center">

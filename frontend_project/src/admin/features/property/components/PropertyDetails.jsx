@@ -59,7 +59,7 @@ const PropertyDetails = () => {
             <h2 className="text-xl leading-none font-black tracking-tight text-slate-800 dark:text-white">
               Property Details
             </h2>
-            <p className="mt-1 text-[10px] font-medium text-slate-400">
+            <p className="mt-1 text-pms-tiny font-medium text-slate-400">
               All settings synced and ready
             </p>
           </div>
@@ -77,7 +77,7 @@ const PropertyDetails = () => {
           <div className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2 lg:grid-cols-3">
             {/* 1. Client ID */}
             <div className="space-y-1">
-              <label className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-bold tracking-widest text-slate-400 uppercase">
                 Client ID
               </label>
               <div className="group relative">
@@ -96,7 +96,7 @@ const PropertyDetails = () => {
 
             {/* 2. Property Region */}
             <div className="space-y-1">
-              <label className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-bold tracking-widest text-slate-400 uppercase">
                 Region
               </label>
               <div className="group relative">
@@ -115,7 +115,7 @@ const PropertyDetails = () => {
 
             {/* 3. Property Name* */}
             <div className="space-y-1">
-              <label className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-bold tracking-widest text-slate-400 uppercase">
                 Property Name*
               </label>
               <div className="group relative">
@@ -135,7 +135,7 @@ const PropertyDetails = () => {
 
             {/* 4. Address* */}
             <div className="space-y-1 md:col-span-2">
-              <label className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-bold tracking-widest text-slate-400 uppercase">
                 Address*
               </label>
               <div className="group relative">
@@ -155,7 +155,7 @@ const PropertyDetails = () => {
 
             {/* 5. City* */}
             <div className="space-y-1">
-              <label className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-bold tracking-widest text-slate-400 uppercase">
                 City*
               </label>
               <input
@@ -170,7 +170,7 @@ const PropertyDetails = () => {
 
             {/* 6. State* */}
             <div className="space-y-1">
-              <label className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-bold tracking-widest text-slate-400 uppercase">
                 State*
               </label>
               <input
@@ -185,7 +185,7 @@ const PropertyDetails = () => {
 
             {/* 7. Zip* */}
             <div className="space-y-1">
-              <label className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-bold tracking-widest text-slate-400 uppercase">
                 Zip*
               </label>
               <input
@@ -200,7 +200,7 @@ const PropertyDetails = () => {
 
             {/* 8. Country* */}
             <div className="space-y-1">
-              <label className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-bold tracking-widest text-slate-400 uppercase">
                 Country*
               </label>
               <input
@@ -215,7 +215,7 @@ const PropertyDetails = () => {
 
             {/* 9. Phone* */}
             <div className="space-y-1">
-              <label className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-bold tracking-widest text-slate-400 uppercase">
                 Phone*
               </label>
               <div className="group relative">
@@ -235,7 +235,7 @@ const PropertyDetails = () => {
 
             {/* 10. Email* */}
             <div className="space-y-1">
-              <label className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-bold tracking-widest text-slate-400 uppercase">
                 Email*
               </label>
               <div className="group relative">
@@ -257,7 +257,7 @@ const PropertyDetails = () => {
             <div className="mt-2 grid grid-cols-2 gap-6 border-t border-slate-100 pt-5 md:col-span-2 lg:col-span-2 dark:border-slate-800">
               {/* 11. Property Cover Image */}
               <div className="space-y-1.5">
-                <label className="p-2 text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+                <label className="p-2 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase">
                   Property Cover Image
                 </label>
                 <div className="group relative flex h-50 w-full items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 transition-all hover:border-emerald-500 hover:bg-white dark:border-slate-700 dark:bg-slate-800/30">
@@ -280,7 +280,7 @@ const PropertyDetails = () => {
                       <div className="mb-1 rounded-full bg-emerald-50 p-2">
                         <Upload className="h-4 w-4 text-emerald-500" />
                       </div>
-                      <p className="text-[8px] font-bold text-slate-400 uppercase">UPLOAD COVER</p>
+                      <p className="text-pms-micro font-bold text-slate-400 uppercase">UPLOAD COVER</p>
                       <input
                         type="file"
                         className="absolute inset-0 cursor-pointer opacity-0"
@@ -294,7 +294,7 @@ const PropertyDetails = () => {
 
               {/* 12. Property Logo */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+                <label className="text-pms-tiny font-bold tracking-widest text-slate-400 uppercase">
                   Property Logo
                 </label>
                 <div className="group relative flex h-50 w-full items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 transition-all hover:border-emerald-500 hover:bg-white dark:border-slate-700 dark:bg-slate-800/30">
@@ -317,7 +317,7 @@ const PropertyDetails = () => {
                       <div className="mb-1 rounded-full bg-emerald-50 p-2">
                         <ImageIcon className="h-4 w-4 text-emerald-500" />
                       </div>
-                      <p className="text-[8px] font-bold text-slate-400 uppercase">UPLOAD LOGO</p>
+                      <p className="text-pms-micro font-bold text-slate-400 uppercase">UPLOAD LOGO</p>
                       <input
                         type="file"
                         className="absolute inset-0 cursor-pointer opacity-0"

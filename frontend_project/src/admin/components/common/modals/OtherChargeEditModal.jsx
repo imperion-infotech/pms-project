@@ -36,7 +36,7 @@ export const OtherChargeEditModal = ({
             </div>
             <div>
               <h3 className="text-xl font-extrabold tracking-tight">Edit Other Charge</h3>
-              <p className="text-[10px] font-bold tracking-[0.2em] text-orange-200 uppercase">
+              <p className="text-pms-tiny font-bold tracking-[0.2em] text-orange-200 uppercase">
                 ID: {editOtherCharge.id}
               </p>
             </div>
@@ -52,7 +52,7 @@ export const OtherChargeEditModal = ({
         <form onSubmit={onSubmit} className="scrollbar-hide max-h-[75vh] overflow-y-auto p-8">
           <div className="grid grid-cols-2 gap-6">
             <div className="col-span-1">
-              <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+              <label className="mb-2 block px-1 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
                 Short Name
               </label>
               <input
@@ -67,7 +67,7 @@ export const OtherChargeEditModal = ({
             </div>
 
             <div className="col-span-1">
-              <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+              <label className="mb-2 block px-1 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
                 Category
               </label>
               <select
@@ -88,7 +88,7 @@ export const OtherChargeEditModal = ({
             </div>
 
             <div className="col-span-2">
-              <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+              <label className="mb-2 block px-1 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
                 Charge Name
               </label>
               <input
@@ -123,10 +123,10 @@ export const OtherChargeEditModal = ({
                       <CheckCircle2 className="h-4 w-4" />
                     </div>
                     <div>
-                      <h4 className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                      <h4 className="text-pms-mini font-bold text-slate-700 dark:text-slate-300">
                         {toggle.label}
                       </h4>
-                      <p className="text-[9px] text-slate-400">{toggle.desc}</p>
+                      <p className="text-pms-micro text-slate-400">{toggle.desc}</p>
                     </div>
                   </div>
                   <label className="relative inline-flex cursor-pointer items-center">
@@ -144,7 +144,7 @@ export const OtherChargeEditModal = ({
 
             {editOtherCharge.reoccureCharge && (
               <div className="col-span-2">
-                <label className="mb-2 block px-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+                <label className="mb-2 block px-1 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
                   Reoccurrence Frequency (Days)
                 </label>
                 <input

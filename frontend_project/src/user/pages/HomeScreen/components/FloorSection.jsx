@@ -42,7 +42,7 @@ const FloorSection = ({ floorName, rooms = [], isDark, onRoomClick, onContextMen
 
           <div className="flex min-w-0 flex-col">
             <h3
-              className={`truncate text-[16px] font-black tracking-tight ${
+              className={`truncate text-pms-section font-black tracking-tight ${
                 isDark ? 'text-slate-100' : 'text-slate-900'
               }`}
             >
@@ -52,7 +52,7 @@ const FloorSection = ({ floorName, rooms = [], isDark, onRoomClick, onContextMen
 
           {/* Room Count Badge */}
           <div
-            className={`ml-4 hidden items-center gap-1.5 rounded-xl border px-3 py-1.5 text-[11px] font-black transition-all sm:flex ${
+            className={`ml-4 hidden items-center gap-1.5 rounded-xl border px-3 py-1.5 text-pms-mini font-black transition-all sm:flex ${
               isDark
                 ? 'border-slate-700/50 bg-slate-800/50 text-slate-400 group-hover/floor:border-emerald-500/30 group-hover/floor:text-emerald-400'
                 : 'border-slate-200 bg-slate-50 text-slate-500 group-hover/floor:border-emerald-200 group-hover/floor:text-emerald-600'

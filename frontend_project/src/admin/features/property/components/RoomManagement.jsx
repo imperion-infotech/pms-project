@@ -189,7 +189,7 @@ const RoomManagement = ({
                     key={room.id}
                     className="group h-14 transition-all hover:bg-emerald-50/40 dark:hover:bg-emerald-500/5"
                   >
-                    <td className="border-r border-slate-100 px-6 py-2 text-center font-mono text-[11px] font-bold text-slate-300 group-hover:text-emerald-500 dark:border-slate-800 dark:text-slate-600">
+                    <td className="border-r border-slate-100 px-6 py-2 text-center font-mono text-pms-mini font-bold text-slate-300 group-hover:text-emerald-500 dark:border-slate-800 dark:text-slate-600">
                       {getIndex(index)}
                     </td>
                     <td className="border-r border-slate-100 px-6 py-2 font-bold text-slate-800 dark:border-slate-800 dark:text-slate-200">
@@ -206,7 +206,7 @@ const RoomManagement = ({
                     </td>
                     <td className="border-r border-slate-100 px-6 py-2 text-center dark:border-slate-800">
                       <span
-                        className="inline-block min-w-[90px] rounded-full border px-3 py-1.5 text-[10px] font-black tracking-widest uppercase shadow-sm transition-all duration-300"
+                        className="inline-block min-w-[90px] rounded-full border px-3 py-1.5 text-pms-tiny font-black tracking-widest uppercase shadow-sm transition-all duration-300"
                         style={{
                           backgroundColor: `${statusColor}15`,
                           color: statusColor,

@@ -125,7 +125,7 @@ const RoomStatusManagement = ({
                           className="h-3 w-3 rounded-full shadow-sm"
                           style={{ backgroundColor: status.roomStatusColor }}
                         />
-                        <span className="font-mono text-[10px] font-bold text-slate-400 uppercase">
+                        <span className="font-mono text-pms-tiny font-bold text-slate-400 uppercase">
                           {status.roomStatusColor || 'N/A'}
                         </span>
                       </div>
@@ -136,7 +136,7 @@ const RoomStatusManagement = ({
                           className="h-3 w-3 rounded-full shadow-sm"
                           style={{ backgroundColor: status.roomStatusTextColor }}
                         />
-                        <span className="font-mono text-[10px] font-bold text-slate-400 uppercase">
+                        <span className="font-mono text-pms-tiny font-bold text-slate-400 uppercase">
                           {status.roomStatusTextColor || 'N/A'}
                         </span>
                       </div>

@@ -2,7 +2,7 @@ import React from 'react'
 import CheckInOutDetails from './CheckInOutDetails'
 
 const GuestInformation = ({ formData, handleChange, isDark = false }) => {
-  const labelClass = 'text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block'
+  const labelClass = 'text-pms-tiny font-bold text-slate-500 uppercase tracking-widest mb-1.5 block'
   const inputContainerClass = `flex items-center gap-3 px-3 py-1.5 rounded-xl border transition-all ${
     isDark
       ? 'bg-slate-800/30 border-slate-700 focus-within:border-blue-500/50'

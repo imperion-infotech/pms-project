@@ -36,12 +36,12 @@ const UserPageHeader = ({
           </div>
           <div className="flex flex-col text-left">
             <span
-              className={`mb-1 text-[10px] leading-none font-black tracking-[0.15em] uppercase ${isDark ? 'text-slate-500' : 'text-slate-400'}`}
+              className={`mb-1 text-pms-tiny leading-none font-black tracking-[0.15em] uppercase ${isDark ? 'text-slate-500' : 'text-slate-400'}`}
             >
               Current Module
             </span>
             <span
-              className={`text-[15px] leading-none font-extrabold tracking-tight ${isDark ? 'text-slate-100' : 'text-slate-800'}`}
+              className={`text-pms-card leading-none font-extrabold tracking-tight ${isDark ? 'text-slate-100' : 'text-slate-800'}`}
             >
               Property Engine
             </span>
@@ -57,7 +57,7 @@ const UserPageHeader = ({
             <div className="flex items-center gap-2" title="Total Rooms">
               <BedDouble size={14} className="text-blue-500" />
               <span
-                className={`text-[11px] font-extrabold ${isDark ? 'text-slate-300' : 'text-slate-600'}`}
+                className={`text-pms-mini font-extrabold ${isDark ? 'text-slate-300' : 'text-slate-600'}`}
               >
                 {totalRooms} Rooms
               </span>
@@ -66,7 +66,7 @@ const UserPageHeader = ({
             <div className="flex items-center gap-2" title="Total Floors">
               <Layers size={14} className="text-orange-500" />
               <span
-                className={`text-[11px] font-extrabold ${isDark ? 'text-slate-300' : 'text-slate-600'}`}
+                className={`text-pms-mini font-extrabold ${isDark ? 'text-slate-300' : 'text-slate-600'}`}
               >
                 {totalFloors} Floors
               </span>
@@ -75,7 +75,7 @@ const UserPageHeader = ({
             <div className="flex items-center gap-1.5" title="Available Rooms">
               <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500"></div>
               <span
-                className={`text-[11px] font-extrabold ${isDark ? 'text-slate-300' : 'text-slate-600'}`}
+                className={`text-pms-mini font-extrabold ${isDark ? 'text-slate-300' : 'text-slate-600'}`}
               >
                 {availableRooms} Avail
               </span>
@@ -84,7 +84,7 @@ const UserPageHeader = ({
             <div className="flex items-center gap-1.5" title="Occupied Rooms">
               <div className="h-2 w-2 rounded-full bg-rose-500"></div>
               <span
-                className={`text-[11px] font-extrabold ${isDark ? 'text-slate-300' : 'text-slate-600'}`}
+                className={`text-pms-mini font-extrabold ${isDark ? 'text-slate-300' : 'text-slate-600'}`}
               >
                 {occupiedRooms} Occ
               </span>

@@ -228,7 +228,7 @@ const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
                       <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-emerald-500 shadow-sm">
                         <UploadCloud size={20} />
                       </div>
-                      <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">
+                      <span className="text-pms-tiny font-black tracking-widest text-slate-500 uppercase">
                         Change Logo
                       </span>
                     </>
@@ -267,7 +267,7 @@ const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
                       <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-emerald-500 shadow-sm">
                         <UploadCloud size={20} />
                       </div>
-                      <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">
+                      <span className="text-pms-tiny font-black tracking-widest text-slate-500 uppercase">
                         Change Cover
                       </span>
                     </>

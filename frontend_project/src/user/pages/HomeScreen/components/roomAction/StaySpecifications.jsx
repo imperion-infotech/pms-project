@@ -16,7 +16,7 @@ const StaySpecifications = ({
 }) => {
   // Shared UI classes
   const labelClass =
-    'text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 block ml-1'
+    'text-pms-tiny font-black text-slate-400 uppercase tracking-widest mb-1 block ml-1'
   const inputContainerClass = `flex items-center gap-3 px-3 py-2 rounded-xl border transition-all ${
     isDark
       ? 'bg-slate-800/30 border-slate-700 focus-within:border-emerald-500/50'
@@ -32,11 +32,11 @@ const StaySpecifications = ({
       <div className="flex items-center gap-2 border-l-4 border-blue-500 pl-3">
         <div>
           <h3
-            className={`text-[11px] font-black tracking-widest uppercase ${isDark ? 'text-slate-200' : 'text-slate-800'}`}
+            className={`text-pms-mini font-black tracking-widest uppercase ${isDark ? 'text-slate-200' : 'text-slate-800'}`}
           >
             Stay Specifications
           </h3>
-          <p className="mt-0.5 text-[8px] font-bold tracking-widest text-slate-400 uppercase">
+          <p className="mt-0.5 text-pms-micro font-bold tracking-widest text-slate-400 uppercase">
             Booking & Placement
           </p>
         </div>

@@ -100,7 +100,7 @@ const PropertyDetails = () => {
             <Building2 size={24} />
           </div>
           <div>
-            <div className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+            <div className="flex items-center gap-2 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase">
               <span>Room Settings</span>
               <span>/</span>
               <span className="text-emerald-600">Property Details</span>
@@ -138,7 +138,7 @@ const PropertyDetails = () => {
           <div className="grid grid-cols-1 gap-x-8 gap-y-3.5 md:grid-cols-3">
             {/* Field: Client ID (ReadOnly usually) */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
                 Client ID
               </label>
               <div className="relative">
@@ -157,7 +157,7 @@ const PropertyDetails = () => {
 
             {/* Field: Region */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
                 Region
               </label>
               <div className="relative">
@@ -177,7 +177,7 @@ const PropertyDetails = () => {
 
             {/* Field: Property Name */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
                 Property Name*
               </label>
               <div className="relative">
@@ -197,7 +197,7 @@ const PropertyDetails = () => {
 
             {/* Field: Website URL */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
                 Website URL
               </label>
               <div className="relative">
@@ -217,7 +217,7 @@ const PropertyDetails = () => {
 
             {/* Field: Status */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
                 Property Status
               </label>
               <div className="relative">
@@ -240,7 +240,7 @@ const PropertyDetails = () => {
 
             {/* Field: Address */}
             <div className="space-y-2 md:col-span-2">
-              <label className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
                 Address*
               </label>
               <div className="relative">
@@ -257,7 +257,7 @@ const PropertyDetails = () => {
 
             {/* Field: City */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
                 City*
               </label>
               <input
@@ -271,7 +271,7 @@ const PropertyDetails = () => {
 
             {/* Field: State */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
                 State*
               </label>
               <input
@@ -285,7 +285,7 @@ const PropertyDetails = () => {
 
             {/* Field: Zip */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
                 Zip*
               </label>
               <input
@@ -299,7 +299,7 @@ const PropertyDetails = () => {
 
             {/* Field: Country */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
                 Country*
               </label>
               <input
@@ -313,7 +313,7 @@ const PropertyDetails = () => {
 
             {/* Field: Phone */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
                 Phone*
               </label>
               <div className="relative">
@@ -333,7 +333,7 @@ const PropertyDetails = () => {
 
             {/* Field: Email */}
             <div className="space-y-2 md:col-span-2">
-              <label className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
                 Email*
               </label>
               <div className="relative">
@@ -355,7 +355,7 @@ const PropertyDetails = () => {
           <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2">
             {/* Image Section: Cover */}
             <div className="space-y-3">
-              <label className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
                 Property Cover Image
               </label>
               <div className="group flex h-40 flex-col items-center justify-center gap-4 rounded-[32px] border-2 border-dashed border-slate-200 bg-slate-50 transition-all hover:border-emerald-400 hover:bg-emerald-50/30">
@@ -370,7 +370,7 @@ const PropertyDetails = () => {
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-emerald-500 shadow-sm">
                       <UploadCloud size={24} />
                     </div>
-                    <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">
+                    <span className="text-pms-tiny font-black tracking-widest text-slate-500 uppercase">
                       Upload Cover
                     </span>
                   </>
@@ -380,7 +380,7 @@ const PropertyDetails = () => {
 
             {/* Image Section: Logo */}
             <div className="space-y-3">
-              <label className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+              <label className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
                 Property Logo
               </label>
               <div className="group flex h-40 flex-col items-center justify-center gap-4 rounded-[32px] border-2 border-dashed border-slate-200 bg-slate-50 transition-all hover:border-emerald-400 hover:bg-emerald-50/30">
@@ -395,7 +395,7 @@ const PropertyDetails = () => {
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-emerald-500 shadow-sm">
                       <CheckCircle2 size={24} />
                     </div>
-                    <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">
+                    <span className="text-pms-tiny font-black tracking-widest text-slate-500 uppercase">
                       Upload Logo
                     </span>
                   </>

@@ -159,7 +159,7 @@ const DocumentModal = ({
 
   // Shared UI classes
   const labelClass =
-    'text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-1'
+    'text-pms-tiny font-black text-slate-400 uppercase tracking-widest mb-2 block ml-1'
   const inputContainerClass = `flex items-center gap-3 px-3 py-2 rounded-xl border transition-all ${
     isDark
       ? 'bg-slate-800/30 border-slate-700 focus-within:border-emerald-500/50'
@@ -197,7 +197,7 @@ const DocumentModal = ({
                 >
                   {docFormData.id ? 'Edit' : 'Add'} Document
                 </h3>
-                <p className="text-[9px] font-bold tracking-widest text-slate-400 uppercase">
+                <p className="text-pms-micro font-bold tracking-widest text-slate-400 uppercase">
                   PMS Identification Management
                 </p>
               </div>
@@ -215,7 +215,7 @@ const DocumentModal = ({
               {/* Left Column: Form Fields */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 border-l-4 border-emerald-500 pl-3">
-                  <h4 className="text-[10px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
+                  <h4 className="text-pms-tiny font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
                     Primary Information
                   </h4>
                 </div>
@@ -285,7 +285,7 @@ const DocumentModal = ({
                 </div>
 
                 <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-800/10">
-                  <span className="text-[9px] font-bold tracking-widest text-slate-400 uppercase">
+                  <span className="text-pms-micro font-bold tracking-widest text-slate-400 uppercase">
                     Linked Personal ID
                   </span>
                   <div className="mt-1 text-sm font-black text-emerald-500">
@@ -297,7 +297,7 @@ const DocumentModal = ({
               {/* Right Column: Image Uploads */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 border-l-4 border-emerald-500 pl-3">
-                  <h4 className="text-[10px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
+                  <h4 className="text-pms-tiny font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
                     Image Assets
                   </h4>
                 </div>
@@ -348,14 +348,14 @@ const DocumentModal = ({
             <button
               onClick={onClose}
               disabled={isSubmitting || !!uploadingType}
-              className={`text-[9px] font-black tracking-widest text-slate-400 uppercase ${isSubmitting || uploadingType ? 'cursor-not-allowed opacity-50' : ''}`}
+              className={`text-pms-micro font-black tracking-widest text-slate-400 uppercase ${isSubmitting || uploadingType ? 'cursor-not-allowed opacity-50' : ''}`}
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={isSubmitting || !!uploadingType}
-              className={`flex items-center gap-2 rounded-2xl bg-emerald-600 px-8 py-3 text-[10px] font-black tracking-widest text-white uppercase shadow-lg shadow-emerald-500/20 transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'hover:bg-emerald-700'}`}
+              className={`flex items-center gap-2 rounded-2xl bg-emerald-600 px-8 py-3 text-pms-tiny font-black tracking-widest text-white uppercase shadow-lg shadow-emerald-500/20 transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'hover:bg-emerald-700'}`}
             >
               {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : null}
               {uploadingType ? 'Uploading Assets...' : docFormData.id ? 'Update' : 'Save Document'}

@@ -388,7 +388,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
   const inputClass =
     'w-full rounded-md border border-slate-200 bg-white py-1.5 pr-4 pl-10 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20 placeholder:text-slate-300'
   const labelClass =
-    'mb-1 block text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400'
+    'mb-1 block text-pms-tiny font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400'
   const cardClass =
     'rounded-lg border border-slate-100 bg-slate-50 p-2.5 dark:border-slate-700/50 dark:bg-slate-800/50'
 
@@ -722,7 +722,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                   </h2>
                   <div className="mt-0.5 flex items-center gap-2 text-left">
                     <div className="h-1 w-1 rounded-full bg-blue-500"></div>
-                    <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+                    <p className="text-pms-tiny font-bold tracking-widest text-slate-400 uppercase">
                       Comprehensive Check-in & Allotment • RM {room.roomName}
                     </p>
                   </div>
@@ -742,7 +742,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                     }}
                     title="Click to generate random folio"
                   >
-                    <span className="text-[9px] font-bold tracking-widest text-slate-400 uppercase">
+                    <span className="text-pms-micro font-bold tracking-widest text-slate-400 uppercase">
                       Folio No.
                     </span>
                     <input
@@ -755,7 +755,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                   </div>
                   <div className={`h-8 w-px ${isDark ? 'bg-slate-700' : 'bg-slate-200'}`}></div>
                   <div className="flex flex-col items-end">
-                    <span className="text-[9px] font-bold tracking-widest text-slate-400 uppercase">
+                    <span className="text-pms-micro font-bold tracking-widest text-slate-400 uppercase">
                       CRS Folio No.
                     </span>
                     <input
@@ -786,7 +786,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                     <div className="flex h-5 w-5 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
                       <ShieldCheck size={10} className="text-blue-600 dark:text-blue-400" />
                     </div>
-                    <h3 className="text-[9px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
+                    <h3 className="text-pms-micro font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
                       Personal Information
                     </h3>
                   </div>
@@ -805,7 +805,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                             ) : (
                               <div className="flex h-full w-full flex-col items-center justify-center text-slate-300 dark:text-slate-600">
                                 <User size={32} />
-                                <span className="mt-1 text-[8px] font-bold tracking-wider uppercase">
+                                <span className="mt-1 text-pms-micro font-bold tracking-wider uppercase">
                                   Photo
                                 </span>
                               </div>
@@ -847,7 +847,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                             ) : (
                               <div className="flex h-full flex-col items-center justify-center">
                                 <Save size={20} className="mb-1 text-slate-300" />
-                                <p className="text-[9px] font-bold tracking-widest text-slate-400 uppercase">
+                                <p className="text-pms-micro font-bold tracking-widest text-slate-400 uppercase">
                                   Digital Signature
                                 </p>
                               </div>
@@ -868,7 +868,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                     {/* Personal Information */}
                     <div>
                       <div className="mb-4 flex items-center gap-3">
-                        <span className="text-[10px] font-black tracking-widest text-blue-500 uppercase">
+                        <span className="text-pms-tiny font-black tracking-widest text-blue-500 uppercase">
                           Background Info
                         </span>
                         <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800"></div>
@@ -923,7 +923,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                           </div>
                         </div>
                         <div className="col-span-2">
-                          <label className="text-[9px] font-bold text-slate-400 uppercase">
+                          <label className="text-pms-micro font-bold text-slate-400 uppercase">
                             Contact Info Type
                           </label>
                           <select
@@ -974,7 +974,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                           </div>
                         </div>
                         <div className="col-span-2">
-                          <label className="text-[9px] font-bold text-slate-400 uppercase">
+                          <label className="text-pms-micro font-bold text-slate-400 uppercase">
                             {formData.contactInformationTypeEnum} Full Address{' '}
                             <span className="text-red-500">*</span>
                           </label>
@@ -994,7 +994,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                     {/* Documentation Table */}
                     <div className="rounded-lg border border-blue-100/50 bg-blue-50/50 p-4 dark:border-blue-900/30 dark:bg-blue-900/10">
                       <div className="mb-3 flex items-center justify-between">
-                        <span className="text-[10px] font-black tracking-widest text-blue-600 uppercase dark:text-blue-400">
+                        <span className="text-pms-tiny font-black tracking-widest text-blue-600 uppercase dark:text-blue-400">
                           ID Documents
                         </span>
                         <button
@@ -1008,7 +1008,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                       <div className="overflow-hidden rounded-lg border border-blue-100/50 bg-white dark:border-blue-900/20 dark:bg-slate-900">
                         <table className="w-full text-left font-bold">
                           <thead className="bg-blue-50/50 dark:bg-blue-900/20">
-                            <tr className="text-[9px] font-black tracking-wider text-slate-400 uppercase">
+                            <tr className="text-pms-micro font-black tracking-wider text-slate-400 uppercase">
                               <th className="px-3 py-2">Action</th>
                               <th className="px-3 py-2">Details</th>
                             </tr>
@@ -1026,7 +1026,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                                   (t) => String(t.id) === String(doc.documentTypeId),
                                 )
                                 return (
-                                  <tr key={doc.id || idx} className="text-[10px]">
+                                  <tr key={doc.id || idx} className="text-pms-tiny">
                                     <td className="px-3 py-2">
                                       <div className="flex gap-2 text-slate-400">
                                         <button
@@ -1049,7 +1049,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                                       <div className="font-bold text-slate-700 dark:text-slate-300">
                                         {docType?.documentTypeName}
                                       </div>
-                                      <div className="text-[9px] text-slate-400">
+                                      <div className="text-pms-micro text-slate-400">
                                         {doc.documentNumber}
                                       </div>
                                     </td>
@@ -1060,7 +1060,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                               <tr>
                                 <td
                                   colSpan="2"
-                                  className="px-3 py-4 text-center text-[9px] font-bold text-slate-400"
+                                  className="px-3 py-4 text-center text-pms-micro font-bold text-slate-400"
                                 >
                                   No Documents
                                 </td>
@@ -1081,14 +1081,14 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                     <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-amber-500 shadow-lg shadow-amber-500/20">
                       <CalendarCheck size={12} className="text-white" />
                     </div>
-                    <h3 className="text-[10px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
+                    <h3 className="text-pms-tiny font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
                       Accomodation Information
                     </h3>
                   </div>
                   <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     <div className="rounded-xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                       <div className="mb-4 flex items-center gap-3">
-                        <span className="text-[10px] font-black tracking-widest text-amber-500 uppercase">
+                        <span className="text-pms-tiny font-black tracking-widest text-amber-500 uppercase">
                           Guest Details
                         </span>
                         <div className="h-px flex-1 bg-amber-50 dark:bg-amber-900/20"></div>
@@ -1131,7 +1131,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
 
                     <div className="rounded-lg border border-amber-100/50 bg-amber-50/50 p-2 dark:border-amber-900/20 dark:bg-amber-900/5">
                       <div className="mb-1.5 flex items-center gap-3">
-                        <span className="text-[8px] font-black tracking-widest text-amber-600 uppercase dark:text-amber-400">
+                        <span className="text-pms-micro font-black tracking-widest text-amber-600 uppercase dark:text-amber-400">
                           Booking & Unit Allocation
                         </span>
                         <div className="h-px flex-1 bg-amber-200/50 dark:bg-amber-800/30"></div>
@@ -1157,7 +1157,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                     <div className="flex h-5 w-5 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
                       <Receipt size={10} className="text-emerald-600 dark:text-emerald-400" />
                     </div>
-                    <h3 className="text-[9px] font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
+                    <h3 className="text-pms-micro font-black tracking-widest text-slate-800 uppercase dark:text-slate-200">
                       Rent Information
                     </h3>
                   </div>
@@ -1183,7 +1183,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                 type="button"
                 onClick={(e) => handleSubmit(e, 'Reservation')}
                 disabled={isSubmitting || uploadingType || isReserved}
-                className={`flex items-center gap-2 rounded-lg px-5 py-2.5 text-[10px] font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${
+                className={`flex items-center gap-2 rounded-lg px-5 py-2.5 text-pms-tiny font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${
                   isSubmitting || uploadingType || isReserved
                     ? 'cursor-not-allowed bg-slate-400 shadow-none'
                     : 'hover:opacity-90'
@@ -1205,7 +1205,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                 type="button"
                 onClick={(e) => handleSubmit(e, 'Occupied')}
                 disabled={isSubmitting || uploadingType}
-                className={`flex items-center gap-2 rounded-lg px-5 py-2.5 text-[10px] font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${
+                className={`flex items-center gap-2 rounded-lg px-5 py-2.5 text-pms-tiny font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${
                   isSubmitting || uploadingType
                     ? 'cursor-not-allowed bg-slate-400 shadow-none'
                     : 'hover:opacity-90'
@@ -1226,7 +1226,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                 type="submit"
                 form="guestProfileForm"
                 disabled={isSubmitting || uploadingType}
-                className={`flex items-center gap-2 rounded-lg px-5 py-2.5 text-[10px] font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-indigo-600 shadow-indigo-500/30 hover:bg-indigo-700 hover:shadow-indigo-500/40'}`}
+                className={`flex items-center gap-2 rounded-lg px-5 py-2.5 text-pms-tiny font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-indigo-600 shadow-indigo-500/30 hover:bg-indigo-700 hover:shadow-indigo-500/40'}`}
               >
                 <RefreshCw size={14} className={isSubmitting ? 'animate-spin' : ''} />
                 <span>Update Profile</span>

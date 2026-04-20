@@ -91,7 +91,7 @@ const UserSidebar = ({ buildings = [], roomTypes = [], roomStatuses = [] }) => {
               onClick={() => setIsSidebarOpen(false)}
             />
             <div className="flex flex-col overflow-hidden">
-              <span className="text-[10px] font-black tracking-[0.2em] text-emerald-500 uppercase opacity-90">
+              <span className="text-pms-tiny font-black tracking-[0.2em] text-emerald-500 uppercase opacity-90">
                 Property Engine
               </span>
               <span className="text-[13px] font-black leading-tight tracking-wide text-white uppercase">
@@ -156,13 +156,13 @@ const UserSidebar = ({ buildings = [], roomTypes = [], roomStatuses = [] }) => {
                         className={`group relative flex w-full items-center justify-between px-6 py-2.5 text-xs font-medium text-slate-400 transition-all hover:bg-slate-800/30 hover:text-white`}
                       >
                         <span className="capitalize">{building.name}</span>
-                        <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] font-bold whitespace-nowrap text-slate-500 uppercase opacity-0 transition-opacity group-hover:opacity-100">
+                        <span className="rounded bg-slate-800 px-1.5 py-0.5 text-pms-tiny font-bold whitespace-nowrap text-slate-500 uppercase opacity-0 transition-opacity group-hover:opacity-100">
                           {building.location || 'Main'}
                         </span>
                       </div>
                     ))}
                     {buildings.length === 0 && (
-                      <span className="block px-6 py-3 text-[11px] font-medium text-slate-600 italic">
+                      <span className="block px-6 py-3 text-pms-mini font-medium text-slate-600 italic">
                         No buildings found.
                       </span>
                     )}
@@ -204,13 +204,13 @@ const UserSidebar = ({ buildings = [], roomTypes = [], roomStatuses = [] }) => {
                         className={`group relative flex w-full items-center justify-between px-6 py-2.5 text-xs font-medium text-slate-400 transition-all hover:bg-slate-800/30 hover:text-white`}
                       >
                         <span className="capitalize">{type.roomTypeName}</span>
-                        <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] font-bold whitespace-nowrap text-slate-500 opacity-0 transition-opacity group-hover:opacity-100">
+                        <span className="rounded bg-slate-800 px-1.5 py-0.5 text-pms-tiny font-bold whitespace-nowrap text-slate-500 opacity-0 transition-opacity group-hover:opacity-100">
                           {type.shortName}
                         </span>
                       </div>
                     ))}
                     {roomTypes.length === 0 && (
-                      <span className="block px-6 py-3 text-[11px] font-medium text-slate-600 italic">
+                      <span className="block px-6 py-3 text-pms-mini font-medium text-slate-600 italic">
                         No room types found.
                       </span>
                     )}
@@ -259,7 +259,7 @@ const UserSidebar = ({ buildings = [], roomTypes = [], roomStatuses = [] }) => {
                       </div>
                     ))}
                     {roomStatuses.length === 0 && (
-                      <span className="block px-6 py-3 text-[11px] font-medium text-slate-600 italic">
+                      <span className="block px-6 py-3 text-pms-mini font-medium text-slate-600 italic">
                         No statuses found.
                       </span>
                     )}

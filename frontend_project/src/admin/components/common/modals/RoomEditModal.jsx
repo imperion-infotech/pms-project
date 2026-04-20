@@ -42,7 +42,7 @@ export const RoomEditModal = ({
             <Pencil className="h-6 w-6 text-blue-400" />
             <div>
               <h3 className="font-heading text-lg font-bold tracking-tight">Edit Room</h3>
-              <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+              <p className="text-pms-tiny font-bold tracking-widest text-slate-400 uppercase">
                 Update Property Mapping
               </p>
             </div>
@@ -153,7 +153,7 @@ export const RoomEditModal = ({
               <div className="animate-in fade-in slide-in-from-top-2 col-span-2 flex flex-wrap items-end gap-6 rounded-2xl border border-slate-100 bg-slate-50/50 p-4 transition-all hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50">
                 {editRoom.roomTypeId && (
                   <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+                    <span className="text-pms-tiny font-bold tracking-widest text-slate-400 uppercase">
                       Type Summary
                     </span>
                     <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-white px-4 py-2.5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
@@ -163,7 +163,7 @@ export const RoomEditModal = ({
                           ?.roomTypeName || 'Selected Type'}
                       </span>
                       <div className="ml-1 h-4 w-px bg-slate-100 dark:bg-slate-700"></div>
-                      <span className="text-[11px] font-black tracking-wider text-emerald-500">
+                      <span className="text-pms-mini font-black tracking-wider text-emerald-500">
                         ₹
                         {roomTypes.find((rt) => String(rt.id) === String(editRoom.roomTypeId))
                           ?.price || '0'}
@@ -174,11 +174,11 @@ export const RoomEditModal = ({
 
                 {editRoom.roomStatusTableId && (
                   <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+                    <span className="text-pms-tiny font-bold tracking-widest text-slate-400 uppercase">
                       Current Status
                     </span>
                     <div
-                      className="inline-flex items-center rounded-xl border px-4 py-2 text-[10px] font-black tracking-widest uppercase shadow-sm transition-all duration-300"
+                      className="inline-flex items-center rounded-xl border px-4 py-2 text-pms-tiny font-black tracking-widest uppercase shadow-sm transition-all duration-300"
                       style={{
                         backgroundColor: `${roomStatuses.find((rs) => String(rs.id) === String(editRoom.roomStatusTableId))?.roomStatusColor || '#64748b'}15`,
                         color:
@@ -223,7 +223,7 @@ export const RoomEditModal = ({
                 className={`w-full border bg-slate-50 px-4 py-2.5 dark:bg-slate-800/50 ${isDuplicate ? 'border-red-500 text-red-500 ring-2 ring-red-500/20' : 'border-slate-200 text-slate-800 dark:border-slate-700 dark:text-slate-200'} rounded-xl text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20`}
               />
               {isDuplicate && (
-                <p className="animate-in slide-in-from-top-1 mt-1.5 text-[10px] font-bold text-red-500 sm:text-xs">
+                <p className="animate-in slide-in-from-top-1 mt-1.5 text-pms-tiny font-bold text-red-500 sm:text-xs">
                   Room Name already exists!
                 </p>
               )}
@@ -257,7 +257,7 @@ export const RoomEditModal = ({
                       Smoking
                     </span>
                   </div>
-                  <span className="text-[10px] font-medium text-slate-400">
+                  <span className="text-pms-tiny font-medium text-slate-400">
                     Guest can smoke in room
                   </span>
                 </div>
@@ -285,7 +285,7 @@ export const RoomEditModal = ({
                       Handicap
                     </span>
                   </div>
-                  <span className="text-[10px] font-medium text-slate-400">
+                  <span className="text-pms-tiny font-medium text-slate-400">
                     Specially designed for access
                   </span>
                 </div>
@@ -320,7 +320,7 @@ export const RoomEditModal = ({
                       Non-Room
                     </span>
                   </div>
-                  <span className="text-[10px] font-medium text-slate-400">
+                  <span className="text-pms-tiny font-medium text-slate-400">
                     Internal service/utility space
                   </span>
                 </div>

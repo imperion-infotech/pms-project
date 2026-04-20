@@ -159,7 +159,7 @@ const Register = () => {
           <button
             type="submit"
             disabled={loading}
-            className="mt-3 flex cursor-pointer items-center justify-center gap-2 rounded-xl border-none bg-linear-to-br from-emerald-500 to-emerald-700 p-4 text-[15px] font-bold text-white shadow-lg shadow-emerald-500/40 transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
+            className="mt-3 flex cursor-pointer items-center justify-center gap-2 rounded-xl border-none bg-linear-to-br from-emerald-500 to-emerald-700 p-4 text-pms-card font-bold text-white shadow-lg shadow-emerald-500/40 transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
           >
             {loading ? <Loader2 size={18} className="animate-spin" /> : 'Create Account'}
             {!loading && <ArrowRight size={18} />}
