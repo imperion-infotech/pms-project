@@ -155,7 +155,13 @@ export const propertyService = {
     handleResponse(() =>
       api.post('/user/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
     ),
-  getImageUrl: (filename) => `/user/${filename}`,
+  getImageUrl: (filename) => {
+    if (!filename || filename === 'string') return ''
+    // If the database has the messy string "Image uploaded...: /path/abc.jpg"
+    // we extract only "abc.jpg"
+    const nameOnly = filename.includes('/') ? filename.split('/').pop() : filename
+    return `/uploads/pms/${nameOnly}`
+  },
   deleteImage: (filename) => handleResponse(() => api.delete(`/user/delete/${filename}`)),
 
   // --- PAYMENT TYPES (Cash, Card, UPI, etc.) ---
@@ -177,4 +183,11 @@ export const propertyService = {
   deleteOtherCharge: (id) => handleResponse(() => api.delete(`/admin/deleteothercharge/${id}`)),
   searchOtherCharges: (query) =>
     handleResponse(() => api.get('/user/othercharge/search', { params: { query } })),
+
+  // --- HOTEL MANAGEMENT (Property level details) ---
+  getHotels: () => handleResponse(() => api.get('/hotels/gethotels')),
+  getHotelById: (id) => handleResponse(() => api.get(`/hotels/gethotel/${id}`)),
+  createHotel: (data) => handleResponse(() => api.post('/hotels/createhotel', data)),
+  updateHotel: (id, data) => handleResponse(() => api.put(`/hotels/updatehotel/${id}`, data)),
+  deleteHotel: (id) => handleResponse(() => api.delete(`/hotels/deletehotel/${id}`)),
 }

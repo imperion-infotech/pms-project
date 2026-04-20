@@ -10,7 +10,7 @@ import TaxManagement from '../../../features/property/components/TaxManagement'
 import DocumentTypeManagement from '../../../features/property/components/DocumentTypeManagement'
 import PaymentTypeManagement from '../../../features/property/components/PaymentTypeManagement'
 import OtherChargeManagement from '../../../features/property/components/OtherChargeManagement'
-import PropertyDetails from '../../../features/property/components/PropertyDetails'
+import PropertyDetails from '../PropertyDetails'
 
 /**
  * DashboardRouter - Ye file 'Traffic Inspector' ka kaam karti hai.

@@ -213,9 +213,9 @@ const HomeScreen = () => {
             {/* Industrial Skeleton View - Jab data fetch hota hai */}
             {isLoading && (
               <div className="space-y-12">
-                {[1, 2, 3].map(i => (
+                {[1, 2, 3].map((i) => (
                   <div key={i} className="space-y-6">
-                    <div className="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded-full" />
+                    <div className="h-4 w-32 rounded-full bg-slate-200 dark:bg-slate-800" />
                     <RoomCardSkeleton repeat={15} />
                   </div>
                 ))}
@@ -229,7 +229,9 @@ const HomeScreen = () => {
                 <h3 className="mb-3 text-xl font-black text-slate-900 uppercase dark:text-red-400">
                   Sync Failed
                 </h3>
-                <p className="mb-8 text-sm text-slate-500">{error}</p>
+                <p className="mb-8 text-sm text-slate-500">
+                  {`${error?.response?.data?.message || error?.message || 'Connection Error: Please check your backend connection.'}`}
+                </p>
                 <button
                   onClick={refreshData}
                   className="w-full rounded-2xl bg-red-500 py-4 font-black tracking-widest text-white uppercase shadow-lg active:scale-95"

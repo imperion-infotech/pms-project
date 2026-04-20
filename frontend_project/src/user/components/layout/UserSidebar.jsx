@@ -13,6 +13,45 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useSidebar } from '../../../context/SidebarContext'
 
+// Helper to check for Admin role
+const checkIsAdmin = () => {
+  const token = localStorage.getItem('access_token')
+  if (!token) return false
+  try {
+    const cleanToken = token.trim().replace(/^"|"$/g, '')
+    const payload = JSON.parse(atob(cleanToken.split('.')[1]))
+    const roles = payload.roles || []
+    return roles.some((r) => {
+      const name = (typeof r === 'object' ? r.name || r.authority : r) || ''
+      const roleStr = String(name).toUpperCase()
+      return (
+        roleStr.includes('ADMIN') ||
+        roleStr.includes('MANAGER') ||
+        roleStr.includes('SUPER_ADMIN')
+      )
+    })
+  } catch {
+    return String(localStorage.getItem('user_role') || '').toUpperCase().includes('ADMIN')
+  }
+}
+
+const checkIsSuperAdmin = () => {
+  const token = localStorage.getItem('access_token')
+  if (!token) return false
+  try {
+    const cleanToken = token.trim().replace(/^"|"$/g, '')
+    const payload = JSON.parse(atob(cleanToken.split('.')[1]))
+    const roles = payload.roles || []
+    return roles.some((r) => {
+      const name = (typeof r === 'object' ? r.name || r.authority : r) || ''
+      const roleStr = String(name).toUpperCase()
+      return roleStr.includes('SUPER_ADMIN')
+    })
+  } catch {
+    return String(localStorage.getItem('user_role') || '').toUpperCase().includes('SUPER_ADMIN')
+  }
+}
+
 /**
  * UserSidebar component - Matches exactly with the Admin Dashboard Sidebar.
  * Displays fetched room types and room statuses as nested accordion lists.
@@ -23,6 +62,12 @@ const UserSidebar = ({ buildings = [], roomTypes = [], roomStatuses = [] }) => {
   const [isTypeMenuOpen, setIsTypeMenuOpen] = React.useState(true)
   const [isStatusMenuOpen, setIsStatusMenuOpen] = React.useState(true)
   const navigate = useNavigate()
+
+  const isAdmin = checkIsAdmin()
+  const isSuper = checkIsSuperAdmin()
+
+  // Industrial Fix: Get the active hotel name to show in the branding section
+  const activeHotelName = localStorage.getItem('activeHotelName') || 'Imperion Engine'
 
   return (
     <>
@@ -45,29 +90,38 @@ const UserSidebar = ({ buildings = [], roomTypes = [], roomStatuses = [] }) => {
               className="h-5 w-5 cursor-pointer text-slate-400 transition-colors hover:text-white"
               onClick={() => setIsSidebarOpen(false)}
             />
-            <span className="text-sm font-semibold tracking-widest whitespace-nowrap uppercase">
-              Imperion Engine
-            </span>
+            <div className="flex flex-col overflow-hidden">
+              <span className="text-[10px] font-black tracking-[0.2em] text-emerald-500 uppercase opacity-90">
+                Property Engine
+              </span>
+              <span className="text-[13px] font-black leading-tight tracking-wide text-white uppercase">
+                {activeHotelName}
+              </span>
+            </div>
           </div>
         </div>
 
         <nav className="flex flex-1 flex-col overflow-hidden py-0">
           <div className="custom-scrollbar flex-1 overflow-y-auto py-4">
-            {/* Go to Dashboard Button */}
-            <button
-              type="button"
-              onDoubleClick={() => {
-                navigate('/dashboard')
-                if (window.innerWidth < 1024) setIsSidebarOpen(false)
-              }}
-              className={`relative mb-1 flex w-full items-center gap-3 px-4 py-3 text-sm font-semibold text-slate-300 transition-all hover:bg-slate-700/60 hover:text-white`}
-              style={{ borderRadius: '0' }}
-            >
-              <LayoutDashboard className={`h-5 w-5 text-emerald-400`} />
-              <span>Go to Dashboard</span>
-            </button>
+            {/* Go to Dashboard Button (Industrial Fix: Single Click for Admin) */}
+            {isAdmin && (
+              <button
+                type="button"
+                onClick={() => {
+                  navigate('/dashboard')
+                  if (window.innerWidth < 1024) setIsSidebarOpen(false)
+                }}
+                className={`relative mb-1 flex w-full items-center gap-3 px-4 py-3 text-sm font-semibold text-slate-300 transition-all hover:bg-emerald-500/10 hover:text-emerald-400`}
+                style={{ borderRadius: '0' }}
+              >
+                <div className="absolute top-0 bottom-0 left-0 w-1 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
+                <LayoutDashboard className={`h-5 w-5 text-emerald-400`} />
+                <span>Go to Dashboard</span>
+              </button>
+            )}
 
             <div className="my-2 border-t border-slate-700/40"></div>
+
 
             {/* BUILDINGS ACCORDION */}
             <div>
@@ -218,16 +272,36 @@ const UserSidebar = ({ buildings = [], roomTypes = [], roomStatuses = [] }) => {
           </div>
 
           <div className="mt-auto border-t border-slate-700/50 p-4">
+            {/* Only Super Admins can switch properties/see the selection page */}
+            {isSuper && (
+              <button
+                onClick={() => {
+                  localStorage.removeItem('activeHotelId')
+                  localStorage.removeItem('activeHotelName')
+                  navigate('/property-selection')
+                }}
+                className="group mb-2 flex w-full items-center gap-3 rounded-xl px-4 py-3 text-slate-300 transition-colors hover:bg-blue-500/10 hover:text-blue-400"
+              >
+                <Layers className="h-5 w-5 text-slate-400 transition-colors group-hover:text-blue-400" />
+                <span className="text-sm font-semibold">Switch Property</span>
+              </button>
+            )}
+
             <button
               onClick={() => {
                 localStorage.removeItem('access_token')
                 localStorage.removeItem('refresh_token')
+                localStorage.removeItem('user_role')
+                localStorage.removeItem('activeHotelId')
+                localStorage.removeItem('adminHotels')
                 navigate('/login')
               }}
               className="group flex w-full items-center gap-3 rounded-xl px-4 py-3 text-slate-300 transition-colors hover:bg-red-500/10 hover:text-red-400"
             >
               <LogOut className="h-5 w-5 text-slate-400 transition-colors group-hover:text-red-400" />
-              <span className="text-sm font-semibold">Log Out</span>
+              <span className="text-sm font-semibold text-slate-300 group-hover:text-red-400">
+                Log Out
+              </span>
             </button>
           </div>
         </nav>

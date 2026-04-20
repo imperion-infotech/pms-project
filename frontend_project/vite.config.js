@@ -22,6 +22,17 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      '/hotels': {
+        target: 'http://192.168.1.5:9091',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/uploads': {
+        target: 'http://192.168.1.5:9091',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/uploads/, '/uploads'),
+      },
     },
   },
 })

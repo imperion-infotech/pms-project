@@ -185,10 +185,28 @@ const SectionHeader = ({ label, icon, isOpen, onToggle, isActive, color }) => {
   )
 }
 
+// Helper to check for Super Admin role
+const checkIsSuperAdmin = () => {
+  const token = localStorage.getItem('access_token')
+  if (!token) return false
+  try {
+    const cleanToken = token.trim().replace(/^"|"$/g, '')
+    const payload = JSON.parse(atob(cleanToken.split('.')[1]))
+    const roles = payload.roles || []
+    return roles.some((r) => {
+      const name = (typeof r === 'object' ? r.name || r.authority : r) || ''
+      return String(name).toUpperCase().includes('SUPER_ADMIN')
+    })
+  } catch {
+    return String(localStorage.getItem('user_role') || '').toUpperCase().includes('SUPER_ADMIN')
+  }
+}
+
 /* ─── Main Sidebar ──────────────────────────────────────────── */
 const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem }) => {
   const navigate = useNavigate()
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
+  const isSuperAdmin = checkIsSuperAdmin()
 
   const propertyItems = [
     { name: 'Property Details', icon: Home },
@@ -199,6 +217,7 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
     { name: 'Room Status', icon: CheckSquare },
     { name: 'Tax', icon: Receipt },
   ]
+
 
   const profileItems = [{ name: 'Personal Detail', icon: User }]
 
@@ -236,16 +255,21 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
           isSidebarOpen ? 'ml-0' : '-ml-64'
         }`}
       >
-        {/* Logo */}
+        {/* Logo & Branding */}
         <div className="flex items-center justify-between border-b border-slate-700/50 p-4">
           <div className="flex items-center gap-3 overflow-hidden">
             <Menu
               className="h-5 w-5 cursor-pointer text-slate-400 transition-colors hover:text-white"
               onClick={() => setIsSidebarOpen(false)}
             />
-            <span className="text-sm font-semibold tracking-widest whitespace-nowrap uppercase">
-              Imperion
-            </span>
+            <div className="flex flex-col">
+              <span className="text-[10px] font-black tracking-[0.2em] text-emerald-500 uppercase opacity-90">
+                Admin Center
+              </span>
+              <span className="text-[13px] font-black leading-tight tracking-wide text-white uppercase line-clamp-1">
+                {localStorage.getItem('activeHotelName') || 'IMPERION'}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -253,7 +277,7 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
           <div className="custom-scrollbar flex-1 overflow-y-auto py-4">
             {/* Go to Home */}
             <button
-              onDoubleClick={() => {
+              onClick={() => {
                 navigate('/home', { state: { initialFloor: 'All' } })
                 if (window.innerWidth < 1024) setIsSidebarOpen(false)
               }}
@@ -370,22 +394,22 @@ const Sidebar = ({ isPropertyOpen, setIsPropertyOpen, activeItem, setActiveItem 
             </div>
           </div>
 
-          {/* Property Actions */}
           <div className="mt-auto space-y-1 border-t border-slate-700/50 p-3">
-            {/* 1. Switch Hotel Button (Requested by User) */}
-            <button
-              onClick={() => {
-                // Sirf Hotel specific data clear kar rahe hain, Token nahi!
-                localStorage.removeItem('activeHotelId')
-                localStorage.removeItem('activeHotelName')
-                navigate('/property-selection')
-              }}
-              className="group flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-slate-300 transition-colors hover:bg-blue-500/10 hover:text-blue-400"
-              title="Exit current hotel and select another one"
-            >
-              <Building className="h-4.5 w-4.5 text-slate-400 transition-colors group-hover:text-blue-400" />
-              <span className="text-sm font-semibold">Switch Hotel</span>
-            </button>
+            {/* 1. Switch Hotel Button (Only for Super Admin) */}
+            {isSuperAdmin && (
+              <button
+                onClick={() => {
+                  localStorage.removeItem('activeHotelId')
+                  localStorage.removeItem('activeHotelName')
+                  navigate('/property-selection')
+                }}
+                className="group flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-slate-300 transition-colors hover:bg-blue-500/10 hover:text-blue-400"
+                title="Exit current hotel and select another one"
+              >
+                <Building className="h-4.5 w-4.5 text-slate-400 transition-colors group-hover:text-blue-400" />
+                <span className="text-sm font-semibold">Switch Hotel</span>
+              </button>
+            )}
 
             {/* 2. Full Log Out Button */}
             <button
