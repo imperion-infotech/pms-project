@@ -3,6 +3,7 @@
  */
 package com.pms.personaldetails;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pms.baseentity.BaseEntity;
 import com.pms.document.entity.DocumentDetails;
 import com.pms.personaldetails.controller.ContactInformationTypeEnum;
 
@@ -44,7 +46,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name="personal_details")
-public class PersonalDetails {
+public class PersonalDetails extends BaseEntity implements Serializable {
 	
 static final Logger logger = LoggerFactory.getLogger(PersonalDetails.class);
 	

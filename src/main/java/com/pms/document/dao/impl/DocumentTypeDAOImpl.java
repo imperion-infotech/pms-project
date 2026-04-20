@@ -49,8 +49,6 @@ static final Logger logger = LoggerFactory.getLogger(DocumentTypeDAOImpl.class);
 
 	@Override
 	public DocumentType updateDocumentType(int documentTypeId, DocumentType documentType) {
-		//First We are taking Book detail from database by given book id and 
-		// then updating detail with provided book object
 		DocumentType documentTypeFromDB = getDocumentType(documentTypeId);
 		documentTypeFromDB.setCreatedOn(documentType.getCreatedOn());
 		documentTypeFromDB.setDocumentTypeCategory(documentType.getDocumentTypeCategory());
@@ -60,7 +58,6 @@ static final Logger logger = LoggerFactory.getLogger(DocumentTypeDAOImpl.class);
 		documentTypeFromDB.setDocumentTypeShortName(documentType.getDocumentTypeShortName());
 		entityManager.flush();
 		
-		//again i am taking updated result of book and returning the book object
 		DocumentType updatedDocumentType = getDocumentType(documentTypeId);
 		
 		return updatedDocumentType;

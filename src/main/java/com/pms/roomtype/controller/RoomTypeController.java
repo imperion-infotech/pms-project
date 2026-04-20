@@ -46,7 +46,7 @@ public class RoomTypeController {
 
 	@GetMapping("/user/getroomtype/{id}")
 //	@GetMapping("/auth/getroomtype/{id}")
-	public ResponseEntity<RoomType> getRoomType(@PathVariable("id") Integer id) {
+	public ResponseEntity<RoomType> getRoomType(@PathVariable("id") Long id) {
 		RoomType roomType = service.getRoomType(id);
 		return new ResponseEntity<RoomType>(roomType, HttpStatus.OK);
 	}
@@ -80,7 +80,7 @@ public class RoomTypeController {
 
 @PutMapping("/admin/updateroomtype/{id}")
 //	@PutMapping("/auth/updateroomtype/{id}")
-	public ResponseEntity<?> updateRoomType(@PathVariable Integer id, @RequestBody RoomType roomTypeDetails) {
+	public ResponseEntity<?> updateRoomType(@PathVariable Long id, @RequestBody RoomType roomTypeDetails) {
 		// Validate input
 		if (roomTypeDetails == null || roomTypeDetails.getShortName() == null
 				|| roomTypeDetails.getShortName().trim().isEmpty()) {
@@ -123,7 +123,7 @@ public class RoomTypeController {
 
 	@DeleteMapping("/admin/deleteroomtype/{id}")
 //	@DeleteMapping("/auth/deleteroomtype/{id}")
-	public ResponseEntity<String> deleteRoomType(@PathVariable("id") int id) {
+	public ResponseEntity<String> deleteRoomType(@PathVariable("id") Long id) {
 		boolean isDeleted = service.deleteRoomType(id);
 		if (isDeleted) {
 			String responseContent = "RoomType has been deleted successfully";
@@ -136,11 +136,10 @@ public class RoomTypeController {
 	@GetMapping("/user/roomtype/search")
     public List<RoomType> searchRoomType(
             @RequestParam(required = false) String shortName,
-            @RequestParam(required = false) String roomTypeName,
-            @RequestParam(required = false) Double price
+            @RequestParam(required = false) String roomTypeName
             ) {
 
-        return service.search(shortName,roomTypeName,price);
+        return service.search(shortName,roomTypeName);
     }
 
 }

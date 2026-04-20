@@ -8,6 +8,7 @@ import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.pms.baseentity.BaseEntity;
 import com.pms.paymentdetails.entity.PaymentDetails;
 
 import jakarta.persistence.Column;
@@ -34,7 +35,7 @@ import lombok.Setter;
 @Table(name="payment_type")
 @Entity
 @Data
-public class PaymentType implements Serializable{
+public class PaymentType extends BaseEntity implements Serializable{
 	
 	
 	private static final long serialVersionUID = 1L;

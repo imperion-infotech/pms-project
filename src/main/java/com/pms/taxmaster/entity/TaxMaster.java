@@ -7,8 +7,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.pms.baseentity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,6 +21,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,7 +39,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name="tax_master")
-public class TaxMaster implements Serializable{
+@SQLRestriction("is_deleted = false")
+public class TaxMaster extends BaseEntity implements Serializable{
 	
 static final Logger logger = LoggerFactory.getLogger(TaxMaster.class);
 	
@@ -61,6 +66,18 @@ static final Logger logger = LoggerFactory.getLogger(TaxMaster.class);
 	@Column(name="created_on", nullable = false, updatable = false)
 	@CreationTimestamp // Automatically sets value when entity is persisted
 	private Date createdOn;
+	
+	@NotNull(message = "Amount is required")
+	@Column(name="amount")
+	private Double amount;
+	
+	public Double getAmount() {
+		return amount;
+	}
+
+	public void setAmount(Double amount) {
+		this.amount = amount;
+	}
 
 	public int getId() {
 		return id;

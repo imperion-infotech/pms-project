@@ -17,6 +17,9 @@ import com.pms.guestdetails.GuestDetails;
 import com.pms.guestdetails.dao.IGuestDetailsDAO;
 import com.pms.guestdetails.dao.impl.GuestDetailsRepository;
 import com.pms.guestdetails.service.IGuestDetailsService;
+import com.pms.paymentdetails.entity.PaymentDetails;
+import com.pms.paymentdetails.repository.PaymentDetailsRepository;
+import com.pms.security.configuration.HotelContext;
 import com.pms.security.util.SecurityUtils;
 
 import jakarta.transaction.Transactional;
@@ -34,6 +37,9 @@ public class GuestDetailsServiceImpl implements IGuestDetailsService {
 	private GuestDetailsRepository guestDetailsRepository;
 	
 	@Autowired
+	private PaymentDetailsRepository paymentDetailsRepository;
+	
+	@Autowired
 	private AuditLogRepository auditLogRepository;
 	
 
@@ -45,15 +51,23 @@ public class GuestDetailsServiceImpl implements IGuestDetailsService {
 	
 	@Override
 	public List<GuestDetails> getGuestDetails() {
+		Long hotelId = HotelContext.getHotelId();
+ 		 if (hotelId == null) {
+ 	         throw new RuntimeException("Hotel not selected");
+ 	     }
 //		return guestDetailsRepository.findAll();
-		return guestDetailsRepository.findByIsDeletedFalse();
+		return guestDetailsRepository.findByHotelIdAndIsDeletedFalse(hotelId);
 	}
 	
 	@Override
 	public GuestDetails getGuestDetail(int guestDetailsId) {
-//		return dao.getGuestDetail(guestDetailsId);
-		return guestDetailsRepository.findByIdAndIsDeletedFalse(guestDetailsId)
-	                .orElseThrow(() -> new RuntimeException("Record not found"));
+		Long hotelId = HotelContext.getHotelId();
+		 if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
+		
+		return guestDetailsRepository.findByIdAndHotelIdAndIsDeletedFalse(Long.valueOf(guestDetailsId),hotelId);
+	                
 	}
 	@Auditable(action = "CREATE", entity = "GUESTDETAILS")
 	public GuestDetails createGuestDetail(GuestDetails guestDetails) {
@@ -65,17 +79,20 @@ public class GuestDetailsServiceImpl implements IGuestDetailsService {
 		return dao.updateGuestDetails(guestDetailsId, guestDetails);
 	}
 	
-	@Auditable(action = "DELETE", entity = "GUESTDETAILS")
-	public boolean deleteGuestDetail(int guestDetailsId)
-	{ 
-		return dao.deleteGuestDetails(guestDetailsId);
-	}
 	
 	@Auditable(action = "DELETE", entity = "STAYDETAILS")
     @Transactional
     public boolean deleteSoftStayDetails(Integer id) {
+		
+		Long hotelId = HotelContext.getHotelId();
+		 if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
 
-		GuestDetails entity = dao.findById(id);
+		GuestDetails entity = guestDetailsRepository.findByIdAndHotelIdAndIsDeletedFalse(Long.valueOf(id),hotelId);
+		List<PaymentDetails> paymentDetails = paymentDetailsRepository.findByHotelId(hotelId);
+		
+		entity.setPaymentDetails(paymentDetails);
 
         // ✅ Soft delete
         entity.setDeleted(true);
@@ -101,10 +118,4 @@ public class GuestDetailsServiceImpl implements IGuestDetailsService {
         }
 }
 	
-	public GuestDetails findById(Integer id)
-	{
-		return dao.findById(id);
-	}
-
-
 }

@@ -3,6 +3,7 @@
  */
 package com.pms.stay.entity;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -10,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.pms.baseentity.BaseEntity;
 import com.pms.building.entity.Building;
 import com.pms.floor.entity.Floor;
 import com.pms.room.entity.RoomMaster;
@@ -24,7 +26,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -44,9 +45,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name="stay_details")
-public class StayDetails {
-	
-	static final Logger logger = LoggerFactory.getLogger(StayDetails.class);
+public class StayDetails extends BaseEntity implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
 	

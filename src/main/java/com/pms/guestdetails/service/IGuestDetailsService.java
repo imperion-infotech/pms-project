@@ -16,8 +16,6 @@ public interface IGuestDetailsService {
 	public GuestDetails getGuestDetail(int guestDetailsId);
 	public GuestDetails createGuestDetail(GuestDetails guestDetails);
 	public GuestDetails updateGuestDetails(int guestDetailsId,GuestDetails guestDetails);
-	public boolean deleteGuestDetail(int guestDetailsId);
-	public GuestDetails findById(Integer id);
 	public boolean deleteSoftStayDetails(Integer id);
 	
 	

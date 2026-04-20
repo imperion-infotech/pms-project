@@ -14,7 +14,10 @@ import com.pms.document.dao.DocumentTypeRepository;
 import com.pms.document.dao.IDocumentTypeDAO;
 import com.pms.document.entity.DocumentType;
 import com.pms.document.service.IDocumentTypeService;
+import com.pms.floor.entity.Floor;
 import com.pms.search.specification.DocumentTypeSpecification;
+import com.pms.search.specification.FloorSpecification;
+import com.pms.security.configuration.HotelContext;
 
 /**
  * 
@@ -36,13 +39,17 @@ public class DocumentTypeServiceImpl implements IDocumentTypeService {
 
 	@Override
 	public List<DocumentType> getDocumentTypes() {
-//			return dao.getFloors();
-		return documentTypeRepository.findAll();
+		Long hotelId = HotelContext.getHotelId();
+
+	    if (hotelId == null) {
+	        throw new RuntimeException("Hotel not selected");
+	    }
+		return documentTypeRepository.findByHotelId(HotelContext.getHotelId());
 	}
 
 	@Override
-	public DocumentType getDocumentType(int documentTypeId) {
-		return dao.getDocumentType(documentTypeId);
+	public DocumentType getDocumentType(Long documentTypeId) {
+		return documentTypeRepository.findByIdAndHotelId(documentTypeId,HotelContext.getHotelId());
 	}
 
 	@Override
@@ -60,20 +67,34 @@ public class DocumentTypeServiceImpl implements IDocumentTypeService {
 
 	@Override
 	@Auditable(action = "DELETE", entity = "DOCUMENTTYPE")
-	public boolean deleteDocumentType(int documentTypeId) {
-		return dao.deleteDocumentType(documentTypeId);
+	public boolean deleteDocumentType(Long documentTypeId) {
+		DocumentType documentType = documentTypeRepository.findByIdAndHotelId(documentTypeId,HotelContext.getHotelId());
+		 boolean isDeleted=true;;
+		 if(documentType == null ) {
+			 isDeleted=false;
+			 throw new RuntimeException("floor not found");
+		 }
+		 documentTypeRepository.delete(documentType);
+		 return isDeleted;
 	}
 
 	@Override
-	public DocumentType findById(Integer id) {
-		  return dao.findById(id);
+	public DocumentType findByIdAndHotelId(Long id) {
+		  return documentTypeRepository.findByIdAndHotelId(id,HotelContext.getHotelId());
 	}
+	
 	
 	@Override
 	public 	List<DocumentType> search(String shortName, String documentTypeName,String documentTypeDescription)
 	{   
+		Long hotelId = HotelContext.getHotelId();   // 🔥 get from JWT
+
+	     if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
 	Specification<DocumentType> spec = Specification
-	                .where(DocumentTypeSpecification.hasShortName(shortName))
+					.where(DocumentTypeSpecification.hasHotelId(hotelId))
+	                .and(DocumentTypeSpecification.hasShortName(shortName))
 	                .and(DocumentTypeSpecification.hasDocumentTypeName(documentTypeName))
 	                .and(DocumentTypeSpecification.hasDocumentTypeDescription(documentTypeDescription));
 

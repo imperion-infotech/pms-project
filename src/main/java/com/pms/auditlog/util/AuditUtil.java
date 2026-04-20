@@ -28,7 +28,12 @@ public class AuditUtil {
     public static String getUsername() {
     	
     	User user =(User) AuditUtil.getSessionAttribute("user");
+    	if(user != null) {
     	return user.getUsername();
+    	} else
+    	{
+    		return "";
+    	}
     
     }
 

@@ -10,7 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.pms.paymenttype.entity.PaymentType;
+import com.pms.baseentity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,7 +35,7 @@ import lombok.Setter;
 @Table(name="other_charge")
 @Entity
 @Data
-public class OtherCharge implements Serializable{
+public class OtherCharge extends BaseEntity  implements Serializable{
 	
 static final Logger logger = LoggerFactory.getLogger(OtherCharge.class);
 	

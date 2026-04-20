@@ -10,10 +10,12 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.pms.baseentity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,7 +38,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name="building")
-public class Building implements Serializable {
+@SQLRestriction("is_deleted = false")
+public class Building extends BaseEntity implements Serializable {
 	
 	static final Logger logger = LoggerFactory.getLogger(Building.class);
 	

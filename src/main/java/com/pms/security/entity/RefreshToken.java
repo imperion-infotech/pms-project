@@ -26,8 +26,20 @@ import jakarta.persistence.ManyToOne;
 	    private String token;
 
 	    private Instant expiryDate;
+	    
+	    private Long hotelId;
+	    
+	    
 
-	    @ManyToOne
+	    public Long getHotelId() {
+			return hotelId;
+		}
+
+		public void setHotelId(Long hotelId) {
+			this.hotelId = hotelId;
+		}
+
+		@ManyToOne
 	    @JoinColumn(name = "user_id", nullable = false)
 	    private User user;
 
@@ -50,7 +62,7 @@ import jakarta.persistence.ManyToOne;
 		public Instant getExpiryDate() {
 			return expiryDate;
 		}
-
+		
 		public void setExpiryDate(Instant expiryDate) {
 			this.expiryDate = expiryDate;
 		}

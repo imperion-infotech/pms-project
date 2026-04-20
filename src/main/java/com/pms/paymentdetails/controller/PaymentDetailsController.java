@@ -49,9 +49,9 @@ public class PaymentDetailsController {
 	@PostMapping("/admin/createpaymentdetails")
 	public ResponseEntity<?> createPaymentDetails(@RequestBody PaymentDetails paymentDetails) {
 		// Validate input
-		if (paymentDetails == null || paymentDetails.getPaymentType()== null ) {
-			return ResponseEntity.badRequest().body("PaymentDetails PaymentType must not be null or empty");
-		}
+//		if (paymentDetails == null || paymentDetails.getPaymentType()== null ) {
+//			return ResponseEntity.badRequest().body("PaymentDetails PaymentType must not be null or empty");
+//		}
 		
 		if (paymentDetails == null || paymentDetails.getCurrencySymbol() == null || paymentDetails.getCurrencySymbol().toString().trim().isEmpty()) {
 			return ResponseEntity.badRequest().body("PaymentDetails CurrencySymbol must not be null or empty");
@@ -61,9 +61,9 @@ public class PaymentDetailsController {
 			return ResponseEntity.badRequest().body("PaymentDetails payment date must not be null or empty");
 		}
 		
-		if (paymentDetails == null || paymentDetails.getGuestDetails() == null) {
-			return ResponseEntity.badRequest().body("PaymentDetails guestdetails id must not be null or empty");
-		}
+//		if (paymentDetails == null || paymentDetails.getGuestDetails() == null) {
+//			return ResponseEntity.badRequest().body("PaymentDetails guestdetails id must not be null or empty");
+//		}
 		
 		try {
 			PaymentDetails savedPaymentDetails = service.createPaymentDetails(paymentDetails);

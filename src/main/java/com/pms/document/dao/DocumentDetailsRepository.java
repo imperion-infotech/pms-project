@@ -17,7 +17,8 @@ import com.pms.personaldetails.PersonalDetails;
  */
 public interface DocumentDetailsRepository extends JpaRepository<DocumentDetails, Integer> , JpaSpecificationExecutor<DocumentDetails>{
 	
-	Optional<DocumentDetails> findByIdAndIsDeletedFalse(Integer id);
-	List<DocumentDetails> findByIsDeletedFalse();
+	Optional<DocumentDetails> findByIdAndHotelIdAndIsDeletedFalse(Integer id, Long hotelId);
+	List<DocumentDetails> findByHotelIdAndIsDeletedFalse(Long hotelId);
+	
 	
 }

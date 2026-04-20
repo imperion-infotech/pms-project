@@ -5,6 +5,7 @@ package com.pms.rent.services.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import com.pms.rent.RentDetails;
 import com.pms.rent.dao.IRentDetailsDAO;
 import com.pms.rent.dao.impl.RentDetailsRepository;
 import com.pms.rent.services.IRentDetailsService;
+import com.pms.security.configuration.HotelContext;
 import com.pms.security.util.SecurityUtils;
 import com.pms.stay.entity.StayDetails;
 
@@ -46,24 +48,35 @@ public class RentDetailsServiceImpl implements IRentDetailsService {
 
 	@Override
 	public List<RentDetails> getRentDetails() {
-		return rentDetailsRepository.findByIsDeletedFalse();
+		Long hotelId = HotelContext.getHotelId();
+ 		 if (hotelId == null) {
+ 	         throw new RuntimeException("Hotel not selected");
+ 	     }
+		return rentDetailsRepository.findByHotelIdAndIsDeletedFalse(hotelId);
 	}
 	
 	@Auditable(action = "CREATE", entity = "RENTDETAILS")
 	public RentDetails createRentDetail(RentDetails rentDetail) {
 		
-		return dao.createRentDetail(rentDetail);
+//		return dao.createRentDetail(rentDetail);
+		return rentDetailsRepository.saveAndFlush(rentDetail);
 	}
 	
 	@Auditable(action = "UPDATE", entity = "RENTDETAILS")
 	@Override
 	public RentDetails updateRentDetail(int rentDetailsId, RentDetails rentDetail) {
-		return dao.updateRentDetail(rentDetailsId, rentDetail);
+//		return dao.updateRentDetail(rentDetailsId, rentDetail);
+		rentDetailsRepository.saveAndFlush(rentDetail);
+		 return getRentDetail(rentDetailsId);
+		
 	}
 	
 	public RentDetails getRentDetail(int rentDetailsId) {
-		 return rentDetailsRepository.findByIdAndIsDeletedFalse(rentDetailsId)
-	                .orElseThrow(() -> new RuntimeException("Record not found"));
+		Long hotelId = HotelContext.getHotelId();
+		 if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
+		  return rentDetailsRepository.findByIdAndHotelIdAndIsDeletedFalse(Long.valueOf(rentDetailsId),hotelId);
 	}
 
 	@Auditable(action = "DELETE", entity = "RENTDETAILS")
@@ -81,7 +94,11 @@ public class RentDetailsServiceImpl implements IRentDetailsService {
     @Transactional
     public boolean deleteSoftRentDetails(Long id) {
 
-		RentDetails entity = dao.findById(id);
+		Long hotelId = HotelContext.getHotelId();
+		 if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
+		RentDetails entity = rentDetailsRepository.findByIdAndHotelIdAndIsDeletedFalse(id,hotelId);
 
         // ✅ Soft delete
         entity.setDeleted(true);

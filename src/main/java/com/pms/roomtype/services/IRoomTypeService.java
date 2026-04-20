@@ -18,10 +18,10 @@ public interface IRoomTypeService {
 	List<RoomType> getRoomTypes();
 	RoomType createRoomType(RoomType roomType);
 	RoomType updateRoomType(int roomTypeId, RoomType roomType);
-	RoomType getRoomType(int roomTypeId);
-	boolean deleteRoomType(int RoomTypeId);
-	RoomType getRoomTypeById(Integer id);
-	List<RoomType> search(String shortName, String roomTypeName,Double price);
+	RoomType getRoomType(Long roomTypeId);
+	boolean deleteRoomType(Long RoomTypeId);
+	RoomType getRoomTypeById(Long id);
+	List<RoomType> search(String shortName, String roomTypeName);
 	
 
 }

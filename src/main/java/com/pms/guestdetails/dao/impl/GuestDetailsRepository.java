@@ -15,6 +15,6 @@ import com.pms.guestdetails.GuestDetails;
  * 
  */
 public interface GuestDetailsRepository extends JpaRepository<GuestDetails, Integer>, JpaSpecificationExecutor<GuestDetails>{ 
-	Optional<GuestDetails> findByIdAndIsDeletedFalse(Integer id);
-	List<GuestDetails> findByIsDeletedFalse();
+	GuestDetails findByIdAndHotelIdAndIsDeletedFalse(Long id, Long hotelId);
+	List<GuestDetails> findByHotelIdAndIsDeletedFalse(Long hotelId);
 }

@@ -49,7 +49,7 @@ public class StayDetailsController {
 
 	@GetMapping("/user/getstaydetail/{id}")
 //	@GetMapping("/auth/getroommaster/{id}")
-	public ResponseEntity<StayDetails> getStayDetails(@PathVariable("id") Integer id) {
+	public ResponseEntity<StayDetails> getStayDetails(@PathVariable("id") Long id) {
 		StayDetails stayDetails = service.getStayDetail(id);
 		return new ResponseEntity<StayDetails>(stayDetails, HttpStatus.OK);
 	}
@@ -138,7 +138,7 @@ public class StayDetailsController {
 		if (stayDetails == null || stayDetails.getBuildingId() == null
 				|| stayDetails.getBuildingId() == 0l) {
 			
-			return ResponseEntity.badRequest().body("StayDetails color must not be null or empty");
+			return ResponseEntity.badRequest().body("StayDetails building must not be null or empty");
 		}
 		
 		if (stayDetails == null || stayDetails.getFloorId() == 0)
@@ -179,7 +179,7 @@ public class StayDetailsController {
 
 		try {
 			// Find existing RoomType
-			StayDetails existingStayDetails = service.findById(id);
+			StayDetails existingStayDetails = service.getStayDetail(id);
 			session.setAttribute("oldValue", AuditUtil.toJson(existingStayDetails));
 			if (existingStayDetails == null) {
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("StayDetails with ID " + id + " not found");
@@ -198,7 +198,7 @@ public class StayDetailsController {
 			// You can add more setters here for other updatable fields
 
 			// Save updated RoomType
-			StayDetails updatedStayDetails = service.updateStayDetails(existingStayDetails.getId(), existingStayDetails);
+			StayDetails updatedStayDetails = service.updateStayDetails(Long.valueOf(existingStayDetails.getId()), existingStayDetails);
 
 			return ResponseEntity.ok(updatedStayDetails);
 

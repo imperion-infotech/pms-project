@@ -48,7 +48,7 @@ public class BuildingController {
 
 //	@GetMapping("/admin/getfloor/{id}")
 	@GetMapping("/user/getbuilding/{id}")
-	public ResponseEntity<Building> getBuilding(@PathVariable("id") Integer id) {
+	public ResponseEntity<Building> getBuilding(@PathVariable("id") Long id) {
 		Building building = service.getBuilding(id);
 		return new ResponseEntity<Building>(building, HttpStatus.OK);
 	}
@@ -78,7 +78,7 @@ public class BuildingController {
 
 	@PutMapping("/admin/updatebuilding/{id}")
 //	@PutMapping("/auth/updatefloor/{id}")
-	public ResponseEntity<?> updateBuilding(@PathVariable Integer id, @RequestBody Building buildingDetails,HttpSession session) {
+	public ResponseEntity<?> updateBuilding(@PathVariable Long id, @RequestBody Building buildingDetails,HttpSession session) {
 		// Validate input
 		if (buildingDetails == null || buildingDetails.getName() == null || buildingDetails.getName().trim().isEmpty()) {
 			return ResponseEntity.badRequest().body("Building name must not be null or empty");
@@ -116,7 +116,7 @@ public class BuildingController {
 
 	@DeleteMapping("/admin/deletebuilding/{id}")
 //	@DeleteMapping("/user/deletefloor/{id}")
-	public ResponseEntity<String> deleteBuilding(@PathVariable("id") int id) {
+	public ResponseEntity<String> deleteBuilding(@PathVariable("id") Long id) {
 		boolean isDeleted = service.deleteBuilding(id);
 		if (isDeleted) {
 			String responseContent = "Building has been deleted successfully";

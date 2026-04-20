@@ -20,7 +20,7 @@ public interface IRoomMasterService {
 	RoomMaster updateRoomMaster(int roomTypeId, RoomMaster roomMaster);
 	RoomMaster getRoomMaster(int roomMasterId);
 	boolean deleteRoomMaster(int roomMasterId);
-	RoomMaster getRoomMasterById(Integer id);
+	public RoomMaster getRoomMasterByIdAndHotelID(Integer id);
 	List<RoomMaster> search(String roomName, String roomShortName, String floorName);
 
 }

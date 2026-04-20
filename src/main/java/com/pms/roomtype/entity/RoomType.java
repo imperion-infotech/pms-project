@@ -3,11 +3,15 @@
  */
 package com.pms.roomtype.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.pms.baseentity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,8 +35,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
+@SQLRestriction("is_deleted = false")
 @Table(name="Room_Type")
-public class RoomType {
+public class RoomType extends BaseEntity implements Serializable{
 	
 static final Logger logger = LoggerFactory.getLogger(RoomType.class);
 	

@@ -17,7 +17,6 @@ import com.pms.stay.entity.StayDetails;
  */
 public interface StayDetailsRepository extends JpaRepository<StayDetails, Integer> , JpaSpecificationExecutor<StayDetails>{
 	
-	Optional<StayDetails> findByIdAndIsDeletedFalse(Integer id);
-	List<StayDetails> findByIsDeletedFalse();
-
+	StayDetails findByIdAndHotelIdAndIsDeletedFalse(Long id, Long hotelId);
+	List<StayDetails> findByHotelIdAndIsDeletedFalse(Long hotelId);
 }

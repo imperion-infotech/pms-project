@@ -10,13 +10,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.pms.floor.entity.Floor;
 import com.pms.room.dao.IRoomMasterDAO;
 import com.pms.room.dao.impl.RoomMasterRepository;
 import com.pms.room.entity.RoomMaster;
 import com.pms.room.services.IRoomMasterService;
 import com.pms.roomstatus.dao.RoomStatusRepository;
 import com.pms.roomstatus.entity.RoomStatus;
+import com.pms.search.specification.FloorSpecification;
 import com.pms.search.specification.RoomMasterSpecification;
+import com.pms.security.configuration.HotelContext;
 
 @Service
 public class RoomMasterServiceImpl implements IRoomMasterService {
@@ -40,18 +43,19 @@ static final Logger logger = LoggerFactory.getLogger(RoomMasterServiceImpl.class
 		this.roomStatusRepository = roomStatusRepository;
 	}
 
-	@Override
 	public Page<RoomMaster> getRoomMasters(Pageable pageable) {
-		Page<RoomMaster> page = roomMasterRepository.findAll(pageable);
-//		for (RoomMaster rMaster : page) {
-//			rMaster.setRoomStatusTable(roomStatusRepository.getById(rMaster.getRoomStatusTableId()));
-//		}
-		return page;
+
+	    Long hotelId = HotelContext.getHotelId();
+
+	    if (hotelId == null) {
+	        throw new RuntimeException("Hotel not selected");
+	    }
+
+	    return roomMasterRepository.findByHotelId(hotelId, pageable);
 	}
 	
 	public RoomMaster createRoomMaster(RoomMaster roomMaster) {
-	
-		return dao.createRoomMaster(roomMaster);
+		return roomMasterRepository.saveAndFlush(roomMaster);
 	}
 
 	public RoomMaster updateRoomMaster(int roomMasterId, RoomMaster roomMaster) {
@@ -59,25 +63,46 @@ static final Logger logger = LoggerFactory.getLogger(RoomMasterServiceImpl.class
 	}
 
 	public RoomMaster getRoomMaster(int roomMasterId) {
-		RoomMaster rMaster = dao.getRoomMaster(roomMasterId);
-//		RoomStatus rStatus = roomStatusRepository.getById(rMaster.getRoomStatusTableId());
-//		rMaster.setRoomStatusTable(rStatus);
-		return rMaster;
+		return roomMasterRepository.findByIdAndHotelId(roomMasterId,HotelContext.getHotelId());
 	}
 
 	public boolean deleteRoomMaster(int roomMasterId) {
-		return dao.deleteRoomMaster(roomMasterId);
+//		return dao.deleteRoomMaster(roomMasterId);
+		 //
+		 RoomMaster roomMaster = getRoomMaster(roomMasterId);
+		 roomMaster.setIsDeleted(true);
+		 roomMaster.setIsActive(false);
+		 RoomMaster b = roomMasterRepository.save(roomMaster);
+			boolean isDeleted = false;
+			if(b.getId() != 0)
+			{
+				isDeleted=true;
+			} else 
+			{
+				isDeleted=false;
+			}
+			return isDeleted;
 	}
 
 	
 	@Override
-	public RoomMaster getRoomMasterById(Integer id) {
-		return dao.findById(id);
-	}
+	public RoomMaster getRoomMasterByIdAndHotelID(Integer id) { // ✅ Implemented method
+		Long hotelId = HotelContext.getHotelId(); 
+        return roomMasterRepository.findByIdAndHotelId(id,hotelId);
+    }
+	
 	
 	public List<RoomMaster> search(String roomName, String roomShortName, String floorName) {
+		
+		 Long hotelId = HotelContext.getHotelId();   // 🔥 get from JWT
+
+	     if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
+	     
         Specification<RoomMaster> spec = Specification
-                .where(RoomMasterSpecification.hasRoomName(roomName))
+        		 .where(RoomMasterSpecification.hasHotelId(hotelId))
+                .and(RoomMasterSpecification.hasRoomName(roomName))
                 .and(RoomMasterSpecification.hasRoomShortName(roomShortName))
                 .and(RoomMasterSpecification.hasFloorName(floorName));
 

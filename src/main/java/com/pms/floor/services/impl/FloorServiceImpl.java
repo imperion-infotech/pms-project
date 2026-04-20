@@ -8,11 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.pms.building.entity.Building;
 import com.pms.floor.dao.FloorsRepository;
 import com.pms.floor.dao.IFloorDAO;
 import com.pms.floor.entity.Floor;
 import com.pms.floor.services.IFloorService;
 import com.pms.search.specification.FloorSpecification;
+import com.pms.security.configuration.HotelContext;
 
 @Service
 public class FloorServiceImpl implements IFloorService {
@@ -33,9 +35,16 @@ public class FloorServiceImpl implements IFloorService {
 		this.floorsRepository = floorsRepository;
 	}
 
+	
+	
 	public List<Floor> getFloors() {
-//		return dao.getFloors();
-		return floorsRepository.findAll();
+
+		Long hotelId = HotelContext.getHotelId();
+
+	    if (hotelId == null) {
+	        throw new RuntimeException("Hotel not selected");
+	    }
+		return floorsRepository.findByHotelId(HotelContext.getHotelId());
 	}
 
 	public Floor createFloor(Floor floor) {
@@ -48,25 +57,49 @@ public class FloorServiceImpl implements IFloorService {
 	}
 
 	public Floor getFloor(int floorId) {
-		return dao.getFloor(floorId);
+		return floorsRepository.findByIdAndHotelId(floorId,HotelContext.getHotelId());
 	}
 
 	public boolean deleteFloor(int floorId) {
-		return dao.deleteFloor(floorId);
+		
+		 Floor floor = getFloor(floorId);
+		 floor.setIsDeleted(true);
+		 floor.setIsActive(false);
+		 Floor b = floorsRepository.save(floor);
+			boolean isDeleted = false;
+			if(b.getId() != 0)
+			{
+				isDeleted=true;
+			} else 
+			{
+				isDeleted=false;
+			}
+			return isDeleted;
 	}
 	
 	
-	 public Floor getFloorById(Integer id) { // ✅ Implemented method
-	        return dao.findById(id);
+	 public Floor getFloorByIdAndHotelID(Integer id,Long hotelId) { // ✅ Implemented method
+	        return floorsRepository.findByIdAndHotelId(id,hotelId);
 	    }
 
 	 @Override
 	 public List<Floor> search(String name, String description) {
-	        Specification<Floor> spec = Specification
-	                .where(FloorSpecification.hasName(name))
-	                .and(FloorSpecification.hasDescription(description));
 
-	        return floorsRepository.findAll(spec);
-	    }
+	     Long hotelId = HotelContext.getHotelId();   // 🔥 get from JWT
+
+	     if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
+
+	     Specification<Floor> spec = Specification
+	             .where(FloorSpecification.hasHotelId(hotelId))   // ✅ ADD THIS
+	             .and(FloorSpecification.hasName(name))
+	             .and(FloorSpecification.hasDescription(description));
+
+	     return floorsRepository.findAll(spec);
+	 }
+
+
+
 	 
 }

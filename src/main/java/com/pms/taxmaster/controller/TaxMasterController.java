@@ -84,7 +84,7 @@ public class TaxMasterController {
 
 		try {
 			// Find existing floor
-			TaxMaster existingTaxMaster = service.getTaxMasterById(id);
+			TaxMaster existingTaxMaster = service.getTaxMasterByIdAndHotelID(id);
 			if (existingTaxMaster == null) {
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("TaxMaster with ID " + id + " not found");
 			}
@@ -94,8 +94,7 @@ public class TaxMasterController {
 			existingTaxMaster.setTaxTypeEnum(taxMasterDetails.getTaxTypeEnum());
 			existingTaxMaster.setPerDayTax(taxMasterDetails.getPerDayTax());
 			existingTaxMaster.setPerStayTax(taxMasterDetails.getPerStayTax());
-
-			// You can add more setters here for other updatable fields
+			existingTaxMaster.setAmount(taxMasterDetails.getAmount());
 
 			// Save updated floor
 			TaxMaster updatedTaxMaster = service.updateTaxMaster(existingTaxMaster.getId(), existingTaxMaster);

@@ -6,14 +6,14 @@ package com.pms.paymentdetails.entity;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Date;
-import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pms.baseentity.BaseEntity;
 import com.pms.guestdetails.GuestDetails;
 import com.pms.paymenttype.entity.PaymentType;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -22,7 +22,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,7 +39,7 @@ import lombok.Setter;
 @Table(name="payment_details")
 @Entity
 @Data
-public class PaymentDetails implements Serializable{
+public class PaymentDetails extends BaseEntity  implements Serializable{
 	
 	
 	private static final long serialVersionUID = 1L;
@@ -88,6 +87,7 @@ public class PaymentDetails implements Serializable{
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "guest_id")
+	@JsonIgnore
 	private GuestDetails guestDetails;
 	
 //	private Integer guestDetailsId;

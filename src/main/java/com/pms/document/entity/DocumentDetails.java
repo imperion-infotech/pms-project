@@ -3,6 +3,7 @@
  */
 package com.pms.document.entity;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -11,6 +12,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.pms.baseentity.BaseEntity;
 import com.pms.guestdetails.GuestDetails;
 import com.pms.personaldetails.PersonalDetails;
 
@@ -40,7 +42,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name="document_details")
-public class DocumentDetails {
+public class DocumentDetails extends BaseEntity implements Serializable{
 	
 static final Logger logger = LoggerFactory.getLogger(DocumentDetails.class);
 	

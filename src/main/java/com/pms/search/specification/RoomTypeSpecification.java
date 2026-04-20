@@ -13,20 +13,35 @@ import com.pms.roomtype.entity.RoomType;
  */
 public class RoomTypeSpecification {
 	
+	
+	
 	public static Specification<RoomType> hasRoomTypeName(String roomTypeName) {
-        return (root, query, cb) ->
-        roomTypeName == null ? null : cb.like(cb.lower(root.get("roomTypeName")), "%" + roomTypeName.toLowerCase() + "%");
+        return (root, query, cb) -> {
+            if (roomTypeName == null || roomTypeName.isEmpty()) {
+                return cb.conjunction();
+            }
+            return cb.like(cb.lower(root.get("roomTypeName")), "%" + roomTypeName.toLowerCase() + "%");
+        };
     }
+	
 	
 	public static Specification<RoomType> hasShortName(String shortName) {
-        return (root, query, cb) ->
-        shortName == null ? null : cb.like(cb.lower(root.get("shortName")), "%" + shortName.toLowerCase() + "%");
+        return (root, query, cb) -> {
+            if (shortName == null || shortName.isEmpty()) {
+                return cb.conjunction();
+            }
+            return cb.like(cb.lower(root.get("shortName")), "%" + shortName.toLowerCase() + "%");
+        };
     }
 	
-	public static Specification<RoomType> hasPrice(Double price) {
-		 return (root, query, cb) ->
-	        price == null ? null : cb.equal(root.get("price"), price);
+	public static Specification<RoomType> hasHotelId(Long hotelId) {
+        return (root, query, cb) -> {
+            if (hotelId == null) {
+                return cb.conjunction(); // no filter
+            }
+            return cb.equal(root.get("hotelId"), hotelId);
+        };
     }
-
+	
 
 }

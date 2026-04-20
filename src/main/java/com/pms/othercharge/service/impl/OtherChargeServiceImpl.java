@@ -12,11 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.pms.floor.entity.Floor;
 import com.pms.othercharge.entity.OtherCharge;
 import com.pms.othercharge.repository.OtherChargeRepository;
 import com.pms.othercharge.service.IOtherChargeService;
+import com.pms.search.specification.FloorSpecification;
 import com.pms.search.specification.OtherChargeSpecification;
 import com.pms.search.specification.PaymentTypeSpecification;
+import com.pms.security.configuration.HotelContext;
 
 /**
  * 
@@ -36,7 +39,11 @@ static final Logger logger = LoggerFactory.getLogger(OtherChargeServiceImpl.clas
 
 	@Override
 	public List<OtherCharge> getOtherCharges() {
-		return otherChargeRepository.findAll();
+		Long hotelId = HotelContext.getHotelId();
+	    if (hotelId == null) {
+	        throw new RuntimeException("Hotel not selected");
+	    }
+		return otherChargeRepository.findByHotelId(HotelContext.getHotelId());
 	}
 
 	@Override
@@ -65,24 +72,41 @@ static final Logger logger = LoggerFactory.getLogger(OtherChargeServiceImpl.clas
 
 	@Override
 	public OtherCharge getOtherChargeById(Integer id) {
-		  return otherChargeRepository.findById(id)
-		            .orElseThrow(() -> new RuntimeException("OtherCharge not found with id: " + id));
+		Long hotelId = HotelContext.getHotelId();
+
+	    if (hotelId == null) {
+	        throw new RuntimeException("Hotel not selected");
+	    }
+		  return otherChargeRepository.findByIdAndHotelId(id,hotelId);
 	}
 
 	@Override
 	public boolean deleteOtherCharge(int otherChargeId) {
-		 try {
-			 otherChargeRepository.deleteById(otherChargeId);
-		        return true;
-		    } catch (Exception e) {
-		        return false;
-		    }
+		
+		 OtherCharge otherCharge = otherChargeRepository.findByIdAndHotelId(otherChargeId,HotelContext.getHotelId()); 
+		
+		 boolean isDeleted=true;;
+		 if(otherCharge == null ) {
+			 isDeleted=false;
+			 throw new RuntimeException("floor not found");
+		 }
+		 otherChargeRepository.delete(otherCharge);
+		 return isDeleted;
+		 
 	}
 
 	@Override
 	public List<OtherCharge> search(String otherChargeName, String otherChargeShortName, String categoryName) {
+		
+		 Long hotelId = HotelContext.getHotelId();   // 🔥 get from JWT
+
+	     if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
+		
 		 Specification<OtherCharge> spec = Specification
-	                .where(OtherChargeSpecification.hasOtherChargeName(otherChargeName))
+				 	.where(OtherChargeSpecification.hasHotelId(hotelId)) 
+	                .and(OtherChargeSpecification.hasOtherChargeName(otherChargeName))
 	                .and(OtherChargeSpecification.hasOtherChargeShortName(otherChargeShortName))
 	        		.and(OtherChargeSpecification.hasCategoryName(categoryName));
 

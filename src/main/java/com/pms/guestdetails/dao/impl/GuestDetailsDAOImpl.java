@@ -16,12 +16,15 @@ import com.pms.document.dao.DocumentDetailsRepository;
 import com.pms.document.entity.DocumentDetails;
 import com.pms.guestdetails.GuestDetails;
 import com.pms.guestdetails.dao.IGuestDetailsDAO;
+import com.pms.paymentdetails.entity.PaymentDetails;
+import com.pms.paymentdetails.repository.PaymentDetailsRepository;
 import com.pms.personaldetails.PersonalDetails;
 import com.pms.personaldetails.PersonalDetailsRepository;
 import com.pms.rent.RentDetails;
 import com.pms.rent.dao.impl.RentDetailsRepository;
 import com.pms.room.dao.impl.RoomMasterRepository;
 import com.pms.room.entity.RoomMaster;
+import com.pms.security.configuration.HotelContext;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -50,6 +53,10 @@ public class GuestDetailsDAOImpl implements IGuestDetailsDAO {
 
 	@Autowired
 	private RentDetailsRepository rentDetailsRepository;
+	
+	@Autowired
+	private PaymentDetailsRepository paymentDetailsRepository;
+	
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -97,6 +104,18 @@ public class GuestDetailsDAOImpl implements IGuestDetailsDAO {
 				guestDetails.setDocumentDetails(dbDocs);
 			}
 		}*/
+		
+		Long hotelId = HotelContext.getHotelId();
+		 if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
+		 
+		 PaymentDetails paymentDetails1 = guestDetails.getPaymentDetails().get(0);
+		 
+		 
+		 
+		List<PaymentDetails> paymentDetails = paymentDetailsRepository.findByGuestDetailsIdAndHotelId(Long.valueOf(paymentDetails1.getId()+""),hotelId);
+		guestDetails.setPaymentDetails(paymentDetails);
 		GuestDetails b = guestDetailsRepository.saveAndFlush(guestDetails);
 		return b;
 	}

@@ -143,7 +143,7 @@ public class RoomMasterController {
 
 		try {
 			// Find existing RoomType
-			RoomMaster existingRoomMaster = service.getRoomMasterById(id);
+			RoomMaster existingRoomMaster = service.getRoomMasterByIdAndHotelID(id);
 			if (existingRoomMaster == null) {
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("RoomMaster with ID " + id + " not found");
 			}
@@ -154,7 +154,7 @@ public class RoomMasterController {
 			existingRoomMaster.setRoomShortName(roomMaster.getRoomShortName());
 //			existingRoomMaster.setRoomStatusTableId(roomMaster.getRoomStatusTableId());
 			existingRoomMaster.setRoomType(roomTypeRepository.getById(roomMaster.getRoomTypeId()));
-
+			
 			existingRoomMaster.setHandicap(roomMaster.isHandicap());
 			existingRoomMaster.setSmoking(roomMaster.isSmoking());
 			existingRoomMaster.setNonRoom(roomMaster.isNonRoom());

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.pms.floor.entity.Floor;
 import com.pms.paymentdetails.entity.PaymentDetails;
 import com.pms.paymentdetails.entity.PaymentDetailsResponseDTO;
 import com.pms.paymentdetails.repository.PaymentDetailsRepository;
@@ -18,6 +19,7 @@ import com.pms.paymentdetails.service.IPaymentDetailsService;
 import com.pms.paymenttype.entity.PaymentType;
 import com.pms.paymenttype.repository.PaymentTypeRepository;
 import com.pms.paymenttype.service.IPaymentTypeService;
+import com.pms.security.configuration.HotelContext;
 
 /**
  * 
@@ -47,19 +49,29 @@ public class PaymentDetailsServiceImpl implements IPaymentDetailsService{
 
 	@Override
 	public List<PaymentDetails> getAllPaymentDetails() {
-		return paymentDetailsRepository.findAll();
+		Long hotelId = HotelContext.getHotelId();
+
+	    if (hotelId == null) {
+	        throw new RuntimeException("Hotel not selected");
+	    }
+		return paymentDetailsRepository.findByHotelId(HotelContext.getHotelId());
 	}
 	
 	@Override
 	public PaymentDetails getPaymentDetailsById(Integer id) {
-		PaymentDetails details = paymentDetailsRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("PaymentDetails not found with id: " + id));
+		Long hotelId = HotelContext.getHotelId();
+
+	    if (hotelId == null) {
+	        throw new RuntimeException("Hotel not selected");
+	    }
 		
-		PaymentType type =service.getPaymentTypeById(details.getPaymentType().getId());
+		PaymentDetails details = paymentDetailsRepository.findByIdAndHotelId(id,hotelId);
+		
+		PaymentType type =service.getPaymentTypeById( details.getPaymentType() != null 
+		        ? details.getPaymentType().getId()
+		                : null);
 		if(type != null )
 		{
-//		PaymentType type =service.getPaymentTypeById(details.getPaymentTypes().get(0).getId());
-//		details.setPaymentType(List.of(type));
 		details.setPaymentType(type);
 		}
 		return details;
@@ -68,8 +80,6 @@ public class PaymentDetailsServiceImpl implements IPaymentDetailsService{
 	@Override
 	public PaymentDetails createPaymentDetails(PaymentDetails paymentDetails) {
 		paymentDetails.setPaymentType(paymentDetails.getPaymentType());
-//		PaymentType type =service.getPaymentTypeById(Integer.parseInt(paymentDetails.getPaymentTypesId()));
-//		paymentDetails.setPaymentTypes(List.of(type));
 		return paymentDetailsRepository.save(paymentDetails);
 	}
 
@@ -95,18 +105,26 @@ public class PaymentDetailsServiceImpl implements IPaymentDetailsService{
 
 	@Override
 	public boolean deletePaymentDetails(int paymentDetailsId) {
-		 try {
-			 paymentDetailsRepository.deleteById(paymentDetailsId);
-		        return true;
-		    } catch (Exception e) {
-		        return false;
-		    }
+		 PaymentDetails paymentDetails = paymentDetailsRepository.findByIdAndHotelId(paymentDetailsId,HotelContext.getHotelId());
+		 boolean isDeleted=true;;
+		 if(paymentDetails == null ) {
+			 isDeleted=false;
+			 throw new RuntimeException("floor not found");
+		 }
+		 paymentDetailsRepository.delete(paymentDetails);
+		 return isDeleted;
 	}
 	
 	 public List<PaymentDetailsResponseDTO> getPaymentsByGuestId(Long guestId) {
+		 
+		 Long hotelId = HotelContext.getHotelId();
+
+		    if (hotelId == null) {
+		        throw new RuntimeException("Hotel not selected");
+		    }
 
 	        List<PaymentDetails> payments =
-	                paymentDetailsRepository.findByGuestDetailsId(guestId);
+	                paymentDetailsRepository.findByGuestDetailsIdAndHotelId(guestId,hotelId);
 
 	        return payments.stream()
 	                .map(p -> {

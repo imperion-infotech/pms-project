@@ -45,7 +45,7 @@ public class DocumentTypeController {
 	
 //	@GetMapping("/admin/getfloor/{id}")
 	@GetMapping("/user/getdocumenttype/{id}")
-	public ResponseEntity<DocumentType> getDocumentType(@PathVariable("id") Integer id) {
+	public ResponseEntity<DocumentType> getDocumentType(@PathVariable("id") Long id) {
 		DocumentType documentType = service.getDocumentType(id);
 		return new ResponseEntity<DocumentType>(documentType, HttpStatus.OK);
 	}
@@ -83,7 +83,7 @@ public class DocumentTypeController {
 	
 	@PutMapping("/admin/updatedocumenttype/{id}")
 //	@PutMapping("/auth/updatefloor/{id}")
-	public ResponseEntity<?> updateDocumentType(@PathVariable Integer id, @RequestBody DocumentType documentType,HttpSession session) {
+	public ResponseEntity<?> updateDocumentType(@PathVariable Long id, @RequestBody DocumentType documentType,HttpSession session) {
 		// Validate input
 		if (documentType == null || documentType.getDocumentTypeName() == null || documentType.getDocumentTypeName().trim().isEmpty()) {
 			return ResponseEntity.badRequest().body("documentType name must not be null or empty");
@@ -120,7 +120,7 @@ public class DocumentTypeController {
 	
 	@DeleteMapping("/admin/deletedocumenttype/{id}")
 //	@DeleteMapping("/user/deletefloor/{id}")
-	public ResponseEntity<String> deleteDocumentType(@PathVariable("id") int id) {
+	public ResponseEntity<String> deleteDocumentType(@PathVariable("id") Long id) {
 		boolean isDeleted = service.deleteDocumentType(id);
 		if (isDeleted) {
 			String responseContent = "DocumentType has been deleted successfully";

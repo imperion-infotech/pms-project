@@ -5,60 +5,73 @@ package com.pms.security.util.filter;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.pms.security.configuration.HotelContext;
 import com.pms.security.util.JwtUtil;
 
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.GenericFilter;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Component
-public class JwtAuthFilter extends GenericFilter {
-	
-	static final Logger logger = LoggerFactory.getLogger(JwtAuthFilter.class);
+public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwtUtil;
-    private final UserDetailsService userDetailsService;
-
-    public JwtAuthFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
-        this.jwtUtil = jwtUtil;
-        this.userDetailsService = userDetailsService;
-    }
+    @Autowired
+    private JwtUtil jwtUtil;
+    
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain chain)
+            throws ServletException, IOException {
+    	try {
+    	   String header = request.getHeader("Authorization");
 
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        String authHeader = httpRequest.getHeader("Authorization");
+           String token = null;
+           String username = null;
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            try {
-                String username = jwtUtil.validateToken(token);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+           if (header != null && header.startsWith("Bearer ")) {
+               token = header.substring(7);
+               username = jwtUtil.extractUsername(token);
+           }
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities());
+           if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (Exception e) {
-                // Optional: log token validation errors
-                System.out.println("JWT validation failed: " + e.getMessage());
-            }
-        }
+               UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        chain.doFilter(request, response);
+               UsernamePasswordAuthenticationToken auth =
+                       new UsernamePasswordAuthenticationToken(
+                               userDetails,
+                               null,
+                               userDetails.getAuthorities()
+                       );
+
+               SecurityContextHolder.getContext().setAuthentication(auth);
+           }
+           
+           // 🔥🔥 ADD THIS BLOCK (MOST IMPORTANT)
+           if (token != null) {
+               Long hotelId = jwtUtil.extractHotelId(token);
+               HotelContext.setHotelId(hotelId);
+           }
+
+           chain.doFilter(request, response);
+       
+    } finally {
+    	
+    	 HotelContext.clear();
     }
-}
+       // HotelContext.clear();
+    }
+    }

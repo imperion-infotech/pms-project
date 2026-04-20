@@ -5,6 +5,7 @@ package com.pms.stay.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import com.pms.auditlog.annotation.Auditable;
 import com.pms.auditlog.entity.AuditLog;
 import com.pms.auditlog.repository.AuditLogRepository;
 import com.pms.auditlog.util.AuditUtil;
+import com.pms.security.configuration.HotelContext;
 import com.pms.security.util.SecurityUtils;
 import com.pms.stay.dao.IStatyDetailsDAO;
 import com.pms.stay.dao.StayDetailsRepository;
@@ -44,8 +46,11 @@ static final Logger logger = LoggerFactory.getLogger(StayDetailServiceImpl.class
 	}
 
 	public List<StayDetails> getStayDetails() {
-//		return dao.getStayDetails();
-		 return repository.findByIsDeletedFalse();
+		Long hotelId = HotelContext.getHotelId();
+  		 if (hotelId == null) {
+  	         throw new RuntimeException("Hotel not selected");
+  	     }
+		return repository.findByHotelIdAndIsDeletedFalse(hotelId);
 	}
 
 	@Auditable(action = "CREATE", entity = "STAYDETAILS")
@@ -56,28 +61,32 @@ static final Logger logger = LoggerFactory.getLogger(StayDetailServiceImpl.class
 	}
 
 	@Auditable(action = "UPDATE", entity = "STAYDETAILS")
-	public StayDetails updateStayDetails(int stayDetailsId, StayDetails stayDetails) {
+	public StayDetails updateStayDetails(Long stayDetailsId, StayDetails stayDetails) {
 		//return dao.updateStayDetails(stayDetailsId, stayDetails);
 		 repository.saveAndFlush(stayDetails);
 		 return getStayDetail(stayDetailsId);
 		 
 	}
-
-	public StayDetails getStayDetail(int stayDetailsId) {
-		  return repository.findByIdAndIsDeletedFalse(stayDetailsId)
-	                .orElseThrow(() -> new RuntimeException("Record not found"));
+	
+	public StayDetails getStayDetail(Long stayDetailsId) {
+		Long hotelId = HotelContext.getHotelId();
+ 		 if (hotelId == null) {
+ 	         throw new RuntimeException("Hotel not selected");
+ 	     }
+		  return repository.findByIdAndHotelIdAndIsDeletedFalse(stayDetailsId,hotelId);
 	}
 
-	@Auditable(action = "DELETE", entity = "STAYDETAILS")
-	public boolean deleteStayDetails(int stayDetailsId) {
-		return dao.deleteStayDetails(stayDetailsId);
-	}
 	
 	@Auditable(action = "DELETE", entity = "STAYDETAILS")
     @Transactional
     public boolean deleteSoftStayDetails(Long id) {
+		
+		Long hotelId = HotelContext.getHotelId();
+		 if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
 
-		StayDetails entity = dao.findById(id);
+		StayDetails entity = repository.findByIdAndHotelIdAndIsDeletedFalse( id,hotelId);
 
         // ✅ Soft delete
         entity.setDeleted(true);
@@ -103,10 +112,5 @@ static final Logger logger = LoggerFactory.getLogger(StayDetailServiceImpl.class
         } else {
         	return false;
         }
-}
-
-	public StayDetails findById(Long id) {
-		return dao.findById(id);
 	}
-
 }

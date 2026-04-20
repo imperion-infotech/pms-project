@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface PersonalDetailsRepository extends JpaRepository<PersonalDetails, Long>, JpaSpecificationExecutor<PersonalDetails> {
 
-	Optional<PersonalDetails> findByIdAndIsDeletedFalse(Long id);
-	List<PersonalDetails> findByIsDeletedFalse();
+	Optional<PersonalDetails> findByIdAndHotelIdAndIsDeletedFalse(Long id, Long hotelId);
+	List<PersonalDetails> findByHotelIdAndIsDeletedFalse(Long hotelId);
 }

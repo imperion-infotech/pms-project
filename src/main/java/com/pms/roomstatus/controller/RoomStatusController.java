@@ -45,7 +45,7 @@ public class RoomStatusController {
 
 	@GetMapping("/user/getroomstatus/{id}")
 //	@GetMapping("/auth/getroomstatus/{id}")
-	public ResponseEntity<RoomStatus> getRoomStatus(@PathVariable("id") Integer id) {
+	public ResponseEntity<RoomStatus> getRoomStatus(@PathVariable("id") Long id) {
 		RoomStatus roomStatus = service.getRoomStatus(id);
 		return new ResponseEntity<RoomStatus>(roomStatus, HttpStatus.OK);
 	}
@@ -87,7 +87,7 @@ public class RoomStatusController {
 
 @PutMapping("/admin/updateroomstatus/{id}")
 //	@PutMapping("/auth/updateroomstatus/{id}")
-	public ResponseEntity<?> updateRoomType(@PathVariable Integer id, @RequestBody RoomStatus roomStatusDetails) {
+	public ResponseEntity<?> updateRoomType(@PathVariable Long id, @RequestBody RoomStatus roomStatusDetails) {
 		// Validate input
 		if (roomStatusDetails == null || roomStatusDetails.getRoomStatusName() == null
 				|| roomStatusDetails.getRoomStatusName().trim().isEmpty()) {
@@ -139,7 +139,7 @@ public class RoomStatusController {
 
 	@DeleteMapping("/admin/deleteroomstatus/{id}")
 //	@DeleteMapping("/auth/deleteroomstatus/{id}")
-	public ResponseEntity<String> deleteRoomStatus(@PathVariable("id") int id) {
+	public ResponseEntity<String> deleteRoomStatus(@PathVariable("id") Long id) {
 		boolean isDeleted = service.deleteRoomStatus(id);
 		if (isDeleted) {
 			String responseContent = "RoomStatus has been deleted successfully";

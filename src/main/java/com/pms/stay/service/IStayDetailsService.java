@@ -19,11 +19,9 @@ public interface IStayDetailsService {
 static final Logger logger = LoggerFactory.getLogger(IStatyDetailsDAO.class);
 	
 	public List<StayDetails> getStayDetails();
-	public StayDetails getStayDetail(int stayDetailsId);
+	public StayDetails getStayDetail(Long stayDetailsId);
 	public StayDetails createStayDetails(StayDetails stayDetails);
-	public StayDetails updateStayDetails(int stayDetailsId,StayDetails stayDetails);
-	public boolean deleteStayDetails(int stayDetailsId);
-	public StayDetails findById(Long id);
+	public StayDetails updateStayDetails(Long stayDetailsId,StayDetails stayDetails);
 	public boolean deleteSoftStayDetails(Long id);
 
 

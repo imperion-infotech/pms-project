@@ -8,10 +8,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.pms.floor.entity.Floor;
 import com.pms.othercharge.entity.OtherCharge;
 import com.pms.othercharge.entity.OtherChargeDetails;
 import com.pms.othercharge.repository.OtherChargeDetailsRepository;
 import com.pms.othercharge.service.IOtherChargeDetailsService;
+import com.pms.security.configuration.HotelContext;
 
 /**
  * 
@@ -29,7 +31,12 @@ public class OtherChargeDetailsServiceImpl implements IOtherChargeDetailsService
 
 	@Override
 	public List<OtherChargeDetails> getAllOtherChargeDetails() {
-		return otherChargeDetailsRepository.findAll();
+		Long hotelId = HotelContext.getHotelId();
+
+	    if (hotelId == null) {
+	        throw new RuntimeException("Hotel not selected");
+	    }
+		return otherChargeDetailsRepository.findByHotelId(HotelContext.getHotelId());
 	}
 
 	@Override
@@ -52,18 +59,21 @@ public class OtherChargeDetailsServiceImpl implements IOtherChargeDetailsService
 
 	@Override
 	public OtherChargeDetails getOtherChargeDetailsById(Integer id) {
-		return otherChargeDetailsRepository.findById(id)
-	            .orElseThrow(() -> new RuntimeException("OtherChargeDetails not found with id: " + id));
+		
+		return otherChargeDetailsRepository.findByIdAndHotelId(id,HotelContext.getHotelId());
 	}
 
 	@Override
 	public boolean deleteOtherChargeDetails(int otherChargeDetailsId) {
-		 try {
-			 otherChargeDetailsRepository.deleteById(otherChargeDetailsId);
-		        return true;
-		    } catch (Exception e) {
-		        return false;
-		    }
-	}
+		
+		OtherChargeDetails otherChargeDetails = otherChargeDetailsRepository.findByIdAndHotelId(otherChargeDetailsId,HotelContext.getHotelId());
+		 boolean isDeleted=true;;
+		 if(otherChargeDetails == null ) {
+			 isDeleted=false;
+			 throw new RuntimeException("floor not found");
+		 }
+		 otherChargeDetailsRepository.delete(otherChargeDetails);
+		 return isDeleted;
+	}	
 
 }

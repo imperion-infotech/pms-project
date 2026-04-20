@@ -16,7 +16,9 @@ import com.pms.auditlog.util.AuditUtil;
 import com.pms.personaldetails.PersonalDetails;
 import com.pms.personaldetails.PersonalDetailsRepository;
 import com.pms.personaldetails.service.IPersonalDetailsService;
+import com.pms.search.specification.DocumentDetailsSpecification;
 import com.pms.search.specification.PersonalDetailsSpecification;
+import com.pms.security.configuration.HotelContext;
 import com.pms.security.util.SecurityUtils;
 
 import jakarta.transaction.Transactional;
@@ -38,8 +40,13 @@ public class PersonalDetailsServiceImpl implements IPersonalDetailsService {
 	}
 
 		public List<PersonalDetails> getAll() {
+			
 //	        return repository.findAll();
-	        return repository.findByIsDeletedFalse();
+			Long hotelId = HotelContext.getHotelId();
+	   		 if (hotelId == null) {
+	   	         throw new RuntimeException("Hotel not selected");
+	   	     }
+	        return repository.findByHotelIdAndIsDeletedFalse(hotelId);
 	    }
 
 		/*
@@ -50,7 +57,11 @@ public class PersonalDetailsServiceImpl implements IPersonalDetailsService {
 	    */
 	    
 	    public PersonalDetails getById(Long id) {
-	        return repository.findByIdAndIsDeletedFalse(id)
+	    	Long hotelId = HotelContext.getHotelId();
+	   		 if (hotelId == null) {
+	   	         throw new RuntimeException("Hotel not selected");
+	   	     }
+	        return repository.findByIdAndHotelIdAndIsDeletedFalse(id,hotelId)
 	                .orElseThrow(() -> new RuntimeException("Record not found"));
 	    }
 	    
@@ -65,7 +76,8 @@ public class PersonalDetailsServiceImpl implements IPersonalDetailsService {
 	    public PersonalDetails update(Long id, PersonalDetails details) {
 	        PersonalDetails existing = getById(id);
 	        existing.setFirstName(details.getFirstName());
-	        existing.setLastName(details.getLastName());	        
+	        existing.setLastName(details.getLastName());
+	        existing.setCompanyName(details.getCompanyName());
 	        existing.setEmail(details.getEmail());
 	        existing.setPhone(details.getPhone());
 	        existing.setAddress(details.getAddress());
@@ -82,8 +94,13 @@ public class PersonalDetailsServiceImpl implements IPersonalDetailsService {
 	    	@Auditable(action = "DELETE", entity = "PERSONALDETAILS")
 	        @Transactional
 	        public void deletePersonalDetails(Long id) {
+	    		
+	    		Long hotelId = HotelContext.getHotelId();
+	   		 if (hotelId == null) {
+	   	         throw new RuntimeException("Hotel not selected");
+	   	     }
 
-	            PersonalDetails entity = repository.findById(id)
+	            PersonalDetails entity = repository.findByIdAndHotelIdAndIsDeletedFalse(id,hotelId)
 	                    .orElseThrow(() -> new RuntimeException("Record not found"));
 
 	            // ✅ Soft delete
@@ -108,8 +125,13 @@ public class PersonalDetailsServiceImpl implements IPersonalDetailsService {
 	    
 	    
 	    public List<PersonalDetails> search(String firstName,String lastName, String email, String phone, String address) {
+	    	Long hotelId = HotelContext.getHotelId();   // 🔥 get from JWT
+		     if (hotelId == null) {
+		         throw new RuntimeException("Hotel not selected");
+		     }
 	    	Specification<PersonalDetails> spec = Specification
-	                .where(PersonalDetailsSpecification.isNotDeleted()) // ✅ ADD THIS
+	    			.where(PersonalDetailsSpecification.hasHotelId(hotelId))
+	                .and(PersonalDetailsSpecification.isNotDeleted()) // ✅ ADD THIS
 	                .and(PersonalDetailsSpecification.hasFirstName(firstName))
 	                .and(PersonalDetailsSpecification.hasLastName(lastName))
 	                .and(PersonalDetailsSpecification.hasEmail(email))

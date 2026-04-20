@@ -16,7 +16,7 @@ import com.pms.rent.RentDetails;
  */
 public interface RentDetailsRepository extends JpaRepository<RentDetails, Integer>, JpaSpecificationExecutor<RentDetails>{
 	
-	Optional<RentDetails> findByIdAndIsDeletedFalse(Integer id);
-	List<RentDetails> findByIsDeletedFalse();
+	RentDetails findByIdAndHotelIdAndIsDeletedFalse(Long id, Long hotelId);
+	List<RentDetails> findByHotelIdAndIsDeletedFalse(Long hotelId);
 
 }

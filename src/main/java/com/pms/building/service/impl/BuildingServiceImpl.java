@@ -13,7 +13,10 @@ import com.pms.building.dao.BuildingsRepository;
 import com.pms.building.dao.IBuildingDAO;
 import com.pms.building.entity.Building;
 import com.pms.building.service.IBuildingService;
-import com.pms.search.specification.BuildingSpecification;;
+import com.pms.floor.entity.Floor;
+import com.pms.search.specification.BuildingSpecification;
+import com.pms.search.specification.FloorSpecification;
+import com.pms.security.configuration.HotelContext;;
 
 @Service
 public class BuildingServiceImpl implements IBuildingService {
@@ -35,16 +38,19 @@ static final Logger logger = LoggerFactory.getLogger(BuildingServiceImpl.class);
 	}
 
 	public List<Building> getBuildings() {
-//		return dao.getFloors();
-		return buildingRepository.findAll();
+		Long hotelId = HotelContext.getHotelId();
+
+	    if (hotelId == null) {
+	        throw new RuntimeException("Hotel not selected");
+	    }
+		return buildingRepository.findByHotelId(HotelContext.getHotelId());
 	}
 	
 	
 	
 	@Auditable(action = "CREATE", entity = "BUILDING")
 	public Building createBuilding(Building building) {
-//		return dao.createFloor(Floor);
-		//logger.info("Audit: {} performed on {}", audit.action(), audit.entity());
+//		logger.info("Audit: {} performed on {}", audit.action(), audit.entity());
 		 return buildingRepository.saveAndFlush(building);
 	}
 
@@ -53,24 +59,48 @@ static final Logger logger = LoggerFactory.getLogger(BuildingServiceImpl.class);
 		return dao.updateBuilding(buildingId, building);
 	}
 
-	public Building getBuilding(int buildingId) {
-		return dao.getBuilding(buildingId);
+	public Building getBuilding(Long buildingId) {
+		return buildingRepository.findByIdAndHotelId(buildingId, HotelContext.getHotelId());
 	}
 
 	@Auditable(action = "DELETE", entity = "BUILDING")
-	public boolean deleteBuilding(int buildingId) {
-		return dao.deleteBuilding(buildingId);
+	public boolean deleteBuilding(Long buildingId) {
+//		return dao.deleteBuilding(buildingId);
+		
+		Building building = getBuilding(buildingId);
+		building.setIsDeleted(true);
+		building.setIsActive(false);
+		Building b = buildingRepository.save(building);
+		boolean isDeleted = false;
+		if(b.getId() != 0)
+		{
+			isDeleted=true;
+		} else 
+		{
+			isDeleted=false;
+		}
+		return isDeleted;
+		
 	}
 	
 	
-	 public Building getBuildingById(Integer id) { // ✅ Implemented method
-	        return dao.findById(id);
+	 public Building getBuildingById(Long id) { // ✅ Implemented method
+	        return buildingRepository.findByIdAndHotelId(id, HotelContext.getHotelId());
 	    }
 
 	 @Override
 	 public List<Building> search(String name, String description) {
-	        Specification<Building> spec = Specification
-	                .where(BuildingSpecification.hasName(name))
+		 
+		 Long hotelId = HotelContext.getHotelId();   // 🔥 get from JWT
+
+	     if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
+		 
+		 
+	     Specification<Building> spec = Specification
+	                 .where(BuildingSpecification.hasHotelId(hotelId))  
+	                .and(BuildingSpecification.hasName(name))
 	                .and(BuildingSpecification.hasDescription(description));
 
 	        return buildingRepository.findAll(spec);

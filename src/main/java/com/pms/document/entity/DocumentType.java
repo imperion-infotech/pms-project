@@ -3,11 +3,14 @@
  */
 package com.pms.document.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.pms.baseentity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,7 +35,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name="document_type")
-public class DocumentType {
+public class DocumentType extends BaseEntity implements Serializable {
 	
 static final Logger logger = LoggerFactory.getLogger(DocumentType.class);
 	

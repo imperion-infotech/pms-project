@@ -3,6 +3,7 @@
  */
 package com.pms.guestdetails;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
@@ -11,8 +12,8 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pms.baseentity.BaseEntity;
 import com.pms.paymentdetails.entity.PaymentDetails;
-import com.pms.personaldetails.PersonalDetails;
 import com.pms.room.entity.RoomMaster;
 
 import jakarta.persistence.CascadeType;
@@ -41,7 +42,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name="guest_details")
-public class GuestDetails {
+public class GuestDetails extends BaseEntity implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	@Id

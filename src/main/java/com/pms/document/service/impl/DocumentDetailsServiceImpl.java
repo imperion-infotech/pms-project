@@ -17,8 +17,10 @@ import com.pms.document.dao.DocumentDetailsRepository;
 import com.pms.document.dao.IDocumentDetailsDAO;
 import com.pms.document.entity.DocumentDetails;
 import com.pms.document.service.IDocumentDetailsService;
-import com.pms.personaldetails.PersonalDetails;
+import com.pms.exception.ResourceNotFoundException;
 import com.pms.search.specification.DocumentDetailsSpecification;
+import com.pms.search.specification.FloorSpecification;
+import com.pms.security.configuration.HotelContext;
 import com.pms.security.util.SecurityUtils;
 
 @Service
@@ -46,8 +48,11 @@ static final Logger logger = LoggerFactory.getLogger(DocumentDetailsServiceImpl.
 	
 
 	public List<DocumentDetails> getDocumentDetails() {
-//		return documentDetailsRepository.findAll();
-		 return documentDetailsRepository.findByIsDeletedFalse();
+		Long hotelId = HotelContext.getHotelId();
+		 if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
+		 return documentDetailsRepository.findByHotelIdAndIsDeletedFalse(hotelId);
 	}
 
 	@Auditable(action = "CREATE", entity = "DOCUMENTDETAILS")
@@ -62,19 +67,24 @@ static final Logger logger = LoggerFactory.getLogger(DocumentDetailsServiceImpl.
 	}
 
 	public <Optional>DocumentDetails getDocumentDetail(int documentDetailsId) {
-//		return dao.getDocumentDetail(documentDetailsId);
-		    return documentDetailsRepository.findByIdAndIsDeletedFalse(documentDetailsId)
-			            .orElseThrow(() -> new RuntimeException("Record not found"));
-			}
+		Long hotelId = HotelContext.getHotelId();
+		 if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
+		    return documentDetailsRepository.findByIdAndHotelIdAndIsDeletedFalse(documentDetailsId,hotelId)
+			            .orElseThrow(() -> new ResourceNotFoundException("Record not found"));
+		}
 
 	@Auditable(action = "DELETE", entity = "DOCUMENTDETAILS")
 	public boolean deleteDocumentDetails(int documentDetailsId) {
-//			return dao.deleteDocumentDetails(documentDetailsId);
-		DocumentDetails entity = documentDetailsRepository.findById(documentDetailsId)
+		
+		Long hotelId = HotelContext.getHotelId();
+		 if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
+		
+		DocumentDetails entity = documentDetailsRepository.findByIdAndHotelIdAndIsDeletedFalse(documentDetailsId,hotelId)
                  .orElseThrow(() -> new RuntimeException("Record not found"));
-		
-		
-
          // ✅ Soft delete
          entity.setDeleted(true);
          entity.setDeletedAt(LocalDateTime.now());
@@ -98,15 +108,14 @@ static final Logger logger = LoggerFactory.getLogger(DocumentDetailsServiceImpl.
          
 	}
 	
-	
-	 public DocumentDetails findById(Integer id) { // ✅ Implemented method
-	        return dao.findById(id);
-	    }
-
-	 @Override
 	 public List<DocumentDetails> search(String documentTypeEnum, String documentNumber) {
+		 Long hotelId = HotelContext.getHotelId();   // 🔥 get from JWT
+	     if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
 	        Specification<DocumentDetails> spec = Specification
-	        		.where(DocumentDetailsSpecification.isNotDeleted()) // ✅ ADD THIS
+	        		.where(DocumentDetailsSpecification.hasHotelId(hotelId))
+	        		.and(DocumentDetailsSpecification.isNotDeleted()) // ✅ ADD THIS
 	                .and(DocumentDetailsSpecification.hasDocumentTypeEnum(documentTypeEnum))
 	                .and(DocumentDetailsSpecification.hasDocumentNumber(documentNumber));
 
