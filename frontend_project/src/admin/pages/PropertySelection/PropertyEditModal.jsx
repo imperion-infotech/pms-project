@@ -294,7 +294,7 @@ const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
           <button
             onClick={handleSubmit}
             disabled={isUpdating || isUploading}
-            className="flex flex-[2] items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-6 py-4 text-xs font-black tracking-widest text-white uppercase shadow-lg shadow-emerald-600/20 transition-all hover:-translate-y-0.5 hover:bg-emerald-700 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
+            className="flex flex-2 items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-6 py-4 text-xs font-black tracking-widest text-white uppercase shadow-lg shadow-emerald-600/20 transition-all hover:-translate-y-0.5 hover:bg-emerald-700 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
           >
             {isUpdating ? <Loader2 size={18} className="animate-spin" /> : null}
             {isUpdating ? 'Saving Changes...' : 'Update Property'}
