@@ -5,7 +5,6 @@ package com.pms.stay.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,9 @@ import com.pms.auditlog.annotation.Auditable;
 import com.pms.auditlog.entity.AuditLog;
 import com.pms.auditlog.repository.AuditLogRepository;
 import com.pms.auditlog.util.AuditUtil;
+import com.pms.common.service.SoftDeleteService;
 import com.pms.security.configuration.HotelContext;
+import com.pms.security.configuration.UserContext;
 import com.pms.security.util.SecurityUtils;
 import com.pms.stay.dao.IStatyDetailsDAO;
 import com.pms.stay.dao.StayDetailsRepository;
@@ -35,8 +36,10 @@ static final Logger logger = LoggerFactory.getLogger(StayDetailServiceImpl.class
 	
 	@Autowired
 	private IStatyDetailsDAO dao;
-	 private final AuditLogRepository auditRepo;
-	 private final StayDetailsRepository repository;
+	 private AuditLogRepository auditRepo;
+	 private StayDetailsRepository repository;
+	 @Autowired
+	 private SoftDeleteService softDeleteService;
 	
 	public StayDetailServiceImpl(IStatyDetailsDAO dao, AuditLogRepository auditRepo, StayDetailsRepository repository) {
 		super();
@@ -55,15 +58,25 @@ static final Logger logger = LoggerFactory.getLogger(StayDetailServiceImpl.class
 
 	@Auditable(action = "CREATE", entity = "STAYDETAILS")
 	public StayDetails createStayDetails(StayDetails stayDetails) {
-		
-//		return dao.createStayDetails(stayDetails);
+		Long userId = UserContext.getUserId();
+
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    stayDetails.setCreatedBy(userId);
 		return repository.saveAndFlush(stayDetails);
 	}
 
 	@Auditable(action = "UPDATE", entity = "STAYDETAILS")
 	public StayDetails updateStayDetails(Long stayDetailsId, StayDetails stayDetails) {
-		//return dao.updateStayDetails(stayDetailsId, stayDetails);
-		 repository.saveAndFlush(stayDetails);
+		 
+		Long userId = UserContext.getUserId();
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    stayDetails.setUpdatedBy(userId);
+	    stayDetails.setUpdatedOn(LocalDateTime.now());
+		repository.saveAndFlush(stayDetails);
 		 return getStayDetail(stayDetailsId);
 		 
 	}
@@ -82,6 +95,10 @@ static final Logger logger = LoggerFactory.getLogger(StayDetailServiceImpl.class
     public boolean deleteSoftStayDetails(Long id) {
 		
 		Long hotelId = HotelContext.getHotelId();
+		Long userId = UserContext.getUserId();
+		if(userId == null) {
+			 throw new RuntimeException("User not selected");
+		}
 		 if (hotelId == null) {
 	         throw new RuntimeException("Hotel not selected");
 	     }
@@ -89,11 +106,14 @@ static final Logger logger = LoggerFactory.getLogger(StayDetailServiceImpl.class
 		StayDetails entity = repository.findByIdAndHotelIdAndIsDeletedFalse( id,hotelId);
 
         // ✅ Soft delete
-        entity.setDeleted(true);
-        entity.setDeletedAt(LocalDateTime.now());
-        entity.setDeletedBy(SecurityUtils.getCurrentUser());
-        
-        repository.save(entity);
+//        entity.setDeleted(true);
+//        entity.setDeletedOn(LocalDateTime.now());
+//        entity.setDeletedBy(userId);
+//        
+//        repository.save(entity);
+		
+		softDeleteService.softDelete(id, repository);
+		
 
         // ✅ Audit log
         AuditLog log = new AuditLog();
@@ -107,8 +127,6 @@ static final Logger logger = LoggerFactory.getLogger(StayDetailServiceImpl.class
         if(entity != null)
         {
         	return true;
-        	
-        	
         } else {
         	return false;
         }

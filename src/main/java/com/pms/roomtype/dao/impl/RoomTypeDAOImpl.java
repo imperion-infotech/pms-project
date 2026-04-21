@@ -35,7 +35,7 @@ public class RoomTypeDAOImpl implements IRoomTypeDAO  {
 		return (List<RoomType>) entityManager.createQuery(hql).getResultList();
 	}
 
-	public RoomType getRoomType(int roomTypeId) {
+	public RoomType getRoomType(Long roomTypeId) {
 		return entityManager.find(RoomType.class, roomTypeId);
 	}
 
@@ -45,7 +45,7 @@ public class RoomTypeDAOImpl implements IRoomTypeDAO  {
 		return b;
 	}
 
-	public RoomType updateRoomType(int roomTypeId, RoomType roomType) {
+	public RoomType updateRoomType(Long roomTypeId, RoomType roomType) {
 		// First We are taking Book detail from database by given book id and
 		// then updating detail with provided book object
 		RoomType roomTypeFromDB = getRoomType(roomTypeId);
@@ -61,7 +61,7 @@ public class RoomTypeDAOImpl implements IRoomTypeDAO  {
 		return updatedRoomType;
 	}
 
-	public boolean deleteRoomType(int roomTypeId) {
+	public boolean deleteRoomType(Long roomTypeId) {
 		RoomType roomType = getRoomType(roomTypeId);
 		entityManager.remove(roomType);
 

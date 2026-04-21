@@ -15,9 +15,9 @@ public interface IPaymentTypeService {
 	
 	List<PaymentType> getPaymentTypes();
 	PaymentType createPaymentType(PaymentType PaymentType);
-	PaymentType updatePaymentType(int paymentTypeId, PaymentType paymentType);
-	PaymentType getPaymentTypeById(Integer id);
-	public boolean deletePaymentType(int paymentTypeId);
+	PaymentType updatePaymentType(Long paymentTypeId, PaymentType paymentType);
+	PaymentType getPaymentTypeById(Long id);
+	public boolean deletePaymentType(Integer paymentTypeId);
 	public List<PaymentType> search(String paymentTypeName,String paymentTypeShortName, String categoryName, String description);
 
 }

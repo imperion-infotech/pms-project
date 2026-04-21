@@ -4,14 +4,15 @@
 package com.pms.othercharge.entity;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.pms.baseentity.BaseEntity;
-import com.pms.paymenttype.entity.PaymentType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,6 +36,7 @@ import lombok.Setter;
 @Table(name="other_charge_details")
 @Entity
 @Data
+@SQLRestriction("is_deleted = false")
 public class OtherChargeDetails extends BaseEntity implements Serializable{
 	
 static final Logger logger = LoggerFactory.getLogger(OtherChargeDetails.class);
@@ -44,11 +46,7 @@ static final Logger logger = LoggerFactory.getLogger(OtherChargeDetails.class);
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="id")
-	private Integer id;
-	
-	@Column(name="created_on", nullable = false, updatable = false)
-	@CreationTimestamp // Automatically sets value when entity is persisted
-	private Date createdOn;
+	private Long id;
 	
 	@Column(name="total_charges")
 	private Double totalCharges;
@@ -59,21 +57,14 @@ static final Logger logger = LoggerFactory.getLogger(OtherChargeDetails.class);
 	@Column(name="display_on_folio")
 	private Boolean displayOnFolio;
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public Date getCreatedOn() {
-		return createdOn;
-	}
-
-	public void setCreatedOn(Date createdOn) {
-		this.createdOn = createdOn;
-	}
 
 	public Double getTotalCharges() {
 		return totalCharges;

@@ -41,7 +41,7 @@ public class PaymentTypeController {
 	}
 	
 	@GetMapping("/user/getpaymenttype/{id}")
-	public ResponseEntity<PaymentType> getPaymentType(@PathVariable("id") Integer id) {
+	public ResponseEntity<PaymentType> getPaymentType(@PathVariable("id") Long id) {
 		PaymentType paymentType = service.getPaymentTypeById(id);
 		return new ResponseEntity<PaymentType>(paymentType, HttpStatus.OK);
 	}
@@ -72,7 +72,7 @@ public class PaymentTypeController {
 	}
 	
 	@PutMapping("/admin/updatepaymenttype/{id}")
-	public ResponseEntity<?> updatePaymentType(@PathVariable Integer id, @RequestBody PaymentType paymentTypeDetails) {
+	public ResponseEntity<?> updatePaymentType(@PathVariable Long id, @RequestBody PaymentType paymentTypeDetails) {
 		// Validate input
 		if (paymentTypeDetails == null || paymentTypeDetails.getCategoryName() == null || paymentTypeDetails.getCategoryName().trim().isEmpty()) {
 			return ResponseEntity.badRequest().body("PaymentType CategoryName must not be null or empty");
@@ -103,7 +103,7 @@ public class PaymentTypeController {
 	}
 	
 	@DeleteMapping("/admin/deletepaymenttype/{id}")
-	public ResponseEntity<String> deletePaymentType(@PathVariable("id") int id) {
+	public ResponseEntity<String> deletePaymentType(@PathVariable("id") Integer id) {
 		boolean isDeleted = service.deletePaymentType(id);
 		if (isDeleted) {
 			String responseContent = "PaymentType has been deleted successfully";

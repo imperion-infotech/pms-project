@@ -3,6 +3,7 @@
  */
 package com.pms.document.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,14 +11,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.pms.auditlog.annotation.Auditable;
+import com.pms.common.service.SoftDeleteService;
 import com.pms.document.dao.DocumentTypeRepository;
 import com.pms.document.dao.IDocumentTypeDAO;
 import com.pms.document.entity.DocumentType;
 import com.pms.document.service.IDocumentTypeService;
-import com.pms.floor.entity.Floor;
 import com.pms.search.specification.DocumentTypeSpecification;
-import com.pms.search.specification.FloorSpecification;
 import com.pms.security.configuration.HotelContext;
+import com.pms.security.configuration.UserContext;
 
 /**
  * 
@@ -30,6 +31,9 @@ public class DocumentTypeServiceImpl implements IDocumentTypeService {
 	
 	@Autowired
 	private DocumentTypeRepository documentTypeRepository;
+	
+	@Autowired
+	private SoftDeleteService softDeleteService;
 	
 	public DocumentTypeServiceImpl(IDocumentTypeDAO dao, DocumentTypeRepository documentTypeRepository) {
 		super();
@@ -56,26 +60,32 @@ public class DocumentTypeServiceImpl implements IDocumentTypeService {
 	@Auditable(action = "CREATE", entity = "DOCUMENTTYPE")
 	public DocumentType createDocumentType(DocumentType documentType) {
 //		return dao.createFloor(Floor);
+		Long userId = UserContext.getUserId();
+
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    documentType.setCreatedBy(userId);
 		 return documentTypeRepository.saveAndFlush(documentType);
 	}
 
 	@Override
 	@Auditable(action = "UPDATE", entity = "DOCUMENTTYPE")
-	public DocumentType updateDocumentType(int documentTypeId, DocumentType documentType) {
+	public DocumentType updateDocumentType(Long documentTypeId, DocumentType documentType) {
+		Long userId = UserContext.getUserId();
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    documentType.setUpdatedBy(userId);
+	    documentType.setUpdatedOn(LocalDateTime.now());
 		return dao.updateDocumentType(documentTypeId, documentType);
 	}
 
 	@Override
 	@Auditable(action = "DELETE", entity = "DOCUMENTTYPE")
 	public boolean deleteDocumentType(Long documentTypeId) {
-		DocumentType documentType = documentTypeRepository.findByIdAndHotelId(documentTypeId,HotelContext.getHotelId());
-		 boolean isDeleted=true;;
-		 if(documentType == null ) {
-			 isDeleted=false;
-			 throw new RuntimeException("floor not found");
-		 }
-		 documentTypeRepository.delete(documentType);
-		 return isDeleted;
+		softDeleteService.softDelete(documentTypeId, documentTypeRepository);
+		return true;
 	}
 
 	@Override

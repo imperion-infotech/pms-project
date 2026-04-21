@@ -14,7 +14,7 @@ import lombok.Data;
 @Data
 @Builder
 public class PaymentDetailsResponseDTO {
-	    private Integer id;
+	    private Long id;
 	    private Double amount;
 	    private Double totalAmount;
 	    private String paymentMode;
@@ -24,7 +24,7 @@ public class PaymentDetailsResponseDTO {
 	    
 	    public PaymentDetailsResponseDTO()
 	    {}	    
-	    public PaymentDetailsResponseDTO(Integer id, Double amount, Double totalAmount, String paymentMode,
+	    public PaymentDetailsResponseDTO(Long id, Double amount, Double totalAmount, String paymentMode,
 				String receiptNumber, String remark, LocalDate paymentDate) {
 			super();
 			this.id = id;
@@ -35,10 +35,10 @@ public class PaymentDetailsResponseDTO {
 			this.remark = remark;
 			this.paymentDate = paymentDate;
 		}
-		public Integer getId() {
+		public Long getId() {
 			return id;
 		}
-		public void setId(Integer id) {
+		public void setId(Long id) {
 			this.id = id;
 		}
 		public Double getAmount() {

@@ -4,9 +4,11 @@
 package com.pms.paymenttype.entity;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 
 import com.pms.baseentity.BaseEntity;
 import com.pms.paymentdetails.entity.PaymentDetails;
@@ -35,6 +37,7 @@ import lombok.Setter;
 @Table(name="payment_type")
 @Entity
 @Data
+@SQLRestriction("is_deleted = false")
 public class PaymentType extends BaseEntity implements Serializable{
 	
 	
@@ -44,7 +47,7 @@ public class PaymentType extends BaseEntity implements Serializable{
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="id")
-	private Integer id;
+	private Long id;
 	
 	@Column(name="payment_type_name")
 	private String paymentTypeName;
@@ -61,19 +64,15 @@ public class PaymentType extends BaseEntity implements Serializable{
 	@Column(name="is_creditcard_processing")
 	private Boolean creditCardProcessing;
 	
-	@Column(name="created_on", nullable = false, updatable = false)
-	@CreationTimestamp // Automatically sets value when entity is persisted
-	private Date createdOn;
-	
 	@ManyToOne
 	@JoinColumn(name = "payment_details_id")
 	private PaymentDetails paymentDetails;
 	
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -109,22 +108,12 @@ public class PaymentType extends BaseEntity implements Serializable{
 		this.description = description;
 	}
 
-	
-
 	public Boolean isCreditCardProcessing() {
 		return creditCardProcessing;
 	}
 
 	public void setCreditCardProcessing(Boolean creditCardProcessing) {
 		this.creditCardProcessing = creditCardProcessing;
-	}
-
-	public Date getCreatedOn() {
-		return createdOn;
-	}
-
-	public void setCreatedOn(Date createdOn) {
-		this.createdOn = createdOn;
 	}
 
 }

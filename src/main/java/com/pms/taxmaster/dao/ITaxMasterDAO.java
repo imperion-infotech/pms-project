@@ -19,10 +19,10 @@ public interface ITaxMasterDAO {
 static final Logger logger = LoggerFactory.getLogger(ITaxMasterDAO.class);
 	
 	public List<TaxMaster> getTaxMasters();
-	public TaxMaster getTaxMaster(int taxMasterId);
+	public TaxMaster getTaxMaster(Long taxMasterId);
 	public TaxMaster createTaxMaster(TaxMaster taxMaster);
-	public TaxMaster updateTaxMaster(int taxMasterId,TaxMaster taxMaster);
-	public boolean deleteTaxMaster(int taxMasterId);
+	public TaxMaster updateTaxMaster(Long taxMasterId,TaxMaster taxMaster);
+	public boolean deleteTaxMaster(Long taxMasterId);
 	public TaxMaster findById(Integer id);
 
 

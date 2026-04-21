@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name="document_details")
+@SQLRestriction("is_deleted = false")
 public class DocumentDetails extends BaseEntity implements Serializable{
 	
 static final Logger logger = LoggerFactory.getLogger(DocumentDetails.class);
@@ -50,8 +52,7 @@ static final Logger logger = LoggerFactory.getLogger(DocumentDetails.class);
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="id")
-	private Integer id;
-	
+	private Long id;
 	
 	@Column(name="document_number")
 	private String documentNumber;
@@ -68,9 +69,7 @@ static final Logger logger = LoggerFactory.getLogger(DocumentDetails.class);
 	@Column(name="remark")
 	private String remark;
 	
-	@Column(name="created_on", nullable = false, updatable = false)
-	@CreationTimestamp // Automatically sets value when entity is persisted
-	private Date createdOn;
+	
 	
 	 // ✅ FIX: Many documents → one personal
     @ManyToOne
@@ -87,19 +86,12 @@ static final Logger logger = LoggerFactory.getLogger(DocumentDetails.class);
     @JoinColumn(name = "document_type_id")
     private DocumentType documentType;
 	
-	// ✅ NEW FIELDS (Soft Delete)
-    @Column(name = "is_deleted")
-    private boolean isDeleted = false;
 
-    private LocalDateTime deletedAt;
-
-    private String deletedBy;
-
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -143,13 +135,6 @@ static final Logger logger = LoggerFactory.getLogger(DocumentDetails.class);
 		this.remark = remark;
 	}
 
-	public Date getCreatedOn() {
-		return createdOn;
-	}
-
-	public void setCreatedOn(Date createdOn) {
-		this.createdOn = createdOn;
-	}
 
 	public PersonalDetails getPersonalDetails() {
 		return personalDetails;
@@ -169,29 +154,10 @@ static final Logger logger = LoggerFactory.getLogger(DocumentDetails.class);
 	}
 	
 
-	public boolean isDeleted() {
-		return isDeleted;
-	}
 
-	public void setDeleted(boolean isDeleted) {
-		this.isDeleted = isDeleted;
-	}
+	
 
-	public LocalDateTime getDeletedAt() {
-		return deletedAt;
-	}
-
-	public void setDeletedAt(LocalDateTime deletedAt) {
-		this.deletedAt = deletedAt;
-	}
-
-	public String getDeletedBy() {
-		return deletedBy;
-	}
-
-	public void setDeletedBy(String deletedBy) {
-		this.deletedBy = deletedBy;
-	}
+	
 
 	
 }

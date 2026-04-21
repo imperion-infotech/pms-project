@@ -7,6 +7,7 @@ package com.pms.roomstatus.entity;
  * 
  */
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -46,7 +47,7 @@ public class RoomStatus extends BaseEntity implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="room_status_id")
-	private int id;
+	private Long id;
 	
 	@Column(name="room_status_name")
 	private String roomStatusName;
@@ -61,15 +62,11 @@ public class RoomStatus extends BaseEntity implements Serializable {
 	@Column(name="room_status_text_color")
 	private String roomStatusTextColor;
 	
-	@Column(name="created_on", nullable = false, updatable = false)
-	@CreationTimestamp // Automatically sets value when entity is persisted
-	private Date createdOn;
-
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -105,14 +102,6 @@ public class RoomStatus extends BaseEntity implements Serializable {
 		this.roomStatusTextColor = roomStatusTextColor;
 	}
 
-	public Date getCreatedOn() {
-		return createdOn;
-	}
-
-	public void setCreatedOn(Date createdOn) {
-		this.createdOn = createdOn;
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -126,8 +115,6 @@ public class RoomStatus extends BaseEntity implements Serializable {
 		builder.append(roomStatusColor);
 		builder.append(", roomStatusTextColor=");
 		builder.append(roomStatusTextColor);
-		builder.append(", createdOn=");
-		builder.append(createdOn);
 		builder.append("]");
 		return builder.toString();
 	}

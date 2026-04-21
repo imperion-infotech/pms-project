@@ -13,10 +13,10 @@ public interface IFloorDAO  {
 	static final Logger logger = LoggerFactory.getLogger(IFloorDAO.class);
 	
 	public List<com.pms.floor.entity.Floor> getFloors();
-	public Floor getFloor(int floorId);
+	public Floor getFloor(Long floorId);
 	public Floor createFloor(Floor floor);
-	public Floor updateFloor(int floorId,Floor floor);
-	public boolean deleteFloor(int floorId);
-	public Floor findById(Integer id);
+	public Floor updateFloor(Long floorId,Floor floor);
+	public boolean deleteFloor(Long floorId);
+	public Floor findById(Long id);
 
 }

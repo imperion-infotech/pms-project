@@ -4,9 +4,10 @@
 package com.pms.document.entity;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name="document_type")
+@SQLRestriction("is_deleted = false")
 public class DocumentType extends BaseEntity implements Serializable {
 	
 static final Logger logger = LoggerFactory.getLogger(DocumentType.class);
@@ -43,7 +45,7 @@ static final Logger logger = LoggerFactory.getLogger(DocumentType.class);
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="id")
-	private int id;
+	private Long id;
 	
 	@Column(name="document_type_short_name")
 	private String documentTypeShortName;
@@ -60,25 +62,13 @@ static final Logger logger = LoggerFactory.getLogger(DocumentType.class);
 	@Column(name="document_type_default")
 	private boolean documentTypeDefault;
 	
-	@Column(name="created_on", nullable = false, updatable = false)
-	@CreationTimestamp // Automatically sets value when entity is persisted
-	private Date createdOn;
-
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
-	public Date getCreatedOn() {
-		return createdOn;
-	}
-
-	public void setCreatedOn(Date createdOn) {
-		this.createdOn = createdOn;
-	}
-	
 	public String getDocumentTypeCategory() {
 		return documentTypeCategory;
 	}
@@ -134,8 +124,6 @@ static final Logger logger = LoggerFactory.getLogger(DocumentType.class);
 		builder.append(documentTypeCategory);
 		builder.append(", documentTypeDefault=");
 		builder.append(documentTypeDefault);
-		builder.append(", createdOn=");
-		builder.append(createdOn);
 		builder.append("]");
 		return builder.toString();
 	}

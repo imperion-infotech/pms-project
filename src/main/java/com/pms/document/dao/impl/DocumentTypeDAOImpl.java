@@ -36,7 +36,7 @@ static final Logger logger = LoggerFactory.getLogger(DocumentTypeDAOImpl.class);
 	}
 
 	@Override
-	public DocumentType getDocumentType(int documentTypeId) {
+	public DocumentType getDocumentType(Long documentTypeId) {
 		return entityManager.find(DocumentType.class, documentTypeId);
 	}
 
@@ -48,7 +48,7 @@ static final Logger logger = LoggerFactory.getLogger(DocumentTypeDAOImpl.class);
 	}
 
 	@Override
-	public DocumentType updateDocumentType(int documentTypeId, DocumentType documentType) {
+	public DocumentType updateDocumentType(Long documentTypeId, DocumentType documentType) {
 		DocumentType documentTypeFromDB = getDocumentType(documentTypeId);
 		documentTypeFromDB.setCreatedOn(documentType.getCreatedOn());
 		documentTypeFromDB.setDocumentTypeCategory(documentType.getDocumentTypeCategory());
@@ -64,7 +64,7 @@ static final Logger logger = LoggerFactory.getLogger(DocumentTypeDAOImpl.class);
 	}
 
 	@Override
-	public boolean deleteDocumentType(int documentTypeId) {
+	public boolean deleteDocumentType(Long documentTypeId) {
 		DocumentType documentType = getDocumentType(documentTypeId);
 		entityManager.remove(documentType);
 		

@@ -114,7 +114,7 @@ public class DocumentTypeController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("An error occurred while updating the taxmaster");
+					.body("An error occurred while updating the DocumentType");
 		}
 	}
 	

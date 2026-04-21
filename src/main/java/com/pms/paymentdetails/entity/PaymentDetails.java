@@ -5,9 +5,11 @@ package com.pms.paymentdetails.entity;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pms.baseentity.BaseEntity;
@@ -39,6 +41,7 @@ import lombok.Setter;
 @Table(name="payment_details")
 @Entity
 @Data
+@SQLRestriction("is_deleted = false")
 public class PaymentDetails extends BaseEntity  implements Serializable{
 	
 	
@@ -48,11 +51,7 @@ public class PaymentDetails extends BaseEntity  implements Serializable{
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="id")
-	private Integer id;
-	
-	@Column(name="created_on", nullable = false, updatable = false)
-	@CreationTimestamp // Automatically sets value when entity is persisted
-	private Date createdOn;
+	private Long id;
 	
 	@Column(name="amount")
 	private Double amount;
@@ -108,14 +107,6 @@ public class PaymentDetails extends BaseEntity  implements Serializable{
 		this.guestDetails = guestDetails;
 	}
 
-	public Date getCreatedOn() {
-		return createdOn;
-	}
-
-	public void setCreatedOn(Date createdOn) {
-		this.createdOn = createdOn;
-	}
-
 	public LocalDate getPaymentDate() {
 		return paymentDate;
 	}
@@ -125,11 +116,11 @@ public class PaymentDetails extends BaseEntity  implements Serializable{
 	}
 
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

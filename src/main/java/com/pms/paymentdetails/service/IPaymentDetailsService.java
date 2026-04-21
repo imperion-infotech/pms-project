@@ -15,9 +15,9 @@ public interface IPaymentDetailsService {
 	
 	List<PaymentDetails> getAllPaymentDetails();
 	PaymentDetails createPaymentDetails(PaymentDetails paymentDetails);
-	PaymentDetails updatePaymentDetails(int PaymentDetailsId, PaymentDetails paymentDetails);
-	PaymentDetails getPaymentDetailsById(Integer id);
-	public boolean deletePaymentDetails(int paymentDetailsId);
+	PaymentDetails updatePaymentDetails(Long PaymentDetailsId, PaymentDetails paymentDetails);
+	PaymentDetails getPaymentDetailsById(Long id);
+	public boolean deletePaymentDetails(Long paymentDetailsId);
     public List<PaymentDetailsResponseDTO> getPaymentsByGuestId(Long guestId);
 
 }

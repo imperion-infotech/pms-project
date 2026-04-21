@@ -14,9 +14,9 @@ public interface IFloorService  {
 	
 	List<Floor> getFloors();
 	Floor createFloor(Floor floor);
-	Floor updateFloor(int floorId, Floor floor);
-	Floor getFloor(int floorId);
-	boolean deleteFloor(int floorId);
+	Floor updateFloor(Long floorId, Floor floor);
+	Floor getFloor(Long floorId);
+	boolean deleteFloor(Long floorId);
 //	Floor getFloorByIdAndHotelID(Integer id,Long hotelId);
 	public List<Floor> search(String name,String description);
 

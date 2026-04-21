@@ -19,7 +19,7 @@ static final Logger logger = LoggerFactory.getLogger(IBuildingService.class);
 	
 	List<Building> getBuildings();
 	Building createBuilding(Building building);
-	Building updateBuilding(int floorId, Building building);
+	Building updateBuilding(Long buildingId, Building building);
 	Building getBuilding(Long building);
 	boolean deleteBuilding(Long building);
 	Building getBuildingById(Long id);

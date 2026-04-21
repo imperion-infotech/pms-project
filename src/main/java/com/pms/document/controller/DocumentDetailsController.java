@@ -55,7 +55,7 @@ public class DocumentDetailsController {
 
 //	@GetMapping("/admin/getfloor/{id}")
 	@GetMapping("/user/getdocumentdetail/{id}")
-	public ResponseEntity<DocumentDetails> getDocumentDetail(@PathVariable("id") Integer id) {
+	public ResponseEntity<DocumentDetails> getDocumentDetail(@PathVariable("id") Long id) {
 		DocumentDetails documentDetails = service.getDocumentDetail(id);//????
 		return new ResponseEntity<DocumentDetails>(documentDetails, HttpStatus.OK);
 	}
@@ -82,7 +82,7 @@ public class DocumentDetailsController {
 
 	@PutMapping("/admin/updatedocumentdetails/{id}")
 //	@PutMapping("/auth/updatefloor/{id}")DocumentDetails
-	public ResponseEntity<?> updateDocumentDetails(@PathVariable Integer id, @RequestBody DocumentDetails documentDetails,HttpSession session) {
+	public ResponseEntity<?> updateDocumentDetails(@PathVariable Long id, @RequestBody DocumentDetails documentDetails,HttpSession session) {
 		// Validate input
 		if (documentDetails == null || documentDetails.getDocumentNumber() == null || documentDetails.getDocumentNumber().trim().isEmpty()) {
 			return ResponseEntity.badRequest().body("documentDetails number must not be null or empty");
@@ -107,10 +107,9 @@ public class DocumentDetailsController {
 			existingDocumentDetails.setDocumentType(documentDetails.getDocumentType());
 			existingDocumentDetails.setPersonalDetails(documentDetails.getPersonalDetails());
 			existingDocumentDetails.setValidTill(documentDetails.getValidTill());
+			existingDocumentDetails.setIsActive(documentDetails.getIsActive());
+			existingDocumentDetails.setIsDeleted(documentDetails.getIsDeleted());
 
-			// You can add more setters here for other updatable fields
-
-			// Save updated floor
 			DocumentDetails updatedDocumentDetails = service.updateDocumentDetails(existingDocumentDetails.getId(), existingDocumentDetails);
 
 			return ResponseEntity.ok(updatedDocumentDetails);
@@ -124,7 +123,7 @@ public class DocumentDetailsController {
 
 	@DeleteMapping("/admin/deletedocumentdetails/{id}")
 //	@DeleteMapping("/user/deletefloor/{id}")
-	public ResponseEntity<String> deleteDocumentDetails(@PathVariable("id") int id) {
+	public ResponseEntity<String> deleteDocumentDetails(@PathVariable("id") Long id) {
 		boolean isDeleted = service.deleteDocumentDetails(id);
 		if (isDeleted) {
 			String responseContent = "DocumentDetails has been deleted successfully";

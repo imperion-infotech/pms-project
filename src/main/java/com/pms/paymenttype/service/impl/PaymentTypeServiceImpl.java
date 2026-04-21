@@ -3,6 +3,7 @@
  */
 package com.pms.paymenttype.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -11,13 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import com.pms.floor.entity.Floor;
+import com.pms.common.service.SoftDeleteService;
 import com.pms.paymenttype.entity.PaymentType;
 import com.pms.paymenttype.repository.PaymentTypeRepository;
 import com.pms.paymenttype.service.IPaymentTypeService;
-import com.pms.search.specification.FloorSpecification;
 import com.pms.search.specification.PaymentTypeSpecification;
 import com.pms.security.configuration.HotelContext;
+import com.pms.security.configuration.UserContext;
 
 /**
  * 
@@ -29,6 +30,8 @@ public class PaymentTypeServiceImpl implements IPaymentTypeService {
 
 	@Autowired
 	private PaymentTypeRepository paymentTypeRepository;
+	@Autowired
+	private SoftDeleteService softDeleteService;
 
 	public PaymentTypeServiceImpl(PaymentTypeRepository paymentTypeRepository) {
 		super();
@@ -43,17 +46,23 @@ public class PaymentTypeServiceImpl implements IPaymentTypeService {
 		return paymentTypeRepository.findByHotelId(HotelContext.getHotelId());
 	}
 
-	public PaymentType getPaymentTypeById(Integer id) {
+	public PaymentType getPaymentTypeById(Long id) {
 
 		return paymentTypeRepository.findByIdAndHotelId(id, HotelContext.getHotelId());
 
 	}
 
 	public PaymentType createPaymentType(PaymentType paymentType) {
+		Long userId = UserContext.getUserId();
+
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    paymentType.setCreatedBy(userId);
 		return paymentTypeRepository.saveAndFlush(paymentType);
 	}
 
-	public PaymentType updatePaymentType(int paymentTypeId, PaymentType paymentType) {
+	public PaymentType updatePaymentType(Long paymentTypeId, PaymentType paymentType) {
 
 		PaymentType paymentTypeFromDB = getPaymentTypeById(paymentTypeId);
 		paymentTypeFromDB.setCategoryName(paymentType.getCategoryName());
@@ -62,6 +71,12 @@ public class PaymentTypeServiceImpl implements IPaymentTypeService {
 		paymentTypeFromDB.setId(paymentTypeId);
 		paymentTypeFromDB.setCreditCardProcessing(paymentType.isCreditCardProcessing());
 		paymentTypeFromDB.setPaymentTypeShortName(paymentType.getPaymentTypeShortName());
+		Long userId = UserContext.getUserId();
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    paymentTypeFromDB.setUpdatedBy(userId);
+	    paymentTypeFromDB.setUpdatedOn(LocalDateTime.now());
 		paymentTypeRepository.saveAndFlush(paymentTypeFromDB);
 		PaymentType updatedPaymentType = getPaymentTypeById(paymentTypeId);
 		return updatedPaymentType;
@@ -81,14 +96,8 @@ public class PaymentTypeServiceImpl implements IPaymentTypeService {
 	}
 
 	@Override
-	public boolean deletePaymentType(int paymentTypeId) {
-		PaymentType paymentType = paymentTypeRepository.findByIdAndHotelId(paymentTypeId, HotelContext.getHotelId());
-		boolean isDeleted = true;
-		if (paymentType == null) {
-			isDeleted = false;
-			throw new RuntimeException("paymentType not found");
-		}
-		paymentTypeRepository.delete(paymentType);
-		return isDeleted;
+	public boolean deletePaymentType(Integer paymentTypeId) {
+		softDeleteService.softDelete(paymentTypeId, paymentTypeRepository);
+		return true;
 	}
 }

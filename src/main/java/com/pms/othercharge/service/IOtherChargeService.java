@@ -14,8 +14,8 @@ public interface IOtherChargeService {
 
 	List<OtherCharge> getOtherCharges();
 	OtherCharge createOtherCharge(OtherCharge otherCharge);
-	OtherCharge updateOtherCharge(int otherChargeId, OtherCharge otherCharge);
-	OtherCharge getOtherChargeById(Integer id);
-	public boolean deleteOtherCharge(int otherChargeId);
+	OtherCharge updateOtherCharge(Long otherChargeId, OtherCharge otherCharge);
+	OtherCharge getOtherChargeById(Long id);
+	public boolean deleteOtherCharge(Long otherChargeId);
 	public List<OtherCharge> search(String otherChargeName,String otherChargeShortName, String categoryName);
 }

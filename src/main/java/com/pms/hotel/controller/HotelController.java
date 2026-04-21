@@ -54,7 +54,7 @@ public class HotelController {
 	}
 	
 	@PreAuthorize("hasRole('SUPER_ADMIN')")
-	@PutMapping("/update/{id}")
+	@PutMapping("/updatehotel/{id}")
 	public ResponseEntity<?> updateHotel(@PathVariable Integer id, @RequestBody Hotel hotel,HttpSession session) {
 		
 		try {

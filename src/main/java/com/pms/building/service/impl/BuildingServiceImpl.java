@@ -1,5 +1,6 @@
 package com.pms.building.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -13,10 +14,10 @@ import com.pms.building.dao.BuildingsRepository;
 import com.pms.building.dao.IBuildingDAO;
 import com.pms.building.entity.Building;
 import com.pms.building.service.IBuildingService;
-import com.pms.floor.entity.Floor;
+import com.pms.common.service.SoftDeleteService;
 import com.pms.search.specification.BuildingSpecification;
-import com.pms.search.specification.FloorSpecification;
-import com.pms.security.configuration.HotelContext;;
+import com.pms.security.configuration.HotelContext;
+import com.pms.security.configuration.UserContext;;
 
 @Service
 public class BuildingServiceImpl implements IBuildingService {
@@ -28,6 +29,9 @@ static final Logger logger = LoggerFactory.getLogger(BuildingServiceImpl.class);
 	
 	@Autowired
 	private BuildingsRepository buildingRepository;
+	
+	 @Autowired
+     private SoftDeleteService softDeleteService;
 	
 	
 
@@ -51,11 +55,23 @@ static final Logger logger = LoggerFactory.getLogger(BuildingServiceImpl.class);
 	@Auditable(action = "CREATE", entity = "BUILDING")
 	public Building createBuilding(Building building) {
 //		logger.info("Audit: {} performed on {}", audit.action(), audit.entity());
+		Long userId = UserContext.getUserId();
+
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    building.setCreatedBy(userId);
 		 return buildingRepository.saveAndFlush(building);
 	}
 
 	@Auditable(action = "UPDATE", entity = "BUILDING")
-	public Building updateBuilding(int buildingId, Building building) {
+	public Building updateBuilding(Long buildingId, Building building) {
+		Long userId = UserContext.getUserId();
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+		building.setUpdatedBy(userId);
+		building.setUpdatedOn(LocalDateTime.now());
 		return dao.updateBuilding(buildingId, building);
 	}
 
@@ -65,22 +81,10 @@ static final Logger logger = LoggerFactory.getLogger(BuildingServiceImpl.class);
 
 	@Auditable(action = "DELETE", entity = "BUILDING")
 	public boolean deleteBuilding(Long buildingId) {
-//		return dao.deleteBuilding(buildingId);
-		
-		Building building = getBuilding(buildingId);
-		building.setIsDeleted(true);
-		building.setIsActive(false);
-		Building b = buildingRepository.save(building);
-		boolean isDeleted = false;
-		if(b.getId() != 0)
-		{
-			isDeleted=true;
-		} else 
-		{
-			isDeleted=false;
-		}
-		return isDeleted;
-		
+
+	    softDeleteService.softDelete(buildingId, buildingRepository);
+
+	    return true;
 	}
 	
 	

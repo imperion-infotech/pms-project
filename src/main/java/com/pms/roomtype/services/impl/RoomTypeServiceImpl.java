@@ -3,6 +3,7 @@
  */
 package com.pms.roomtype.services.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -11,14 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import com.pms.building.entity.Building;
+import com.pms.common.service.SoftDeleteService;
 import com.pms.roomtype.dao.IRoomTypeDAO;
 import com.pms.roomtype.dao.RoomTypeRepository;
 import com.pms.roomtype.entity.RoomType;
 import com.pms.roomtype.services.IRoomTypeService;
-import com.pms.search.specification.BuildingSpecification;
 import com.pms.search.specification.RoomTypeSpecification;
 import com.pms.security.configuration.HotelContext;
+import com.pms.security.configuration.UserContext;
 
 /**
  * 
@@ -33,6 +34,9 @@ static final Logger logger = LoggerFactory.getLogger(RoomTypeServiceImpl.class);
 	
 	@Autowired
 	private RoomTypeRepository roomTypeRepository;
+	
+	@Autowired
+	private SoftDeleteService softDeleteService;
 
 	public List<RoomType> getRoomTypes() {
 		Long hotelId = HotelContext.getHotelId();
@@ -44,10 +48,22 @@ static final Logger logger = LoggerFactory.getLogger(RoomTypeServiceImpl.class);
 
 	
 	public RoomType createRoomType(RoomType roomType) {
+		Long userId = UserContext.getUserId();
+
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    roomType.setCreatedBy(userId);
 		 return roomTypeRepository.saveAndFlush(roomType);
 	}
 
-	public RoomType updateRoomType(int roomTypeId, RoomType roomType) {
+	public RoomType updateRoomType(Long roomTypeId, RoomType roomType) {
+		Long userId = UserContext.getUserId();
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    roomType.setUpdatedBy(userId);
+	    roomType.setUpdatedOn(LocalDateTime.now());
 		return dao.updateRoomType(roomTypeId, roomType);
 	}
 
@@ -56,21 +72,8 @@ static final Logger logger = LoggerFactory.getLogger(RoomTypeServiceImpl.class);
 	}
 
 	public boolean deleteRoomType(Long roomTypeId) {
-//		return dao.deleteRoomType(roomTypeId);
-		
-		RoomType roomType = getRoomType(roomTypeId);
-		roomType.setIsDeleted(true);
-		roomType.setIsActive(false);
-		RoomType b = roomTypeRepository.save(roomType);
-		boolean isDeleted = false;
-		if(b.getId() != 0)
-		{
-			isDeleted=true;
-		} else 
-		{
-			isDeleted=false;
-		}
-		return isDeleted;
+		softDeleteService.softDelete(roomTypeId, roomTypeRepository);
+		return true;
 	}
 	
 	 @Override

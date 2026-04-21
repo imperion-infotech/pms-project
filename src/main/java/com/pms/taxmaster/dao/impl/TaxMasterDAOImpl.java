@@ -33,7 +33,7 @@ static final Logger logger = LoggerFactory.getLogger(TaxMasterDAOImpl.class);
 	}
 	
 
-	public TaxMaster getTaxMaster(int taxMasterId) {
+	public TaxMaster getTaxMaster(Long taxMasterId) {
 		return entityManager.find(TaxMaster.class, taxMasterId);
 	}
 
@@ -43,7 +43,7 @@ static final Logger logger = LoggerFactory.getLogger(TaxMasterDAOImpl.class);
 		return b;
 	}
 
-	public TaxMaster updateTaxMaster(int taxMasterId, TaxMaster taxMaster) {
+	public TaxMaster updateTaxMaster(Long taxMasterId, TaxMaster taxMaster) {
 		//First We are taking Book detail from database by given book id and 
 				// then updating detail with provided book object
 				TaxMaster taxMasterFromDB = getTaxMaster(taxMasterId);
@@ -59,7 +59,7 @@ static final Logger logger = LoggerFactory.getLogger(TaxMasterDAOImpl.class);
 				return updatedTaxMaster;
 	}
 
-	public boolean deleteTaxMaster(int taxMasterId) {
+	public boolean deleteTaxMaster(Long taxMasterId) {
 		TaxMaster taxMaster = getTaxMaster(taxMasterId);
 		entityManager.remove(taxMaster);
 		

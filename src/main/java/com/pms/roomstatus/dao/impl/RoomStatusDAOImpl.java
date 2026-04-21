@@ -37,7 +37,7 @@ static final Logger logger = LoggerFactory.getLogger(RoomStatusDAOImpl.class);
 	}
 	
 
-	public RoomStatus getRoomStatus(int roomStatusId) {
+	public RoomStatus getRoomStatus(Long roomStatusId) {
 		return entityManager.find(RoomStatus.class, roomStatusId);
 	}
 
@@ -47,7 +47,7 @@ static final Logger logger = LoggerFactory.getLogger(RoomStatusDAOImpl.class);
 		return b;
 	}
 
-	public RoomStatus updateRoomStatus(int roomStatusId, RoomStatus roomStatus) {
+	public RoomStatus updateRoomStatus(Long roomStatusId, RoomStatus roomStatus) {
 		//First We are taking Book detail from database by given book id and 
 				// then updating detail with provided book object
 		RoomStatus roomStatusDB = getRoomStatus(roomStatusId);
@@ -63,7 +63,7 @@ static final Logger logger = LoggerFactory.getLogger(RoomStatusDAOImpl.class);
 	}
 	
 
-	public boolean deleteRoomStatus(int roomStatusId) {
+	public boolean deleteRoomStatus(Long roomStatusId) {
 		RoomStatus roomStatus = getRoomStatus(roomStatusId);
 		entityManager.remove(roomStatus);
 		
@@ -88,6 +88,13 @@ static final Logger logger = LoggerFactory.getLogger(RoomStatusDAOImpl.class);
 		return roomStatus;
 	}
 
+
+//	@Override
+//	public RoomStatus findById(Long id) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+
 	
 //	/**
 //	 * This method will get the latest inserted record from the database and return the object of Book class
@@ -101,11 +108,6 @@ static final Logger logger = LoggerFactory.getLogger(RoomStatusDAOImpl.class);
 //		return floor;
 //	}
 
-	@Override
-	public RoomStatus findById(Integer id) {
-		return entityManager.find(RoomStatus.class, id);
-	}
-	
 
 
 

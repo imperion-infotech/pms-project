@@ -11,12 +11,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.pms.building.entity.Building;
+import com.pms.common.repository.SoftDeleteRepository;
 import com.pms.roomtype.entity.RoomType;
 
 /**
  * 
  */
-public interface RoomTypeRepository  extends JpaRepository<RoomType, Integer> , JpaSpecificationExecutor<RoomType>{
+public interface RoomTypeRepository  extends SoftDeleteRepository<RoomType, Long> , JpaSpecificationExecutor<RoomType>{
 	List<RoomType> findByHotelId(Long hotelId);
 	
 	RoomType findByIdAndHotelId(Long roomTypeId,Long hotelId);

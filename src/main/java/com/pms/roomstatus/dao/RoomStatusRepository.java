@@ -5,18 +5,17 @@ package com.pms.roomstatus.dao;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.pms.floor.entity.Floor;
+import com.pms.common.repository.SoftDeleteRepository;
 import com.pms.roomstatus.entity.RoomStatus;
 
 /**
  * 
  */
-public interface RoomStatusRepository extends JpaRepository<RoomStatus, Integer> , JpaSpecificationExecutor<RoomStatus>{
+public interface RoomStatusRepository extends SoftDeleteRepository<RoomStatus, Long> , JpaSpecificationExecutor<RoomStatus>{
 	
 List<RoomStatus> findByHotelId(Long hotelId);
 	

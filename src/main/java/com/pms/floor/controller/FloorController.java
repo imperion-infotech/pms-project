@@ -40,7 +40,7 @@ public class FloorController {
 
 //	@GetMapping("/admin/getfloor/{id}")
 	@GetMapping("/user/getfloor/{id}")
-	public ResponseEntity<Floor> getFloor(@PathVariable("id") Integer id) {
+	public ResponseEntity<Floor> getFloor(@PathVariable("id") Long id) {
 		Floor floor = service.getFloor(id);
 		return new ResponseEntity<Floor>(floor, HttpStatus.OK);
 	}
@@ -70,7 +70,7 @@ public class FloorController {
 
 	@PutMapping("/admin/updatefloor/{id}")
 //	@PutMapping("/auth/updatefloor/{id}")
-	public ResponseEntity<?> updateFloor(@PathVariable Integer id, @RequestBody Floor floorDetails) {
+	public ResponseEntity<?> updateFloor(@PathVariable Long id, @RequestBody Floor floorDetails) {
 		// Validate input
 		if (floorDetails == null || floorDetails.getName() == null || floorDetails.getName().trim().isEmpty()) {
 			return ResponseEntity.badRequest().body("Floor name must not be null or empty");
@@ -108,7 +108,7 @@ public class FloorController {
 
 	@DeleteMapping("/admin/deletefloor/{id}")
 //	@DeleteMapping("/user/deletefloor/{id}")
-	public ResponseEntity<String> deleteFloor(@PathVariable("id") int id) {
+	public ResponseEntity<String> deleteFloor(@PathVariable("id") Long id) {
 		boolean isDeleted = service.deleteFloor(id);
 		if (isDeleted) {
 			String responseContent = "Floor has been deleted successfully";

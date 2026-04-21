@@ -6,6 +6,7 @@ package com.pms.personaldetails.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -13,12 +14,13 @@ import com.pms.auditlog.annotation.Auditable;
 import com.pms.auditlog.entity.AuditLog;
 import com.pms.auditlog.repository.AuditLogRepository;
 import com.pms.auditlog.util.AuditUtil;
+import com.pms.common.service.SoftDeleteService;
 import com.pms.personaldetails.PersonalDetails;
 import com.pms.personaldetails.PersonalDetailsRepository;
 import com.pms.personaldetails.service.IPersonalDetailsService;
-import com.pms.search.specification.DocumentDetailsSpecification;
 import com.pms.search.specification.PersonalDetailsSpecification;
 import com.pms.security.configuration.HotelContext;
+import com.pms.security.configuration.UserContext;
 import com.pms.security.util.SecurityUtils;
 
 import jakarta.transaction.Transactional;
@@ -30,14 +32,18 @@ import jakarta.transaction.Transactional;
 public class PersonalDetailsServiceImpl implements IPersonalDetailsService {
 
 	
-	 private final PersonalDetailsRepository repository;
-	 private final AuditLogRepository auditRepo;
+	@Autowired
+	 private PersonalDetailsRepository repository;
+	@Autowired 
+	private AuditLogRepository auditRepo;
 
 	    public PersonalDetailsServiceImpl(PersonalDetailsRepository repository, AuditLogRepository auditRepo) {
 		super();
 		this.repository = repository;
 		this.auditRepo = auditRepo;
 	}
+	    @Autowired
+	    private SoftDeleteService softDeleteService;
 
 		public List<PersonalDetails> getAll() {
 			
@@ -68,6 +74,12 @@ public class PersonalDetailsServiceImpl implements IPersonalDetailsService {
 
 	    @Auditable(action = "CREATE", entity = "PERSONALDETAILS")
 	    public PersonalDetails create(PersonalDetails details) {
+	    	Long userId = UserContext.getUserId();
+
+		    if (userId == null) {
+		        throw new RuntimeException("User not selected");
+		    }
+		    details.setCreatedBy(userId);
 	        return repository.saveAndFlush(details);
 	        
 	    }
@@ -82,6 +94,12 @@ public class PersonalDetailsServiceImpl implements IPersonalDetailsService {
 	        existing.setPhone(details.getPhone());
 	        existing.setAddress(details.getAddress());
 	        existing.setContactInformationTypeEnum(details.getContactInformationTypeEnum());
+	        Long userId = UserContext.getUserId();
+		    if (userId == null) {
+		        throw new RuntimeException("User not selected");
+		    }
+		    existing.setUpdatedBy(userId);
+		    existing.setUpdatedOn(LocalDateTime.now());
 	        return repository.save(existing);
 	    }
 
@@ -96,6 +114,7 @@ public class PersonalDetailsServiceImpl implements IPersonalDetailsService {
 	        public void deletePersonalDetails(Long id) {
 	    		
 	    		Long hotelId = HotelContext.getHotelId();
+	    		Long userId = UserContext.getUserId();
 	   		 if (hotelId == null) {
 	   	         throw new RuntimeException("Hotel not selected");
 	   	     }
@@ -103,12 +122,13 @@ public class PersonalDetailsServiceImpl implements IPersonalDetailsService {
 	            PersonalDetails entity = repository.findByIdAndHotelIdAndIsDeletedFalse(id,hotelId)
 	                    .orElseThrow(() -> new RuntimeException("Record not found"));
 
-	            // ✅ Soft delete
-	            entity.setDeleted(true);
-	            entity.setDeletedAt(LocalDateTime.now());
-	            entity.setDeletedBy(SecurityUtils.getCurrentUser());
-
-	            repository.save(entity);
+//	            // ✅ Soft delete
+//	            entity.setDeleted(true);
+//	            entity.setDeletedOn(LocalDateTime.now());
+//	            entity.setDeletedBy(userId);
+//
+//	            repository.save(entity);
+	            softDeleteService.softDelete(id, repository);
 
 	            // ✅ Audit log
 	            AuditLog log = new AuditLog();

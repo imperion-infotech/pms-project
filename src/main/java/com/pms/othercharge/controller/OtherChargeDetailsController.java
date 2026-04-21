@@ -39,7 +39,7 @@ public class OtherChargeDetailsController {
 	}
 	
 	@GetMapping("/user/getotherchargedetails/{id}")
-	public ResponseEntity<OtherChargeDetails> getOtherChargeDetails(@PathVariable("id") Integer id) {
+	public ResponseEntity<OtherChargeDetails> getOtherChargeDetails(@PathVariable("id") Long id) {
 		OtherChargeDetails otherChargeDetails = service.getOtherChargeDetailsById(id);
 		return new ResponseEntity<OtherChargeDetails>(otherChargeDetails, HttpStatus.OK);
 	}
@@ -71,7 +71,7 @@ public class OtherChargeDetailsController {
 	}
 	
 	@PutMapping("/admin/updateotherchargedetails/{id}")
-	public ResponseEntity<?> updateOtherChargeDetails(@PathVariable Integer id, @RequestBody OtherChargeDetails otherChargeDetails) {
+	public ResponseEntity<?> updateOtherChargeDetails(@PathVariable Long id, @RequestBody OtherChargeDetails otherChargeDetails) {
 		// Validate input
 		if (otherChargeDetails == null || otherChargeDetails.getRemark() == null || otherChargeDetails.getRemark().trim().isEmpty()) {
 			return ResponseEntity.badRequest().body("otherChargeDetails remark must not be null or empty");
@@ -101,7 +101,7 @@ public class OtherChargeDetailsController {
 	}
 	
 	@DeleteMapping("/admin/deleteotherchargedetails/{id}")
-	public ResponseEntity<String> deleteOtherChargeDetails(@PathVariable("id") int id) {
+	public ResponseEntity<String> deleteOtherChargeDetails(@PathVariable("id") Long id) {
 		boolean isDeleted = service.deleteOtherChargeDetails(id);
 		if (isDeleted) {
 			String responseContent = "OtherChargeDetails has been deleted successfully";

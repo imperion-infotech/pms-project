@@ -1,5 +1,6 @@
 package com.pms.floor.services.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -9,12 +10,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.pms.building.entity.Building;
+import com.pms.common.service.SoftDeleteService;
 import com.pms.floor.dao.FloorsRepository;
 import com.pms.floor.dao.IFloorDAO;
 import com.pms.floor.entity.Floor;
 import com.pms.floor.services.IFloorService;
 import com.pms.search.specification.FloorSpecification;
 import com.pms.security.configuration.HotelContext;
+import com.pms.security.configuration.UserContext;
 
 @Service
 public class FloorServiceImpl implements IFloorService {
@@ -27,7 +30,8 @@ public class FloorServiceImpl implements IFloorService {
 	@Autowired
 	private FloorsRepository floorsRepository;
 	
-	
+	@Autowired
+    private SoftDeleteService softDeleteService;
 
 	public FloorServiceImpl(IFloorDAO dao, FloorsRepository floorsRepository) {
 		super();
@@ -49,39 +53,38 @@ public class FloorServiceImpl implements IFloorService {
 
 	public Floor createFloor(Floor floor) {
 //		return dao.createFloor(Floor);
+		Long userId = UserContext.getUserId();
+
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    floor.setCreatedBy(userId);
 		 return floorsRepository.saveAndFlush(floor);
 	}
 
-	public Floor updateFloor(int floorId, Floor floor) {
-		return dao.updateFloor(floorId, floor);
+	public Floor updateFloor(Long floorId, Floor floor) {
+		Long userId = UserContext.getUserId();
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+		floor.setUpdatedBy(userId);
+		floor.setUpdatedOn(LocalDateTime.now());
+		Floor b=floorsRepository.saveAndFlush(floor);
+//		return dao.updateFloor(floorId, floor);
+		return b;
 	}
 
-	public Floor getFloor(int floorId) {
+	public Floor getFloor(Long floorId) {
 		return floorsRepository.findByIdAndHotelId(floorId,HotelContext.getHotelId());
 	}
 
-	public boolean deleteFloor(int floorId) {
+	public boolean deleteFloor(Long floorId) {
 		
-		 Floor floor = getFloor(floorId);
-		 floor.setIsDeleted(true);
-		 floor.setIsActive(false);
-		 Floor b = floorsRepository.save(floor);
-			boolean isDeleted = false;
-			if(b.getId() != 0)
-			{
-				isDeleted=true;
-			} else 
-			{
-				isDeleted=false;
-			}
-			return isDeleted;
+		softDeleteService.softDelete(floorId, floorsRepository);
+		 return true;
 	}
 	
 	
-	 public Floor getFloorByIdAndHotelID(Integer id,Long hotelId) { // ✅ Implemented method
-	        return floorsRepository.findByIdAndHotelId(id,hotelId);
-	    }
-
 	 @Override
 	 public List<Floor> search(String name, String description) {
 
@@ -98,8 +101,4 @@ public class FloorServiceImpl implements IFloorService {
 
 	     return floorsRepository.findAll(spec);
 	 }
-
-
-
-	 
 }

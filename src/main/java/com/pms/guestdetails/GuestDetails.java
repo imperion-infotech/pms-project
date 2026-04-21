@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pms.baseentity.BaseEntity;
@@ -42,17 +43,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name="guest_details")
+@SQLRestriction("is_deleted = false")
 public class GuestDetails extends BaseEntity implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="guest_details_id")
-	private Integer id;
-	
-	@Column(name="created_on", nullable = false, updatable = false)
-	@CreationTimestamp // Automatically sets value when entity is persisted
-	private Date createdOn;
+	private Long id;
 	
 	@ManyToOne
     @JoinColumn(name = "room_master_id", insertable = false, updatable = false)
@@ -115,10 +113,6 @@ public class GuestDetails extends BaseEntity implements Serializable {
 		this.paymentDetails = paymentDetails;
 	}
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
 	@Column(name="check_in_date")
 	private LocalDateTime checkInDate;
 
@@ -141,9 +135,9 @@ public class GuestDetails extends BaseEntity implements Serializable {
     @Column(name = "is_deleted")
     private boolean isDeleted = false;
 
-    private LocalDateTime deletedAt;
+    private LocalDateTime deletedOn;
 
-    private String deletedBy;
+    private Long deletedBy;
 	
 	public RoomMaster getRoomMaster() {
 		return roomMaster;
@@ -153,8 +147,6 @@ public class GuestDetails extends BaseEntity implements Serializable {
 		this.roomMaster = roomMaster;
 	}
 
-	
-	
 	public LocalDateTime getCheckInDate() {
 		return checkInDate;
 	}
@@ -195,20 +187,12 @@ public class GuestDetails extends BaseEntity implements Serializable {
 		this.guestDetailsStatus = guestDetailsStatus;
 	}
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
-
-	public void setId(int id) {
+	
+	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public Date getCreatedOn() {
-		return createdOn;
-	}
-
-	public void setCreatedOn(Date createdOn) {
-		this.createdOn = createdOn;
 	}
 
 	public Integer getRoomMasterId() {
@@ -236,19 +220,19 @@ public class GuestDetails extends BaseEntity implements Serializable {
 		this.isDeleted = isDeleted;
 	}
 
-	public LocalDateTime getDeletedAt() {
-		return deletedAt;
+	public LocalDateTime getDeletedOn() {
+		return deletedOn;
 	}
 
-	public void setDeletedAt(LocalDateTime deletedAt) {
-		this.deletedAt = deletedAt;
+	public void setDeletedOn(LocalDateTime deletedOn) {
+		this.deletedOn = deletedOn;
 	}
 
-	public String getDeletedBy() {
+	public Long getDeletedBy() {
 		return deletedBy;
 	}
 
-	public void setDeletedBy(String deletedBy) {
+	public void setDeletedBy(Long deletedBy) {
 		this.deletedBy = deletedBy;
 	}
 

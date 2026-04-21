@@ -4,6 +4,7 @@
 package com.pms.room.entity;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -51,7 +52,7 @@ static final Logger logger = LoggerFactory.getLogger(RoomMaster.class);
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="id")
-	private int id;
+	private Long id;
 	
 	@Column(name="room_name")
 	private String roomName;
@@ -77,17 +78,13 @@ static final Logger logger = LoggerFactory.getLogger(RoomMaster.class);
 	@Column(name="non_room")
 	private boolean nonRoom;
 	
-	@Column(name="created_on", nullable = false, updatable = false)
-	@CreationTimestamp // Automatically sets value when entity is persisted
-	private Date createdOn;
-	
 	private String floorName;
 	
 	private String roomTypeName;
 	
 	private String buildingName;
 	
-	private Integer roomStatusId;
+	private Long roomStatusId;
 	
 	private String roomStatus;
 	
@@ -101,12 +98,9 @@ static final Logger logger = LoggerFactory.getLogger(RoomMaster.class);
 
 	
 	
-	public Integer getRoomStatusId() {
+	public Long getRoomStatusId() {
+//		this.roomStatusId = roomStatusId;
 		return roomStatusId;
-	}
-
-	public void setRoomStatusId(Integer roomStatusId) {
-		this.roomStatusId = roomStatusId;
 	}
 
 	@ManyToOne
@@ -170,11 +164,11 @@ static final Logger logger = LoggerFactory.getLogger(RoomMaster.class);
 			this.floor = floor;
 		}
 
-		public int getId() {
+		public Long getId() {
 			return id;
 		}
 
-		public void setId(int id) {
+		public void setId(Long id) {
 			this.id = id;
 		}
 
@@ -240,12 +234,8 @@ static final Logger logger = LoggerFactory.getLogger(RoomMaster.class);
 			this.nonRoom = nonRoom;
 		}
 
-		public Date getCreatedOn() {
-			return createdOn;
-		}
-
-		public void setCreatedOn(Date createdOn) {
-			this.createdOn = createdOn;
+		public String getFloorName() {
+			return floorName;
 		}
 
 		public Integer getBuildingId() {

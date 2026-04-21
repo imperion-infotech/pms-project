@@ -3,6 +3,7 @@
  */
 package com.pms.taxmaster.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -11,10 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import com.pms.floor.entity.Floor;
-import com.pms.search.specification.FloorSpecification;
+import com.pms.common.service.SoftDeleteService;
 import com.pms.search.specification.TaxMasterSpecification;
 import com.pms.security.configuration.HotelContext;
+import com.pms.security.configuration.UserContext;
 import com.pms.taxmaster.dao.ITaxMasterDAO;
 import com.pms.taxmaster.dao.TaxMastersRepository;
 import com.pms.taxmaster.entity.TaxMaster;
@@ -34,6 +35,9 @@ public class TaxMasterServiceImpl implements ITaxMasterService {
 	@Autowired
 	private TaxMastersRepository taxMastersRepository;
 	
+	@Autowired
+	private SoftDeleteService softDeleteService;
+	
 	
 
 	public TaxMasterServiceImpl(ITaxMasterDAO dao, TaxMastersRepository taxMastersRepository) {
@@ -52,11 +56,22 @@ public class TaxMasterServiceImpl implements ITaxMasterService {
 	}
 
 	public TaxMaster createTaxMaster(TaxMaster taxMaster) {
-//		return dao.createFloor(Floor);
+		Long userId = UserContext.getUserId();
+
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    taxMaster.setCreatedBy(userId);
 		 return taxMastersRepository.saveAndFlush(taxMaster);
 	}
 
-	public TaxMaster updateTaxMaster(int taxMasterId, TaxMaster taxMaster) {
+	public TaxMaster updateTaxMaster(Long taxMasterId, TaxMaster taxMaster) {
+		Long userId = UserContext.getUserId();
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    taxMaster.setUpdatedBy(userId);
+	    taxMaster.setUpdatedOn(LocalDateTime.now());
 		return dao.updateTaxMaster(taxMasterId, taxMaster);
 	}
 
@@ -65,23 +80,12 @@ public class TaxMasterServiceImpl implements ITaxMasterService {
 	}
 
 	public boolean deleteTaxMaster(int taxMasterId) {
-		TaxMaster taxMaster = taxMastersRepository.findByIdAndHotelId(taxMasterId,HotelContext.getHotelId());
-		 boolean isDeleted=true;;
-		 if(taxMaster == null ) {
-			 isDeleted=false;
-			 throw new RuntimeException("taxMaster not found");
-		 }
-		 taxMaster.setIsDeleted(true);
-		 taxMaster.setIsActive(false);
-		 TaxMaster b= taxMastersRepository.save(taxMaster);
-			if(b.getId() != 0)
-			{
-				isDeleted=true;
-			} else 
-			{
-				isDeleted=false;
-			}
-			return isDeleted;
+		try {
+		softDeleteService.softDelete(taxMasterId, taxMastersRepository);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return true;
 	}
 	
 	

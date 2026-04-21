@@ -27,6 +27,7 @@ import com.pms.room.entity.RoomMaster;
 import com.pms.room.services.IRoomMasterService;
 import com.pms.roomtype.dao.RoomTypeRepository;
 import com.pms.roomtype.entity.RoomType;
+import com.pms.security.configuration.HotelContext;
 
 
 /**
@@ -71,7 +72,7 @@ public class RoomMasterController {
 
 	@GetMapping("/user/getroommaster/{id}")
 //	@GetMapping("/auth/getroommaster/{id}")
-	public ResponseEntity<RoomMaster> getRoomMaster(@PathVariable("id") Integer id) {
+	public ResponseEntity<RoomMaster> getRoomMaster(@PathVariable("id") Long id) {
 		RoomMaster roomMaster = service.getRoomMaster(id);
 		return new ResponseEntity<RoomMaster>(roomMaster, HttpStatus.OK);
 	}
@@ -118,7 +119,7 @@ public class RoomMasterController {
 
 	@PutMapping("/admin/updateroommaster/{id}")
 //	@PutMapping("/auth/updateroommaster/{id}")
-	public ResponseEntity<?> updateRoomType(@PathVariable Integer id, @RequestBody RoomMaster roomMaster) {
+	public ResponseEntity<?> updateRoomType(@PathVariable Long id, @RequestBody RoomMaster roomMaster) {
 		// Validate input
 		if (roomMaster == null || roomMaster.getFloorId() == null
 				) {
@@ -153,12 +154,18 @@ public class RoomMasterController {
 			existingRoomMaster.setRoomName(roomMaster.getRoomName());
 			existingRoomMaster.setRoomShortName(roomMaster.getRoomShortName());
 //			existingRoomMaster.setRoomStatusTableId(roomMaster.getRoomStatusTableId());
-			existingRoomMaster.setRoomType(roomTypeRepository.getById(roomMaster.getRoomTypeId()));
+			
+			Long hotelId = HotelContext.getHotelId();
+		    if (hotelId == null) {
+		        throw new RuntimeException("Hotel not selected");
+		    }
+			
+		    existingRoomMaster.setRoomType(roomTypeRepository.findByIdAndHotelId((long)roomMaster.getRoomTypeId(),hotelId));
 			
 			existingRoomMaster.setHandicap(roomMaster.isHandicap());
 			existingRoomMaster.setSmoking(roomMaster.isSmoking());
 			existingRoomMaster.setNonRoom(roomMaster.isNonRoom());
-			existingRoomMaster.setRoomStatusId(roomMaster.getRoomStatusId());
+//			existingRoomMaster.setRoomStatusId(roomMaster.getRoomStatusId());
 			existingRoomMaster.setRoomStatus(roomMaster.getRoomStatus());
 			// You can add more setters here for other updatable fields
 
@@ -176,7 +183,7 @@ public class RoomMasterController {
 
 	@DeleteMapping("/admin/deleteroommaster/{id}")
 //	@DeleteMapping("/auth/deleteroommaster/{id}")
-	public ResponseEntity<String> deleteRoomStatus(@PathVariable("id") int id) {
+	public ResponseEntity<String> deleteRoomStatus(@PathVariable("id") Long id) {
 		boolean isDeleted = service.deleteRoomMaster(id);
 		if (isDeleted) {
 			String responseContent = "RoomMaster has been deleted successfully";

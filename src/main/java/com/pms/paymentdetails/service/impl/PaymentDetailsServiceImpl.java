@@ -3,6 +3,7 @@
  */
 package com.pms.paymentdetails.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.pms.common.service.SoftDeleteService;
 import com.pms.floor.entity.Floor;
 import com.pms.paymentdetails.entity.PaymentDetails;
 import com.pms.paymentdetails.entity.PaymentDetailsResponseDTO;
@@ -20,6 +22,7 @@ import com.pms.paymenttype.entity.PaymentType;
 import com.pms.paymenttype.repository.PaymentTypeRepository;
 import com.pms.paymenttype.service.IPaymentTypeService;
 import com.pms.security.configuration.HotelContext;
+import com.pms.security.configuration.UserContext;
 
 /**
  * 
@@ -38,6 +41,9 @@ public class PaymentDetailsServiceImpl implements IPaymentDetailsService{
 	
 	@Autowired
 	private IPaymentTypeService service;
+	
+	@Autowired
+	private SoftDeleteService  softDeleteService;
 	
 	
 
@@ -58,7 +64,7 @@ public class PaymentDetailsServiceImpl implements IPaymentDetailsService{
 	}
 	
 	@Override
-	public PaymentDetails getPaymentDetailsById(Integer id) {
+	public PaymentDetails getPaymentDetailsById(Long id) {
 		Long hotelId = HotelContext.getHotelId();
 
 	    if (hotelId == null) {
@@ -80,11 +86,17 @@ public class PaymentDetailsServiceImpl implements IPaymentDetailsService{
 	@Override
 	public PaymentDetails createPaymentDetails(PaymentDetails paymentDetails) {
 		paymentDetails.setPaymentType(paymentDetails.getPaymentType());
+		Long userId = UserContext.getUserId();
+
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+		paymentDetails.setCreatedBy(userId);
 		return paymentDetailsRepository.save(paymentDetails);
 	}
 
 	@Override
-	public PaymentDetails updatePaymentDetails(int paymentDetailsId, PaymentDetails paymentDetails) {
+	public PaymentDetails updatePaymentDetails(Long paymentDetailsId, PaymentDetails paymentDetails) {
 		PaymentDetails paymentDetailsFromDB = getPaymentDetailsById(paymentDetailsId);
 		paymentDetailsFromDB.setAuthorizationNo(paymentDetails.getAuthorizationNo());
 		paymentDetailsFromDB.setAmount(paymentDetails.getAmount());
@@ -98,21 +110,22 @@ public class PaymentDetailsServiceImpl implements IPaymentDetailsService{
 		paymentDetailsFromDB.setPaymentDate(paymentDetails.getPaymentDate());
 		paymentDetailsFromDB.setTotalAmount(paymentDetails.getTotalAmount());
 		
+		Long userId = UserContext.getUserId();
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    paymentDetailsFromDB.setUpdatedBy(userId);
+	    paymentDetailsFromDB.setUpdatedOn(LocalDateTime.now());
+		
 		paymentDetailsRepository.saveAndFlush(paymentDetailsFromDB);
 		PaymentDetails updatedPaymentDetails = getPaymentDetailsById(paymentDetailsId);
 		return updatedPaymentDetails;
 	}
 
 	@Override
-	public boolean deletePaymentDetails(int paymentDetailsId) {
-		 PaymentDetails paymentDetails = paymentDetailsRepository.findByIdAndHotelId(paymentDetailsId,HotelContext.getHotelId());
-		 boolean isDeleted=true;;
-		 if(paymentDetails == null ) {
-			 isDeleted=false;
-			 throw new RuntimeException("floor not found");
-		 }
-		 paymentDetailsRepository.delete(paymentDetails);
-		 return isDeleted;
+	public boolean deletePaymentDetails(Long paymentDetailsId) {
+		softDeleteService.softDelete(paymentDetailsId, paymentDetailsRepository);
+		return true;
 	}
 	
 	 public List<PaymentDetailsResponseDTO> getPaymentsByGuestId(Long guestId) {

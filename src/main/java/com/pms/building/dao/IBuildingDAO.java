@@ -18,10 +18,10 @@ public interface IBuildingDAO {
 static final Logger logger = LoggerFactory.getLogger(IBuildingDAO.class);
 	
 	public List<Building> getBuildings();
-	public Building getBuilding(int buildingId);
+	public Building getBuilding(Long buildingId);
 	public Building createBuilding(Building building);
-	public Building updateBuilding(int buildingId,Building building);
-	public boolean deleteBuilding(int buildingId);
+	public Building updateBuilding(Long buildingId,Building building);
+	public boolean deleteBuilding(Long buildingId);
 	public Building findById(Integer id);
 
 }

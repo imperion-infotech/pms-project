@@ -18,10 +18,10 @@ public interface IRoomMasterDAO {
 static final Logger logger = LoggerFactory.getLogger(IRoomMasterDAO.class);
 	
 	public Page<RoomMaster> getRoomMasters(Pageable pageable);
-	public RoomMaster getRoomMaster(int roomMasterId);
+	public RoomMaster getRoomMaster(Long roomMasterId);
 	public RoomMaster createRoomMaster(RoomMaster roomStatus);
-	public RoomMaster updateRoomMaster(int roomMasterId,RoomMaster roomMaster);
-	public boolean deleteRoomMaster(int roomMasterId);
+	public RoomMaster updateRoomMaster(Long roomMasterId,RoomMaster roomMaster);
+	public boolean deleteRoomMaster(Long roomMasterId);
 	public RoomMaster findById(Integer id);
 
 }

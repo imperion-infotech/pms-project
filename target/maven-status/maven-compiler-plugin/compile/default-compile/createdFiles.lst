@@ -124,6 +124,7 @@ com\pms\floor\services\impl\FloorServiceImpl.class
 com\pms\security\entity\PasswordResetToken.class
 com\pms\room\dao\impl\RoomMasterRepository.class
 com\pms\floor\controller\BookStoreController.class
+com\pms\security\configuration\UserContext.class
 com\pms\rent\dao\impl\RentDetailsDAOImpl.class
 com\pms\room\dao\impl\package-info.class
 com\pms\othercharge\service\impl\OtherChargeDetailsServiceImpl.class

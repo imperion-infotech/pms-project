@@ -20,10 +20,10 @@ public interface IRoomStatusDAO {
 static final Logger logger = LoggerFactory.getLogger(IRoomStatusDAO.class);
 	
 	public List<RoomStatus> getRoomStatuses();
-	public RoomStatus getRoomStatus(int roomStatusId);
+	public RoomStatus getRoomStatus(Long roomStatusId);
 	public RoomStatus createRoomStatus(RoomStatus roomStatus);
-	public RoomStatus updateRoomStatus(int roomStatusId,RoomStatus roomStatus);
-	public boolean deleteRoomStatus(int roomStatusId);
-	public RoomStatus findById(Integer id);
+	public RoomStatus updateRoomStatus(Long roomStatusId,RoomStatus roomStatus);
+	public boolean deleteRoomStatus(Long roomStatusId);
+//	public RoomStatus findById(Long id);
 
 }

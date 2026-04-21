@@ -1,5 +1,6 @@
 package com.pms.roommaster.services.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -10,16 +11,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import com.pms.floor.entity.Floor;
+import com.pms.common.service.SoftDeleteService;
 import com.pms.room.dao.IRoomMasterDAO;
 import com.pms.room.dao.impl.RoomMasterRepository;
 import com.pms.room.entity.RoomMaster;
 import com.pms.room.services.IRoomMasterService;
 import com.pms.roomstatus.dao.RoomStatusRepository;
-import com.pms.roomstatus.entity.RoomStatus;
-import com.pms.search.specification.FloorSpecification;
 import com.pms.search.specification.RoomMasterSpecification;
 import com.pms.security.configuration.HotelContext;
+import com.pms.security.configuration.UserContext;
 
 @Service
 public class RoomMasterServiceImpl implements IRoomMasterService {
@@ -34,6 +34,9 @@ static final Logger logger = LoggerFactory.getLogger(RoomMasterServiceImpl.class
 	
 	@Autowired
 	RoomStatusRepository roomStatusRepository;
+
+	@Autowired
+	SoftDeleteService softDeleteService;
 	
 	public RoomMasterServiceImpl(IRoomMasterDAO dao, RoomMasterRepository roomMasterRepository,
 			RoomStatusRepository roomStatusRepository) {
@@ -55,38 +58,38 @@ static final Logger logger = LoggerFactory.getLogger(RoomMasterServiceImpl.class
 	}
 	
 	public RoomMaster createRoomMaster(RoomMaster roomMaster) {
+		Long userId = UserContext.getUserId();
+
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    roomMaster.setCreatedBy(userId);
 		return roomMasterRepository.saveAndFlush(roomMaster);
 	}
 
-	public RoomMaster updateRoomMaster(int roomMasterId, RoomMaster roomMaster) {
-		return dao.updateRoomMaster(roomMasterId, roomMaster);
+	public RoomMaster updateRoomMaster(Long roomMasterId, RoomMaster roomMaster) {
+		Long userId = UserContext.getUserId();
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    roomMaster.setUpdatedBy(userId);
+	    roomMaster.setUpdatedOn(LocalDateTime.now());
+	    RoomMaster b = roomMasterRepository.saveAndFlush(roomMaster);
+		return b;
 	}
 
-	public RoomMaster getRoomMaster(int roomMasterId) {
+	public RoomMaster getRoomMaster(Long roomMasterId) {
 		return roomMasterRepository.findByIdAndHotelId(roomMasterId,HotelContext.getHotelId());
 	}
 
-	public boolean deleteRoomMaster(int roomMasterId) {
-//		return dao.deleteRoomMaster(roomMasterId);
-		 //
-		 RoomMaster roomMaster = getRoomMaster(roomMasterId);
-		 roomMaster.setIsDeleted(true);
-		 roomMaster.setIsActive(false);
-		 RoomMaster b = roomMasterRepository.save(roomMaster);
-			boolean isDeleted = false;
-			if(b.getId() != 0)
-			{
-				isDeleted=true;
-			} else 
-			{
-				isDeleted=false;
-			}
-			return isDeleted;
+	public boolean deleteRoomMaster(Long roomMasterId) {
+		softDeleteService.softDelete(roomMasterId, roomMasterRepository);
+		return true;
 	}
 
 	
 	@Override
-	public RoomMaster getRoomMasterByIdAndHotelID(Integer id) { // ✅ Implemented method
+	public RoomMaster getRoomMasterByIdAndHotelID(Long id) { // ✅ Implemented method
 		Long hotelId = HotelContext.getHotelId(); 
         return roomMasterRepository.findByIdAndHotelId(id,hotelId);
     }
@@ -109,6 +112,5 @@ static final Logger logger = LoggerFactory.getLogger(RoomMasterServiceImpl.class
         return roomMasterRepository.findAll(spec);
     }
 
-	
 
 }

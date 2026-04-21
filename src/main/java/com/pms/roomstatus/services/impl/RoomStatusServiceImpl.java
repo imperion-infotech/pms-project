@@ -3,6 +3,7 @@
  */
 package com.pms.roomstatus.services.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -11,14 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.pms.common.service.SoftDeleteService;
 import com.pms.roomstatus.dao.IRoomStatusDAO;
 import com.pms.roomstatus.dao.RoomStatusRepository;
 import com.pms.roomstatus.entity.RoomStatus;
 import com.pms.roomstatus.services.IRoomStatusService;
-import com.pms.roomtype.entity.RoomType;
-import com.pms.search.specification.FloorSpecification;
 import com.pms.search.specification.RoomStatusSpecification;
 import com.pms.security.configuration.HotelContext;
+import com.pms.security.configuration.UserContext;
 
 /**
  * 
@@ -33,6 +34,9 @@ static final Logger logger = LoggerFactory.getLogger(RoomStatusServiceImpl.class
 	
 	@Autowired
 	private RoomStatusRepository roomStatusRepository;
+	
+	@Autowired
+	private SoftDeleteService softDeleteService;
 	
 	public RoomStatusServiceImpl(IRoomStatusDAO dao, RoomStatusRepository roomStatusRepository) {
 		super();
@@ -50,10 +54,22 @@ static final Logger logger = LoggerFactory.getLogger(RoomStatusServiceImpl.class
 	}
 
 	public RoomStatus createRoomStatus(RoomStatus roomStatus) {
+		Long userId = UserContext.getUserId();
+
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    roomStatus.setCreatedBy(userId);
 		 return roomStatusRepository.saveAndFlush(roomStatus);
 	}
 
-	public RoomStatus updateRoomStatus(int roomStatuseId, RoomStatus roomStatus) {
+	public RoomStatus updateRoomStatus(Long roomStatuseId, RoomStatus roomStatus) {
+		Long userId = UserContext.getUserId();
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    roomStatus.setUpdatedBy(userId);
+	    roomStatus.setUpdatedOn(LocalDateTime.now());
 		return dao.updateRoomStatus(roomStatuseId, roomStatus);
 	}
 
@@ -62,20 +78,8 @@ static final Logger logger = LoggerFactory.getLogger(RoomStatusServiceImpl.class
 	}
 
 	public boolean deleteRoomStatus(Long roomStatusId) {
-//		return dao.deleteRoomStatus(roomStatusId);
-		RoomStatus roomStatus = getRoomStatus(roomStatusId);
-		roomStatus.setIsDeleted(true);
-		roomStatus.setIsActive(false);
-		RoomStatus b = roomStatusRepository.save(roomStatus);
-		boolean isDeleted = false;
-		if(b.getId() != 0)
-		{
-			isDeleted=true;
-		} else 
-		{
-			isDeleted=false;
-		}
-		return isDeleted;
+		softDeleteService.softDelete(roomStatusId, roomStatusRepository);
+		return true;
 	}
 
 	

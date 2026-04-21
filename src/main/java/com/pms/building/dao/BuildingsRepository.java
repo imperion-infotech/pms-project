@@ -5,18 +5,19 @@ package com.pms.building.dao;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import com.pms.building.entity.Building;
-import com.pms.floor.entity.Floor;
+import com.pms.common.repository.SoftDeleteRepository;
 
 /**
  * 
  */
-public interface BuildingsRepository extends JpaRepository<Building, Integer> , JpaSpecificationExecutor<Building>{
+@Repository
+public interface BuildingsRepository extends SoftDeleteRepository<Building, Long> , JpaSpecificationExecutor<Building>{
 	
 	List<Building> findByHotelId(Long hotelId);
 	

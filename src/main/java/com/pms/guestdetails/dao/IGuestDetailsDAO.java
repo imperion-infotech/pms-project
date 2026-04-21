@@ -20,9 +20,9 @@ public interface IGuestDetailsDAO {
 static final Logger logger = LoggerFactory.getLogger(IGuestDetailsDAO.class);
 	
 	public List<GuestDetails> getGuestDetails();
-	public GuestDetails getGuestDetail(int guestDetailsId);
+	public GuestDetails getGuestDetail(Long guestDetailsId);
 	public GuestDetails createGuestDetails(GuestDetails guestDetails);
-	public GuestDetails updateGuestDetails(int guestDetailsId,GuestDetails guestDetails);
+	public GuestDetails updateGuestDetails(Long guestDetailsId,GuestDetails guestDetails);
 	public GuestDetails findById(Integer id);
-	public boolean deleteGuestDetails(int guestDetailsId);
+	public boolean deleteGuestDetails(Long guestDetailsId);
 }

@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +41,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name="rent_details")
+@SQLRestriction("is_deleted = false")
 public class RentDetails extends BaseEntity implements Serializable {
 	
 static final Logger logger = LoggerFactory.getLogger(RentDetails.class);
@@ -48,7 +50,7 @@ static final Logger logger = LoggerFactory.getLogger(RentDetails.class);
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="id")
-	private Integer id;
+	private Long id;
 	
 	@Column(name="rent")
 	private Double rent;
@@ -57,7 +59,7 @@ static final Logger logger = LoggerFactory.getLogger(RentDetails.class);
 	private Double basic;
 	
 	@Column(name="tax_id")
-	private Integer taxId;
+	private Long taxId;
 	
 	@OneToOne
     @JoinColumn(name = "tax_id", insertable = false, updatable = false)
@@ -90,25 +92,15 @@ static final Logger logger = LoggerFactory.getLogger(RentDetails.class);
 //	 @OneToOne(mappedBy = "rentDetails")
 //	 private GuestDetails guest;
 	
-	@Column(name="created_on", nullable = false, updatable = false)
-	@CreationTimestamp // Automatically sets value when entity is persisted
-	private Date createdOn;
-	
 	 // ✅ NEW FIELDS (Soft Delete)
     @Column(name = "is_deleted")
     private boolean isDeleted = false;
 
-    private LocalDateTime deletedAt;
+    private LocalDateTime deletedOn;
 
-    private String deletedBy;
+    private Long deletedBy;
     
-	public Date getCreatedOn() {
-		return createdOn;
-	}
-
-	public void setCreatedOn(Date createdOn) {
-		this.createdOn = createdOn;
-	}
+	
 
 	public boolean isDeleted() {
 		return isDeleted;
@@ -118,28 +110,28 @@ static final Logger logger = LoggerFactory.getLogger(RentDetails.class);
 		this.isDeleted = isDeleted;
 	}
 
-	public LocalDateTime getDeletedAt() {
-		return deletedAt;
+	public LocalDateTime getDeletedOn() {
+		return deletedOn;
 	}
 
-	public void setDeletedAt(LocalDateTime deletedAt) {
-		this.deletedAt = deletedAt;
+	public void setDeletedOn(LocalDateTime deletedOn) {
+		this.deletedOn = deletedOn;
 	}
 
-	public String getDeletedBy() {
+	public Long getDeletedBy() {
 		return deletedBy;
 	}
 
-	public void setDeletedBy(String deletedBy) {
+	public void setDeletedBy(Long deletedBy) {
 		this.deletedBy = deletedBy;
 	}
 
-	public int getId() {
-		return id;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
-	public void setId(int id) {
-		this.id = id;
+	public Long getId() {
+		return id;
 	}
 
 	public Double getRent() {
@@ -158,11 +150,11 @@ static final Logger logger = LoggerFactory.getLogger(RentDetails.class);
 		this.basic = basic;
 	}
 
-	public Integer getTaxId() {
+	public Long getTaxId() {
 		return taxId;
 	}
 
-	public void setTaxId(Integer taxId) {
+	public void setTaxId(Long taxId) {
 		this.taxId = taxId;
 	}
 

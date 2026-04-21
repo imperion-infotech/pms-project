@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.pms.security.configuration.HotelContext;
+import com.pms.security.configuration.UserContext;
 import com.pms.security.entity.User;
 
 import io.jsonwebtoken.Claims;
@@ -42,6 +43,7 @@ public class JwtUtil {
     
     public String generateToken(User user, Long hotelId) {
     	 HotelContext.setHotelId(hotelId);
+    	 UserContext.setUserId(user.getId());
     	return Jwts.builder()
     	        .setSubject(user.getUsername())
     	        .claim("userId", user.getId())
@@ -70,6 +72,11 @@ public class JwtUtil {
     public Long extractHotelId(String token) {
         Claims claims = extractAllClaims(token);
         return claims.get("hotelId", Long.class);
+    }
+    
+    public Long extractUserId(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.get("userId", Long.class);
     }
     
     private Claims extractAllClaims(String token) {

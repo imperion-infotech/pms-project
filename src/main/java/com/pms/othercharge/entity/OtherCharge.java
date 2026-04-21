@@ -4,9 +4,11 @@
 package com.pms.othercharge.entity;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +37,7 @@ import lombok.Setter;
 @Table(name="other_charge")
 @Entity
 @Data
+@SQLRestriction("is_deleted = false")
 public class OtherCharge extends BaseEntity  implements Serializable{
 	
 static final Logger logger = LoggerFactory.getLogger(OtherCharge.class);
@@ -45,11 +48,7 @@ static final Logger logger = LoggerFactory.getLogger(OtherCharge.class);
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="id")
-	private Integer id;
-	
-	@Column(name="created_on", nullable = false, updatable = false)
-	@CreationTimestamp // Automatically sets value when entity is persisted
-	private Date createdOn;
+	private Long id;
 	
 	@Column(name="short_name")
 	private String otherChargeShortName;
@@ -84,23 +83,14 @@ static final Logger logger = LoggerFactory.getLogger(OtherCharge.class);
 	@Column(name="is_forecasting_revenue")
 	private Boolean foreCastingRevenue;
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public Date getCreatedOn() {
-		return createdOn;
-	}
-
-	public void setCreatedOn(Date createdOn) {
-		this.createdOn = createdOn;
-	}
-
-	
 	public String getOtherChargeShortName() {
 		return otherChargeShortName;
 	}

@@ -39,7 +39,7 @@ public class BuildingDAOImpl implements IBuildingDAO {
 	}
 	
 
-	public Building getBuilding(int buildingId) {
+	public Building getBuilding(Long buildingId) {
 		return entityManager.find(Building.class, buildingId);
 	}
 
@@ -49,7 +49,7 @@ public class BuildingDAOImpl implements IBuildingDAO {
 		return b;
 	}
 
-	public Building updateBuilding(int buildingId, Building building) {
+	public Building updateBuilding(Long buildingId, Building building) {
 		//First We are taking Book detail from database by given book id and 
 				// then updating detail with provided book object
 				Building buildingFromDB = getBuilding(buildingId);
@@ -62,7 +62,7 @@ public class BuildingDAOImpl implements IBuildingDAO {
 				return updatedBuilding;
 	}
 
-	public boolean deleteBuilding(int buildingId) {
+	public boolean deleteBuilding(Long buildingId) {
 		Building building = getBuilding(buildingId);
 		entityManager.remove(building);
 		

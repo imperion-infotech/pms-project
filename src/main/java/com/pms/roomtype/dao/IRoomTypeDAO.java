@@ -19,10 +19,10 @@ public interface IRoomTypeDAO {
 static final Logger logger = LoggerFactory.getLogger(IRoomTypeDAO.class);
 	
 	public List<RoomType> getRoomTypes();
-	public RoomType getRoomType(int roomTypeId);
+	public RoomType getRoomType(Long roomTypeId);
 	public RoomType createRoomType(RoomType roomType);
-	public RoomType updateRoomType(int roomTypeId,RoomType floor);
-	public boolean deleteRoomType(int roomTypeId);
+	public RoomType updateRoomType(Long roomTypeId,RoomType floor);
+	public boolean deleteRoomType(Long roomTypeId);
 	public RoomType findById(Integer id);
 
 }

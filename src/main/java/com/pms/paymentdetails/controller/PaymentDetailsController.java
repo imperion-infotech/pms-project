@@ -36,12 +36,11 @@ public class PaymentDetailsController {
 	@GetMapping("/user/getAllpaymentdetails")
 	public ResponseEntity<List<PaymentDetails>> getPaymentDetails() {
 		List<PaymentDetails> paymentDetails = service.getAllPaymentDetails();
-		
 		return new ResponseEntity<List<PaymentDetails>>(paymentDetails, HttpStatus.OK);
 	}
 	
 	@GetMapping("/user/getpaymentdetails/{id}")
-	public ResponseEntity<PaymentDetails> getPaymentDetails(@PathVariable("id") Integer id) {
+	public ResponseEntity<PaymentDetails> getPaymentDetails(@PathVariable("id") Long id) {
 		PaymentDetails paymentDetails = service.getPaymentDetailsById(id);
 		return new ResponseEntity<PaymentDetails>(paymentDetails, HttpStatus.OK);
 	}
@@ -77,7 +76,7 @@ public class PaymentDetailsController {
 	
 	
 	@PutMapping("/admin/updatepaymentdetails/{id}")
-	public ResponseEntity<?> updatePaymentDetails(@PathVariable Integer id, @RequestBody PaymentDetails paymentDetails) {
+	public ResponseEntity<?> updatePaymentDetails(@PathVariable Long id, @RequestBody PaymentDetails paymentDetails) {
 		// Validate input
 		if (paymentDetails == null || paymentDetails.getPaymentType()== null ) {
 			return ResponseEntity.badRequest().body("PaymentDetails PaymentType must not be null or empty");
@@ -106,7 +105,6 @@ public class PaymentDetailsController {
 			
 
 			PaymentDetails updatedPaymentDetails = service.updatePaymentDetails(existingPaymentDetails.getId(), existingPaymentDetails);
-
 			return ResponseEntity.ok(updatedPaymentDetails);
 
 		} catch (Exception e) {
@@ -117,7 +115,7 @@ public class PaymentDetailsController {
 	}
 	
 	@DeleteMapping("/admin/deletepaymentdetails/{id}")
-	public ResponseEntity<String> deletePaymentDetails(@PathVariable("id") int id) {
+	public ResponseEntity<String> deletePaymentDetails(@PathVariable("id") Long id) {
 		boolean isDeleted = service.deletePaymentDetails(id);
 		if (isDeleted) {
 			String responseContent = "PaymentDetails has been deleted successfully";

@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,25 +46,26 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name="stay_details")
+@SQLRestriction("is_deleted = false")
 public class StayDetails extends BaseEntity implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name="floor_id", nullable = false)
-    private Integer floorId;
+    private Long floorId;
     
     @Column(name="building_id",nullable = false)
-    private Integer buildingId;
+    private Long buildingId;
     
     @Column(name="room_type_id",nullable = false)
-    private Integer roomTypeId;
+    private Long roomTypeId;
     
     @Column(name="room_master_id",nullable = false)
-    private Integer roomMasterId;
+    private Long roomMasterId;
     
     @Column(name="comment",nullable = false)
     private String comment;
@@ -78,11 +80,6 @@ public class StayDetails extends BaseEntity implements Serializable{
    	@Column(name = "stay_status_enum", nullable = false)
    	private StayStatusEnum stayStatusEnum = StayStatusEnum.UnConfirmed;
    	
-    
-    @Column(name="created_on", nullable = false, updatable = false)
-	@CreationTimestamp // Automatically sets value when entity is persisted
-	private Date createdOn;
-    
     @Column(nullable = false)
     private Integer noOfGuest;
     
@@ -90,15 +87,15 @@ public class StayDetails extends BaseEntity implements Serializable{
     @Column(name = "is_deleted")
     private boolean isDeleted = false;
 
-    private LocalDateTime deletedAt;
+    private LocalDateTime deletedOn;
 
-    private String deletedBy;
+    private Long deletedBy;
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -106,11 +103,11 @@ public class StayDetails extends BaseEntity implements Serializable{
     @JoinColumn(name = "floor_id", insertable = false, updatable = false)
     private Floor floor;
 	
-	public Integer getFloorId() {
+	public Long getFloorId() {
 		return floorId;
 	}
 
-	public void setFloorId(Integer floorId) {
+	public void setFloorId(Long floorId) {
 		this.floorId = floorId;
 	}
 
@@ -118,11 +115,11 @@ public class StayDetails extends BaseEntity implements Serializable{
     @JoinColumn(name = "building_id", insertable = false, updatable = false)
     private Building building;
 	
-	public Integer getBuildingId() {
+	public Long getBuildingId() {
 		return buildingId;
 	}
 
-	public void setBuildingId(Integer buildingId) {
+	public void setBuildingId(Long buildingId) {
 		this.buildingId = buildingId;
 	}
 
@@ -130,11 +127,11 @@ public class StayDetails extends BaseEntity implements Serializable{
     @JoinColumn(name = "room_type_id", insertable = false, updatable = false)
     private RoomType roomType;
 	
-	public Integer getRoomTypeId() {
+	public Long getRoomTypeId() {
 		return roomTypeId;
 	}
 
-	public void setRoomTypeId(Integer roomTypeId) {
+	public void setRoomTypeId(Long roomTypeId) {
 		this.roomTypeId = roomTypeId;
 	}
 
@@ -174,11 +171,11 @@ public class StayDetails extends BaseEntity implements Serializable{
 		this.roomMaster = roomMaster;
 	}
 
-	public Integer getRoomMasterId() {
+	public Long getRoomMasterId() {
 		return roomMasterId;
 	}
 
-	public void setRoomMasterId(Integer roomMasterId) {
+	public void setRoomMasterId(Long roomMasterId) {
 		this.roomMasterId = roomMasterId;
 	}
 
@@ -214,14 +211,18 @@ public class StayDetails extends BaseEntity implements Serializable{
 		this.noOfGuest = noOfGuest;
 	}
 	
-	public Date getCreatedOn() {
-		return createdOn;
+	public LocalDateTime getDeletedOn() {
+		return deletedOn;
 	}
 
-	public void setCreatedOn(Date createdOn) {
-		this.createdOn = createdOn;
+	public void setDeletedOn(LocalDateTime deletedOn) {
+		this.deletedOn = deletedOn;
 	}
-	
+
+	public void setDeletedBy(Long deletedBy) {
+		this.deletedBy = deletedBy;
+	}
+
 	public boolean isDeleted() {
 		return isDeleted;
 	}
@@ -230,20 +231,10 @@ public class StayDetails extends BaseEntity implements Serializable{
 		this.isDeleted = isDeleted;
 	}
 
-	public LocalDateTime getDeletedAt() {
-		return deletedAt;
-	}
+	
 
-	public void setDeletedAt(LocalDateTime deletedAt) {
-		this.deletedAt = deletedAt;
-	}
-
-	public String getDeletedBy() {
+	public Long getDeletedBy() {
 		return deletedBy;
-	}
-
-	public void setDeletedBy(String deletedBy) {
-		this.deletedBy = deletedBy;
 	}
 
 	@Override
@@ -265,8 +256,6 @@ public class StayDetails extends BaseEntity implements Serializable{
 		builder.append(rateTypeEnum);
 		builder.append(", stayStatusEnum=");
 		builder.append(stayStatusEnum);
-		builder.append(", createdOn=");
-		builder.append(createdOn);
 		builder.append(", noOfGuest=");
 		builder.append(noOfGuest);
 		builder.append(", floor=");

@@ -15,7 +15,7 @@ public interface IOtherChargeDetailsService {
 	
 	List<OtherChargeDetails> getAllOtherChargeDetails();
 	OtherChargeDetails createOtherChargeDetails(OtherChargeDetails otherChargeDetails);
-	OtherChargeDetails updateOtherChargeDetails(int otherChargeDetailsId, OtherChargeDetails otherChargeDetails);
-	OtherChargeDetails getOtherChargeDetailsById(Integer id);
-	public boolean deleteOtherChargeDetails(int otherChargeDetailsId);
+	OtherChargeDetails updateOtherChargeDetails(Long otherChargeDetailsId, OtherChargeDetails otherChargeDetails);
+	OtherChargeDetails getOtherChargeDetailsById(Long id);
+	public boolean deleteOtherChargeDetails(Long otherChargeDetailsId);
 }

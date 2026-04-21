@@ -44,7 +44,7 @@ public class OtherChargeController {
 	}
 	
 	@GetMapping("/user/getothercharge/{id}")
-	public ResponseEntity<OtherCharge> getOtherCharge(@PathVariable("id") Integer id) {
+	public ResponseEntity<OtherCharge> getOtherCharge(@PathVariable("id") Long id) {
 		OtherCharge otherCharge = service.getOtherChargeById(id);
 		return new ResponseEntity<OtherCharge>(otherCharge, HttpStatus.OK);
 	}
@@ -79,7 +79,7 @@ public class OtherChargeController {
 	}
 	
 	@PutMapping("/admin/updateothercharge/{id}")
-	public ResponseEntity<?> updateOtherCharge(@PathVariable Integer id, @RequestBody OtherCharge otherChargeDetails) {
+	public ResponseEntity<?> updateOtherCharge(@PathVariable Long id, @RequestBody OtherCharge otherChargeDetails) {
 		// Validate input
 		if (otherChargeDetails == null || otherChargeDetails.getCategoryName() == null || otherChargeDetails.getCategoryName().trim().isEmpty()) {
 			return ResponseEntity.badRequest().body("otherCharge CategoryName must not be null or empty");
@@ -117,7 +117,7 @@ public class OtherChargeController {
 	}
 	
 	@DeleteMapping("/admin/deleteothercharge/{id}")
-	public ResponseEntity<String> deleteOtherCharge(@PathVariable("id") int id) {
+	public ResponseEntity<String> deleteOtherCharge(@PathVariable("id") Long id) {
 		boolean isDeleted = service.deleteOtherCharge(id);
 		if (isDeleted) {
 			String responseContent = "OtherCharge has been deleted successfully";

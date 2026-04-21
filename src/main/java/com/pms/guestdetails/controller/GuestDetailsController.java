@@ -47,7 +47,7 @@ public class GuestDetailsController {
 	
 	@GetMapping("/user/getguestdetail/{id}")
 //	@GetMapping("/auth/getroomstatus/{id}")
-	public ResponseEntity<GuestDetails> getGuestDetail(@PathVariable("id") Integer id) {
+	public ResponseEntity<GuestDetails> getGuestDetail(@PathVariable("id") Long id) {
 		GuestDetails guestDetails = service.getGuestDetail(id);
 		return new ResponseEntity<GuestDetails>(guestDetails, HttpStatus.OK);
 	}
@@ -114,7 +114,7 @@ public class GuestDetailsController {
 	
 	@PutMapping("/admin/updateguestdetail/{id}")
 //	@PutMapping("/auth/updateroomstatus/{id}")
-	public ResponseEntity<?> updateGuestDetails(@PathVariable Integer id, @RequestBody GuestDetails guestDetails,HttpSession session) {
+	public ResponseEntity<?> updateGuestDetails(@PathVariable Long id, @RequestBody GuestDetails guestDetails,HttpSession session) {
 		// Validate input
 		
 		try {

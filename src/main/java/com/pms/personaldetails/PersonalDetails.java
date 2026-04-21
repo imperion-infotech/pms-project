@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name="personal_details")
+@SQLRestriction("is_deleted = false")
 public class PersonalDetails extends BaseEntity implements Serializable {
 	
 static final Logger logger = LoggerFactory.getLogger(PersonalDetails.class);
@@ -83,17 +85,13 @@ static final Logger logger = LoggerFactory.getLogger(PersonalDetails.class);
     @Column(unique = true, nullable = true)
     private String signature;
     
-    @Column(name="created_on", nullable = true, updatable = false)
-	@CreationTimestamp // Automatically sets value when entity is persisted
-	private Date createdOn;
-    
     // ✅ NEW FIELDS (Soft Delete)
     @Column(name = "is_deleted")
     private boolean isDeleted = false;
 
-    private LocalDateTime deletedAt;
+    private LocalDateTime deletedOn;
 
-    private String deletedBy;
+    private Long deletedBy;
     
    
 //    // ✅ Correct OneToOne (inverse side)
@@ -141,15 +139,6 @@ static final Logger logger = LoggerFactory.getLogger(PersonalDetails.class);
 		return id;
 	}
 
-	public Date getCreatedOn() {
-		return createdOn;
-	}
-
-	public void setCreatedOn(Date createdOn) {
-		this.createdOn = createdOn;
-	}
-
-	
 	public List<DocumentDetails> getDocuments() {
 		return documents;
 	}
@@ -246,19 +235,19 @@ static final Logger logger = LoggerFactory.getLogger(PersonalDetails.class);
 		this.isDeleted = isDeleted;
 	}
 
-	public LocalDateTime getDeletedAt() {
-		return deletedAt;
+	public LocalDateTime getDeletedOn() {
+		return deletedOn;
 	}
 
-	public void setDeletedAt(LocalDateTime deletedAt) {
-		this.deletedAt = deletedAt;
+	public void setDeletedOn(LocalDateTime deletedOn) {
+		this.deletedOn = deletedOn;
 	}
 
-	public String getDeletedBy() {
+	public Long getDeletedBy() {
 		return deletedBy;
 	}
 
-	public void setDeletedBy(String deletedBy) {
+	public void setDeletedBy(Long deletedBy) {
 		this.deletedBy = deletedBy;
 	}
 	

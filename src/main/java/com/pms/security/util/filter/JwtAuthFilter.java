@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.pms.security.configuration.HotelContext;
+import com.pms.security.configuration.UserContext;
 import com.pms.security.util.JwtUtil;
 
 import jakarta.servlet.FilterChain;
@@ -40,10 +41,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
            String token = null;
            String username = null;
+           Long userId = null;
 
            if (header != null && header.startsWith("Bearer ")) {
                token = header.substring(7);
                username = jwtUtil.extractUsername(token);
+              
+               
            }
 
            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -64,6 +68,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
            if (token != null) {
                Long hotelId = jwtUtil.extractHotelId(token);
                HotelContext.setHotelId(hotelId);
+               userId = jwtUtil.extractUserId(token);
+               UserContext.setUserId(userId);
+               
            }
 
            chain.doFilter(request, response);
@@ -71,6 +78,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     } finally {
     	
     	 HotelContext.clear();
+    	 UserContext.clear();
     }
        // HotelContext.clear();
     }

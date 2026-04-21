@@ -30,17 +30,16 @@ public class FloorDAOImpl implements IFloorDAO {
 	}
 	
 
-	public Floor getFloor(int floorId) {
+	public Floor getFloor(Long floorId) {
 		return entityManager.find(Floor.class, floorId);
 	}
 
 	public Floor createFloor(Floor floor) {
-		entityManager.persist(floor);
-		Floor b = getLastInsertedFloor();
-		return b;
+		
+		return floor;
 	}
 
-	public Floor updateFloor(int floorId, Floor floor) {
+	public Floor updateFloor(Long floorId, Floor floor) {
 		//First We are taking Book detail from database by given book id and 
 				// then updating detail with provided book object
 				Floor floorFromDB = getFloor(floorId);
@@ -54,7 +53,7 @@ public class FloorDAOImpl implements IFloorDAO {
 				return updatedFloor;
 	}
 
-	public boolean deleteFloor(int floorId) {
+	public boolean deleteFloor(Long floorId) {
 		Floor floor = getFloor(floorId);
 		entityManager.remove(floor);
 		
@@ -67,23 +66,13 @@ public class FloorDAOImpl implements IFloorDAO {
 		return true;
 	}
 
-	
-	/**
-	 * This method will get the latest inserted record from the database and return the object of Book class
-	 * @return book
-	 */
-	private Floor getLastInsertedFloor(){
-		String hql = "from Floor order by id DESC";
-		Query query = entityManager.createQuery(hql);
-		query.setMaxResults(1);
-		Floor floor = (Floor)query.getSingleResult();
-		return floor;
-	}
-
 
 	@Override
-	public Floor findById(Integer id) {
-		        return entityManager.find(Floor.class, id);
-		    }
-	
+	public Floor findById(Long id) {
+		// TODO Auto-generated method stub
+		return null;
 	}
+}
+	
+
+

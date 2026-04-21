@@ -13,14 +13,15 @@ import com.pms.auditlog.annotation.Auditable;
 import com.pms.auditlog.entity.AuditLog;
 import com.pms.auditlog.repository.AuditLogRepository;
 import com.pms.auditlog.util.AuditUtil;
+import com.pms.common.service.SoftDeleteService;
 import com.pms.document.dao.DocumentDetailsRepository;
 import com.pms.document.dao.IDocumentDetailsDAO;
 import com.pms.document.entity.DocumentDetails;
 import com.pms.document.service.IDocumentDetailsService;
 import com.pms.exception.ResourceNotFoundException;
 import com.pms.search.specification.DocumentDetailsSpecification;
-import com.pms.search.specification.FloorSpecification;
 import com.pms.security.configuration.HotelContext;
+import com.pms.security.configuration.UserContext;
 import com.pms.security.util.SecurityUtils;
 
 @Service
@@ -34,8 +35,12 @@ static final Logger logger = LoggerFactory.getLogger(DocumentDetailsServiceImpl.
 	
 	@Autowired
 	private DocumentDetailsRepository documentDetailsRepository;
-	private final AuditLogRepository auditRepo;
-
+	
+	@Autowired
+	private AuditLogRepository auditRepo;
+	
+	@Autowired
+	private SoftDeleteService softDeleteService;
 	
 	public DocumentDetailsServiceImpl(IDocumentDetailsDAO dao, DocumentDetailsRepository documentDetailsRepository,
 			AuditLogRepository auditRepo) {
@@ -44,8 +49,6 @@ static final Logger logger = LoggerFactory.getLogger(DocumentDetailsServiceImpl.
 		this.documentDetailsRepository = documentDetailsRepository;
 		this.auditRepo = auditRepo;
 	}
-
-	
 
 	public List<DocumentDetails> getDocumentDetails() {
 		Long hotelId = HotelContext.getHotelId();
@@ -58,15 +61,27 @@ static final Logger logger = LoggerFactory.getLogger(DocumentDetailsServiceImpl.
 	@Auditable(action = "CREATE", entity = "DOCUMENTDETAILS")
 	public DocumentDetails createDocumentDetails(DocumentDetails documentDetails) {
 //		return dao.createFloor(Floor);
+		Long userId = UserContext.getUserId();
+
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    documentDetails.setCreatedBy(userId);
 		 return documentDetailsRepository.saveAndFlush(documentDetails);
 	}
 
 	@Auditable(action = "UPDATE", entity = "DOCUMENTDETAILS")
-	public DocumentDetails updateDocumentDetails(int documentDetailsId, DocumentDetails documentDetails) {
+	public DocumentDetails updateDocumentDetails(Long documentDetailsId, DocumentDetails documentDetails) {
+		Long userId = UserContext.getUserId();
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    documentDetails.setUpdatedBy(userId);
+	    documentDetails.setUpdatedOn(LocalDateTime.now());
 		return dao.updateDocumentDetails(documentDetailsId, documentDetails);
 	}
 
-	public <Optional>DocumentDetails getDocumentDetail(int documentDetailsId) {
+	public <Optional>DocumentDetails getDocumentDetail(Long documentDetailsId) {
 		Long hotelId = HotelContext.getHotelId();
 		 if (hotelId == null) {
 	         throw new RuntimeException("Hotel not selected");
@@ -76,32 +91,22 @@ static final Logger logger = LoggerFactory.getLogger(DocumentDetailsServiceImpl.
 		}
 
 	@Auditable(action = "DELETE", entity = "DOCUMENTDETAILS")
-	public boolean deleteDocumentDetails(int documentDetailsId) {
+	public boolean deleteDocumentDetails(Long documentDetailsId) {
 		
-		Long hotelId = HotelContext.getHotelId();
-		 if (hotelId == null) {
-	         throw new RuntimeException("Hotel not selected");
-	     }
+		softDeleteService.softDelete(documentDetailsId, documentDetailsRepository);
+		DocumentDetails  dDetails = getDocumentDetail(documentDetailsId);
 		
-		DocumentDetails entity = documentDetailsRepository.findByIdAndHotelIdAndIsDeletedFalse(documentDetailsId,hotelId)
-                 .orElseThrow(() -> new RuntimeException("Record not found"));
-         // ✅ Soft delete
-         entity.setDeleted(true);
-         entity.setDeletedAt(LocalDateTime.now());
-         entity.setDeletedBy(SecurityUtils.getCurrentUser());
-
-         documentDetailsRepository.save(entity);
 
          // ✅ Audit log
          AuditLog log = new AuditLog();
          log.setAction("DELETE");
          log.setEntityName("DOCUMENT DETAILS");
-         log.setEntityId(entity.getId()+"");
+         log.setEntityId(documentDetailsId+"");
          log.setUsername(SecurityUtils.getCurrentUser());
          log.setTimestamp(LocalDateTime.now());
-         log.setOldValue(AuditUtil.toJson(entity));
+         log.setOldValue(AuditUtil.toJson(dDetails));
          auditRepo.save(log);
-         if(entity != null)
+         if(dDetails != null)
         	 return true;
          else
         	 return false;
@@ -121,6 +126,4 @@ static final Logger logger = LoggerFactory.getLogger(DocumentDetailsServiceImpl.
 
 	        return documentDetailsRepository.findAll(spec);
 	    }
-
-
 }

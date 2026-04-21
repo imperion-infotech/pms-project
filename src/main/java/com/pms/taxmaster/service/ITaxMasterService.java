@@ -20,7 +20,7 @@ static final Logger logger = LoggerFactory.getLogger(ITaxMasterService.class);
 	
 	List<TaxMaster> getTaxMasters();
 	TaxMaster createTaxMaster(TaxMaster taxMaster);
-	TaxMaster updateTaxMaster(int taxMasterId, TaxMaster taxMaster);
+	TaxMaster updateTaxMaster(Long taxMasterId, TaxMaster taxMaster);
 	TaxMaster getTaxMaster(int taxMasterId);
 	boolean deleteTaxMaster(int taxMasterId);
 	TaxMaster getTaxMasterByIdAndHotelID(Integer id);

@@ -1,6 +1,7 @@
 package com.pms.floor.entity;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -40,7 +41,7 @@ public class Floor extends BaseEntity implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="floor_id")
-	private int id;
+	private Long id;
 	
 	@Column(name="floor_name")
 	private String name;
@@ -48,20 +49,7 @@ public class Floor extends BaseEntity implements Serializable {
 	@Column(name="description")
 	private String description;
 	
-	@Column(name="created_on" , nullable = false, updatable = false)
-	@CreationTimestamp // Automatically sets value when entity is persisted
-	private Date createdOn;
-
 	private Integer noOfRooms;
-	
-	
-	public Date getCreatedOn() {
-		return createdOn;
-	}
-
-	public void setCreatedOn(Date createdOn) {
-		this.createdOn = createdOn;
-	}
 
 	public Integer getNoOfRooms() {
 		return noOfRooms;
@@ -71,11 +59,11 @@ public class Floor extends BaseEntity implements Serializable {
 		this.noOfRooms = noOfRooms;
 	}
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -109,7 +97,7 @@ public class Floor extends BaseEntity implements Serializable {
 		builder.append(", description=");
 		builder.append(description);
 		builder.append(", createdOn=");
-		builder.append(createdOn);
+//		builder.append(createdOn);
 		builder.append(", noOfRooms=");
 		builder.append(noOfRooms);
 		builder.append("]");

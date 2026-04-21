@@ -13,6 +13,7 @@ import com.pms.auditlog.annotation.Auditable;
 import com.pms.auditlog.entity.AuditLog;
 import com.pms.auditlog.repository.AuditLogRepository;
 import com.pms.auditlog.util.AuditUtil;
+import com.pms.common.service.SoftDeleteService;
 import com.pms.guestdetails.GuestDetails;
 import com.pms.guestdetails.dao.IGuestDetailsDAO;
 import com.pms.guestdetails.dao.impl.GuestDetailsRepository;
@@ -20,6 +21,7 @@ import com.pms.guestdetails.service.IGuestDetailsService;
 import com.pms.paymentdetails.entity.PaymentDetails;
 import com.pms.paymentdetails.repository.PaymentDetailsRepository;
 import com.pms.security.configuration.HotelContext;
+import com.pms.security.configuration.UserContext;
 import com.pms.security.util.SecurityUtils;
 
 import jakarta.transaction.Transactional;
@@ -42,6 +44,9 @@ public class GuestDetailsServiceImpl implements IGuestDetailsService {
 	@Autowired
 	private AuditLogRepository auditLogRepository;
 	
+	@Autowired
+	private SoftDeleteService softDeleteService;
+	
 
 	public GuestDetailsServiceImpl(IGuestDetailsDAO dao, GuestDetailsRepository guestDetailsRepository) {
 		super();
@@ -60,7 +65,7 @@ public class GuestDetailsServiceImpl implements IGuestDetailsService {
 	}
 	
 	@Override
-	public GuestDetails getGuestDetail(int guestDetailsId) {
+	public GuestDetails getGuestDetail(Long guestDetailsId) {
 		Long hotelId = HotelContext.getHotelId();
 		 if (hotelId == null) {
 	         throw new RuntimeException("Hotel not selected");
@@ -71,11 +76,23 @@ public class GuestDetailsServiceImpl implements IGuestDetailsService {
 	}
 	@Auditable(action = "CREATE", entity = "GUESTDETAILS")
 	public GuestDetails createGuestDetail(GuestDetails guestDetails) {
+		Long userId = UserContext.getUserId();
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    guestDetails.setCreatedBy(userId);
+	    return guestDetailsRepository.save(guestDetails);		
 		
-		return dao.createGuestDetails(guestDetails);
 	}
 	@Auditable(action = "UPDATE", entity = "GUESTDETAILS")
-	public GuestDetails updateGuestDetails(int guestDetailsId, GuestDetails guestDetails) {
+	public GuestDetails updateGuestDetails(Long guestDetailsId, GuestDetails guestDetails) {
+		
+		Long userId = UserContext.getUserId();
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    guestDetails.setUpdatedBy(userId);
+	    guestDetails.setUpdatedOn(LocalDateTime.now());
 		return dao.updateGuestDetails(guestDetailsId, guestDetails);
 	}
 	
@@ -85,6 +102,10 @@ public class GuestDetailsServiceImpl implements IGuestDetailsService {
     public boolean deleteSoftStayDetails(Integer id) {
 		
 		Long hotelId = HotelContext.getHotelId();
+		Long userId = UserContext.getUserId();
+		if(userId == null) {
+			 throw new RuntimeException("User not selected");
+		}
 		 if (hotelId == null) {
 	         throw new RuntimeException("Hotel not selected");
 	     }
@@ -93,13 +114,7 @@ public class GuestDetailsServiceImpl implements IGuestDetailsService {
 		List<PaymentDetails> paymentDetails = paymentDetailsRepository.findByHotelId(hotelId);
 		
 		entity.setPaymentDetails(paymentDetails);
-
-        // ✅ Soft delete
-        entity.setDeleted(true);
-        entity.setDeletedAt(LocalDateTime.now());
-        entity.setDeletedBy(SecurityUtils.getCurrentUser());
-        
-        guestDetailsRepository.save(entity);
+        softDeleteService.softDelete((long) id, guestDetailsRepository);
 
         // ✅ Audit log
         AuditLog log = new AuditLog();

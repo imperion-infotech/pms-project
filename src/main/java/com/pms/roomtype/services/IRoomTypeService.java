@@ -17,7 +17,7 @@ public interface IRoomTypeService {
 	
 	List<RoomType> getRoomTypes();
 	RoomType createRoomType(RoomType roomType);
-	RoomType updateRoomType(int roomTypeId, RoomType roomType);
+	RoomType updateRoomType(Long roomTypeId, RoomType roomType);
 	RoomType getRoomType(Long roomTypeId);
 	boolean deleteRoomType(Long RoomTypeId);
 	RoomType getRoomTypeById(Long id);

@@ -67,7 +67,7 @@ public class GuestDetailsDAOImpl implements IGuestDetailsDAO {
 		return guestDetailsRepository.findAll();
 	}
 
-	public GuestDetails getGuestDetail(int guestDetailsId) {
+	public GuestDetails getGuestDetail(Long guestDetailsId) {
 		return entityManager.find(GuestDetails.class, guestDetailsId);
 	}
 
@@ -135,7 +135,7 @@ public class GuestDetailsDAOImpl implements IGuestDetailsDAO {
 //		});
 
 	@Override
-	public GuestDetails updateGuestDetails(int guestDetailsId, GuestDetails guestDetails) {
+	public GuestDetails updateGuestDetails(Long guestDetailsId, GuestDetails guestDetails) {
 
 		GuestDetails guestDetailsDB = getGuestDetail(guestDetailsId);
 		guestDetailsDB.setCheckInDate(guestDetails.getCheckInDate());
@@ -175,7 +175,7 @@ public class GuestDetailsDAOImpl implements IGuestDetailsDAO {
 	}
 
 	@Override
-	public boolean deleteGuestDetails(int guestDetailsId) {
+	public boolean deleteGuestDetails(Long guestDetailsId) {
 
 		GuestDetails guestDetails = getGuestDetail(guestDetailsId);
 		entityManager.remove(guestDetails);
@@ -195,12 +195,5 @@ public class GuestDetailsDAOImpl implements IGuestDetailsDAO {
 		return entityManager.find(GuestDetails.class, id);
 	}
 
-	private GuestDetails getLastInsertedGuestDetail() {
-		String hql = "from GuestDetails order by id DESC";
-		Query query = entityManager.createQuery(hql);
-		query.setMaxResults(1);
-		GuestDetails guestDetails = (GuestDetails) query.getSingleResult();
-		return guestDetails;
-	}
 
 }

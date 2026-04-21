@@ -17,10 +17,10 @@ public interface IRoomMasterService {
 	
 	Page<RoomMaster> getRoomMasters(Pageable pageable);
 	RoomMaster createRoomMaster(RoomMaster roomMaster);
-	RoomMaster updateRoomMaster(int roomTypeId, RoomMaster roomMaster);
-	RoomMaster getRoomMaster(int roomMasterId);
-	boolean deleteRoomMaster(int roomMasterId);
-	public RoomMaster getRoomMasterByIdAndHotelID(Integer id);
+	RoomMaster updateRoomMaster(Long roomTypeId, RoomMaster roomMaster);
+	RoomMaster getRoomMaster(Long roomMasterId);
+	boolean deleteRoomMaster(Long roomMasterId);
+	public RoomMaster getRoomMasterByIdAndHotelID(Long id);
 	List<RoomMaster> search(String roomName, String roomShortName, String floorName);
 
 }

@@ -18,10 +18,10 @@ public interface IDocumentTypeDAO {
 static final Logger logger = LoggerFactory.getLogger(IDocumentTypeDAO.class);
 	
 	public List<DocumentType> getDocumentTypes();
-	public DocumentType getDocumentType(int documentTypeId);
+	public DocumentType getDocumentType(Long documentTypeId);
 	public DocumentType createDocumentType(DocumentType documentType);
-	public DocumentType updateDocumentType(int documentTypeId,DocumentType documentType);
-	public boolean deleteDocumentType(int documentTypeId);
+	public DocumentType updateDocumentType(Long documentTypeId,DocumentType documentType);
+	public boolean deleteDocumentType(Long documentTypeId);
 	public DocumentType findById(Integer id);
 
 

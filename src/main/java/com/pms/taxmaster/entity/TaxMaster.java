@@ -4,6 +4,7 @@
 package com.pms.taxmaster.entity;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -21,7 +22,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -48,7 +48,7 @@ static final Logger logger = LoggerFactory.getLogger(TaxMaster.class);
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="tax_master_id")
-	private int id;
+	private Long id;
 	
 	@Column(name="tax_master_name")
 	private String taxMasterName;
@@ -63,10 +63,6 @@ static final Logger logger = LoggerFactory.getLogger(TaxMaster.class);
 	@Column(name="per_stay_tax")
 	private Boolean perStayTax;
 	
-	@Column(name="created_on", nullable = false, updatable = false)
-	@CreationTimestamp // Automatically sets value when entity is persisted
-	private Date createdOn;
-	
 	@NotNull(message = "Amount is required")
 	@Column(name="amount")
 	private Double amount;
@@ -79,11 +75,11 @@ static final Logger logger = LoggerFactory.getLogger(TaxMaster.class);
 		this.amount = amount;
 	}
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -119,13 +115,6 @@ static final Logger logger = LoggerFactory.getLogger(TaxMaster.class);
 		this.perStayTax = perStayTax;
 	}
 	
-	public Date getCreatedOn() {
-		return createdOn;
-	}
-
-	public void setCreatedOn(Date createdOn) {
-		this.createdOn = createdOn;
-	}
 
 	@Override
 	public String toString() {

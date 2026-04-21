@@ -66,7 +66,7 @@ static final Logger logger = LoggerFactory.getLogger(RoomMasterDAOImpl.class);
 	}
 	
 
-	public RoomMaster getRoomMaster(int roomMasterId) {
+	public RoomMaster getRoomMaster(Long roomMasterId) {
 		
 		RoomMaster rMaster= entityManager.find(RoomMaster.class, roomMasterId);
 		RoomStatus rStatus = roomStatusDAO.getRoomStatus(rMaster.getRoomStatusId());
@@ -76,11 +76,11 @@ static final Logger logger = LoggerFactory.getLogger(RoomMasterDAOImpl.class);
 
 	public RoomMaster createRoomMaster(RoomMaster roomMaster) {
 		entityManager.persist(roomMaster);
-		RoomMaster b = getLastInsertedRoomMaster(roomMaster);
-		return b;
+//		RoomMaster b = getLastInsertedRoomMaster(roomMaster);
+		return roomMaster;
 	}
 
-	public RoomMaster updateRoomMaster(int roomMasterId, RoomMaster roomMaster) {
+	public RoomMaster updateRoomMaster(Long roomMasterId, RoomMaster roomMaster) {
 		//First We are taking Book detail from database by given book id and 
 				// then updating detail with provided book object
 		RoomMaster roomMasterDB = getRoomMaster(roomMasterId);
@@ -104,7 +104,7 @@ static final Logger logger = LoggerFactory.getLogger(RoomMasterDAOImpl.class);
 	}
 	
 
-	public boolean deleteRoomMaster(int roomMasterId) {
+	public boolean deleteRoomMaster(Long roomMasterId) {
 		RoomMaster roomMaster = getRoomMaster(roomMasterId);
 		entityManager.remove(roomMaster);
 		
@@ -121,33 +121,6 @@ static final Logger logger = LoggerFactory.getLogger(RoomMasterDAOImpl.class);
 	 * This method will get the latest inserted record from the database and return the object of Book class
 	 * @return book
 	 */
-	private RoomMaster getLastInsertedRoomMaster(RoomMaster roomMaster){
-//		String hql = "from RoomMaster order by id DESC";
-//		Query query = entityManager.createQuery(hql);
-//		query.setMaxResults(1);
-//		RoomMaster roomMaster = (RoomMaster)query.getSingleResult();
-		
-		Floor floor =floorDao.getFloor(roomMaster.getFloorId());
-		roomMaster.setFloor(floor);
-		roomMaster.setFloorName(floor.getName());
-		
-		RoomType roomType= roomTypeDAO.getRoomType(roomMaster.getRoomTypeId());
-		
-		if(roomMaster.isNonRoom() == Boolean.TRUE)
-		{
-		roomMaster.setRoomStatusTable(null);
-		roomMaster.setRoomType(null);
-		} else {
-			roomMaster.setRoomType(roomType);	
-			roomMaster.setRoomTypeName(roomType.getRoomTypeName());
-			RoomStatus roomStatus = roomStatusDAO.getRoomStatus(roomMaster.getRoomStatusId());
-			roomMaster.setRoomStatusTable(roomStatus);
-		}
-		
-		
-		return roomMaster;
-	}
-
 	
 //	/**
 //	 * This method will get the latest inserted record from the database and return the object of Book class

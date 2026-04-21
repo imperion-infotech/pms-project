@@ -5,7 +5,6 @@ package com.pms.rent.services.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,13 +13,14 @@ import com.pms.auditlog.annotation.Auditable;
 import com.pms.auditlog.entity.AuditLog;
 import com.pms.auditlog.repository.AuditLogRepository;
 import com.pms.auditlog.util.AuditUtil;
+import com.pms.common.service.SoftDeleteService;
 import com.pms.rent.RentDetails;
 import com.pms.rent.dao.IRentDetailsDAO;
 import com.pms.rent.dao.impl.RentDetailsRepository;
 import com.pms.rent.services.IRentDetailsService;
 import com.pms.security.configuration.HotelContext;
+import com.pms.security.configuration.UserContext;
 import com.pms.security.util.SecurityUtils;
-import com.pms.stay.entity.StayDetails;
 
 import jakarta.transaction.Transactional;
 
@@ -35,6 +35,9 @@ public class RentDetailsServiceImpl implements IRentDetailsService {
 	
 	@Autowired
 	RentDetailsRepository rentDetailsRepository;
+	
+	@Autowired 
+	private SoftDeleteService softDeleteService;
 	
 	 private final AuditLogRepository auditRepo;
 
@@ -57,21 +60,31 @@ public class RentDetailsServiceImpl implements IRentDetailsService {
 	
 	@Auditable(action = "CREATE", entity = "RENTDETAILS")
 	public RentDetails createRentDetail(RentDetails rentDetail) {
-		
-//		return dao.createRentDetail(rentDetail);
+		Long userId = UserContext.getUserId();
+
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    rentDetail.setCreatedBy(userId);
 		return rentDetailsRepository.saveAndFlush(rentDetail);
 	}
 	
 	@Auditable(action = "UPDATE", entity = "RENTDETAILS")
 	@Override
-	public RentDetails updateRentDetail(int rentDetailsId, RentDetails rentDetail) {
-//		return dao.updateRentDetail(rentDetailsId, rentDetail);
+	public RentDetails updateRentDetail(Long rentDetailsId, RentDetails rentDetail) {
+		Long userId = UserContext.getUserId();
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    rentDetail.setUpdatedBy(userId);
+	    rentDetail.setUpdatedOn(LocalDateTime.now());
+		
 		rentDetailsRepository.saveAndFlush(rentDetail);
 		 return getRentDetail(rentDetailsId);
 		
 	}
 	
-	public RentDetails getRentDetail(int rentDetailsId) {
+	public RentDetails getRentDetail(Long rentDetailsId) {
 		Long hotelId = HotelContext.getHotelId();
 		 if (hotelId == null) {
 	         throw new RuntimeException("Hotel not selected");
@@ -79,12 +92,6 @@ public class RentDetailsServiceImpl implements IRentDetailsService {
 		  return rentDetailsRepository.findByIdAndHotelIdAndIsDeletedFalse(Long.valueOf(rentDetailsId),hotelId);
 	}
 
-	@Auditable(action = "DELETE", entity = "RENTDETAILS")
-	@Override
-	public boolean deleteRentDetail(int rentDetailsId) {
-		return dao.deleteRentDetail(rentDetailsId);
-	}
-	
 	@Override
 	public RentDetails findById(Long id) {
 		return dao.findById(id);
@@ -95,17 +102,23 @@ public class RentDetailsServiceImpl implements IRentDetailsService {
     public boolean deleteSoftRentDetails(Long id) {
 
 		Long hotelId = HotelContext.getHotelId();
+		Long userId = UserContext.getUserId();
+		if(userId == null) {
+			 throw new RuntimeException("User not selected");
+		}
 		 if (hotelId == null) {
 	         throw new RuntimeException("Hotel not selected");
 	     }
 		RentDetails entity = rentDetailsRepository.findByIdAndHotelIdAndIsDeletedFalse(id,hotelId);
 
-        // ✅ Soft delete
-        entity.setDeleted(true);
-        entity.setDeletedAt(LocalDateTime.now());
-        entity.setDeletedBy(SecurityUtils.getCurrentUser());
+//        // ✅ Soft delete
+//        entity.setDeleted(true);
+//        entity.setDeletedOn(LocalDateTime.now());
+//        entity.setDeletedBy(userId);
+        
+        softDeleteService.softDelete(id, rentDetailsRepository);
 
-        rentDetailsRepository.save(entity);
+//        rentDetailsRepository.save(entity);
         
         // ✅ Audit log
         AuditLog log = new AuditLog();
@@ -125,8 +138,4 @@ public class RentDetailsServiceImpl implements IRentDetailsService {
         	return false;
         }
 }
-	
-	
-	
-
 }

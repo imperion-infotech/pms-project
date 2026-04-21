@@ -19,10 +19,9 @@ public interface IRentDetailsService {
 static final Logger logger = LoggerFactory.getLogger(IRentDetailsService.class);
 	
 	public List<RentDetails> getRentDetails();
-	public RentDetails getRentDetail(int rentDetailsId);
+	public RentDetails getRentDetail(Long rentDetailsId);
 	public RentDetails createRentDetail(RentDetails rentDetails);
-	public RentDetails updateRentDetail(int rentDetailsId, RentDetails rentDetail);
-	public boolean deleteRentDetail(int rentDetailsId);
+	public RentDetails updateRentDetail(Long rentDetailsId, RentDetails rentDetail);
 	public RentDetails findById(Long id);
 	public boolean deleteSoftRentDetails(Long id) ;
 
