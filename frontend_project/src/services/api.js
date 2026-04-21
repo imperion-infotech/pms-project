@@ -14,13 +14,14 @@ const api = axios.create({
 // Request Interceptor: Token aur Hotel ID attach karne ke liye
 api.interceptors.request.use(
   (config) => {
+    // Robust check for Token
     const rawToken = localStorage.getItem('access_token')
+    const hasToken = rawToken && rawToken !== 'null' && rawToken !== 'undefined'
 
-    // Auth paths are ones that DON'T need a token (login/register)
-    // select-hotel DOES need a token from the first-step login
-    const isPublicPath = config.url.includes('/auth/login') || config.url.includes('/auth/register')
+    // Auth paths that DON'T need a token
+    const isPublicAuth = config.url.includes('/auth/login') || config.url.includes('/auth/register')
 
-    if (rawToken && !isPublicPath) {
+    if (hasToken && !isPublicAuth) {
       // 1. Remove quotes if any
       let cleanToken = String(rawToken).trim().replace(/^"|"$/g, '')
 
@@ -33,12 +34,9 @@ api.interceptors.request.use(
     }
 
     const activeHotelId = localStorage.getItem('activeHotelId')
-    if (
-      activeHotelId &&
-      activeHotelId !== 'undefined' &&
-      activeHotelId !== 'null' &&
-      !config.url.includes('/auth/')
-    ) {
+    const hasHotelId = activeHotelId && activeHotelId !== 'undefined' && activeHotelId !== 'null'
+
+    if (hasHotelId && !config.url.includes('/auth/')) {
       config.headers['X-Hotel-Id'] = activeHotelId
     }
     return config

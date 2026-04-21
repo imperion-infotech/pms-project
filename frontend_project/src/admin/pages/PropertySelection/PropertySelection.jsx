@@ -19,6 +19,7 @@ import {
 import api from '../../../services/api'
 import { propertyService } from '../../../services/propertyService'
 import PropertyEditModal from './PropertyEditModal'
+import { AuthImage } from '../../components/common/AuthImage'
 
 // Helper to determine if user is a Super Admin
 const checkIsSuperAdmin = () => {
@@ -58,6 +59,26 @@ const PropertySelection = () => {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const [editingHotel, setEditingHotel] = useState(null)
+  const [localPreviews, setLocalPreviews] = useState({ hotelLogo: null, hotelImage: null })
+
+  // Clean Image URL logic from GuestPersonalDetailsModal
+  const cleanImageUrl = (path) => {
+    if (!path || path === 'string' || path.length < 3) return null
+    let cleanPath = String(path)
+    if (cleanPath.includes(': ')) cleanPath = cleanPath.split(': ')[1].trim()
+    if (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1)
+    const parts = cleanPath.split('/')
+    return parts[parts.length - 1] // Only the filename
+  }
+
+  // Cleanup effect
+  React.useEffect(() => {
+    if (!showCreateModal && (localPreviews.hotelLogo || localPreviews.hotelImage)) {
+      if (localPreviews.hotelLogo) URL.revokeObjectURL(localPreviews.hotelLogo)
+      if (localPreviews.hotelImage) URL.revokeObjectURL(localPreviews.hotelImage)
+      setLocalPreviews({ hotelLogo: null, hotelImage: null })
+    }
+  }, [showCreateModal, localPreviews.hotelLogo, localPreviews.hotelImage])
 
   // Hotel Form State
   const [newHotel, setNewHotel] = useState({
@@ -75,9 +96,6 @@ const PropertySelection = () => {
     timezone: 'IST',
     hotelLogo: '',
     hotelImage: '',
-    // Preview URLs (Local only, not for API)
-    logoPreview: '',
-    imagePreview: '',
     createdOn: new Date().toISOString(),
     updatedOn: new Date().toISOString(),
     // Admin Credentials (For Super Admin flow)
@@ -160,6 +178,12 @@ const PropertySelection = () => {
 
       if (newToken) {
         const cleanToken = String(newToken).replace(/^"|"$/g, '').trim()
+
+        // Log for the USER to see the token change
+        console.log('--- TOKEN UPDATE CHECK ---')
+        console.log('Old Token:', localStorage.getItem('access_token'))
+        console.log('New Token Received:', cleanToken)
+
         localStorage.setItem('access_token', cleanToken)
         localStorage.setItem('activeHotelId', hotelId)
         localStorage.setItem('activeHotelName', hotelName)
@@ -286,41 +310,37 @@ const PropertySelection = () => {
   }
 
   const handleImageSelect = async (e, type) => {
-    const file = e.target.files[0]
+    const file = e.target.files?.[0]
     if (!file) return
+
+    // 1. Show local preview immediately (using temporary URL)
+    const url = URL.createObjectURL(file)
+    setLocalPreviews((prev) => {
+      if (prev[type]) URL.revokeObjectURL(prev[type])
+      return { ...prev, [type]: url }
+    })
 
     setIsProcessing(true)
     try {
-      // 1. Show local preview immediately (using temporary URL)
-      const localUrl = URL.createObjectURL(file)
-      setNewHotel((prev) => ({
-        ...prev,
-        [type === 'hotelLogo' ? 'logoPreview' : 'imagePreview']: localUrl,
-      }))
-
       // 2. Prepare for upload
       const formData = new FormData()
       formData.append('file', file) // Backend usually expects 'file'
 
-      console.log(`--- UPLOADING ${type}... ---`)
+      console.log(`--- [UPLOAD START] Picked: ${file.name} ---`)
       const response = await propertyService.uploadImage(formData)
 
       // 3. CLEANING LOGIC: Extract ONLY the filename from the noisy response
-      // Example: "Image uploaded successfully: /uploads/pms/abc.jpg" -> "abc.jpg"
       const rawData = response.data.filename || response.data
-      let cleanFileName = rawData
-
-      if (typeof rawData === 'string' && rawData.includes(':')) {
-        const pathParts = rawData.split('/')
-        cleanFileName = pathParts[pathParts.length - 1] // Get last part (filename)
-      }
+      let cleanFileName = String(rawData).split(/[/\\]/).pop().split(':').pop().trim()
 
       setNewHotel((prev) => ({
         ...prev,
-        [type]: cleanFileName, // Store only the clean filename (e.g. abc.webp)
+        [type]: cleanFileName, // Saving the server-returned name so it can be fetched
       }))
 
-      console.log(`--- [UPLOAD SUCCESS] Clean Path: ${cleanFileName} ---`)
+      console.log(`--- [UPLOAD SUCCESS] ---`)
+      console.log(`Original Name: ${file.name}`)
+      console.log(`Server Saved As: ${cleanFileName}`)
     } catch (err) {
       console.error('Upload error:', err)
       alert('Failed to upload image. Please try again.')
@@ -596,11 +616,22 @@ const PropertySelection = () => {
                       onClick={() => document.getElementById('logo-upload').click()}
                       className="group relative flex h-32 cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 transition-all hover:border-emerald-400 hover:bg-emerald-50/30"
                     >
-                      {newHotel.logoPreview ? (
-                        <img
-                          src={newHotel.logoPreview}
+                      {localPreviews.hotelLogo ||
+                      (cleanImageUrl(newHotel.hotelLogo)
+                        ? propertyService.getImageUrl(newHotel.hotelLogo)
+                        : null) ? (
+                        <AuthImage
+                          src={
+                            localPreviews.hotelLogo ||
+                            propertyService.getImageUrl(newHotel.hotelLogo)
+                          }
                           alt="Logo"
                           className="h-full w-full object-contain p-4"
+                          fallback={
+                            <div className="flex h-full w-full items-center justify-center bg-slate-50 text-slate-300">
+                              <Building2 size={24} />
+                            </div>
+                          }
                         />
                       ) : (
                         <>
@@ -611,6 +642,11 @@ const PropertySelection = () => {
                             Upload Logo
                           </span>
                         </>
+                      )}
+                      {isProcessing && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+                          <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+                        </div>
                       )}
                     </div>
                   </div>
@@ -630,11 +666,22 @@ const PropertySelection = () => {
                       onClick={() => document.getElementById('cover-upload').click()}
                       className="group relative flex h-32 cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 transition-all hover:border-blue-400 hover:bg-blue-50/30"
                     >
-                      {newHotel.imagePreview ? (
-                        <img
-                          src={newHotel.imagePreview}
+                      {localPreviews.hotelImage ||
+                      (cleanImageUrl(newHotel.hotelImage)
+                        ? propertyService.getImageUrl(newHotel.hotelImage)
+                        : null) ? (
+                        <AuthImage
+                          src={
+                            localPreviews.hotelImage ||
+                            propertyService.getImageUrl(newHotel.hotelImage)
+                          }
                           alt="Cover"
                           className="h-full w-full object-cover"
+                          fallback={
+                            <div className="flex h-full w-full items-center justify-center bg-slate-50 text-slate-300">
+                              <Building2 size={32} />
+                            </div>
+                          }
                         />
                       ) : (
                         <>
@@ -645,6 +692,11 @@ const PropertySelection = () => {
                             Upload Cover
                           </span>
                         </>
+                      )}
+                      {isProcessing && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+                          <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                        </div>
                       )}
                     </div>
                   </div>
@@ -702,23 +754,33 @@ const PropertySelection = () => {
                 {/* New Premium Card Header with Cover Image */}
                 <div className="relative h-24 w-full overflow-hidden">
                   {hotel.hotelImage && hotel.hotelImage !== 'string' ? (
-                    <img
+                    <AuthImage
                       src={propertyService.getImageUrl(hotel.hotelImage)}
                       alt="Cover"
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      fallback={
+                        <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-300">
+                          <Building2 size={32} />
+                        </div>
+                      }
                     />
                   ) : (
                     <div className="h-full w-full bg-linear-to-br from-emerald-400/80 to-emerald-600"></div>
                   )}
                   <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
- 
+
                   {/* Floating Logo using Image Controller */}
                   <div className="absolute -bottom-2 left-4 h-12 w-12 overflow-hidden rounded-xl border-2 border-white bg-white shadow-lg">
                     {hotel.hotelLogo && hotel.hotelLogo !== 'string' ? (
-                      <img
+                      <AuthImage
                         src={propertyService.getImageUrl(hotel.hotelLogo)}
                         alt={hotel.hotelName}
                         className="h-full w-full object-cover"
+                        fallback={
+                          <div className="flex h-full w-full items-center justify-center bg-white text-slate-300">
+                            <Building2 size={16} />
+                          </div>
+                        }
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center bg-slate-50 text-emerald-600">
@@ -727,7 +789,7 @@ const PropertySelection = () => {
                     )}
                   </div>
                 </div>
- 
+
                 <div className="relative z-10 flex flex-col gap-3 p-5 pt-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1">
@@ -735,10 +797,10 @@ const PropertySelection = () => {
                         {hotel.hotelName || hotel.name}
                       </h3>
                       <div className="mt-1 flex items-center gap-2">
-                        <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-pms-micro font-black tracking-widest text-emerald-700 uppercase">
+                        <span className="text-pms-micro inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 font-black tracking-widest text-emerald-700 uppercase">
                           ID: {hotel.id}
                         </span>
-                        <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-pms-micro font-black tracking-widest text-emerald-700 uppercase">
+                        <span className="text-pms-micro inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 font-black tracking-widest text-emerald-700 uppercase">
                           Active
                         </span>
                       </div>
@@ -767,13 +829,13 @@ const PropertySelection = () => {
                       </div>
                     )}
                   </div>
- 
+
                   <div className="mt-1 flex flex-col gap-1">
-                    <p className="flex items-center gap-1.5 text-pms-tiny font-medium text-slate-400">
+                    <p className="text-pms-tiny flex items-center gap-1.5 font-medium text-slate-400">
                       <MapPin size={10} /> {hotel.city || 'Location N/A'}, {hotel.state1 || ''}
                     </p>
                   </div>
- 
+
                   <div className="mt-2 flex items-center justify-between border-t border-slate-50 pt-4">
                     <span className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase transition-colors group-hover:text-emerald-600">
                       Manage Dashboard

@@ -65,6 +65,8 @@ export const GuestPersonalDetailsModal = ({
     return parts[parts.length - 1] // Only the filename
   }
 
+  console.log('Clean Image URL', cleanImageUrl)
+
   const handlePreviewUpload = (e, type) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -78,6 +80,7 @@ export const GuestPersonalDetailsModal = ({
     handleFileUpload(e, type)
   }
 
+  console.log('Handle File Upload', handleFileUpload)
   // Body Scroll Lock
   useEffect(() => {
     if (isOpen) {
@@ -99,6 +102,9 @@ export const GuestPersonalDetailsModal = ({
   const signatureSrc =
     localPreviews.signature ||
     (cleanImageUrl(formData.signature) ? `/user/${cleanImageUrl(formData.signature)}` : null)
+
+  console.log('------------Photos--------------', photoSrc)
+  console.log('------------Signature--------------', signatureSrc)
 
   // Premium UI Classes (Matching GuestProfileModal)
   const inputContainerClass = 'group relative'
@@ -131,7 +137,7 @@ export const GuestPersonalDetailsModal = ({
         >
           <form onSubmit={handleSubmit} className="flex h-full flex-col overflow-hidden">
             {/* Header */}
-            <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-white/40 p-4 shadow-sm sm:px-8 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/40">
+            <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-white/40 p-4 shadow-sm backdrop-blur-xl sm:px-8 dark:border-slate-800 dark:bg-slate-900/40">
               <div className="flex items-center gap-5">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-blue-500 to-blue-600 shadow-xl shadow-blue-500/20">
                   <User className="h-5 w-5 text-white" />
@@ -215,7 +221,7 @@ export const GuestPersonalDetailsModal = ({
                             ) : (
                               <div className="flex h-full w-full flex-col items-center justify-center text-slate-300 dark:text-slate-600">
                                 <User size={32} />
-                                <span className="mt-1 text-pms-micro font-bold tracking-wider uppercase">
+                                <span className="text-pms-micro mt-1 font-bold tracking-wider uppercase">
                                   Photo
                                 </span>
                               </div>
@@ -282,7 +288,7 @@ export const GuestPersonalDetailsModal = ({
 
                     {/* Personal Information */}
                     <div>
-                      <div className="mb-2 mt-2 flex items-center gap-2">
+                      <div className="mt-2 mb-2 flex items-center gap-2">
                         <span className="text-pms-micro font-black tracking-widest text-blue-500 uppercase">
                           Background Info
                         </span>
@@ -397,7 +403,7 @@ export const GuestPersonalDetailsModal = ({
                             rows="2"
                             value={formData.address}
                             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                            className="w-full resize-none rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                            className="w-full resize-none rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 transition-all outline-none [scrollbar-width:none] focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20 [&::-webkit-scrollbar]:hidden"
                             placeholder="Address"
                           ></textarea>
                         </div>
@@ -453,7 +459,9 @@ export const GuestPersonalDetailsModal = ({
                           <input
                             type="date"
                             value={formData.validTill}
-                            onChange={(e) => setFormData({ ...formData, validTill: e.target.value })}
+                            onChange={(e) =>
+                              setFormData({ ...formData, validTill: e.target.value })
+                            }
                             className={inputClass.replace('pl-10', 'px-3')}
                           />
                         </div>
@@ -639,7 +647,7 @@ export const GuestPersonalDetailsModal = ({
                   }, 0)
                 }}
                 disabled={loading}
-                className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-pms-tiny font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${loading ? 'cursor-not-allowed bg-slate-400' : 'hover:opacity-90'}`}
+                className={`text-pms-tiny flex items-center gap-2 rounded-xl px-5 py-2.5 font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${loading ? 'cursor-not-allowed bg-slate-400' : 'hover:opacity-90'}`}
                 style={{
                   backgroundColor: loading ? undefined : '#059669',
                   boxShadow: loading
@@ -670,7 +678,7 @@ export const GuestPersonalDetailsModal = ({
                   }, 0)
                 }}
                 disabled={loading}
-                className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-pms-tiny font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${loading ? 'cursor-not-allowed bg-slate-400' : 'hover:opacity-90'}`}
+                className={`text-pms-tiny flex items-center gap-2 rounded-xl px-5 py-2.5 font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${loading ? 'cursor-not-allowed bg-slate-400' : 'hover:opacity-90'}`}
                 style={{
                   backgroundColor: loading ? undefined : '#f59e0b',
                   boxShadow: loading
@@ -685,7 +693,7 @@ export const GuestPersonalDetailsModal = ({
               <button
                 type="submit"
                 disabled={loading}
-                className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-pms-tiny font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${loading ? 'cursor-not-allowed bg-slate-400' : 'bg-blue-600 shadow-blue-500/30 hover:bg-blue-700 hover:shadow-blue-500/40'}`}
+                className={`text-pms-tiny flex items-center gap-2 rounded-xl px-5 py-2.5 font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${loading ? 'cursor-not-allowed bg-slate-400' : 'bg-blue-600 shadow-blue-500/30 hover:bg-blue-700 hover:shadow-blue-500/40'}`}
               >
                 <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
                 <span>CREATE PROFILE</span>

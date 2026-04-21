@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { X, Loader2, UploadCloud, Building2, MapPin, Phone, Mail, Globe } from 'lucide-react'
 import { propertyService } from '../../../services/propertyService'
+import { AuthImage } from '../../components/common/AuthImage'
 
 const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
   const [formData, setFormData] = useState({
@@ -47,20 +48,28 @@ const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
         [type === 'hotelLogo' ? 'logoPreview' : 'imagePreview']: localUrl,
       }))
 
+      console.log(`--- [UPLOAD START] Picked: ${file.name} ---`)
       const uploadData = new FormData()
       uploadData.append('file', file)
       const response = await propertyService.uploadImage(uploadData)
 
+      // 3. CLEANING LOGIC: Extract ONLY the filename from the noisy response
       const rawData = response.data.filename || response.data
       let cleanFileName = rawData
-      if (typeof rawData === 'string' && rawData.includes('/')) {
-        cleanFileName = rawData.split('/').pop()
+
+      if (typeof rawData === 'string') {
+        // Remove path prefixes if server returns full path
+        cleanFileName = rawData.split(/[/\\]/).pop().split(':').pop().trim()
       }
 
       setFormData((prev) => ({
         ...prev,
-        [type]: cleanFileName,
+        [type]: cleanFileName, // Saving the server-returned name so it can be fetched
       }))
+
+      console.log(`--- [UPLOAD SUCCESS] ---`)
+      console.log(`Original Name: ${file.name}`)
+      console.log(`Server Saved As: ${cleanFileName}`)
     } catch (err) {
       console.error('Upload failed:', err)
       alert('Image upload failed')
@@ -73,7 +82,9 @@ const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
     e.preventDefault()
     setIsUpdating(true)
     try {
-      const { _logoPreview, _imagePreview, ...payload } = formData
+      // Underscore prefix ka use karke ESLint warning ko fix karna
+      const { logoPreview: _lp, imagePreview: _ip, ...payload } = formData
+
       const response = await propertyService.updateHotel(hotel.id, payload)
       if (response.data) {
         onUpdate(response.data)
@@ -218,10 +229,15 @@ const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
                   className="group relative flex h-36 cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 transition-all hover:border-emerald-400 hover:bg-emerald-50/30"
                 >
                   {formData.logoPreview ? (
-                    <img
+                    <AuthImage
                       src={formData.logoPreview}
                       alt="Logo"
                       className="h-full w-full object-contain p-4 transition-transform group-hover:scale-105"
+                      fallback={
+                        <div className="flex h-full w-full items-center justify-center bg-slate-50 text-slate-300">
+                          <Building2 size={24} />
+                        </div>
+                      }
                     />
                   ) : (
                     <>
@@ -257,10 +273,15 @@ const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
                   className="group relative flex h-36 cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 transition-all hover:border-emerald-400 hover:bg-emerald-50/30"
                 >
                   {formData.imagePreview ? (
-                    <img
+                    <AuthImage
                       src={formData.imagePreview}
                       alt="Cover"
                       className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                      fallback={
+                        <div className="flex h-full w-full items-center justify-center bg-slate-50 text-slate-300">
+                          <Building2 size={32} />
+                        </div>
+                      }
                     />
                   ) : (
                     <>

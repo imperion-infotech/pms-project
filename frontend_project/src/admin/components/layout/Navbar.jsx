@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { Menu, Building2, UserCircle, Bell, Mail, Phone, Globe, MapPin } from 'lucide-react'
 import { useSidebar } from '../../../context/SidebarContext'
 import { propertyService } from '../../../services/propertyService'
+import { AuthImage } from '../common/AuthImage'
 
 const Navbar = () => {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
@@ -72,14 +73,15 @@ const Navbar = () => {
       >
         <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-emerald-400/20 bg-linear-to-br from-emerald-500/10 to-emerald-700/20 shadow-[0_0_15px_rgba(16,185,129,0.1)] backdrop-blur-md transition-all duration-300 hover:scale-105">
           {activeHotel?.hotelLogo && activeHotel?.hotelLogo !== 'string' ? (
-            <img
+            <AuthImage
               src={propertyService.getImageUrl(activeHotel.hotelLogo)}
               alt="Logo"
               className="h-full w-full rounded-xl object-contain p-1"
-              onError={(e) => {
-                e.target.style.display = 'none'
-                e.target.nextSibling.style.display = 'flex'
-              }}
+              fallback={
+                <div className="flex h-full w-full items-center justify-center rounded-xl bg-linear-to-br from-emerald-500 to-emerald-700">
+                  <Building2 className="h-4.5 w-4.5 text-white" />
+                </div>
+              }
             />
           ) : null}
           <div
@@ -103,10 +105,15 @@ const Navbar = () => {
             {/* Image Header */}
             <div className="relative h-24 w-full">
               {activeHotel.hotelImage && activeHotel.hotelImage !== 'string' ? (
-                <img
+                <AuthImage
                   src={propertyService.getImageUrl(activeHotel.hotelImage)}
                   alt="Property"
                   className="h-full w-full object-cover"
+                  fallback={
+                    <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-emerald-900/40 to-slate-900">
+                      <Building2 className="h-8 w-8 text-emerald-500/30" />
+                    </div>
+                  }
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-emerald-900/40 to-slate-900">

@@ -156,11 +156,21 @@ export const propertyService = {
       api.post('/user/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
     ),
   getImageUrl: (filename) => {
-    if (!filename || filename === 'string') return ''
-    // If the database has the messy string "Image uploaded...: /path/abc.jpg"
-    // we extract only "abc.jpg"
-    const nameOnly = filename.includes('/') ? filename.split('/').pop() : filename
-    return `/uploads/pms/${nameOnly}`
+    // If filename is effectively empty or just a placeholder 'string'
+    if (!filename || filename === 'string' || filename.length < 5) return ''
+
+    // If filename is already a full URL, use it
+    if (typeof filename === 'string' && filename.startsWith('http')) return filename
+
+    // Extract only the filename from messy strings:
+    const nameOnly = filename.includes('/')
+      ? filename.split('/').pop()
+      : filename.includes(':')
+        ? filename.split(':').pop().trim()
+        : filename
+
+    // Return the standard endpoint path as per Postman: /user/filename
+    return `/user/${nameOnly}`
   },
   deleteImage: (filename) => handleResponse(() => api.delete(`/user/delete/${filename}`)),
 

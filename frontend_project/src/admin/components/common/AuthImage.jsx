@@ -1,64 +1,66 @@
 import React, { useState, useEffect } from 'react'
+import { Building2, Loader2 } from 'lucide-react'
+import api from '../../../services/api'
 
 /**
  * AuthImage Component
- *
- * Purpose:
- * Fetches an image from the backend using an Authorization token.
- * This is necessary for protected static assets.
- *
- * Props:
- * - src: The relative path or URL of the image.
- * - alt: Alternate text for the image.
- * - className: CSS classes for styling.
- * - fallback: Optional React element to show if the image fails to load.
+ * - Handles protected & public images
+ * - Fixes 403 issue for /uploads
+ * - Supports fallback + loading UI
  */
 export const AuthImage = ({ src, alt, className, fallback }) => {
   const [imgSrc, setImgSrc] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
   useEffect(() => {
     let active = true
     let objectUrl = null
 
-    if (!src) {
+    // Reset states when src changes
+    setLoading(true)
+    setError(false)
+    setImgSrc(null)
+
+    if (!src || src === 'string' || src === '') {
       setError(true)
+      setLoading(false)
       return
     }
 
     // If it's a blob, data URL, or external HTTP link, use it directly
     if (src.startsWith('blob:') || src.startsWith('data:') || src.startsWith('http')) {
       setImgSrc(src)
+      setLoading(false)
       setError(false)
       return
     }
 
     const fetchImage = async () => {
       try {
-        const token = localStorage.getItem('access_token')
-        const cleanToken = token ? token.replace(/^"|"$/g, '') : null
-
-        const response = await fetch(src, {
-          method: 'GET',
-          headers: {
-            Authorization: cleanToken ? `Bearer ${cleanToken}` : '',
-          },
+        // Using the centralized axios instance so headers are managed automatically
+        const response = await api.get(src, {
+          responseType: 'blob',
         })
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-
-        const blob = await response.blob()
         if (active) {
-          objectUrl = URL.createObjectURL(blob)
+          objectUrl = URL.createObjectURL(response.data)
           setImgSrc(objectUrl)
           setError(false)
         }
       } catch (err) {
-        console.error('AuthImage Load Failed:', src, err)
+        console.error(`[AuthImage] Failed to fetch: ${src}`, {
+          message: err.message,
+          status: err.response?.status,
+          data: err.response?.data, // ← yeh important
+          headers: err.response?.headers,
+        })
         if (active) {
           setError(true)
+        }
+      } finally {
+        if (active) {
+          setLoading(false)
         }
       }
     }
@@ -73,25 +75,38 @@ export const AuthImage = ({ src, alt, className, fallback }) => {
     }
   }, [src])
 
-  // If there's an error and a fallback is provided, render the fallback
-  if (error && fallback) {
-    return <>{fallback}</>
+  // While loading, show a pulsing placeholder with a spinner
+  if (loading) {
+    return (
+      <div
+        className={`${className} flex animate-pulse items-center justify-center bg-slate-100 dark:bg-slate-800`}
+      >
+        <Loader2 className="animate-spin text-slate-300" size={20} />
+      </div>
+    )
   }
 
-  // Show a pulsing placeholder while loading unless a source is already available
-  if (!imgSrc && !error) {
-    return (
-      <div className={`${className} animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800`} />
+  // If there's an error and NO source, return fallback
+  if (error || !imgSrc) {
+    return fallback ? (
+      <>{fallback}</>
+    ) : (
+      <div className={`${className} flex items-center justify-center bg-slate-50 text-slate-300`}>
+        <Building2 size={24} />
+      </div>
     )
   }
 
   return (
     <img
-      src={imgSrc || src}
+      src={imgSrc}
       alt={alt}
       className={className}
-      onError={() => setError(true)}
       loading="lazy"
+      onError={() => {
+        setError(true)
+        setLoading(false)
+      }}
     />
   )
 }

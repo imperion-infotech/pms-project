@@ -14,6 +14,7 @@ import {
   Search,
 } from 'lucide-react'
 import { propertyService } from '../../../services/propertyService'
+import { AuthImage } from '../../components/common/AuthImage'
 
 const PropertyDetails = () => {
   const [hotelData, setHotelData] = useState(null)
@@ -358,12 +359,17 @@ const PropertyDetails = () => {
               <label className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
                 Property Cover Image
               </label>
-              <div className="group flex h-40 flex-col items-center justify-center gap-4 rounded-[32px] border-2 border-dashed border-slate-200 bg-slate-50 transition-all hover:border-emerald-400 hover:bg-emerald-50/30">
+              <div className="group flex h-40 flex-col items-center justify-center gap-4 overflow-hidden rounded-[32px] border-2 border-dashed border-slate-200 bg-slate-50 transition-all hover:border-emerald-400 hover:bg-emerald-50/30">
                 {hotelData.hotelImage && hotelData.hotelImage !== 'string' ? (
-                  <img
+                  <AuthImage
                     src={propertyService.getImageUrl(hotelData.hotelImage)}
                     alt="Cover"
-                    className="h-full w-full rounded-[32px] object-cover"
+                    className="h-full w-full object-cover"
+                    fallback={
+                      <div className="flex h-full w-full items-center justify-center bg-slate-50 text-slate-300">
+                        <Building2 size={32} />
+                      </div>
+                    }
                   />
                 ) : (
                   <>
@@ -383,12 +389,17 @@ const PropertyDetails = () => {
               <label className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase">
                 Property Logo
               </label>
-              <div className="group flex h-40 flex-col items-center justify-center gap-4 rounded-[32px] border-2 border-dashed border-slate-200 bg-slate-50 transition-all hover:border-emerald-400 hover:bg-emerald-50/30">
+              <div className="group flex h-40 flex-col items-center justify-center gap-4 overflow-hidden rounded-[32px] border-2 border-dashed border-slate-200 bg-slate-50 transition-all hover:border-emerald-400 hover:bg-emerald-50/30">
                 {hotelData.hotelLogo && hotelData.hotelLogo !== 'string' ? (
-                  <img
+                  <AuthImage
                     src={propertyService.getImageUrl(hotelData.hotelLogo)}
                     alt="Logo"
-                    className="h-16 w-16 object-contain"
+                    className="h-24 w-24 object-contain"
+                    fallback={
+                      <div className="flex h-full w-full items-center justify-center bg-slate-50 text-slate-300">
+                        <CheckCircle2 size={32} />
+                      </div>
+                    }
                   />
                 ) : (
                   <>
