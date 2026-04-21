@@ -101,7 +101,7 @@ const PropertyDetails = () => {
             <Building2 size={24} />
           </div>
           <div>
-            <div className="flex items-center gap-2 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase">
+            <div className="text-pms-tiny flex items-center gap-2 font-bold tracking-widest text-slate-400 uppercase">
               <span>Room Settings</span>
               <span>/</span>
               <span className="text-emerald-600">Property Details</span>

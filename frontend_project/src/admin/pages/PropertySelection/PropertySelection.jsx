@@ -852,21 +852,20 @@ const PropertySelection = () => {
                     )}
                   </div>
 
-                  {/* 3. INTERACTIVE FOOTER - Redesigned for "Proper" Look */}
+                  {/* 3. INTERACTIVE FOOTER - Final "Proper" Polish */}
                   <div className="mt-auto pt-6">
-                    <div className="flex items-center justify-between rounded-2xl bg-slate-50/80 p-3.5 transition-all duration-300 group-hover:bg-emerald-500 group-hover:shadow-lg group-hover:shadow-emerald-500/20">
+                    <div className="flex w-full items-center justify-between rounded-2xl bg-emerald-50/50 p-4 transition-all duration-500 group-hover:bg-emerald-600 group-hover:shadow-[0_10px_20px_-5px_rgba(16,185,129,0.3)]">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white shadow-sm transition-transform group-hover:scale-90">
-                          <Building2 size={16} className="text-emerald-600" />
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white shadow-sm transition-transform duration-500 group-hover:scale-90">
+                          <Building2 size={18} className="text-emerald-600" />
                         </div>
-                        <span className="text-xs font-black tracking-widest text-slate-900 uppercase transition-colors group-hover:text-white">
+                        <span className="text-xs font-black tracking-widest text-emerald-800 uppercase transition-colors duration-500 group-hover:text-white">
                           Manage Dashboard
                         </span>
                       </div>
-                      <ArrowRight
-                        size={18}
-                        className="text-slate-400 transition-all duration-300 group-hover:translate-x-1 group-hover:text-white"
-                      />
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/50 text-emerald-600 backdrop-blur-sm transition-all duration-500 group-hover:bg-emerald-400 group-hover:text-white group-hover:translate-x-1">
+                        <ArrowRight size={18} />
+                      </div>
                     </div>
                   </div>
                 </div>
