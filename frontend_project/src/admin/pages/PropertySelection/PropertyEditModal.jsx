@@ -82,8 +82,17 @@ const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
     e.preventDefault()
     setIsUpdating(true)
     try {
-      // Underscore prefix ka use karke ESLint warning ko fix karna
-      const { logoPreview: _lp, imagePreview: _ip, ...payload } = formData
+      // 1. CLEAN PAYLOAD: Strip out preview URLs and set timestamps
+      // logoPreview aur imagePreview local frontend state hain, inhe backend ko nahi bhejna hai.
+      const { logoPreview: _lp, imagePreview: _ip, ...basePayload } = formData
+
+      const payload = {
+        ...basePayload,
+        id: hotel.id, // Ensure ID matches the hotel being edited
+        updatedOn: new Date().toISOString(), // Automatically set updated timestamp
+      }
+
+      console.log('--- [UPDATE START] Sending Payload ---', payload)
 
       const response = await propertyService.updateHotel(hotel.id, payload)
       if (response.data) {
@@ -92,7 +101,7 @@ const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
       }
     } catch (err) {
       console.error('Update failed:', err)
-      alert('Failed to update property.')
+      alert(`Property update failed: ${err.response?.data?.message || err.message}`)
     } finally {
       setIsUpdating(false)
     }
@@ -123,7 +132,8 @@ const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
 
         {/* Scrollable Form Area */}
         <div className="custom-scrollbar flex-1 overflow-y-auto px-8 py-8">
-          <form className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3">
+          <form className="grid grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-3">
+            {/* Row 1: Name and Timezone */}
             <div className="md:col-span-2">
               <label className="mb-2 block text-xs font-black tracking-widest text-slate-400 uppercase">
                 Hotel Name*
@@ -133,7 +143,7 @@ const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
                 required
                 value={formData.hotelName}
                 onChange={(e) => setFormData({ ...formData, hotelName: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold transition-all outline-none focus:border-emerald-500 focus:bg-white"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm font-bold transition-all outline-none focus:border-emerald-500 focus:bg-white"
               />
             </div>
 
@@ -145,10 +155,11 @@ const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
                 type="text"
                 value={formData.timezone}
                 onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold transition-all outline-none focus:border-emerald-500 focus:bg-white"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm font-bold transition-all outline-none focus:border-emerald-500 focus:bg-white"
               />
             </div>
 
+            {/* Row 2: Full Address */}
             <div className="md:col-span-3">
               <label className="mb-2 block text-xs font-black tracking-widest text-slate-400 uppercase">
                 Full Address
@@ -157,24 +168,57 @@ const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
                 rows="1"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold transition-all outline-none focus:border-emerald-500 focus:bg-white"
+                className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm font-bold transition-all outline-none focus:border-emerald-500 focus:bg-white"
               />
             </div>
 
-            {['city', 'state1', 'zipCode', 'country'].map((field) => (
-              <div key={field}>
-                <label className="mb-2 block text-xs font-black tracking-widest text-slate-400 uppercase">
-                  {field.replace('1', '').replace(/([A-Z])/, ' $1')}
-                </label>
-                <input
-                  type="text"
-                  value={formData[field]}
-                  onChange={(e) => setFormData({ ...formData, [field]: e.target.value })}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 transition-all outline-none focus:border-emerald-500 focus:bg-white"
-                />
-              </div>
-            ))}
+            {/* Row 3: City, State, Zip */}
+            <div>
+              <label className="mb-2 block text-xs font-black tracking-widest text-slate-400 uppercase">
+                City
+              </label>
+              <input
+                type="text"
+                value={formData.city}
+                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm font-bold text-slate-700 transition-all outline-none focus:border-emerald-500 focus:bg-white"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-xs font-black tracking-widest text-slate-400 uppercase">
+                State
+              </label>
+              <input
+                type="text"
+                value={formData.state1}
+                onChange={(e) => setFormData({ ...formData, state1: e.target.value })}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm font-bold text-slate-700 transition-all outline-none focus:border-emerald-500 focus:bg-white"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-xs font-black tracking-widest text-slate-400 uppercase">
+                Zip Code
+              </label>
+              <input
+                type="text"
+                value={formData.zipCode}
+                onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm font-bold text-slate-700 transition-all outline-none focus:border-emerald-500 focus:bg-white"
+              />
+            </div>
 
+            {/* Row 4: Country, Contact, Website */}
+            <div>
+              <label className="mb-2 block text-xs font-black tracking-widest text-slate-400 uppercase">
+                Country
+              </label>
+              <input
+                type="text"
+                value={formData.country}
+                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm font-bold text-slate-700 transition-all outline-none focus:border-emerald-500 focus:bg-white"
+              />
+            </div>
             <div>
               <label className="mb-2 block text-xs font-black tracking-widest text-slate-400 uppercase">
                 Contact Number
@@ -183,11 +227,10 @@ const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
                 type="text"
                 value={formData.contactNumber}
                 onChange={(e) => setFormData({ ...formData, contactNumber: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold transition-all outline-none focus:border-emerald-500 focus:bg-white"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm font-bold transition-all outline-none focus:border-emerald-500 focus:bg-white"
               />
             </div>
-
-            <div className="md:col-span-1">
+            <div>
               <label className="mb-2 block text-xs font-black tracking-widest text-slate-400 uppercase">
                 Website URL
               </label>
@@ -195,10 +238,11 @@ const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
                 type="url"
                 value={formData.url}
                 onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold transition-all outline-none focus:border-emerald-500 focus:bg-white"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm font-bold transition-all outline-none focus:border-emerald-500 focus:bg-white"
               />
             </div>
 
+            {/* Row 5: Email (Full Width) */}
             <div className="md:col-span-3">
               <label className="mb-2 block text-xs font-black tracking-widest text-slate-400 uppercase">
                 Contact Email
@@ -207,7 +251,7 @@ const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold transition-all outline-none focus:border-emerald-500 focus:bg-white"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm font-bold transition-all outline-none focus:border-emerald-500 focus:bg-white"
               />
             </div>
 
@@ -226,7 +270,7 @@ const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
                 />
                 <div
                   onClick={() => document.getElementById('edit-logo-upload').click()}
-                  className="group relative flex h-36 cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 transition-all hover:border-emerald-400 hover:bg-emerald-50/30"
+                  className="group relative flex h-36 cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 shadow-inner transition-all hover:border-emerald-400 hover:bg-emerald-50/30"
                 >
                   {formData.logoPreview ? (
                     <AuthImage
@@ -270,7 +314,7 @@ const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
                 />
                 <div
                   onClick={() => document.getElementById('edit-cover-upload').click()}
-                  className="group relative flex h-36 cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 transition-all hover:border-emerald-400 hover:bg-emerald-50/30"
+                  className="group relative flex h-36 cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 shadow-inner transition-all hover:border-emerald-400 hover:bg-emerald-50/30"
                 >
                   {formData.imagePreview ? (
                     <AuthImage
@@ -308,14 +352,14 @@ const PropertyEditModal = ({ isOpen, onClose, hotel, onUpdate }) => {
         <div className="flex gap-4 border-t border-slate-100 bg-slate-50/80 px-8 py-6 backdrop-blur-md">
           <button
             onClick={onClose}
-            className="flex-1 rounded-2xl border border-slate-200 bg-white px-6 py-4 text-xs font-black tracking-widest text-slate-600 uppercase transition-all hover:bg-slate-50"
+            className="flex-1 rounded-2xl border border-slate-200 bg-white px-6 py-4 text-xs font-black tracking-widest text-slate-600 uppercase shadow-sm transition-all hover:bg-slate-50 active:scale-95"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={isUpdating || isUploading}
-            className="flex flex-2 items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-6 py-4 text-xs font-black tracking-widest text-white uppercase shadow-lg shadow-emerald-600/20 transition-all hover:-translate-y-0.5 hover:bg-emerald-700 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
+            className="flex flex-2 items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-6 py-4 text-xs font-black tracking-widest text-white uppercase shadow-lg shadow-emerald-600/30 transition-all hover:-translate-y-0.5 hover:bg-emerald-700 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
           >
             {isUpdating ? <Loader2 size={18} className="animate-spin" /> : null}
             {isUpdating ? 'Saving Changes...' : 'Update Property'}

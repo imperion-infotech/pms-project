@@ -749,99 +749,124 @@ const PropertySelection = () => {
               <div
                 key={hotel.id || index}
                 onClick={() => handleSelectHotel(hotel.id, hotel.hotelName || hotel.name)}
-                className="group relative cursor-pointer overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:border-emerald-400 hover:shadow-xl"
+                className="group relative flex cursor-pointer flex-col overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition-all duration-500 hover:-translate-y-2 hover:border-emerald-400 hover:shadow-[0_20px_50px_-12px_rgba(16,185,129,0.15)]"
               >
-                {/* New Premium Card Header with Cover Image */}
-                <div className="relative h-24 w-full overflow-hidden">
+                {/* 1. PREMIUM HEADER SECTION - (overflow-hidden removed to allow logo overlap) */}
+                <div className="relative h-32 w-full">
                   {hotel.hotelImage && hotel.hotelImage !== 'string' ? (
                     <AuthImage
                       src={propertyService.getImageUrl(hotel.hotelImage)}
                       alt="Cover"
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      className="h-full w-full rounded-t-[31px] object-cover transition-transform duration-700 group-hover:scale-110"
                       fallback={
-                        <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-300">
+                        <div className="flex h-full w-full items-center justify-center rounded-t-[31px] bg-slate-100 text-slate-300">
                           <Building2 size={32} />
                         </div>
                       }
                     />
                   ) : (
-                    <div className="h-full w-full bg-linear-to-br from-emerald-400/80 to-emerald-600"></div>
+                    <div className="h-full w-full rounded-t-[31px] bg-linear-to-br from-emerald-400/80 to-emerald-600"></div>
                   )}
-                  <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
+                  {/* Subtle Gradient Overlay */}
+                  <div className="absolute inset-0 rounded-t-[31px] bg-linear-to-t from-black/60 to-transparent"></div>
 
-                  {/* Floating Logo using Image Controller */}
-                  <div className="absolute -bottom-2 left-4 h-12 w-12 overflow-hidden rounded-xl border-2 border-white bg-white shadow-lg">
+                  {/* Super Admin Actions - Floating Top Right */}
+                  {isSuperAdmin && (
+                    <div className="absolute top-4 right-4 flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setEditingHotel(hotel)
+                        }}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/20 text-white backdrop-blur-md transition-all hover:bg-emerald-500 hover:text-white"
+                        title="Edit Property"
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      <button
+                        onClick={(e) => handleDeleteHotel(e, hotel.id, hotel.hotelName)}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/20 text-white backdrop-blur-md transition-all hover:bg-rose-500 hover:text-white"
+                        title="Delete Property"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Floating Logo Badge - Smaller & More Left Aligned */}
+                  <div className="absolute -bottom-8 left-6 z-20 flex h-16 w-16 items-center justify-center overflow-hidden rounded-[24px] border-4 border-white bg-white shadow-[0_12px_30px_-8px_rgba(0,0,0,0.15)] transition-all duration-500 group-hover:scale-110 group-hover:shadow-emerald-500/30">
                     {hotel.hotelLogo && hotel.hotelLogo !== 'string' ? (
                       <AuthImage
                         src={propertyService.getImageUrl(hotel.hotelLogo)}
                         alt={hotel.hotelName}
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-contain p-2.5 transition-transform duration-500"
                         fallback={
-                          <div className="flex h-full w-full items-center justify-center bg-white text-slate-300">
-                            <Building2 size={16} />
+                          <div className="flex h-full w-full items-center justify-center bg-slate-50 text-slate-300">
+                            <Building2 size={24} />
                           </div>
                         }
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-slate-50 text-emerald-600">
-                        <Home size={18} />
+                      <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-emerald-50 to-emerald-100 text-emerald-600">
+                        <Home size={24} />
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="relative z-10 flex flex-col gap-3 p-5 pt-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-extrabold text-slate-900 transition-colors group-hover:text-emerald-700">
-                        {hotel.hotelName || hotel.name}
-                      </h3>
-                      <div className="mt-1 flex items-center gap-2">
-                        <span className="text-pms-micro inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 font-black tracking-widest text-emerald-700 uppercase">
-                          ID: {hotel.id}
-                        </span>
-                        <span className="text-pms-micro inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 font-black tracking-widest text-emerald-700 uppercase">
-                          Active
-                        </span>
-                      </div>
-                    </div>
+                {/* 2. CARD CONTENT SECTION */}
+                <div className="flex flex-1 flex-col p-6 pt-8">
+                  <div className="mb-4">
+                    <h3 className="mb-1.5 text-xl font-black tracking-tight text-slate-900 transition-colors group-hover:text-emerald-700">
+                      {hotel.hotelName || hotel.name}
+                    </h3>
 
-                    {/* Admin Actions */}
-                    {isSuperAdmin && (
-                      <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setEditingHotel(hotel)
-                          }}
-                          className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-emerald-50 hover:text-emerald-600"
-                          title="Edit Property"
-                        >
-                          <Pencil size={14} />
-                        </button>
-                        <button
-                          onClick={(e) => handleDeleteHotel(e, hotel.id, hotel.hotelName)}
-                          className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500"
-                          title="Delete Property"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2 py-1 text-[10px] font-black tracking-widest text-emerald-700 uppercase">
+                        ID: {hotel.id}
+                      </span>
+                      <span
+                        className={`inline-flex items-center rounded-lg px-2 py-1 text-[10px] font-black tracking-widest uppercase ${
+                          hotel.status?.toUpperCase() === 'ACTIVE'
+                            ? 'bg-emerald-500/10 text-emerald-600'
+                            : 'bg-slate-100 text-slate-500'
+                        }`}
+                      >
+                        {hotel.status || 'ACTIVE'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 border-t border-slate-50 pt-4">
+                    <div className="flex items-center gap-2 text-slate-500">
+                      <MapPin size={14} className="text-emerald-500" />
+                      <span className="text-xs leading-tight font-bold">
+                        {hotel.city}, {hotel.state1}
+                      </span>
+                    </div>
+                    {hotel.contactNumber && (
+                      <div className="flex items-center gap-2 text-slate-400">
+                        <Phone size={14} />
+                        <span className="text-xs font-medium">{hotel.contactNumber}</span>
                       </div>
                     )}
                   </div>
 
-                  <div className="mt-1 flex flex-col gap-1">
-                    <p className="text-pms-tiny flex items-center gap-1.5 font-medium text-slate-400">
-                      <MapPin size={10} /> {hotel.city || 'Location N/A'}, {hotel.state1 || ''}
-                    </p>
-                  </div>
-
-                  <div className="mt-2 flex items-center justify-between border-t border-slate-50 pt-4">
-                    <span className="text-pms-tiny font-black tracking-widest text-slate-400 uppercase transition-colors group-hover:text-emerald-600">
-                      Manage Dashboard
-                    </span>
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-50 text-slate-300 transition-all group-hover:bg-emerald-600 group-hover:text-white">
-                      <ArrowRight size={12} />
+                  {/* 3. INTERACTIVE FOOTER - Redesigned for "Proper" Look */}
+                  <div className="mt-auto pt-6">
+                    <div className="flex items-center justify-between rounded-2xl bg-slate-50/80 p-3.5 transition-all duration-300 group-hover:bg-emerald-500 group-hover:shadow-lg group-hover:shadow-emerald-500/20">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white shadow-sm transition-transform group-hover:scale-90">
+                          <Building2 size={16} className="text-emerald-600" />
+                        </div>
+                        <span className="text-xs font-black tracking-widest text-slate-900 uppercase transition-colors group-hover:text-white">
+                          Manage Dashboard
+                        </span>
+                      </div>
+                      <ArrowRight
+                        size={18}
+                        className="text-slate-400 transition-all duration-300 group-hover:translate-x-1 group-hover:text-white"
+                      />
                     </div>
                   </div>
                 </div>

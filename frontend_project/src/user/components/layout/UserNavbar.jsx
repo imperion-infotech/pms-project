@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { Menu, Building2, UserCircle, Bell, MapPin, Phone, Mail, Globe, Info } from 'lucide-react'
 import { useSidebar } from '../../../context/SidebarContext'
 import { propertyService } from '../../../services/propertyService'
+import AuthImage from '../../../admin/components/common/AuthImage'
 
 /**
  * UserNavbar component - Global dark header for User Hub.
@@ -11,7 +12,8 @@ const UserNavbar = () => {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
   const [isHotelHovered, setIsHotelHovered] = useState(false)
 
-  // Memoized user details from token
+  // ... (userDetails and activeHotel logic remains the same) ...
+
   const userDetails = useMemo(() => {
     const token = localStorage.getItem('access_token')
     if (token) {
@@ -64,6 +66,16 @@ const UserNavbar = () => {
 
   return (
     <header className="bg-surface-50 relative z-50 flex h-16 shrink-0 items-center justify-between border-b border-white/5 px-4 text-slate-200 shadow-md transition-all duration-300 md:px-6">
+      {/* PREFETCH LAYER: Loads images in background so they reflect instantly on hover */}
+      <div className="pointer-events-none absolute h-0 w-0 overflow-hidden opacity-0">
+        {activeHotel?.hotelLogo && (
+          <AuthImage src={propertyService.getImageUrl(activeHotel.hotelLogo)} />
+        )}
+        {activeHotel?.hotelImage && (
+          <AuthImage src={propertyService.getImageUrl(activeHotel.hotelImage)} />
+        )}
+      </div>
+
       {/* LEFT SECTION: Context & Sidebar Trigger */}
       <div className="flex items-center gap-4">
         <div
@@ -85,103 +97,118 @@ const UserNavbar = () => {
         onMouseEnter={() => setIsHotelHovered(true)}
         onMouseLeave={() => setIsHotelHovered(false)}
       >
-        <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-emerald-400/20 bg-linear-to-br from-emerald-500/10 to-emerald-700/20 shadow-[0_0_15px_rgba(16,185,129,0.1)] backdrop-blur-md transition-all duration-300 hover:scale-105">
+        <div
+          className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 transition-all duration-500 hover:scale-110 ${
+            isHotelHovered
+              ? 'border-emerald-500 bg-emerald-500/10 shadow-[0_0_20px_rgba(16,185,129,0.5)]'
+              : 'border-white/10 bg-linear-to-br from-emerald-500/10 to-emerald-700/20 shadow-inner'
+          } backdrop-blur-md`}
+        >
           {activeHotel?.hotelLogo && activeHotel?.hotelLogo !== 'string' ? (
-            <img
+            <AuthImage
               src={propertyService.getImageUrl(activeHotel.hotelLogo)}
               alt="Logo"
-              className="h-full w-full rounded-xl object-contain p-1"
-              onError={(e) => {
-                e.target.style.display = 'none'
-                e.target.nextSibling.style.display = 'flex'
-              }}
+              className="h-full w-full rounded-xl object-contain p-1.5 transition-transform duration-500"
             />
           ) : null}
           <div
-            className={`absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-linear-to-br from-emerald-500 to-emerald-700 ${activeHotel?.hotelLogo && activeHotel?.hotelLogo !== 'string' ? 'hidden' : 'flex'}`}
+            className={`absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-linear-to-br from-emerald-500 to-emerald-700 transition-opacity duration-300 ${activeHotel?.hotelLogo && activeHotel?.hotelLogo !== 'string' ? 'opacity-0' : 'opacity-100'}`}
           >
             <Building2 className="h-5 w-5 text-white" />
           </div>
-          <div className="absolute inset-0 rounded-xl bg-linear-to-tr from-transparent via-white/20 to-transparent opacity-80 mix-blend-overlay"></div>
+          <div className="absolute inset-0 rounded-xl bg-linear-to-tr from-transparent via-white/10 to-transparent opacity-80 mix-blend-overlay"></div>
         </div>
         <div className="flex flex-col">
-          <h1 className="text-base leading-tight font-black tracking-tight text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] uppercase">
+          <h1 className="text-base leading-tight font-black tracking-tight text-white uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
             {activeHotel?.hotelName || 'IMPERION'}
           </h1>
-          <p className="mt-0.5 text-pms-tiny leading-none font-black tracking-[0.4em] text-emerald-400 uppercase opacity-90">
+          <p className="text-pms-tiny mt-0.5 leading-none font-black tracking-[0.4em] text-emerald-400 uppercase opacity-90">
             Engine
           </p>
         </div>
 
         {/* Floating Property Detail Card */}
         {isHotelHovered && activeHotel && (
-          <div className="animate-in fade-in zoom-in-95 slide-in-from-top-4 absolute top-full left-1/2 z-50 mt-4 w-72 -translate-x-1/2 overflow-hidden rounded-3xl border border-white/10 bg-slate-900 shadow-2xl backdrop-blur-xl">
-            <div className="relative h-24 w-full">
+          <div className="animate-in fade-in zoom-in-95 slide-in-from-top-4 absolute top-full left-1/2 z-50 mt-5 w-80 -translate-x-1/2 overflow-hidden rounded-[32px] border border-emerald-500/30 bg-slate-900 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.8),0_0_25px_rgba(16,185,129,0.2)] backdrop-blur-2xl">
+            {/* Top Shine Layer */}
+            <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-400/50 to-transparent"></div>
+
+            <div className="relative h-28 w-full">
               {activeHotel.hotelImage && activeHotel.hotelImage !== 'string' ? (
-                <img
+                <AuthImage
                   src={propertyService.getImageUrl(activeHotel.hotelImage)}
                   alt="Cover"
-                  className="h-full w-full object-cover opacity-60"
+                  className="h-full w-full object-cover opacity-60 brightness-75 transition-all duration-700 group-hover:scale-110"
                 />
               ) : (
-                <div className="h-full w-full bg-linear-to-br from-emerald-600 to-slate-900 opacity-60"></div>
+                <div className="h-full w-full bg-linear-to-br from-emerald-600/40 to-slate-900"></div>
               )}
-              <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-transparent to-transparent"></div>
-              <div className="absolute bottom-3 left-4">
-                <span className="inline-flex items-center rounded-full bg-emerald-500 px-2.5 py-0.5 text-pms-tiny font-black tracking-widest text-white uppercase">
-                  Property Info
-                </span>
+              <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
+              <div className="absolute bottom-4 left-5">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)]"></div>
+                  <span className="text-[10px] font-black tracking-[0.2em] text-emerald-400 uppercase">
+                    Property Active
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div className="space-y-3 p-5">
-              <h3 className="text-lg font-black text-white">{activeHotel.hotelName}</h3>
-
-              <div className="space-y-2.5">
-                {activeHotel.address && (
-                  <div className="flex items-start gap-2.5">
-                    <MapPin size={14} className="mt-0.5 shrink-0 text-emerald-500" />
-                    <p className="text-pms-mini font-bold leading-tight text-slate-300">
-                      {activeHotel.address}, {activeHotel.city}, {activeHotel.state1}
-                    </p>
+            <div className="space-y-4 p-6">
+              <div className="flex items-start justify-between">
+                <div className="space-y-1">
+                  <h3 className="text-xl leading-tight font-black text-white">
+                    {activeHotel.hotelName}
+                  </h3>
+                  <div className="flex items-center gap-1.5 text-slate-400">
+                    <MapPin size={12} className="text-emerald-500" />
+                    <span className="text-[11px] font-bold">
+                      {activeHotel.city}, {activeHotel.state1}
+                    </span>
                   </div>
-                )}
+                </div>
+                <div className="flex h-10 w-12 items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/5 transition-colors hover:bg-emerald-500/10">
+                  <span className="text-xs font-black text-emerald-400">#{activeHotel.id}</span>
+                </div>
+              </div>
+
+              <div className="space-y-3.5 border-t border-white/5 pt-4">
                 {activeHotel.contactNumber && (
-                  <div className="flex items-center gap-2.5">
-                    <Phone size={14} className="shrink-0 text-emerald-500" />
-                    <p className="text-pms-mini font-bold text-slate-300">
-                      {activeHotel.contactNumber}
-                    </p>
+                  <div className="group flex items-center gap-4">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-800 text-emerald-500 transition-colors group-hover:bg-emerald-500 group-hover:text-white">
+                      <Phone size={14} />
+                    </div>
+                    <p className="text-xs font-bold text-slate-300">{activeHotel.contactNumber}</p>
                   </div>
                 )}
                 {activeHotel.email && (
-                  <div className="flex items-center gap-2.5">
-                    <Mail size={14} className="shrink-0 text-emerald-500" />
-                    <p className="text-pms-mini font-bold text-slate-300 break-all">
+                  <div className="group flex items-center gap-4">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-800 text-emerald-500 transition-colors group-hover:bg-emerald-500 group-hover:text-white">
+                      <Mail size={14} />
+                    </div>
+                    <p className="max-w-[180px] truncate text-xs font-bold text-slate-300">
                       {activeHotel.email}
                     </p>
                   </div>
                 )}
                 {activeHotel.url && (
-                  <div className="flex items-center gap-2.5">
-                    <Globe size={14} className="shrink-0 text-emerald-500" />
-                    <p className="text-pms-mini font-bold text-slate-300 break-all cursor-pointer hover:text-emerald-400">
+                  <div className="group flex items-center gap-4">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-800 text-emerald-500 transition-colors group-hover:bg-emerald-500 group-hover:text-white">
+                      <Globe size={14} />
+                    </div>
+                    <p className="max-w-[180px] truncate text-xs font-bold text-emerald-400 underline decoration-emerald-400/30 underline-offset-4">
                       {activeHotel.url.replace(/^https?:\/\//, '')}
                     </p>
                   </div>
                 )}
               </div>
 
-              <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-4">
-                <div className="flex items-center gap-1.5">
-                  <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                  <span className="text-pms-tiny font-black tracking-widest text-emerald-500 uppercase">
-                    System Active
+              <div className="mt-2">
+                <div className="group flex w-full items-center justify-center gap-2.5 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 py-3 transition-all hover:bg-emerald-500/10 active:scale-[0.98]">
+                  <span className="text-[10px] font-black tracking-[0.15em] text-emerald-500 uppercase">
+                    Connected Mode Active
                   </span>
                 </div>
-                <span className="text-pms-tiny font-black tracking-widest text-slate-500 uppercase">
-                  ID: {activeHotel.id}
-                </span>
               </div>
             </div>
           </div>
@@ -214,7 +241,7 @@ const UserNavbar = () => {
               <div className="animate-in fade-in slide-in-from-top-4 absolute right-0 z-50 mt-3 w-80 overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)]">
                 <div className="flex items-center justify-between border-b border-slate-700/50 bg-slate-800/95 p-4 backdrop-blur-sm">
                   <h3 className="text-sm font-bold text-white">Notifications</h3>
-                  <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-pms-tiny font-bold text-emerald-400">
+                  <span className="text-pms-tiny rounded-full bg-emerald-500/10 px-2 py-0.5 font-bold text-emerald-400">
                     1 New
                   </span>
                 </div>
@@ -227,7 +254,7 @@ const UserNavbar = () => {
                       Your role has been verified as{' '}
                       <span className="font-semibold text-emerald-400">{userDetails.role}</span>.
                     </p>
-                    <p className="mt-2 text-pms-tiny font-medium text-slate-500">Just now</p>
+                    <p className="text-pms-tiny mt-2 font-medium text-slate-500">Just now</p>
                   </div>
                 </div>
               </div>
