@@ -39,6 +39,13 @@ api.interceptors.request.use(
     if (hasHotelId && !config.url.includes('/auth/')) {
       config.headers['X-Hotel-Id'] = activeHotelId
     }
+
+    // Diagnostic logging for 403 Forbidden errors
+    console.debug(`[API Request] ${config.method.toUpperCase()} ${config.url}`, {
+      hasAuth: !!config.headers.Authorization,
+      hotelId: config.headers['X-Hotel-Id']
+    })
+
     return config
   },
   (error) => Promise.reject(error),

@@ -188,7 +188,13 @@ const PropertySelection = () => {
         localStorage.setItem('activeHotelId', hotelId)
         localStorage.setItem('activeHotelName', hotelName)
 
-        console.log('--- HOTEL SELECTION SUCCESSFUL ---')
+        // Industrial Logging for Debugging
+        console.log('--- HOTEL SELECTION SUCCESSFUL ---', {
+          hotelId: hotelId,
+          username: username,
+          newToken: cleanToken,
+        })
+
         navigate('/home')
       } else {
         throw new Error('New token not found in response')
@@ -863,7 +869,7 @@ const PropertySelection = () => {
                           Manage Dashboard
                         </span>
                       </div>
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/50 text-emerald-600 backdrop-blur-sm transition-all duration-500 group-hover:bg-emerald-400 group-hover:text-white group-hover:translate-x-1">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/50 text-emerald-600 backdrop-blur-sm transition-all duration-500 group-hover:translate-x-1 group-hover:bg-emerald-400 group-hover:text-white">
                         <ArrowRight size={18} />
                       </div>
                     </div>

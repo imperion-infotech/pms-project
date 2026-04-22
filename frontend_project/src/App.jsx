@@ -87,16 +87,16 @@ const AdminRoute = ({ children }) => {
   const token = localStorage.getItem('access_token')
   if (!token) return <Navigate to="/login" replace />
 
-  if (checkIsAdmin()) {
+  if (checkIsAdmin() || checkIsSuperAdmin()) {
     const activeHotelId = localStorage.getItem('activeHotelId')
 
-    // If no hotel selected, try to auto-select if user has exactly one hotel
+    // If no hotel selected, try to auto-select if user has any hotel
     if (!activeHotelId || activeHotelId === 'undefined' || activeHotelId === 'null') {
       const storedHotels = localStorage.getItem('adminHotels')
       if (storedHotels) {
         try {
           const hotels = JSON.parse(storedHotels)
-          if (hotels.length === 1) {
+          if (hotels.length > 0) {
             localStorage.setItem('activeHotelId', hotels[0].id)
             localStorage.setItem('activeHotelName', hotels[0].hotelName || hotels[0].name)
             return children
@@ -105,7 +105,13 @@ const AdminRoute = ({ children }) => {
           console.error('Auto-selection error', e)
         }
       }
-      return <Navigate to="/property-selection" replace />
+
+      // If Super Admin has no hotel, redirect to property selection
+      if (checkIsSuperAdmin()) {
+        return <Navigate to="/property-selection" replace />
+      }
+      // For normal admin, avoid property-selection as per requirements
+      return children
     }
     return children
   }
@@ -119,8 +125,8 @@ const PropertySelectionRoute = ({ children }) => {
   const token = localStorage.getItem('access_token')
   if (!token) return <Navigate to="/login" replace />
 
-  // Only Super Admins (or admins needing selection) should be here
-  if (checkIsAdmin()) return children
+  // Only Super Admins should be here
+  if (checkIsSuperAdmin()) return children
   return <Navigate to="/home" replace />
 }
 
@@ -151,30 +157,19 @@ const RootRoute = () => {
   if (isAdmin) {
     const storedHotels = localStorage.getItem('adminHotels')
     let hotelId = localStorage.getItem('activeHotelId')
-    let redirectToSelection = false
 
     if (storedHotels) {
       try {
         const hotels = JSON.parse(storedHotels)
 
-        // Auto-select if ONLY 1 hotel exists and none is active
-        if (hotels.length === 1 && (!hotelId || hotelId === 'undefined' || hotelId === 'null')) {
+        // Auto-select first hotel if none is active
+        if (hotels.length > 0 && (!hotelId || hotelId === 'undefined' || hotelId === 'null')) {
           localStorage.setItem('activeHotelId', hotels[0].id)
           localStorage.setItem('activeHotelName', hotels[0].hotelName || hotels[0].name)
-          hotelId = hotels[0].id
-        }
-
-        // Check if we still have no valid hotel selected
-        if (!hotelId || hotelId === 'undefined' || hotelId === 'null') {
-          redirectToSelection = true
         }
       } catch {
-        // Fallback to home if JSON is corrupt, though usually we'd want selection
+        // Fallback to home if JSON is corrupt
       }
-    }
-
-    if (redirectToSelection) {
-      return <Navigate to="/property-selection" replace />
     }
 
     return <Navigate to="/home" replace />

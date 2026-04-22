@@ -8,7 +8,7 @@ export const BuildingEditModal = ({
   handleUpdateBuilding,
   buildings = [],
 }) => {
-  if (!isOpen) return null
+  if (!isOpen || !editBuilding) return null
 
   const isDuplicate = buildings.some(
     (b) =>

@@ -29,16 +29,42 @@ const Login = () => {
       // Optimized: Using centralized api (axios) instead of fetch
       const response = await api.post('/auth/login', {
         username: username,
-        password: password
+        password: password,
       })
 
       const data = response.data
-      
+      console.log('--- LOGIN SUCCESS RESPONSE ---', data)
+
       // 1. Token Handling
-      const token = data.token || data.access_token || data.accessToken || (typeof data === 'string' ? data : null)
+      const token =
+        data.token ||
+        data.access_token ||
+        data.accessToken ||
+        (typeof data === 'string' ? data : null)
+
       if (token) {
         localStorage.setItem('access_token', token)
         localStorage.setItem('username', username)
+
+        // Robust User ID Extraction: Check response body first, then fallback to JWT decoding
+        let userId = data.userId || data.id || (data.data && data.data.id)
+
+        if (!userId) {
+          try {
+            // Decode JWT payload (middle part of the token)
+            const base64Url = token.split('.')[1]
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+            const payload = JSON.parse(window.atob(base64))
+            userId = payload.userId || payload.id
+            console.log('UserId extracted from JWT:', userId)
+          } catch (err) {
+            console.warn('Could not decode userId from token:', err)
+          }
+        }
+
+        if (userId) {
+          localStorage.setItem('userId', String(userId))
+        }
       }
 
       // 2. Hotels Extraction
@@ -50,15 +76,25 @@ const Login = () => {
       // 3. User Role Extraction (Optimized to detect ADMIN easily)
       let userRole = 'ROLE_USER'
       const roles = data.roles || (data.data && data.data.roles) || data.authorities
-      
+
       if (roles && Array.isArray(roles) && roles.length > 0) {
-        // Kisi bhi role object ya string mein 'ADMIN' dhoond rahe hain
-        const hasAdmin = roles.some(r => {
+        // Find if user is Super Admin
+        const hasSuperAdmin = roles.some((r) => {
           const roleName = (typeof r === 'object' ? r.name || r.authority : r) || ''
-          return roleName.toUpperCase().includes('ADMIN') || roleName.toUpperCase().includes('MANAGER')
+          return roleName.toUpperCase().includes('SUPER_ADMIN')
         })
-        
-        if (hasAdmin) {
+
+        // Find if user is Admin / Manager
+        const hasAdmin = roles.some((r) => {
+          const roleName = (typeof r === 'object' ? r.name || r.authority : r) || ''
+          return (
+            roleName.toUpperCase().includes('ADMIN') || roleName.toUpperCase().includes('MANAGER')
+          )
+        })
+
+        if (hasSuperAdmin) {
+          userRole = 'ROLE_SUPER_ADMIN'
+        } else if (hasAdmin) {
           userRole = 'ROLE_ADMIN'
         } else {
           const firstRole = roles[0].name || roles[0].authority || roles[0]
@@ -67,7 +103,11 @@ const Login = () => {
       }
 
       // Bypass for testing specific users as Admin if needed
-      if (username.toLowerCase() === 'tejal1') {
+      // if (username.toLowerCase() === 'tejal1') {
+      //   userRole = 'ROLE_ADMIN'
+      // }
+      // Login.jsx में twinkle के लिए Admin Bypass जोड़ दिया है
+      if (username.toLowerCase() === 'tejal1' || username.toLowerCase() === 'twinkle') {
         userRole = 'ROLE_ADMIN'
       }
 
@@ -149,7 +189,7 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="mt-3 flex cursor-pointer items-center justify-center gap-2 rounded-xl border-none bg-linear-to-br from-blue-500 to-blue-700 p-4 text-pms-card font-bold text-white shadow-lg shadow-blue-500/40 transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
+            className="text-pms-card mt-3 flex cursor-pointer items-center justify-center gap-2 rounded-xl border-none bg-linear-to-br from-blue-500 to-blue-700 p-4 font-bold text-white shadow-lg shadow-blue-500/40 transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
           >
             {loading ? <Loader2 size={18} className="animate-spin" /> : 'Sign In'}
             {!loading && <ArrowRight size={18} />}

@@ -65,7 +65,7 @@ export const GuestPersonalDetailsModal = ({
     return parts[parts.length - 1] // Only the filename
   }
 
-  console.log('Clean Image URL', cleanImageUrl)
+  // console.log('Clean Image URL', cleanImageUrl)
 
   const handlePreviewUpload = (e, type) => {
     const file = e.target.files?.[0]
@@ -80,7 +80,7 @@ export const GuestPersonalDetailsModal = ({
     handleFileUpload(e, type)
   }
 
-  console.log('Handle File Upload', handleFileUpload)
+  // console.log('Handle File Upload', handleFileUpload)
   // Body Scroll Lock
   useEffect(() => {
     if (isOpen) {
@@ -103,8 +103,8 @@ export const GuestPersonalDetailsModal = ({
     localPreviews.signature ||
     (cleanImageUrl(formData.signature) ? `/user/${cleanImageUrl(formData.signature)}` : null)
 
-  console.log('------------Photos--------------', photoSrc)
-  console.log('------------Signature--------------', signatureSrc)
+  // console.log('------------Photos--------------', photoSrc)
+  // console.log('------------Signature--------------', signatureSrc)
 
   // Premium UI Classes (Matching GuestProfileModal)
   const inputContainerClass = 'group relative'
