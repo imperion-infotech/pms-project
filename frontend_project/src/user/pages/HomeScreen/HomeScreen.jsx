@@ -56,9 +56,18 @@ const HomeScreen = () => {
 
   // Component local states
   const [selectedFloor, setSelectedFloor] = useState(location.state?.initialFloor || 'All')
+  const [selectedType, setSelectedType] = useState('All')
+  const [selectedStatus, setSelectedStatus] = useState('All')
   const [isActionModalOpen, setIsActionModalOpen] = useState(false)
   const [selectedRoomAction, setSelectedRoomAction] = useState(null)
   const [isFullCalendarOpen, setIsFullCalendarOpen] = useState(false)
+
+  // Reset Filters helper
+  const resetFilters = useCallback(() => {
+    setSelectedFloor('All')
+    setSelectedType('All')
+    setSelectedStatus('All')
+  }, [])
 
   // Context Menu State
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, room: null })
@@ -143,24 +152,56 @@ const HomeScreen = () => {
           : r.guestName,
       }
     })
-    console.log('------------------Mapped Data----------------:', mapped)
 
-    // Calculate quick stats for the header
-    const occupied = mapped.filter((r) => r.guestName).length
-    console.log('--------------Occupied---------', occupied)
-    const available = mapped.length - occupied - mapped.filter((r) => r.nonRoom).length
-    console.log('--------------Available---------', available)
-
-    // Grouping: Convert flat flat array into Floor-based groups for the grid
-    const grouped = {}
-    allFloors.forEach((f) => {
-      grouped[f.name] = mapped.filter((r) => r.floorName === f.name)
+    // 2. Global Filtering: Apply Type and Status filters before grouping
+    const filtered = mapped.filter((r) => {
+      const typeMatch = selectedType === 'All' || String(r.roomTypeId) === String(selectedType)
+      const statusMatch =
+        selectedStatus === 'All' ||
+        String(r.roomStatusTableId || r.roomStatusId) === String(selectedStatus)
+      return typeMatch && statusMatch
     })
 
-    return { mappedRooms: mapped, roomsByFloor: grouped, stats: { occupied, available } }
-  }, [rawRooms, allFloors, roomTypes, roomStatuses, personalDetails])
+    // 3. Calculate counts for Sidebar (always based on full property data)
+    const typeCounts = mapped.reduce((acc, r) => {
+      const tId = String(r.roomTypeId)
+      acc[tId] = (acc[tId] || 0) + 1
+      return acc
+    }, {})
 
-  const { roomsByFloor, stats } = mappedData
+    const statusCounts = mapped.reduce((acc, r) => {
+      const sId = String(r.roomStatusTableId || r.roomStatusId)
+      acc[sId] = (acc[sId] || 0) + 1
+      return acc
+    }, {})
+
+    // Calculate quick stats based on filtered data (or global data, usually global for occupancy)
+    const occupied = mapped.filter((r) => r.guestName).length
+    const available = mapped.length - occupied - mapped.filter((r) => r.nonRoom).length
+
+    // Grouping: Convert filtered flat array into Floor-based groups for the grid
+    const grouped = {}
+    allFloors.forEach((f) => {
+      grouped[f.name] = filtered.filter((r) => r.floorName === f.name)
+    })
+
+    return {
+      mappedRooms: mapped,
+      roomsByFloor: grouped,
+      stats: { occupied, available },
+      counts: { typeCounts, statusCounts },
+    }
+  }, [
+    rawRooms,
+    allFloors,
+    roomTypes,
+    roomStatuses,
+    personalDetails,
+    selectedType,
+    selectedStatus,
+  ])
+
+  const { roomsByFloor, stats, counts } = mappedData
 
   const handleRoomClick = useCallback((room) => {
     // Industrial logic: If room is Vacant & Ready, prioritize opening the Profile form
@@ -192,6 +233,12 @@ const HomeScreen = () => {
         buildings={buildings}
         roomTypes={roomTypes}
         roomStatuses={roomStatuses}
+        selectedType={selectedType}
+        setSelectedType={setSelectedType}
+        selectedStatus={selectedStatus}
+        setSelectedStatus={setSelectedStatus}
+        counts={counts}
+        resetFilters={resetFilters}
         onOpenCalendar={() => setIsFullCalendarOpen(true)}
       />
 

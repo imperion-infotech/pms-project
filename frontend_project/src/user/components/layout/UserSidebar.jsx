@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   Building,
   Calendar,
+  RotateCcw,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
@@ -63,12 +64,20 @@ const UserSidebar = ({
   buildings = [],
   roomTypes = [],
   roomStatuses = [],
+  selectedType = 'All',
+  setSelectedType,
+  selectedStatus = 'All',
+  setSelectedStatus,
+  counts = {},
+  resetFilters,
   onOpenCalendar,
 }) => {
+  const { typeCounts = {}, statusCounts = {} } = counts
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
   const [isBuildingMenuOpen, setIsBuildingMenuOpen] = React.useState(true)
   const [isTypeMenuOpen, setIsTypeMenuOpen] = React.useState(true)
   const [isStatusMenuOpen, setIsStatusMenuOpen] = React.useState(true)
+  const [isCalendarMenuOpen, setIsCalendarMenuOpen] = React.useState(true)
   const navigate = useNavigate()
 
   const isAdmin = checkIsAdmin()
@@ -128,24 +137,80 @@ const UserSidebar = ({
               </button>
             )}
 
+            {/* RESET FILTERS BUTTON */}
+            {(selectedType !== 'All' || selectedStatus !== 'All') && (
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="group relative flex w-full items-center gap-3 px-4 py-3 text-sm font-semibold text-rose-400 transition-all hover:bg-rose-500/10"
+              >
+                <div className="absolute top-0 bottom-0 left-0 w-1 bg-rose-500" />
+                <RotateCcw className="h-5 w-5 transition-transform group-hover:-rotate-180" />
+                <span>Clear All Filters</span>
+              </button>
+            )}
+
             <div className="my-2 border-t border-slate-700/40"></div>
 
-            {/* LIVE CALENDAR TRIGGER */}
-            <button
-              type="button"
-              onClick={() => {
-                if (onOpenCalendar) onOpenCalendar()
-                if (window.innerWidth < 1024) setIsSidebarOpen(false)
-              }}
-              className={`group relative mb-1 flex w-full items-center gap-3 px-4 py-3 text-sm font-semibold text-slate-300 transition-all hover:bg-blue-500/10 hover:text-blue-400`}
-            >
-              <div className="absolute top-0 bottom-0 left-0 w-1 bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.7)]" />
-              <Calendar className="h-5 w-5 text-blue-400 transition-transform group-hover:scale-110" />
-              <span>Live Master Calendar</span>
-              <div className="ml-auto rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] font-bold text-blue-400">
-                PRO
-              </div>
-            </button>
+            {/* CALENDAR ACCORDION */}
+            <div>
+              <button
+                onClick={() => setIsCalendarMenuOpen(!isCalendarMenuOpen)}
+                className="group flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-slate-800"
+              >
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-5 w-5 text-blue-400" />
+                  <span className="text-sm font-medium text-slate-300 group-hover:text-white">
+                    Property Calendar
+                  </span>
+                </div>
+                {isCalendarMenuOpen ? (
+                  <ChevronUp className="h-4 w-4 text-slate-400 opacity-50 group-hover:text-white" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 text-slate-400 opacity-50 group-hover:text-white" />
+                )}
+              </button>
+
+              <AnimatePresence>
+                {isCalendarMenuOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden border-y border-slate-800/50 bg-[#111827] py-1"
+                  >
+                    {/* Master View Link */}
+                    <button
+                      onClick={() => {
+                        if (onOpenCalendar) onOpenCalendar()
+                        if (window.innerWidth < 1024) setIsSidebarOpen(false)
+                      }}
+                      className="group relative flex w-full items-center justify-between px-6 py-2.5 text-xs font-medium text-slate-400 transition-all hover:bg-slate-800/30 hover:text-white"
+                    >
+                      <span>Master Property View</span>
+                      <span className="rounded bg-blue-400/10 px-1.5 py-0.5 text-[10px] font-bold text-blue-400">
+                        Full
+                      </span>
+                    </button>
+
+                    {/* Insights Link */}
+                    <button
+                      onClick={() => {
+                        // For now this just opens the master or could scroll
+                        if (onOpenCalendar) onOpenCalendar()
+                        if (window.innerWidth < 1024) setIsSidebarOpen(false)
+                      }}
+                      className="group relative flex w-full items-center justify-between px-6 py-2.5 text-xs font-medium text-slate-400 transition-all hover:bg-slate-800/30 hover:text-white"
+                    >
+                      <span>Daily Statistics</span>
+                      <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] font-bold text-slate-500">
+                        Live
+                      </span>
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             <div className="my-2 border-t border-slate-700/40"></div>
 
@@ -224,17 +289,47 @@ const UserSidebar = ({
                     exit={{ height: 0, opacity: 0 }}
                     className="overflow-hidden border-y border-slate-800/50 bg-[#111827] py-1"
                   >
-                    {roomTypes.map((type) => (
-                      <div
-                        key={type.id}
-                        className={`group relative flex w-full items-center justify-between px-6 py-2.5 text-xs font-medium text-slate-400 transition-all hover:bg-slate-800/30 hover:text-white`}
-                      >
-                        <span className="capitalize">{type.roomTypeName}</span>
-                        <span className="text-pms-tiny rounded bg-slate-800 px-1.5 py-0.5 font-bold whitespace-nowrap text-slate-500 opacity-0 transition-opacity group-hover:opacity-100">
-                          {type.shortName}
-                        </span>
-                      </div>
-                    ))}
+                    {/* All Room Types Option */}
+                    <button
+                      onClick={() => setSelectedType('All')}
+                      className={`group relative flex w-full items-center justify-between px-6 py-2.5 text-xs font-medium transition-all hover:bg-slate-800/30 ${
+                        selectedType === 'All'
+                          ? 'bg-emerald-500/10 text-emerald-400'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <span>All Room Types</span>
+                    </button>
+
+                    {roomTypes.map((type) => {
+                      const isActive = String(selectedType) === String(type.id)
+                      const count = typeCounts[String(type.id)] || 0
+                      return (
+                        <button
+                          key={type.id}
+                          onClick={() => setSelectedType(type.id)}
+                          className={`group relative flex w-full items-center justify-between px-6 py-2.5 text-xs font-medium transition-all hover:bg-slate-800/30 ${
+                            isActive
+                              ? 'bg-emerald-500/10 text-emerald-400'
+                              : 'text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="capitalize">{type.roomTypeName}</span>
+                            <span className="text-[10px] font-bold text-slate-500">({count})</span>
+                          </div>
+                          <span
+                            className={`text-pms-tiny rounded px-1.5 py-0.5 font-bold whitespace-nowrap transition-all ${
+                              isActive
+                                ? 'bg-emerald-500/20 text-emerald-400'
+                                : 'bg-slate-800 text-slate-500 group-hover:opacity-100'
+                            }`}
+                          >
+                            {type.shortName}
+                          </span>
+                        </button>
+                      )
+                    })}
                     {roomTypes.length === 0 && (
                       <span className="text-pms-mini block px-6 py-3 font-medium text-slate-600 italic">
                         No room types found.
@@ -272,18 +367,43 @@ const UserSidebar = ({
                     exit={{ height: 0, opacity: 0 }}
                     className="overflow-hidden border-y border-slate-800/50 bg-[#111827] py-1"
                   >
-                    {roomStatuses.map((status) => (
-                      <div
-                        key={status.id}
-                        className={`group relative flex w-full items-center gap-3 px-6 py-2.5 text-xs font-medium text-slate-400 transition-all hover:bg-slate-800/30 hover:text-white`}
-                      >
-                        <div
-                          className="h-2 w-2 shrink-0 rounded-full"
-                          style={{ backgroundColor: status.roomStatusColor || '#ef4444' }}
-                        ></div>
-                        <span className="w-full truncate capitalize">{status.roomStatusName}</span>
-                      </div>
-                    ))}
+                    {/* All Statuses Option */}
+                    <button
+                      onClick={() => setSelectedStatus('All')}
+                      className={`group relative flex w-full items-center gap-3 px-6 py-2.5 text-xs font-medium transition-all hover:bg-slate-800/30 ${
+                        selectedStatus === 'All'
+                          ? 'bg-emerald-500/10 text-emerald-400'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <div className="h-2 w-2 shrink-0 rounded-full bg-slate-500"></div>
+                      <span>All Statuses</span>
+                    </button>
+
+                    {roomStatuses.map((status) => {
+                      const isActive = String(selectedStatus) === String(status.id)
+                      const count = statusCounts[String(status.id)] || 0
+                      return (
+                        <button
+                          key={status.id}
+                          onClick={() => setSelectedStatus(status.id)}
+                          className={`group relative flex w-full items-center gap-3 px-6 py-2.5 text-xs font-medium transition-all hover:bg-slate-800/30 ${
+                            isActive
+                              ? 'bg-emerald-500/10 text-emerald-400'
+                              : 'text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          <div
+                            className="h-2 w-2 shrink-0 rounded-full"
+                            style={{ backgroundColor: status.roomStatusColor || '#ef4444' }}
+                          ></div>
+                          <span className="flex-1 truncate text-left capitalize">
+                            {status.roomStatusName}
+                          </span>
+                          <span className="text-[10px] font-bold text-slate-500">{count}</span>
+                        </button>
+                      )
+                    })}
                     {roomStatuses.length === 0 && (
                       <span className="text-pms-mini block px-6 py-3 font-medium text-slate-600 italic">
                         No statuses found.
