@@ -85,19 +85,38 @@ const RentDetails = ({ formData, handleChange, isDark = false, taxes = [] }) => 
           handleChange={handleChange}
           isDark={isDark}
         />
-        <FieldRow
-          label={
-            <>
-              Tax <span className="text-red-500">*</span>
-            </>
-          }
-          name="taxId"
-          type="select"
-          options={taxes.map((t) => ({ id: t.id, name: t.taxMasterName }))}
-          formData={formData}
-          handleChange={handleChange}
-          isDark={isDark}
-        />
+        <div className="flex items-center justify-between py-1.5 border-b border-dashed border-slate-100 dark:border-slate-800">
+          <label className="text-pms-micro font-black text-slate-500 uppercase tracking-widest">
+            Tax <span className="text-red-500">*</span>
+          </label>
+          <div className="flex items-center gap-2">
+            {formData.taxAmount && Number(formData.taxAmount) > 0 && (
+              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">
+                +{formData.taxAmount}
+              </span>
+            )}
+            <div className={`flex items-center px-3 py-1 rounded-lg border transition-all w-32 ${
+              isDark
+                ? 'bg-slate-900/50 border-slate-700/50 focus-within:border-emerald-500/50'
+                : 'bg-white border-slate-200 focus-within:border-emerald-500 focus-within:ring-4 focus-within:ring-emerald-500/10 shadow-sm'
+            }`}>
+              <select
+                required
+                name="taxId"
+                value={formData.taxId || ''}
+                onChange={handleChange}
+                className="bg-transparent border-none outline-none w-full text-xs font-black text-left text-slate-800 dark:text-slate-100 cursor-pointer appearance-none"
+              >
+                <option value="">Select</option>
+                {taxes.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.taxMasterName}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
         <FieldRow
           label="Total Rental"
           name="totalRental"

@@ -22,6 +22,9 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
   const { addRentDetail, updateRentDetail } = usePmsRentDetails()
   const { rooms, updateRoom } = usePmsRooms()
 
+  const activeHotelId = useMemo(() => Number(localStorage.getItem('activeHotelId')) || 0, [])
+  const currentUser = useMemo(() => JSON.parse(localStorage.getItem('user')) || {}, [])
+
   const getIndustrialStayDefaults = useCallback(() => {
     const now = new Date()
     const checkInDate = now.toISOString()
@@ -43,19 +46,28 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
   const defaults = useMemo(() => getIndustrialStayDefaults(), [getIndustrialStayDefaults])
 
   const [personalFormData, setPersonalFormData] = useState({
+    id: 0,
     firstName: '',
     lastName: '',
-    mobileNumber: '',
-    email: '',
-    phone: '',
-    address: '',
     companyName: '',
+    phone: '',
+    email: '',
+    address: '',
     profilePhoto: '',
     signature: '',
-    contactInformationTypeEnum: 'HOME',
-    isDeleted: false,
     folioNo: '',
     crsFolioNo: '',
+    contactInformationTypeEnum: 'HOME',
+    hotelId: 0,
+    isDeleted: false,
+    isActive: true,
+    createdBy: 0,
+    createdOn: new Date().toISOString(),
+    updatedBy: 0,
+    updatedOn: new Date().toISOString(),
+    deletedBy: 0,
+    deletedOn: null,
+    deleted: false,
     // Document Details
     documentNumber: '',
     validTill: '',
@@ -72,7 +84,6 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
     rateTypeEnum: 'RACK',
     noOfGuest: 1,
     stayStatusEnum: 'Confirmed',
-    deleted: false,
     // Guest Details
     checkInDate: defaults.checkInDate,
     checkOutDate: defaults.checkOutDate,
@@ -86,6 +97,7 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
     rent: '',
     basic: '',
     taxId: '',
+    taxAmount: '',
     totalRental: '',
     otherCharges: '',
     discount: '',
@@ -97,20 +109,28 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
   })
 
   const [editPersonalFormData, setEditPersonalFormData] = useState({
-    id: null,
+    id: 0,
     firstName: '',
     lastName: '',
-    mobileNumber: '',
-    email: '',
-    phone: '',
-    address: '',
     companyName: '',
+    phone: '',
+    email: '',
+    address: '',
     profilePhoto: '',
     signature: '',
-    contactInformationTypeEnum: 'HOME',
-    isDeleted: false,
     folioNo: '',
     crsFolioNo: '',
+    contactInformationTypeEnum: 'HOME',
+    hotelId: 0,
+    isDeleted: false,
+    isActive: true,
+    createdBy: 0,
+    createdOn: '',
+    updatedBy: 0,
+    updatedOn: '',
+    deletedBy: 0,
+    deletedOn: null,
+    deleted: false,
     // Document Details
     documentId: null,
     documentNumber: '',
@@ -129,7 +149,6 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
     rateTypeEnum: 'RACK',
     stayStatusEnum: 'Confirmed',
     noOfGuest: 1,
-    deleted: false,
     // Guest Details
     checkInId: null,
     guestDetailId: null,
@@ -142,9 +161,11 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
     rentId: '',
     roomStatusId: '',
     // Rent Details
+    // Rent Details
     rent: '',
     basic: '',
     taxId: '',
+    taxAmount: '',
     totalRental: '',
     otherCharges: '',
     discount: '',
@@ -160,18 +181,25 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
     try {
       // 1. Create Personal Detail
       const personalPayload = {
+        hotelId: activeHotelId,
+        isDeleted: false,
+        isActive: true,
+        createdBy: currentUser.id || 0,
+        createdOn: new Date().toISOString(),
+        updatedBy: currentUser.id || 0,
+        updatedOn: new Date().toISOString(),
         firstName: personalFormData.firstName,
         lastName: personalFormData.lastName,
         companyName: personalFormData.companyName,
-        phone: personalFormData.phone || personalFormData.mobileNumber,
+        phone: personalFormData.phone,
         email: personalFormData.email,
         address: personalFormData.address,
         profilePhoto: personalFormData.profilePhoto || null,
         signature: personalFormData.signature || null,
-        contactInformationTypeEnum: personalFormData.contactInformationTypeEnum || 'HOME',
-        isDeleted: false,
         folioNo: personalFormData.folioNo,
         crsFolioNo: personalFormData.crsFolioNo,
+        contactInformationTypeEnum: personalFormData.contactInformationTypeEnum || 'HOME',
+        deleted: false,
       }
       console.log('1. [Add] Personal Payload:', personalPayload)
       const res = await addPersonalDetail(personalPayload)
@@ -184,9 +212,16 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
       // 2. Create Document Detail
       if (personalFormData.documentNumber || personalFormData.documentTypeId) {
         const docPayload = {
+          hotelId: activeHotelId,
+          isDeleted: false,
+          isActive: true,
+          createdBy: currentUser.id || 0,
+          createdOn: new Date().toISOString(),
+          updatedBy: currentUser.id || 0,
+          updatedOn: new Date().toISOString(),
           documentNumber: personalFormData.documentNumber,
           validTill: personalFormData.validTill
-            ? `${personalFormData.validTill}T00:00:00.000Z`
+            ? `${personalFormData.validTill}T00:00:00.000`
             : null,
           frontImagePath: personalFormData.frontImagePath,
           backImagePath: personalFormData.backImagePath,
@@ -195,7 +230,6 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
           documentType: personalFormData.documentTypeId
             ? { id: Number(personalFormData.documentTypeId) }
             : undefined,
-          deleted: false,
         }
         console.log('2. [Add] Document Payload:', docPayload)
         const docRes = await addDocumentDetail(docPayload)
@@ -205,6 +239,13 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
       // 3. Create Stay Detail
       if (personalFormData.buildingId || personalFormData.roomMasterId) {
         const stayPayload = {
+          hotelId: activeHotelId,
+          isDeleted: false,
+          isActive: true,
+          createdBy: currentUser.id || 0,
+          createdOn: new Date().toISOString(),
+          updatedBy: currentUser.id || 0,
+          updatedOn: new Date().toISOString(),
           floorId: Number(personalFormData.floorId) || 1,
           buildingId: Number(personalFormData.buildingId) || 1,
           roomTypeId: Number(personalFormData.roomTypeId) || 1,
@@ -213,12 +254,10 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
           rateTypeEnum: personalFormData.rateTypeEnum || 'RACK',
           stayStatusEnum: personalFormData.stayStatusEnum || 'Confirmed',
           noOfGuest: Number(personalFormData.noOfGuest) || 1,
-          personalDetailsId: personalDetailsId,
           roomStatusId: personalFormData.roomStatusId
             ? Number(personalFormData.roomStatusId)
             : undefined,
           color: personalFormData.color || '#2F8B2C',
-          deleted: false,
         }
         console.log('3. [Add] Stay Payload:', stayPayload)
         const stayRes = await addStayDetail(stayPayload)
@@ -228,9 +267,16 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
       // 4. Create Rent Details
       if (personalFormData.rent !== '' || personalFormData.basic !== '') {
         const rentPayload = {
+          hotelId: activeHotelId,
+          isDeleted: false,
+          isActive: true,
+          createdBy: currentUser.id || 0,
+          createdOn: new Date().toISOString(),
+          updatedBy: currentUser.id || 0,
+          updatedOn: new Date().toISOString(),
           rent: personalFormData.rent ? Number(personalFormData.rent) : 0,
           basic: personalFormData.basic ? Number(personalFormData.basic) : 0,
-          taxId: personalFormData.taxId ? Number(personalFormData.taxId) : undefined,
+          taxId: personalFormData.taxId ? Number(personalFormData.taxId) : 0,
           totalRental: personalFormData.totalRental ? Number(personalFormData.totalRental) : 0,
           otherCharges: personalFormData.otherCharges ? Number(personalFormData.otherCharges) : 0,
           discount: personalFormData.discount ? Number(personalFormData.discount) : 0,
@@ -239,7 +285,6 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
           ccAuthorized: personalFormData.ccAuthorized ? Number(personalFormData.ccAuthorized) : 0,
           deposite: personalFormData.deposite ? Number(personalFormData.deposite) : 0,
           balance: personalFormData.balance ? Number(personalFormData.balance) : 0,
-          deleted: false,
         }
         console.log('4. [Add] Rent Payload:', rentPayload)
         const rentRes = await addRentDetail(rentPayload)
@@ -248,31 +293,42 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
 
       // 5. Create Guest Detail (Integration)
       const guestPayload = {
-        roomMasterId: personalFormData.roomMasterId
-          ? Number(personalFormData.roomMasterId)
-          : undefined,
+        hotelId: activeHotelId,
+        isDeleted: false,
+        isActive: true,
+        createdBy: currentUser.id || 0,
+        createdOn: new Date().toISOString(),
+        updatedBy: currentUser.id || 0,
+        updatedOn: new Date().toISOString(),
+        roomMasterId: personalFormData.roomMasterId ? Number(personalFormData.roomMasterId) : 0,
         personalDetailsId: personalDetailsId,
         documentDetailsId: documentDetailsId,
         rentDetailsId: rentDetailsId,
         stayDetailsId: stayDetailsId,
         checkInDate: personalFormData.checkInDate
-          ? `${personalFormData.checkInDate}T${personalFormData.checkInTime ? (personalFormData.checkInTime.split(':').length === 2 ? personalFormData.checkInTime + ':00' : personalFormData.checkInTime) : '00:00:00.000'}`
+          ? `${personalFormData.checkInDate}T00:00:00.000Z`
           : null,
         checkOutDate: personalFormData.checkOutDate
-          ? `${personalFormData.checkOutDate}T${personalFormData.checkOutTime ? (personalFormData.checkOutTime.split(':').length === 2 ? personalFormData.checkOutTime + ':00' : personalFormData.checkOutTime) : '00:00:00.000'}`
+          ? `${personalFormData.checkOutDate}T00:00:00.000Z`
           : null,
-        checkInTime: personalFormData.checkInTime
-          ? personalFormData.checkInTime.split(':').length === 2
-            ? `${personalFormData.checkInTime}:00`
-            : personalFormData.checkInTime
-          : '00:00:00',
-        checkOutTime: personalFormData.checkOutTime
-          ? personalFormData.checkOutTime.split(':').length === 2
-            ? `${personalFormData.checkOutTime}:00`
-            : personalFormData.checkOutTime
-          : '00:00:00',
+        checkInTime: personalFormData.checkInTime || '09:00:00',
+        checkOutTime: personalFormData.checkOutTime || '09:00:00',
         noOfDays: personalFormData.noOfDays ? Number(personalFormData.noOfDays) : 1,
         guestDetailsStatus: personalFormData.guestDetailsStatus || 'Reservation',
+        paymentDetails: personalFormData.payments
+          ? [
+              {
+                hotelId: activeHotelId,
+                amount: Number(personalFormData.payments) || 0,
+                totalAmount: Number(personalFormData.totalCharges) || 0,
+                paymentDate: personalFormData.checkInDate || new Date().toISOString().split('T')[0],
+                remark: personalFormData.comment || 'Initial Payment',
+                isActive: true,
+                isDeleted: false,
+              },
+            ]
+          : [],
+        deleted: false,
       }
 
       console.log('5. [Add] Guest Payload:', guestPayload)
@@ -364,6 +420,8 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
     toast,
     rooms,
     updateRoom,
+    activeHotelId,
+    currentUser,
   ])
 
   const handleUpdatePersonalDetail = useCallback(async () => {
@@ -371,18 +429,27 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
     try {
       // 1. Update Personal Detail
       const updatePayload = {
+        id: editPersonalFormData.id,
+        hotelId: activeHotelId,
+        isDeleted: editPersonalFormData.isDeleted || false,
+        isActive:
+          editPersonalFormData.isActive !== undefined ? editPersonalFormData.isActive : true,
+        createdBy: editPersonalFormData.createdBy || currentUser.id || 0,
+        createdOn: editPersonalFormData.createdOn,
+        updatedBy: currentUser.id || 0,
+        updatedOn: new Date().toISOString(),
         firstName: editPersonalFormData.firstName,
         lastName: editPersonalFormData.lastName,
         companyName: editPersonalFormData.companyName,
-        phone: editPersonalFormData.phone || editPersonalFormData.mobileNumber,
+        phone: editPersonalFormData.phone,
         email: editPersonalFormData.email,
         address: editPersonalFormData.address,
         profilePhoto: editPersonalFormData.profilePhoto || null,
         signature: editPersonalFormData.signature || null,
-        contactInformationTypeEnum: editPersonalFormData.contactInformationTypeEnum || 'HOME',
-        isDeleted: editPersonalFormData.isDeleted || false,
         folioNo: editPersonalFormData.folioNo,
         crsFolioNo: editPersonalFormData.crsFolioNo,
+        contactInformationTypeEnum: editPersonalFormData.contactInformationTypeEnum || 'HOME',
+        deleted: editPersonalFormData.deleted || false,
       }
       console.log('1. [Update] Personal Payload:', updatePayload)
       await updatePersonalDetail(editPersonalFormData.id, updatePayload)
@@ -391,6 +458,15 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
       let docId = editPersonalFormData.documentId
       if (editPersonalFormData.documentNumber || editPersonalFormData.documentTypeId) {
         const docPayload = {
+          id: docId || 0,
+          hotelId: editPersonalFormData.hotelId || 0,
+          isDeleted: editPersonalFormData.isDeleted || false,
+          isActive:
+            editPersonalFormData.isActive !== undefined ? editPersonalFormData.isActive : true,
+          createdBy: editPersonalFormData.createdBy || 0,
+          createdOn: editPersonalFormData.createdOn || new Date().toISOString(),
+          updatedBy: editPersonalFormData.updatedBy || 0,
+          updatedOn: new Date().toISOString(),
           documentNumber: editPersonalFormData.documentNumber,
           validTill: editPersonalFormData.validTill?.includes('T')
             ? editPersonalFormData.validTill
@@ -402,7 +478,6 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
           documentType: editPersonalFormData.documentTypeId
             ? { id: Number(editPersonalFormData.documentTypeId) }
             : undefined,
-          deleted: false,
         }
         console.log('2. [Update] Document Payload:', docPayload)
         if (editPersonalFormData.documentId) {
@@ -417,6 +492,15 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
       let stayId = editPersonalFormData.stayId
       if (editPersonalFormData.buildingId || editPersonalFormData.roomMasterId) {
         const stayPayload = {
+          id: stayId || 0,
+          hotelId: editPersonalFormData.hotelId || 0,
+          isDeleted: editPersonalFormData.isDeleted || false,
+          isActive:
+            editPersonalFormData.isActive !== undefined ? editPersonalFormData.isActive : true,
+          createdBy: editPersonalFormData.createdBy || 0,
+          createdOn: editPersonalFormData.createdOn || new Date().toISOString(),
+          updatedBy: editPersonalFormData.updatedBy || 0,
+          updatedOn: new Date().toISOString(),
           floorId: Number(editPersonalFormData.floorId) || 1,
           buildingId: Number(editPersonalFormData.buildingId) || 1,
           roomTypeId: Number(editPersonalFormData.roomTypeId) || 1,
@@ -426,7 +510,6 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
           stayStatusEnum: editPersonalFormData.stayStatusEnum || 'Confirmed',
           noOfGuest: Number(editPersonalFormData.noOfGuest) || 1,
           color: editPersonalFormData.color || '#2F8B2C',
-          deleted: editPersonalFormData.deleted || false,
         }
         console.log('3. [Update] Stay Payload:', stayPayload)
         if (editPersonalFormData.stayId) {
@@ -444,9 +527,18 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
       let rentId = editPersonalFormData.rentId
       if (editPersonalFormData.rent !== '' || editPersonalFormData.basic !== '') {
         const rentPayload = {
+          id: rentId || 0,
+          hotelId: editPersonalFormData.hotelId || 0,
+          isDeleted: editPersonalFormData.isDeleted || false,
+          isActive:
+            editPersonalFormData.isActive !== undefined ? editPersonalFormData.isActive : true,
+          createdBy: editPersonalFormData.createdBy || 0,
+          createdOn: editPersonalFormData.createdOn || new Date().toISOString(),
+          updatedBy: editPersonalFormData.updatedBy || 0,
+          updatedOn: new Date().toISOString(),
           rent: editPersonalFormData.rent ? Number(editPersonalFormData.rent) : 0,
           basic: editPersonalFormData.basic ? Number(editPersonalFormData.basic) : 0,
-          taxId: editPersonalFormData.taxId ? Number(editPersonalFormData.taxId) : undefined,
+          taxId: editPersonalFormData.taxId ? Number(editPersonalFormData.taxId) : 0,
           totalRental: editPersonalFormData.totalRental
             ? Number(editPersonalFormData.totalRental)
             : 0,
@@ -463,7 +555,6 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
             : 0,
           deposite: editPersonalFormData.deposite ? Number(editPersonalFormData.deposite) : 0,
           balance: editPersonalFormData.balance ? Number(editPersonalFormData.balance) : 0,
-          deleted: false,
         }
         console.log('4. [Update] Rent Payload:', rentPayload)
         if (rentId) {
@@ -476,32 +567,47 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
 
       // 5. Update or Create Guest Detail
       const guestPayload = {
+        id: editPersonalFormData.guestDetailId || 0,
+        hotelId: editPersonalFormData.hotelId || 0,
+        isDeleted: editPersonalFormData.isDeleted || false,
+        isActive:
+          editPersonalFormData.isActive !== undefined ? editPersonalFormData.isActive : true,
+        createdBy: editPersonalFormData.createdBy || 0,
+        createdOn: editPersonalFormData.createdOn || new Date().toISOString(),
+        updatedBy: editPersonalFormData.updatedBy || 0,
+        updatedOn: new Date().toISOString(),
         roomMasterId: editPersonalFormData.roomMasterId
           ? Number(editPersonalFormData.roomMasterId)
-          : undefined,
+          : 0,
         personalDetailsId: editPersonalFormData.id,
         documentDetailsId: docId,
         stayDetailsId: stayId,
         rentDetailsId: rentId,
         checkInDate: editPersonalFormData.checkInDate
-          ? `${editPersonalFormData.checkInDate}T${editPersonalFormData.checkInTime ? (editPersonalFormData.checkInTime.split(':').length === 2 ? editPersonalFormData.checkInTime + ':00' : editPersonalFormData.checkInTime) : '00:00:00'}.000`
+          ? `${editPersonalFormData.checkInDate}T00:00:00.000Z`
           : null,
         checkOutDate: editPersonalFormData.checkOutDate
-          ? `${editPersonalFormData.checkOutDate}T${editPersonalFormData.checkOutTime ? (editPersonalFormData.checkOutTime.split(':').length === 2 ? editPersonalFormData.checkOutTime + ':00' : editPersonalFormData.checkOutTime) : '00:00:00'}.000`
+          ? `${editPersonalFormData.checkOutDate}T00:00:00.000Z`
           : null,
-        checkInTime: editPersonalFormData.checkInTime
-          ? editPersonalFormData.checkInTime.split(':').length === 2
-            ? `${editPersonalFormData.checkInTime}:00`
-            : editPersonalFormData.checkInTime
-          : '00:00:00',
-        checkOutTime: editPersonalFormData.checkOutTime
-          ? editPersonalFormData.checkOutTime.split(':').length === 2
-            ? `${editPersonalFormData.checkOutTime}:00`
-            : editPersonalFormData.checkOutTime
-          : '00:00:00',
+        checkInTime: editPersonalFormData.checkInTime || '09:00:00',
+        checkOutTime: editPersonalFormData.checkOutTime || '09:00:00',
         noOfDays: editPersonalFormData.noOfDays ? Number(editPersonalFormData.noOfDays) : 1,
         guestDetailsStatus: editPersonalFormData.guestDetailsStatus || 'Reservation',
-        deleted: false,
+        paymentDetails: editPersonalFormData.payments
+          ? [
+              {
+                hotelId: editPersonalFormData.hotelId || 0,
+                amount: Number(editPersonalFormData.payments) || 0,
+                totalAmount: Number(editPersonalFormData.totalCharges) || 0,
+                paymentDate:
+                  editPersonalFormData.checkInDate || new Date().toISOString().split('T')[0],
+                remark: editPersonalFormData.comment || 'Updated Payment',
+                isActive: true,
+                isDeleted: false,
+              },
+            ]
+          : [],
+        deleted: editPersonalFormData.deleted || false,
       }
 
       console.log('5. [Update] Guest Payload:', guestPayload)
@@ -553,6 +659,8 @@ export const useGuestPersonalDetailsManagement = ({ toggleModal }) => {
     toast,
     rooms,
     updateRoom,
+    activeHotelId,
+    currentUser,
   ])
 
   const handleEditPersonalDetail = useCallback(

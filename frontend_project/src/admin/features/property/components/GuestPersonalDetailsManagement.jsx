@@ -87,20 +87,20 @@ const GuestPersonalDetailsManagement = ({
 
       {/* Main Table Layer */}
       <div className="overflow-hidden rounded-3xl border border-slate-200/60 bg-white/80 shadow-2xl shadow-slate-200/40 backdrop-blur-xl transition-all hover:shadow-slate-300/50 dark:border-slate-800/50 dark:bg-slate-900/80">
-        <div className="scrollbar-hide max-h-[650px] w-full overflow-auto">
+        <div className="custom-scrollbar max-h-[650px] w-full overflow-auto">
           <table className="w-full border-collapse text-left">
             <thead className="sticky top-0 z-10">
               <tr className="border-b border-slate-100 bg-slate-50/50 dark:border-slate-800/50 dark:bg-slate-800/30">
-                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">No.</th>
-                <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">User Name</th>
-                <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">Email Address</th>
-                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Phone No.</th>
-                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Doc Type</th>
-                <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">Document No.</th>
-                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Valid Till</th>
-                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Status</th>
-                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Total Rent</th>
-                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Actions</th>
+                <th className="px-4 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">No.</th>
+                <th className="px-4 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">User Name</th>
+                <th className="px-4 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">Email Address</th>
+                <th className="px-4 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Phone No.</th>
+                <th className="px-4 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Doc Type</th>
+                <th className="px-4 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">Document No.</th>
+                <th className="px-4 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Valid Till</th>
+                <th className="px-4 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Status</th>
+                <th className="px-4 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Total Rent</th>
+                <th className="px-4 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Actions</th>
               </tr>
             </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
@@ -129,10 +129,10 @@ const GuestPersonalDetailsManagement = ({
                       key={guest.id}
                       className="group h-16 transition-all hover:bg-slate-50/50 dark:hover:bg-blue-500/5"
                     >
-                      <td className="px-8 py-2 text-center font-mono text-xs font-bold text-blue-400 group-hover:text-blue-600">
+                      <td className="px-4 py-2 text-center font-mono text-xs font-bold text-blue-400 group-hover:text-blue-600">
                         {getIndex(idx)}
                       </td>
-                      <td className="px-8 py-2">
+                      <td className="px-4 py-2">
                         <div className="flex items-center gap-4">
                           <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 ring-slate-100 dark:ring-slate-800">
                             {cleanImageUrl(guest.profilePhoto) ? (
@@ -161,31 +161,31 @@ const GuestPersonalDetailsManagement = ({
                           </div>
                         </div>
                       </td>
-                      <td className="px-8 py-2 font-mono text-slate-400 lowercase">
+                      <td className="px-4 py-2 font-mono text-slate-400 lowercase">
                         {guest.email || '—'}
                       </td>
-                      <td className="px-8 py-2 text-center font-bold text-[#1a2b4b] dark:text-slate-400">
+                      <td className="px-4 py-2 text-center font-bold text-[#1a2b4b] dark:text-slate-400">
                         {guest.phone || '—'}
                       </td>
-                      <td className="px-8 py-2 text-center font-bold text-blue-500 uppercase">
+                      <td className="px-4 py-2 text-center font-bold text-blue-500 uppercase">
                         {getDocumentTypeName(guestDocument?.documentType?.id || guestDocument?.documentTypeId)}
                       </td>
-                      <td className="px-8 py-2 font-mono text-xs font-bold text-slate-600 dark:text-slate-400">
+                      <td className="px-4 py-2 font-mono text-xs font-bold text-slate-600 dark:text-slate-400">
                         {guestDocument?.documentNumber || '—'}
                       </td>
-                      <td className="px-8 py-2 text-center font-bold text-blue-600 dark:text-blue-400/80">
+                      <td className="px-4 py-2 text-center font-bold text-blue-600 dark:text-blue-400/80">
                         {guestDocument?.validTill || '—'}
                       </td>
-                      <td className="px-8 py-2 text-center text-purple-600 dark:text-purple-400/80">
+                      <td className="px-4 py-2 text-center text-purple-600 dark:text-purple-400/80">
                         <span className="font-bold uppercase tracking-tight">
                           {guestDetail?.guestDetailsStatus || guestStay?.stayStatusEnum || '—'}
                         </span>
                       </td>
-                      <td className="px-8 py-2 text-center font-mono font-bold text-[#1a2b4b] dark:text-slate-300">
+                      <td className="px-4 py-2 text-center font-mono font-bold text-[#1a2b4b] dark:text-slate-300">
                         {rent?.totalCharges ? `₹${rent.totalCharges}` : '—'}
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <div className="flex items-center justify-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+                        <div className="flex items-center justify-center gap-2 transition-opacity">
                           <button onClick={() => {
                             console.log('[DEBUG] ===== EDIT BUTTON CLICKED =====')
                             console.log('[DEBUG] guest (personalDetail):', guest)

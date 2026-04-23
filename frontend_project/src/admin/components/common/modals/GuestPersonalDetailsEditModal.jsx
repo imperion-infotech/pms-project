@@ -402,7 +402,6 @@ export const GuestPersonalDetailsEditModal = ({
                                 setFormData({
                                   ...formData,
                                   phone: e.target.value,
-                                  mobileNumber: e.target.value,
                                 })
                               }
                               className={inputClass}
@@ -643,9 +642,37 @@ export const GuestPersonalDetailsEditModal = ({
                     <div className="overflow-hidden rounded-xl border border-emerald-100 bg-white p-3 shadow-sm dark:border-emerald-900/30 dark:bg-slate-900">
                       <RentDetails
                         formData={formData}
-                        handleChange={(e) =>
-                          setFormData({ ...formData, [e.target.name]: e.target.value })
-                        }
+                        handleChange={(e) => {
+                          const { name, value } = e.target
+                          let updated = { ...formData, [name]: value }
+
+                          const basic = Number(name === 'basic' ? value : formData.basic) || 0
+                          const currentTaxId = name === 'taxId' ? value : formData.taxId
+                          const selectedTax = taxes.find((t) => String(t.id) === String(currentTaxId))
+
+                          if (selectedTax) {
+                            const taxRate = Number(selectedTax.amount) || 0
+                            const taxAmt = (basic * taxRate) / 100
+                            updated.taxAmount = taxAmt.toFixed(2)
+                            updated.totalRental = (basic + taxAmt).toFixed(2)
+                          } else if (name === 'taxId' && !value) {
+                            updated.taxAmount = '0.00'
+                            updated.totalRental = basic.toFixed(2)
+                          }
+
+                          // Chain update for Total Charges and Balance
+                          const totalRent = Number(updated.totalRental || formData.totalRental) || 0
+                          const other = Number(name === 'otherCharges' ? value : formData.otherCharges) || 0
+                          const disc = Number(name === 'discount' ? value : formData.discount) || 0
+                          const totalChg = totalRent + other - disc
+                          updated.totalCharges = totalChg.toFixed(2)
+
+                          const pay = Number(name === 'payments' ? value : formData.payments) || 0
+                          const dep = Number(name === 'deposite' ? value : formData.deposite) || 0
+                          updated.balance = (totalChg - pay - dep).toFixed(2)
+
+                          setFormData(updated)
+                        }}
                         taxes={taxes}
                         isDark={false}
                       />
