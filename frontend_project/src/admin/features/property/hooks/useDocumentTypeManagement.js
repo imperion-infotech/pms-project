@@ -7,16 +7,12 @@ import { usePmsDocumentTypes } from '../../../../hooks/usePmsDocumentTypes'
  */
 export const useDocumentTypeManagement = ({ toggleModal }) => {
   const { addDocumentType, updateDocumentType } = usePmsDocumentTypes()
+
+  // Context: Get IDs from localStorage
+  const activeHotelId = Number(localStorage.getItem('activeHotelId')) || 0
+  const currentUserId = Number(localStorage.getItem('userId')) || 0
+
   const [newDocumentType, setNewDocumentType] = useState({
-    id: 0,
-    documentTypeShortName: '',
-    documentTypeName: '',
-    documentTypeCategory: '',
-    documentTypeDescription: '',
-    documentTypeDefault: false,
-  })
-  const [editDocumentType, setEditDocumentType] = useState({
-    id: null,
     documentTypeShortName: '',
     documentTypeName: '',
     documentTypeCategory: '',
@@ -24,12 +20,35 @@ export const useDocumentTypeManagement = ({ toggleModal }) => {
     documentTypeDefault: false,
   })
 
+  const [editDocumentType, setEditDocumentType] = useState(null)
+
   const handleAddDocumentType = useCallback(async () => {
     if (!newDocumentType.documentTypeName.trim()) return
     try {
-      await addDocumentType(newDocumentType)
-      setNewDocumentType({
+      const timestamp = new Date().toISOString()
+
+      const payload = {
+        hotelId: activeHotelId,
+        isDeleted: false,
+        isActive: true,
+        createdBy: currentUserId,
+        createdOn: timestamp,
+        updatedBy: currentUserId,
+        updatedOn: timestamp,
+        deletedBy: 0,
+        deletedOn: timestamp,
         id: 0,
+        documentTypeShortName: newDocumentType.documentTypeShortName,
+        documentTypeName: newDocumentType.documentTypeName,
+        documentTypeDescription: newDocumentType.documentTypeDescription,
+        documentTypeCategory: newDocumentType.documentTypeCategory,
+        documentTypeDefault: Boolean(newDocumentType.documentTypeDefault),
+      }
+
+      console.log('Document Type Create Payload:', payload)
+      await addDocumentType(payload)
+
+      setNewDocumentType({
         documentTypeShortName: '',
         documentTypeName: '',
         documentTypeCategory: '',
@@ -40,25 +59,27 @@ export const useDocumentTypeManagement = ({ toggleModal }) => {
     } catch (err) {
       console.error('Failed to create document type:', err)
     }
-  }, [newDocumentType, addDocumentType, toggleModal])
+  }, [newDocumentType, addDocumentType, toggleModal, activeHotelId, currentUserId])
 
   const handleUpdateDocumentType = useCallback(async () => {
-    if (editDocumentType.id === null || !editDocumentType.documentTypeName?.trim()) return
+    if (!editDocumentType || !editDocumentType.id || !editDocumentType.documentTypeName?.trim())
+      return
     try {
-      await updateDocumentType(editDocumentType.id, editDocumentType)
-      setEditDocumentType({
-        id: null,
-        documentTypeShortName: '',
-        documentTypeName: '',
-        documentTypeCategory: '',
-        documentTypeDescription: '',
-        documentTypeDefault: false,
-      })
+      const payload = {
+        ...editDocumentType,
+        documentTypeDefault: Boolean(editDocumentType.documentTypeDefault),
+        updatedBy: currentUserId,
+        updatedOn: new Date().toISOString(),
+      }
+
+      console.log('Document Type Update Payload:', payload)
+      await updateDocumentType(editDocumentType.id, payload)
+      setEditDocumentType(null)
       toggleModal('documentTypeEdit', false)
     } catch (err) {
       console.error('Failed to update document type:', err)
     }
-  }, [editDocumentType, updateDocumentType, toggleModal])
+  }, [editDocumentType, updateDocumentType, toggleModal, currentUserId])
 
   const handleEditDocumentType = useCallback(
     (doc) => {

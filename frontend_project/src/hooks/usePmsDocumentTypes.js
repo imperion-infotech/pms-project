@@ -26,7 +26,7 @@ export const usePmsDocumentTypes = () => {
     onSuccess: (_, variables) => {
       const msgs = { create: 'Document Type created!', update: 'Document Type updated!', delete: 'Document Type deleted' }
       toast.success(msgs[variables.type])
-      queryClient.invalidateQueries(['documentTypes'])
+      queryClient.invalidateQueries({ queryKey: ['documentTypes'] })
     },
     onError: (err) => toast.error(err.response?.data?.message || 'Operation failed')
   })

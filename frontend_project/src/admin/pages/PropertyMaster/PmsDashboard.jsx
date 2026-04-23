@@ -214,8 +214,8 @@ const PmsDashboard = () => {
   } = useRoomManagement({
     floors,
     roomTypes,
-    roomStatuses,
     toggleModal,
+    buildings,
   })
 
   const { newTax, setNewTax, editTax, setEditTax, handleAddTax, handleUpdateTax, handleEditTax } =

@@ -10,10 +10,15 @@ export const useRoomManagement = ({
   floors,
   roomTypes = [],
   roomStatuses = [],
+  buildings = [],
   toggleModal,
 }) => {
   const toast = useToast()
   const { addRoom, updateRoom } = usePmsRooms()
+
+  // Context: Get IDs from localStorage
+  const activeHotelId = Number(localStorage.getItem('activeHotelId')) || 0
+  const currentUserId = Number(localStorage.getItem('userId')) || 0
 
   // Naya Room banane ka state
   const [newRoom, setNewRoom] = useState({
@@ -30,19 +35,7 @@ export const useRoomManagement = ({
   })
 
   // Purana Room edit karne ka state
-  const [editRoom, setEditRoom] = useState({
-    id: null,
-    roomName: '',
-    roomShortName: '',
-    roomTypeId: '',
-    floorId: '',
-    buildingId: '',
-    roomStatusTableId: '',
-    roomStatus: '',
-    smoking: false,
-    handicap: false,
-    nonRoom: false,
-  })
+  const [editRoom, setEditRoom] = useState(null)
 
   /**
    * handleAddRoom - Naya room backend pe save karne ke liye.
@@ -63,6 +56,9 @@ export const useRoomManagement = ({
     }
 
     const selectedFloor = floors.find((f) => String(f.id) === String(newRoom.floorId))
+    const selectedBuilding = (floors.length > 0 && buildings) ? buildings.find((b) => String(b.id) === String(newRoom.buildingId)) : null
+    const selectedType = roomTypes.find((rt) => String(rt.id) === String(newRoom.roomTypeId))
+    const selectedStatus = roomStatuses.find((rs) => String(rs.id) === String(newRoom.roomStatusTableId))
 
     const nonRoomType =
       roomTypes.find(
@@ -77,23 +73,42 @@ export const useRoomManagement = ({
           (rs.roomStatusName || '').toLowerCase().includes('n/a'),
       ) || roomStatuses[0]
 
+    const timestamp = new Date().toISOString()
+    
+    // Complex Nested Payload as per user requirement
     const payload = {
+      hotelId: activeHotelId,
+      isDeleted: false,
+      isActive: true,
+      createdBy: currentUserId,
+      createdOn: timestamp,
+      updatedBy: currentUserId,
+      updatedOn: timestamp,
+      deletedBy: 0,
+      deletedOn: timestamp,
+      id: 0,
       roomName: newRoom.roomName,
       roomShortName: newRoom.roomName,
       roomTypeId: isNonRoom ? nonRoomType?.id || 0 : Number(newRoom.roomTypeId) || 0,
       floorId: Number(newRoom.floorId),
       buildingId: Number(newRoom.buildingId),
-      roomStatusId: isNonRoom ? nonRoomStatus?.id || 0 : Number(newRoom.roomStatusTableId) || 0,
-      roomStatus:
-        newRoom.roomStatus ||
-        (isNonRoom ? 'NON-ROOM' : nonRoomStatus?.roomStatusName || 'Available'),
-      name: selectedFloor ? selectedFloor.name : newRoom.roomName,
       smoking: Boolean(newRoom.smoking),
       handicap: Boolean(newRoom.handicap),
       nonRoom: isNonRoom,
+      floorName: selectedFloor?.name || '',
+      roomTypeName: isNonRoom ? nonRoomType?.roomTypeName : selectedType?.roomTypeName || '',
+      buildingName: selectedBuilding?.name || '',
+      roomStatusId: isNonRoom ? nonRoomStatus?.id || 0 : Number(newRoom.roomStatusTableId) || 0,
+      roomStatus: newRoom.roomStatus || (isNonRoom ? 'NON-ROOM' : selectedStatus?.roomStatusTitle || 'Available'),
+      roomStatusTable: isNonRoom ? nonRoomStatus : selectedStatus,
+      roomType: isNonRoom ? nonRoomType : selectedType,
+      floor: selectedFloor,
+      building: selectedBuilding,
+      name: selectedFloor ? selectedFloor.name : newRoom.roomName,
     }
 
     try {
+      console.log('Room Master Create Payload:', payload)
       await addRoom(payload)
       setNewRoom({
         roomName: '',
@@ -117,6 +132,8 @@ export const useRoomManagement = ({
    */
   const handleUpdateRoom = async (e) => {
     if (e) e.preventDefault()
+    if (!editRoom) return
+
     const isNonRoom = Boolean(editRoom.nonRoom)
 
     if (
@@ -129,6 +146,11 @@ export const useRoomManagement = ({
       return
     }
 
+    const selectedFloor = floors.find((f) => String(f.id) === String(editRoom.floorId))
+    const selectedBuilding = buildings ? buildings.find((b) => String(b.id) === String(editRoom.buildingId)) : null
+    const selectedType = roomTypes.find((rt) => String(rt.id) === String(editRoom.roomTypeId))
+    const selectedStatus = roomStatuses.find((rs) => String(rs.id) === String(editRoom.roomStatusTableId))
+
     const nonRoomType =
       roomTypes.find((rt) => (rt.roomTypeName || '').toLowerCase().includes('non-room')) ||
       roomTypes[0]
@@ -137,23 +159,29 @@ export const useRoomManagement = ({
       roomStatuses[0]
 
     const payload = {
-      id: editRoom.id,
-      roomName: editRoom.roomName,
-      roomShortName: editRoom.roomName,
+      ...editRoom,
+      hotelId: activeHotelId,
       roomTypeId: isNonRoom ? nonRoomType?.id || 0 : Number(editRoom.roomTypeId) || 0,
       floorId: Number(editRoom.floorId),
       buildingId: Number(editRoom.buildingId),
       roomStatusId: isNonRoom ? nonRoomStatus?.id || 0 : Number(editRoom.roomStatusTableId) || 0,
-      roomStatus: editRoom.roomStatus || (isNonRoom ? 'NON-ROOM' : 'Available'),
-      name: editRoom.name || editRoom.roomName,
-      smoking: Boolean(editRoom.smoking),
-      handicap: Boolean(editRoom.handicap),
-      nonRoom: isNonRoom,
+      floorName: selectedFloor?.name || editRoom.floorName,
+      roomTypeName: isNonRoom ? nonRoomType?.roomTypeName : selectedType?.roomTypeName || editRoom.roomTypeName,
+      buildingName: selectedBuilding?.name || editRoom.buildingName,
+      roomStatus: editRoom.roomStatus || (isNonRoom ? 'NON-ROOM' : selectedStatus?.roomStatusTitle || 'Available'),
+      roomStatusTable: isNonRoom ? nonRoomStatus : selectedStatus || editRoom.roomStatusTable,
+      roomType: isNonRoom ? nonRoomType : selectedType || editRoom.roomType,
+      floor: selectedFloor || editRoom.floor,
+      building: selectedBuilding || editRoom.building,
+      updatedBy: currentUserId,
+      updatedOn: new Date().toISOString(),
     }
 
     try {
+      console.log('Room Master Update Payload:', payload)
       await updateRoom(editRoom.id, payload)
       toggleModal('roomEdit', false)
+      setEditRoom(null)
     } catch (err) {
       console.error('Failed to update room:', err)
     }

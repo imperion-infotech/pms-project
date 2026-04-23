@@ -18,7 +18,7 @@ export const usePmsBuildings = () => {
       const res = await propertyService.getBuildings()
       return extractData(res)
     },
-    staleTime: 1000 * 60 * 10,
+    staleTime: 1000 * 60 * 2,
   })
 
   const buildingMutation = useMutation({
@@ -35,7 +35,7 @@ export const usePmsBuildings = () => {
         delete: 'Building deleted',
       }
       toast.success(msgs[variables.type])
-      queryClient.invalidateQueries(['buildings'])
+      queryClient.invalidateQueries({ queryKey: ['buildings'] })
     },
     onError: (err) => toast.error(err.response?.data?.message || 'Operation failed'),
   })

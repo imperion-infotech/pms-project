@@ -51,7 +51,7 @@ export const usePmsGuests = () => {
         delete: 'Guest profile deleted',
       }
       toast.success(messages[variables.type])
-      queryClient.invalidateQueries(['guests'])
+      queryClient.invalidateQueries({ queryKey: ['guests'] })
     },
     onError: (err) => {
       toast.error(err.response?.data?.message || 'Operation failed')

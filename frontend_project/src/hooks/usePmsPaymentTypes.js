@@ -26,7 +26,7 @@ export const usePmsPaymentTypes = () => {
     onSuccess: (_, variables) => {
       const msgs = { create: 'Payment Type created!', update: 'Payment Type updated!', delete: 'Payment Type deleted' }
       toast.success(msgs[variables.type])
-      queryClient.invalidateQueries(['paymentTypes'])
+      queryClient.invalidateQueries({ queryKey: ['paymentTypes'] })
     },
     onError: (err) => toast.error(err.response?.data?.message || 'Operation failed')
   })

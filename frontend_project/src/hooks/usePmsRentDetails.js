@@ -34,7 +34,7 @@ export const usePmsRentDetails = () => {
         delete: 'Rent record deleted',
       }
       toast.success(msgs[variables.type])
-      queryClient.invalidateQueries(['rentDetails'])
+      queryClient.invalidateQueries({ queryKey: ['rentDetails'] })
     },
     onError: (err) => toast.error(err.response?.data?.message || 'Operation failed'),
   })

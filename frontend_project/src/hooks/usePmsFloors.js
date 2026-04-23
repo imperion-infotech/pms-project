@@ -18,7 +18,7 @@ export const usePmsFloors = () => {
       const res = await propertyService.getFloors()
       return extractData(res)
     },
-    staleTime: 1000 * 60 * 10,
+    staleTime: 1000 * 60 * 2,
   })
 
   const floorMutation = useMutation({
@@ -31,7 +31,7 @@ export const usePmsFloors = () => {
     onSuccess: (res, variables) => {
       const msgs = { create: 'Floor created', update: 'Floor updated', delete: 'Floor deleted' }
       toast.success(msgs[variables.type])
-      queryClient.invalidateQueries(['floors'])
+      queryClient.invalidateQueries({ queryKey: ['floors'] })
     },
     onError: (err) => toast.error(err.response?.data?.message || 'Operation failed'),
   })

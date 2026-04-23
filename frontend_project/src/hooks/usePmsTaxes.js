@@ -27,7 +27,7 @@ export const usePmsTaxes = () => {
     onSuccess: (_, variables) => {
       const msgs = { create: 'Tax record created', update: 'Tax record updated', delete: 'Tax record deleted' }
       toast.success(msgs[variables.type])
-      queryClient.invalidateQueries(['taxes'])
+      queryClient.invalidateQueries({ queryKey: ['taxes'] })
     },
     onError: (err) => toast.error(err.response?.data?.message || 'Operation failed')
   })

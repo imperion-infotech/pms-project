@@ -59,6 +59,7 @@ const TaxManagement = ({
                 <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">No.</th>
                 <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">Tax Name</th>
                 <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">Tax Type</th>
+                <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Amount</th>
                 <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Daily</th>
                 <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Stay</th>
                 <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">Actions</th>
@@ -94,6 +95,11 @@ const TaxManagement = ({
                     <td className="px-6 py-5">
                       <span className="inline-flex items-center rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                         {tax.taxTypeEnum?.replace('_', ' ') || 'STANDARD'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-5 text-center">
+                      <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">
+                        {tax.amount || 0}
                       </span>
                     </td>
                     <td className="px-6 py-5 text-center">

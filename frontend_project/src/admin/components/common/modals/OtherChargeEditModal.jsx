@@ -109,6 +109,7 @@ export const OtherChargeEditModal = ({
                 { label: 'Always Charge', field: 'alwaysCharge', desc: 'Apply to every guest' },
                 { label: 'Reoccurr Charge', field: 'reoccureCharge', desc: 'Frequent charging' },
                 { label: 'CRS Charge', field: 'crsCharge', desc: 'Include in CRS' },
+                { label: 'Call Logging', field: 'callLoggingCharge', desc: 'Phone system sync' },
                 { label: 'POS Charge', field: 'callPOSCharge', desc: 'Sync with POS' },
                 { label: 'Forecasting', field: 'foreCastingRevenue', desc: 'Revenue forecasting' },
               ].map((toggle) => (

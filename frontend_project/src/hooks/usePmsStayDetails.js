@@ -30,7 +30,7 @@ export const usePmsStayDetails = () => {
     onSuccess: (_, variables) => {
       const msgs = { create: 'Stay created', update: 'Stay updated', delete: 'Stay deleted' }
       toast.success(msgs[variables.type])
-      queryClient.invalidateQueries(['stayDetails'])
+      queryClient.invalidateQueries({ queryKey: ['stayDetails'] })
     },
     onError: (err) => toast.error(err.response?.data?.message || 'Operation failed'),
   })

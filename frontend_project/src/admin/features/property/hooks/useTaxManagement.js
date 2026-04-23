@@ -13,22 +13,39 @@ export const useTaxManagement = ({ toggleModal }) => {
     perDayTax: false,
     perStayTax: false,
   })
-  const [editTax, setEditTax] = useState({
-    id: null,
-    taxMasterName: '',
-    taxTypeEnum: 'Occupancy_tax',
-    perDayTax: false,
-    perStayTax: false,
-    createdOn: '',
-  })
+  const [editTax, setEditTax] = useState(null)
+
+  // Context: Get IDs from localStorage
+  const activeHotelId = Number(localStorage.getItem('activeHotelId')) || 0
+  const currentUserId = Number(localStorage.getItem('userId')) || 0
 
   const handleAddTax = useCallback(async () => {
     if (!newTax.taxMasterName.trim()) return
     try {
-      await addTax({
-        ...newTax,
-        createdOn: new Date().toISOString(),
-      })
+      const timestamp = new Date().toISOString()
+      
+      // Exact alignment with provided JSON schema
+      const payload = {
+        hotelId: activeHotelId,
+        isDeleted: false,
+        isActive: true,
+        createdBy: currentUserId,
+        createdOn: timestamp,
+        updatedBy: currentUserId,
+        updatedOn: timestamp,
+        deletedBy: 0,
+        deletedOn: timestamp,
+        id: 0,
+        taxMasterName: newTax.taxMasterName,
+        taxTypeEnum: newTax.taxTypeEnum,
+        perDayTax: Boolean(newTax.perDayTax),
+        perStayTax: Boolean(newTax.perStayTax),
+        amount: Number(newTax.amount) || 0,
+      }
+
+      console.log('Tax Create Payload:', payload)
+      await addTax(payload)
+
       setNewTax({
         taxMasterName: '',
         taxTypeEnum: 'Occupancy_tax',
@@ -39,27 +56,26 @@ export const useTaxManagement = ({ toggleModal }) => {
     } catch (err) {
       console.error('Failed to create tax record:', err)
     }
-  }, [newTax, addTax, toggleModal])
+  }, [newTax, addTax, toggleModal, activeHotelId, currentUserId])
 
   const handleUpdateTax = useCallback(async () => {
-    if (!editTax.id || !editTax.taxMasterName.trim()) return
+    if (!editTax || !editTax.id || !editTax.taxMasterName.trim()) return
     try {
-      await updateTax(editTax.id, {
+      const payload = {
         ...editTax,
-        createdOn: editTax.createdOn || new Date().toISOString(),
-      })
-      setEditTax({
-        id: null,
-        taxMasterName: '',
-        taxTypeEnum: 'STANDARD',
-        perDayTax: false,
-        perStayTax: false,
-      })
+        amount: Number(editTax.amount) || 0,
+        updatedBy: currentUserId,
+        updatedOn: new Date().toISOString(),
+      }
+
+      console.log('Tax Update Payload:', payload)
+      await updateTax(editTax.id, payload)
+      setEditTax(null)
       toggleModal('taxEdit', false)
     } catch (err) {
       console.error('Failed to update tax record:', err)
     }
-  }, [editTax, updateTax, toggleModal])
+  }, [editTax, updateTax, toggleModal, currentUserId])
 
   const handleEditTax = useCallback(
     (tax) => {

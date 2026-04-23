@@ -26,7 +26,7 @@ export const usePmsRooms = () => {
       const res = await propertyService.getRooms()
       return extractData(res)
     },
-    staleTime: 1000 * 60 * 5, // 5 minute caching
+    staleTime: 1000 * 60 * 2, // 5 minute caching
   })
 
   // 2. MUTATIONS: Data changes logic
@@ -46,7 +46,7 @@ export const usePmsRooms = () => {
       
       toast.success(message)
       // Invalidating 'rooms' cache taaki data refresh ho jaye
-      queryClient.invalidateQueries(['rooms'])
+      queryClient.invalidateQueries({ queryKey: ['rooms'] })
     },
     onError: (err) => {
       toast.error(err.response?.data?.message || 'Operation failed')

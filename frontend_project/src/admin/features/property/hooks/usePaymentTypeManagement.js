@@ -7,63 +7,75 @@ import { usePmsPaymentTypes } from '../../../../hooks/usePmsPaymentTypes'
  */
 export const usePaymentTypeManagement = ({ toggleModal }) => {
   const { addPaymentType, updatePaymentType } = usePmsPaymentTypes()
+  
+  // Context: Get IDs from localStorage
+  const activeHotelId = Number(localStorage.getItem('activeHotelId')) || 0
+  const currentUserId = Number(localStorage.getItem('userId')) || 0
+
   const [newPaymentType, setNewPaymentType] = useState({
-    id: 0,
     paymentTypeName: '',
     paymentTypeShortName: '',
     categoryName: '',
     description: '',
     creditCardProcessing: false,
-    createdOn: new Date().toISOString(),
+    paymentDetails: '', // Added from provided schema
   })
   
-  const [editPaymentType, setEditPaymentType] = useState({
-    id: null,
-    paymentTypeName: '',
-    paymentTypeShortName: '',
-    categoryName: '',
-    description: '',
-    creditCardProcessing: false,
-    createdOn: '',
-  })
+  const [editPaymentType, setEditPaymentType] = useState(null)
 
   const handleAddPaymentType = useCallback(async () => {
     if (!newPaymentType.paymentTypeName.trim()) return
     try {
-      await addPaymentType(newPaymentType)
-      setNewPaymentType({
+      const timestamp = new Date().toISOString()
+      
+      const payload = {
+        hotelId: activeHotelId,
+        isDeleted: false,
+        isActive: true,
+        createdBy: currentUserId,
+        createdOn: timestamp,
+        updatedBy: currentUserId,
+        updatedOn: timestamp,
+        deletedBy: 0,
+        deletedOn: timestamp,
         id: 0,
+        ...newPaymentType
+      }
+
+      console.log('Payment Type Create Payload:', payload)
+      await addPaymentType(payload)
+      
+      setNewPaymentType({
         paymentTypeName: '',
         paymentTypeShortName: '',
         categoryName: '',
         description: '',
         creditCardProcessing: false,
-        createdOn: new Date().toISOString(),
+        paymentDetails: '',
       })
       toggleModal('paymentType', false)
     } catch (err) {
       console.error('Failed to create payment type:', err)
     }
-  }, [newPaymentType, addPaymentType, toggleModal])
+  }, [newPaymentType, addPaymentType, toggleModal, activeHotelId, currentUserId])
 
   const handleUpdatePaymentType = useCallback(async () => {
-    if (editPaymentType.id === null || !editPaymentType.paymentTypeName?.trim()) return
+    if (!editPaymentType || !editPaymentType.id || !editPaymentType.paymentTypeName?.trim()) return
     try {
-      await updatePaymentType(editPaymentType.id, editPaymentType)
-      setEditPaymentType({
-        id: null,
-        paymentTypeName: '',
-        paymentTypeShortName: '',
-        categoryName: '',
-        description: '',
-        creditCardProcessing: false,
-        createdOn: '',
-      })
+      const payload = {
+        ...editPaymentType,
+        updatedBy: currentUserId,
+        updatedOn: new Date().toISOString(),
+      }
+
+      console.log('Payment Type Update Payload:', payload)
+      await updatePaymentType(editPaymentType.id, payload)
+      setEditPaymentType(null)
       toggleModal('paymentTypeEdit', false)
     } catch (err) {
       console.error('Failed to update payment type:', err)
     }
-  }, [editPaymentType, updatePaymentType, toggleModal])
+  }, [editPaymentType, updatePaymentType, toggleModal, currentUserId])
 
   const handleEditPaymentType = useCallback(
     (pt) => {

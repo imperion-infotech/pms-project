@@ -15,22 +15,39 @@ const Navbar = () => {
     return hotels.find((h) => String(h.id) === String(activeId))
   }, [])
 
-  const [userDetails] = useState(() => {
+  const userDetails = useMemo(() => {
     const token = localStorage.getItem('access_token')
     if (token) {
       try {
-        const payload = JSON.parse(atob(token.split('.')[1]))
+        const cleanToken = String(token).trim().replace(/^"|"$/g, '')
+        const base64Url = cleanToken.split('.')[1]
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+        const payload = JSON.parse(window.atob(base64))
         const name = payload.sub || payload.username || payload.name || 'User'
 
         let rawRole = 'User'
-        if (payload.role) rawRole = payload.role
-        else if (payload.roles)
-          rawRole = Array.isArray(payload.roles) ? payload.roles[0] : payload.roles
-        else if (payload.authorities)
+
+        // Extract role from JWT payload
+        if (payload.roles && Array.isArray(payload.roles) && payload.roles.length > 0) {
+          // Handle array of objects: [{id: 1, name: 'ROLE_ADMIN'}]
+          // AND array of strings: ['ROLE_ADMIN']
+          const bestRole =
+            payload.roles.find((r) => {
+              const rn = (typeof r === 'object' ? r.name || r.authority : r) || ''
+              const roleUpper = String(rn).toUpperCase()
+              return roleUpper.includes('ADMIN') || roleUpper.includes('SUPER_ADMIN')
+            }) || payload.roles[0]
+
+          rawRole =
+            typeof bestRole === 'object' ? bestRole.name || bestRole.authority || 'User' : bestRole
+        } else if (payload.role) {
+          rawRole = payload.role
+        } else if (payload.authorities) {
           rawRole = Array.isArray(payload.authorities)
             ? payload.authorities[0]?.authority || payload.authorities[0]
             : payload.authorities
-        else {
+        } else {
+          // Final fallback: localStorage
           const localRole = localStorage.getItem('user_role')
           if (localRole) rawRole = localRole
         }
@@ -45,7 +62,7 @@ const Navbar = () => {
       }
     }
     return { username: 'Loading...', role: '...' }
-  })
+  }, [])
   const [showNotification, setShowNotification] = useState(true)
   const [isNotificationOpen, setIsNotificationOpen] = useState(false)
 
@@ -94,7 +111,7 @@ const Navbar = () => {
           <h1 className="text-base leading-tight font-black tracking-tight text-white uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
             {activeHotel?.hotelName || 'IMPERION'}
           </h1>
-          <p className="mt-0.5 text-pms-micro leading-none font-black tracking-[0.4em] text-emerald-400 uppercase opacity-90">
+          <p className="text-pms-micro mt-0.5 leading-none font-black tracking-[0.4em] text-emerald-400 uppercase opacity-90">
             Admin Console
           </p>
         </div>
@@ -136,7 +153,7 @@ const Navbar = () => {
                   <h3 className="text-lg leading-tight font-black text-white uppercase">
                     {activeHotel.hotelName}
                   </h3>
-                  <p className="mt-1 flex items-center gap-1.5 text-pms-mini font-medium text-slate-400">
+                  <p className="text-pms-mini mt-1 flex items-center gap-1.5 font-medium text-slate-400">
                     <MapPin className="h-3 w-3 text-emerald-400" />
                     {activeHotel.city}, {activeHotel.state1}
                   </p>
@@ -205,7 +222,7 @@ const Navbar = () => {
                 <div className="bg-surface-100 animate-in fade-in slide-in-from-top-4 absolute right-0 z-50 mt-3 w-80 overflow-hidden rounded-2xl border border-slate-700/80 shadow-[0_10px_40px_-5px_rgba(0,0,0,0.6)]">
                   <div className="bg-surface-100/95 flex items-center justify-between border-b border-slate-700/80 p-4 backdrop-blur-sm">
                     <h3 className="text-sm font-bold text-white">Dashboard Alerts</h3>
-                    <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-pms-tiny font-bold text-emerald-400">
+                    <span className="text-pms-tiny rounded-full bg-emerald-500/10 px-2 py-0.5 font-bold text-emerald-400">
                       1 New
                     </span>
                   </div>
@@ -215,7 +232,7 @@ const Navbar = () => {
                         Welcome back, {userDetails.username}!
                       </p>
                       <p className="text-xs text-slate-400">Admin session started successfully.</p>
-                      <p className="mt-2 text-pms-tiny font-medium text-slate-500">Just now</p>
+                      <p className="text-pms-tiny mt-2 font-medium text-slate-500">Just now</p>
                     </div>
                   </div>
                   <div className="bg-surface-100/95 border-t border-slate-700/80 p-3 backdrop-blur-sm">

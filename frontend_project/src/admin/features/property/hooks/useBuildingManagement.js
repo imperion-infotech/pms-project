@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react'
 import { usePmsBuildings } from '../../../../hooks/usePmsBuildings'
 
-
 /**
  * useBuildingManagement - Centralized hook for Building CRUD operations.
  * Ported to TanStack Query for industrial stability.
@@ -11,8 +10,14 @@ export const useBuildingManagement = ({ toggleModal }) => {
   const [newBuilding, setNewBuilding] = useState({ name: '', description: '' })
   const [editBuilding, setEditBuilding] = useState(null)
 
-  // Get active hotel ID for payload
+  // Get active hotel ID and current user ID for payload
   const activeHotelId = Number(localStorage.getItem('activeHotelId')) || 0
+  console.log('activeHotelId', activeHotelId)
+
+  const storedUserId = localStorage.getItem('userId')
+  const currentUserId = storedUserId && !isNaN(Number(storedUserId)) ? Number(storedUserId) : 1 // Default to 1 instead of 0 if NaN
+  console.log('currentUserId', currentUserId)
+  console.log('Stored User ID', storedUserId)
 
   const handleAddBuilding = useCallback(async () => {
     if (!newBuilding.name.trim()) return
@@ -22,25 +27,24 @@ export const useBuildingManagement = ({ toggleModal }) => {
 
     try {
       const currentTimestamp = new Date().toISOString()
-      const currentUserId = Number(localStorage.getItem('userId')) || 0
 
-      // Exact alignment with requested JSON schema to avoid 403/400
+      // Perfect Payload for Admin/Super Admin
       const payload = {
         hotelId: Number(activeHotelId),
-        isDeleted: false, // Changed from user's 'true' example as creation should be active
+        isDeleted: false,
         isActive: true,
-        createdBy: currentUserId, // Matching user's JSON example
+        createdBy: currentUserId,
         createdOn: currentTimestamp,
         updatedBy: currentUserId,
         updatedOn: currentTimestamp,
-        deletedBy: currentUserId,
+        deletedBy: 0,
         deletedOn: currentTimestamp,
         id: 0,
         name: newBuilding.name,
         description: newBuilding.description,
       }
 
-      console.log('Building Payload:', payload)
+      console.log('Building Create Payload:', payload)
       await addBuilding(payload)
 
       setNewBuilding({ name: '', description: '' })
@@ -49,24 +53,26 @@ export const useBuildingManagement = ({ toggleModal }) => {
       console.error('Failed to create building:', err)
       // Throw error to be caught by mutation if needed or keep local logging
     }
-  }, [newBuilding, addBuilding, toggleModal, activeHotelId])
+  }, [newBuilding, addBuilding, toggleModal, activeHotelId, currentUserId])
 
   const handleUpdateBuilding = useCallback(async () => {
     if (!editBuilding || !editBuilding.id || !editBuilding.name.trim()) return
     try {
-      // Preserve existing fields and update name/description/updatedOn
+      // Preserve existing fields and update name/description/updatedOn/updatedBy
       const payload = {
         ...editBuilding,
-        updatedBy: 1,
+        updatedBy: currentUserId,
         updatedOn: new Date().toISOString(),
       }
+
+      console.log('Updating Building:', payload)
       await updateBuilding(editBuilding.id, payload)
       setEditBuilding(null)
       toggleModal('buildingEdit', false)
     } catch (err) {
       console.error('Failed to update building:', err)
     }
-  }, [editBuilding, updateBuilding, toggleModal])
+  }, [editBuilding, updateBuilding, toggleModal, currentUserId])
 
   const handleEditBuilding = useCallback(
     (building) => {

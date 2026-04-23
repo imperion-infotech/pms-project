@@ -82,6 +82,20 @@ export const TaxEditModal = ({
             </select>
           </div>
 
+          <div>
+            <label className="mb-1.5 block text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+              Tax Amount
+            </label>
+            <input
+              required
+              type="number"
+              value={editTax.amount || ''}
+              onChange={(e) => setEditTax({ ...editTax, amount: e.target.value })}
+              placeholder="e.g. 18"
+              className="w-full border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 shadow-inner transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200 rounded-xl"
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <label
               className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 p-3 transition-all ${editTax.perDayTax ? 'border-blue-200 bg-blue-50 dark:border-blue-500/20 dark:bg-blue-500/5' : 'border-slate-100 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50'}`}

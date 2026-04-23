@@ -8,6 +8,7 @@ import {
   ChevronUp,
   LayoutDashboard,
   Building,
+  Calendar,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
@@ -25,13 +26,13 @@ const checkIsAdmin = () => {
       const name = (typeof r === 'object' ? r.name || r.authority : r) || ''
       const roleStr = String(name).toUpperCase()
       return (
-        roleStr.includes('ADMIN') ||
-        roleStr.includes('MANAGER') ||
-        roleStr.includes('SUPER_ADMIN')
+        roleStr.includes('ADMIN') || roleStr.includes('MANAGER') || roleStr.includes('SUPER_ADMIN')
       )
     })
   } catch {
-    return String(localStorage.getItem('user_role') || '').toUpperCase().includes('ADMIN')
+    return String(localStorage.getItem('user_role') || '')
+      .toUpperCase()
+      .includes('ADMIN')
   }
 }
 
@@ -48,7 +49,9 @@ const checkIsSuperAdmin = () => {
       return roleStr.includes('SUPER_ADMIN')
     })
   } catch {
-    return String(localStorage.getItem('user_role') || '').toUpperCase().includes('SUPER_ADMIN')
+    return String(localStorage.getItem('user_role') || '')
+      .toUpperCase()
+      .includes('SUPER_ADMIN')
   }
 }
 
@@ -56,7 +59,12 @@ const checkIsSuperAdmin = () => {
  * UserSidebar component - Matches exactly with the Admin Dashboard Sidebar.
  * Displays fetched room types and room statuses as nested accordion lists.
  */
-const UserSidebar = ({ buildings = [], roomTypes = [], roomStatuses = [] }) => {
+const UserSidebar = ({
+  buildings = [],
+  roomTypes = [],
+  roomStatuses = [],
+  onOpenCalendar,
+}) => {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
   const [isBuildingMenuOpen, setIsBuildingMenuOpen] = React.useState(true)
   const [isTypeMenuOpen, setIsTypeMenuOpen] = React.useState(true)
@@ -94,7 +102,7 @@ const UserSidebar = ({ buildings = [], roomTypes = [], roomStatuses = [] }) => {
               <span className="text-pms-tiny font-black tracking-[0.2em] text-emerald-500 uppercase opacity-90">
                 Property Engine
               </span>
-              <span className="text-[13px] font-black leading-tight tracking-wide text-white uppercase">
+              <span className="text-[13px] leading-tight font-black tracking-wide text-white uppercase">
                 {activeHotelName}
               </span>
             </div>
@@ -122,6 +130,24 @@ const UserSidebar = ({ buildings = [], roomTypes = [], roomStatuses = [] }) => {
 
             <div className="my-2 border-t border-slate-700/40"></div>
 
+            {/* LIVE CALENDAR TRIGGER */}
+            <button
+              type="button"
+              onClick={() => {
+                if (onOpenCalendar) onOpenCalendar()
+                if (window.innerWidth < 1024) setIsSidebarOpen(false)
+              }}
+              className={`group relative mb-1 flex w-full items-center gap-3 px-4 py-3 text-sm font-semibold text-slate-300 transition-all hover:bg-blue-500/10 hover:text-blue-400`}
+            >
+              <div className="absolute top-0 bottom-0 left-0 w-1 bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.7)]" />
+              <Calendar className="h-5 w-5 text-blue-400 transition-transform group-hover:scale-110" />
+              <span>Live Master Calendar</span>
+              <div className="ml-auto rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] font-bold text-blue-400">
+                PRO
+              </div>
+            </button>
+
+            <div className="my-2 border-t border-slate-700/40"></div>
 
             {/* BUILDINGS ACCORDION */}
             <div>
@@ -156,13 +182,13 @@ const UserSidebar = ({ buildings = [], roomTypes = [], roomStatuses = [] }) => {
                         className={`group relative flex w-full items-center justify-between px-6 py-2.5 text-xs font-medium text-slate-400 transition-all hover:bg-slate-800/30 hover:text-white`}
                       >
                         <span className="capitalize">{building.name}</span>
-                        <span className="rounded bg-slate-800 px-1.5 py-0.5 text-pms-tiny font-bold whitespace-nowrap text-slate-500 uppercase opacity-0 transition-opacity group-hover:opacity-100">
+                        <span className="text-pms-tiny rounded bg-slate-800 px-1.5 py-0.5 font-bold whitespace-nowrap text-slate-500 uppercase opacity-0 transition-opacity group-hover:opacity-100">
                           {building.location || 'Main'}
                         </span>
                       </div>
                     ))}
                     {buildings.length === 0 && (
-                      <span className="block px-6 py-3 text-pms-mini font-medium text-slate-600 italic">
+                      <span className="text-pms-mini block px-6 py-3 font-medium text-slate-600 italic">
                         No buildings found.
                       </span>
                     )}
@@ -204,13 +230,13 @@ const UserSidebar = ({ buildings = [], roomTypes = [], roomStatuses = [] }) => {
                         className={`group relative flex w-full items-center justify-between px-6 py-2.5 text-xs font-medium text-slate-400 transition-all hover:bg-slate-800/30 hover:text-white`}
                       >
                         <span className="capitalize">{type.roomTypeName}</span>
-                        <span className="rounded bg-slate-800 px-1.5 py-0.5 text-pms-tiny font-bold whitespace-nowrap text-slate-500 opacity-0 transition-opacity group-hover:opacity-100">
+                        <span className="text-pms-tiny rounded bg-slate-800 px-1.5 py-0.5 font-bold whitespace-nowrap text-slate-500 opacity-0 transition-opacity group-hover:opacity-100">
                           {type.shortName}
                         </span>
                       </div>
                     ))}
                     {roomTypes.length === 0 && (
-                      <span className="block px-6 py-3 text-pms-mini font-medium text-slate-600 italic">
+                      <span className="text-pms-mini block px-6 py-3 font-medium text-slate-600 italic">
                         No room types found.
                       </span>
                     )}
@@ -259,7 +285,7 @@ const UserSidebar = ({ buildings = [], roomTypes = [], roomStatuses = [] }) => {
                       </div>
                     ))}
                     {roomStatuses.length === 0 && (
-                      <span className="block px-6 py-3 text-pms-mini font-medium text-slate-600 italic">
+                      <span className="text-pms-mini block px-6 py-3 font-medium text-slate-600 italic">
                         No statuses found.
                       </span>
                     )}

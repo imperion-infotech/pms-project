@@ -13,21 +13,38 @@ export const useRoomStatusManagement = ({ toggleModal }) => {
     roomStatusColor: '#2798e8',
     roomStatusTextColor: '#ffffff',
   })
-  const [editRoomStatus, setEditRoomStatus] = useState({
-    id: null,
-    roomStatusName: '',
-    roomStatusTitle: '',
-    roomStatusColor: '#2798e8',
-    roomStatusTextColor: '#ffffff',
-  })
+  const [editRoomStatus, setEditRoomStatus] = useState(null)
+
+  // Context: Get IDs from localStorage
+  const activeHotelId = Number(localStorage.getItem('activeHotelId')) || 0
+  const currentUserId = Number(localStorage.getItem('userId')) || 0
 
   const handleAddRoomStatus = useCallback(async () => {
     if (!newRoomStatus.roomStatusName.trim()) return
     try {
-      await addRoomStatus({
-        ...newRoomStatus,
-        createdOn: new Date().toISOString(),
-      })
+      const timestamp = new Date().toISOString()
+
+      // Exact alignment with provided JSON schema
+      const payload = {
+        hotelId: activeHotelId,
+        isDeleted: false,
+        isActive: true,
+        createdBy: currentUserId,
+        createdOn: timestamp,
+        updatedBy: currentUserId,
+        updatedOn: timestamp,
+        deletedBy: 0,
+        deletedOn: timestamp,
+        id: 0,
+        roomStatusName: newRoomStatus.roomStatusName,
+        roomStatusTitle: newRoomStatus.roomStatusTitle,
+        roomStatusColor: newRoomStatus.roomStatusColor,
+        roomStatusTextColor: newRoomStatus.roomStatusTextColor,
+      }
+
+      console.log('Room Status Create Payload:', payload)
+      await addRoomStatus(payload)
+
       setNewRoomStatus({
         roomStatusName: '',
         roomStatusTitle: '',
@@ -38,34 +55,29 @@ export const useRoomStatusManagement = ({ toggleModal }) => {
     } catch (err) {
       console.error('Failed to create room status:', err)
     }
-  }, [newRoomStatus, addRoomStatus, toggleModal])
+  }, [newRoomStatus, addRoomStatus, toggleModal, activeHotelId, currentUserId])
 
   const handleUpdateRoomStatus = useCallback(async () => {
-    if (!editRoomStatus.id || !editRoomStatus.roomStatusName.trim()) return
+    if (!editRoomStatus || !editRoomStatus.id || !editRoomStatus.roomStatusName.trim()) return
     try {
-      await updateRoomStatus(editRoomStatus.id, editRoomStatus)
-      setEditRoomStatus({
-        id: null,
-        roomStatusName: '',
-        roomStatusTitle: '',
-        roomStatusColor: '#2798e8',
-        roomStatusTextColor: '#ffffff',
-      })
+      const payload = {
+        ...editRoomStatus,
+        updatedBy: currentUserId,
+        updatedOn: new Date().toISOString(),
+      }
+
+      console.log('Room Status Update Payload:', payload)
+      await updateRoomStatus(editRoomStatus.id, payload)
+      setEditRoomStatus(null)
       toggleModal('roomStatusEdit', false)
     } catch (err) {
       console.error('Failed to update room status:', err)
     }
-  }, [editRoomStatus, updateRoomStatus, toggleModal])
+  }, [editRoomStatus, updateRoomStatus, toggleModal, currentUserId])
 
   const handleEditRoomStatus = useCallback(
     (status) => {
-      setEditRoomStatus({
-        id: status.id,
-        roomStatusName: status.roomStatusName || '',
-        roomStatusTitle: status.roomStatusTitle || '',
-        roomStatusColor: status.roomStatusColor || '#2798e8',
-        roomStatusTextColor: status.roomStatusTextColor || '#ffffff',
-      })
+      setEditRoomStatus({ ...status })
       toggleModal('roomStatusEdit', true)
     },
     [toggleModal],

@@ -26,7 +26,7 @@ export const usePmsOtherCharges = () => {
     onSuccess: (_, variables) => {
       const msgs = { create: 'Other Charge created!', update: 'Other Charge updated!', delete: 'Other Charge deleted' }
       toast.success(msgs[variables.type])
-      queryClient.invalidateQueries(['otherCharges'])
+      queryClient.invalidateQueries({ queryKey: ['otherCharges'] })
     },
     onError: (err) => toast.error(err.response?.data?.message || 'Operation failed')
   })

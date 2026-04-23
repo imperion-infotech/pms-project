@@ -73,9 +73,23 @@ const Login = () => {
         localStorage.setItem('adminHotels', JSON.stringify(hotelsList))
       }
 
-      // 3. User Role Extraction (Optimized to detect ADMIN easily)
+      // 3. User Role Extraction — Check response body FIRST, then fallback to JWT token
       let userRole = 'ROLE_USER'
-      const roles = data.roles || (data.data && data.data.roles) || data.authorities
+      let roles = data.roles || (data.data && data.data.roles) || data.authorities
+
+      // Fallback: If response doesn't have roles, decode them from the JWT token
+      if ((!roles || !Array.isArray(roles) || roles.length === 0) && token) {
+        try {
+          const cleanTok = String(token).trim().replace(/^"|"$/g, '')
+          const base64Url = cleanTok.split('.')[1]
+          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+          const jwtPayload = JSON.parse(window.atob(base64))
+          roles = jwtPayload.roles || jwtPayload.authorities || []
+          console.log('Roles extracted from JWT token:', roles)
+        } catch (e) {
+          console.warn('Could not decode roles from JWT:', e)
+        }
+      }
 
       if (roles && Array.isArray(roles) && roles.length > 0) {
         // Find if user is Super Admin
@@ -102,16 +116,70 @@ const Login = () => {
         }
       }
 
-      // Bypass for testing specific users as Admin if needed
-      // if (username.toLowerCase() === 'tejal1') {
-      //   userRole = 'ROLE_ADMIN'
-      // }
-      // Login.jsx में twinkle के लिए Admin Bypass जोड़ दिया है
-      if (username.toLowerCase() === 'tejal1' || username.toLowerCase() === 'twinkle') {
-        userRole = 'ROLE_ADMIN'
+      console.log('--- DETECTED USER ROLE ---', userRole)
+      localStorage.setItem('user_role', String(userRole))
+
+      // 4. CRITICAL: For ADMIN users, auto-call /auth/select-hotel to get hotel-scoped token
+      // Without this, the backend rejects all requests with 403 because the initial login
+      // token is NOT scoped to a specific hotel.
+      const isAdmin =
+        userRole.toUpperCase().includes('ADMIN') || userRole.toUpperCase().includes('MANAGER')
+      if (isAdmin && hotelsList && hotelsList.length > 0) {
+        try {
+          const firstHotel = hotelsList[0]
+          const hotelId = firstHotel.hotelId || firstHotel.id
+          const hotelName = firstHotel.hotelName || firstHotel.name || 'Default Hotel'
+
+          console.log(`--- AUTO SELECT-HOTEL FOR ADMIN: ${hotelName} (${hotelId}) ---`)
+
+          const params = new URLSearchParams()
+          params.append('hotelId', hotelId)
+          params.append('username', username)
+
+          const selectResponse = await api.post('/auth/select-hotel', params, {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          })
+
+          const selectData = selectResponse.data
+          console.log('--- SELECT HOTEL RESPONSE ---', selectData)
+
+          // Extract new hotel-scoped token
+          let newToken = null
+          if (typeof selectData === 'string') {
+            newToken = selectData.trim()
+          } else if (selectData) {
+            newToken =
+              selectData.token ||
+              selectData.access_token ||
+              selectData.jwt ||
+              selectData.accessToken ||
+              (selectData.data && selectData.data.token) ||
+              (selectData.data && typeof selectData.data === 'string'
+                ? selectData.data.trim()
+                : null)
+          }
+
+          if (newToken) {
+            const cleanToken = String(newToken).replace(/^"|"$/g, '').trim()
+            localStorage.setItem('access_token', cleanToken)
+            console.log('--- ADMIN TOKEN UPDATED WITH HOTEL SCOPE ---')
+          }
+
+          localStorage.setItem('activeHotelId', hotelId)
+          localStorage.setItem('activeHotelName', hotelName)
+        } catch (selectErr) {
+          console.error('Auto select-hotel failed for admin:', selectErr)
+          // Still continue — user can manually select later
+          if (hotelsList.length > 0) {
+            localStorage.setItem('activeHotelId', hotelsList[0].hotelId || hotelsList[0].id)
+            localStorage.setItem(
+              'activeHotelName',
+              hotelsList[0].hotelName || hotelsList[0].name || 'Default Hotel',
+            )
+          }
+        }
       }
 
-      localStorage.setItem('user_role', String(userRole))
       navigate('/')
     } catch (err) {
       const msg = err.response?.data?.message || err.message || 'Login failed.'

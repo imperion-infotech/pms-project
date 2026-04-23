@@ -15,7 +15,7 @@ export const usePmsRoomStatus = () => {
       const res = await propertyService.getRoomStatuses()
       return extractData(res)
     },
-    staleTime: 1000 * 60 * 10
+    staleTime: 1000 * 60 * 2
   })
 
   const mutation = useMutation({
@@ -27,7 +27,7 @@ export const usePmsRoomStatus = () => {
     onSuccess: (_, variables) => {
       const msgs = { create: 'Room status created', update: 'Room status updated', delete: 'Room status deleted' }
       toast.success(msgs[variables.type])
-      queryClient.invalidateQueries(['roomStatuses'])
+      queryClient.invalidateQueries({ queryKey: ['roomStatuses'] })
     },
     onError: (err) => toast.error(err.response?.data?.message || 'Operation failed')
   })

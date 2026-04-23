@@ -119,12 +119,27 @@ export const PaymentTypeModal = ({
               Description
             </label>
             <textarea
-              rows="3"
+              rows="2"
               value={newPaymentType.description}
               onChange={(e) =>
                 setNewPaymentType({ ...newPaymentType, description: e.target.value })
               }
               placeholder="Describe this payment method..."
+              className="w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-800 transition-all focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 focus:outline-none dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200"
+            ></textarea>
+          </div>
+
+          <div>
+            <label className="mb-2 block px-1 text-pms-tiny font-bold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+              Payment Details
+            </label>
+            <textarea
+              rows="2"
+              value={newPaymentType.paymentDetails || ''}
+              onChange={(e) =>
+                setNewPaymentType({ ...newPaymentType, paymentDetails: e.target.value })
+              }
+              placeholder="Internal processing details or bank info..."
               className="w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-800 transition-all focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 focus:outline-none dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200"
             ></textarea>
           </div>

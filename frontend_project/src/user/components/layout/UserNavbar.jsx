@@ -18,18 +18,32 @@ const UserNavbar = () => {
     const token = localStorage.getItem('access_token')
     if (token) {
       try {
-        const payload = JSON.parse(atob(token.split('.')[1]))
+        const cleanToken = String(token).trim().replace(/^"|"$/g, '')
+        const base64Url = cleanToken.split('.')[1]
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+        const payload = JSON.parse(window.atob(base64))
         const name = payload.sub || payload.username || payload.name || 'User'
 
         let rawRole = 'User'
-        if (payload.role) rawRole = payload.role
-        else if (payload.roles)
-          rawRole = Array.isArray(payload.roles) ? payload.roles[0] : payload.roles
-        else if (payload.authorities)
+
+        // Extract role from JWT payload
+        if (payload.roles && Array.isArray(payload.roles) && payload.roles.length > 0) {
+          // Handle array of objects: [{id: 1, name: 'ROLE_ADMIN'}]
+          // AND array of strings: ['ROLE_ADMIN']
+          const bestRole = payload.roles.find((r) => {
+            const rn = (typeof r === 'object' ? r.name || r.authority : r) || ''
+            return String(rn).toUpperCase().includes('ADMIN') || String(rn).toUpperCase().includes('SUPER_ADMIN')
+          }) || payload.roles[0]
+
+          rawRole = typeof bestRole === 'object' ? (bestRole.name || bestRole.authority || 'User') : bestRole
+        } else if (payload.role) {
+          rawRole = payload.role
+        } else if (payload.authorities) {
           rawRole = Array.isArray(payload.authorities)
             ? payload.authorities[0]?.authority || payload.authorities[0]
             : payload.authorities
-        else {
+        } else {
+          // Final fallback: localStorage
           const localRole = localStorage.getItem('user_role')
           if (localRole) rawRole = localRole
         }

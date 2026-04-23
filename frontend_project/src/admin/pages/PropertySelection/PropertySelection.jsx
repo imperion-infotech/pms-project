@@ -32,7 +32,7 @@ const checkIsSuperAdmin = () => {
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
     const payload = JSON.parse(window.atob(base64))
 
-    console.log('--- JWT ROLE CHECK ---', payload.roles)
+    // console.log('--- JWT ROLE CHECK ---', payload.roles)
 
     const roles = payload.roles || []
     const isSuper = roles.some((r) => {
@@ -173,25 +173,53 @@ const PropertySelection = () => {
       if (typeof data === 'string') {
         newToken = data.trim()
       } else if (data) {
-        newToken = data.token || data.access_token || data.jwt || data.accessToken
+        newToken =
+          data.token ||
+          data.access_token ||
+          data.jwt ||
+          data.accessToken ||
+          (data.data && data.data.token) ||
+          (data.data && data.data.accessToken) ||
+          (data.data && typeof data.data === 'string' ? data.data.trim() : null) ||
+          (data.data &&
+            typeof data.data === 'object' &&
+            Object.values(data.data).find((v) => typeof v === 'string' && v.startsWith('ey')))
       }
 
       if (newToken) {
         const cleanToken = String(newToken).replace(/^"|"$/g, '').trim()
 
+        // Extract User ID from response or New Token
+        let userId = data.userId || data.id || (data.data && data.data.id)
+        if (!userId) {
+          try {
+            const base64Url = cleanToken.split('.')[1]
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+            const payload = JSON.parse(window.atob(base64))
+            userId = payload.userId || payload.id || payload.sub
+          } catch (err) {
+            console.warn('Could not decode userId from new token:', err)
+          }
+        }
+
         // Log for the USER to see the token change
         console.log('--- TOKEN UPDATE CHECK ---')
         console.log('Old Token:', localStorage.getItem('access_token'))
         console.log('New Token Received:', cleanToken)
+        console.log('User ID Extracted:', userId)
 
         localStorage.setItem('access_token', cleanToken)
         localStorage.setItem('activeHotelId', hotelId)
         localStorage.setItem('activeHotelName', hotelName)
+        if (userId) {
+          localStorage.setItem('userId', String(userId))
+        }
 
         // Industrial Logging for Debugging
         console.log('--- HOTEL SELECTION SUCCESSFUL ---', {
           hotelId: hotelId,
           username: username,
+          userId: userId,
           newToken: cleanToken,
         })
 

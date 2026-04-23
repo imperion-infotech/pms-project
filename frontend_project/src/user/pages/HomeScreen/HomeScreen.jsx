@@ -14,6 +14,7 @@
  */
 import React, { useState, useMemo, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import { BedDouble, AlertCircle } from 'lucide-react'
 import usePmsData from '../../../hooks/usePmsData'
 import { useTheme } from '../../../context/ThemeContext'
@@ -28,6 +29,9 @@ import UserPageHeader from '../../components/layout/UserPageHeader'
 import FloorSection from './components/FloorSection'
 import GuestProfileModal from './components/GuestProfileModal'
 import ContextMenu from './components/ContextMenu'
+
+// Calendar Components
+import PropertyMasterCalendar from '../../components/calendar/PropertyMasterCalendar'
 
 const HomeScreen = () => {
   const navigate = useNavigate()
@@ -54,6 +58,7 @@ const HomeScreen = () => {
   const [selectedFloor, setSelectedFloor] = useState(location.state?.initialFloor || 'All')
   const [isActionModalOpen, setIsActionModalOpen] = useState(false)
   const [selectedRoomAction, setSelectedRoomAction] = useState(null)
+  const [isFullCalendarOpen, setIsFullCalendarOpen] = useState(false)
 
   // Context Menu State
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, room: null })
@@ -187,6 +192,7 @@ const HomeScreen = () => {
         buildings={buildings}
         roomTypes={roomTypes}
         roomStatuses={roomStatuses}
+        onOpenCalendar={() => setIsFullCalendarOpen(true)}
       />
 
       <LoadingProcess isLoading={isLoading} barOnly={true} />
@@ -294,6 +300,13 @@ const HomeScreen = () => {
         isDark={isDark}
         onRefresh={refreshData}
       />
+
+      {/* 5. Full Screen Interactive Calendar */}
+      <AnimatePresence>
+        {isFullCalendarOpen && (
+          <PropertyMasterCalendar onClose={() => setIsFullCalendarOpen(false)} />
+        )}
+      </AnimatePresence>
     </div>
   )
 }

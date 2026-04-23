@@ -25,12 +25,13 @@ api.interceptors.request.use(
       // 1. Remove quotes if any
       let cleanToken = String(rawToken).trim().replace(/^"|"$/g, '')
 
-      // 2. Ensure it starts with Bearer (case insensitive)
-      if (!cleanToken.toLowerCase().startsWith('bearer ')) {
-        cleanToken = `Bearer ${cleanToken}`
+      // Remove any existing Bearer prefix to normalize it
+      if (cleanToken.toLowerCase().startsWith('bearer ')) {
+        cleanToken = cleanToken.substring(7).trim()
       }
 
-      config.headers.Authorization = cleanToken
+      // 2. Ensure it starts exactly with Bearer
+      config.headers.Authorization = `Bearer ${cleanToken}`
     }
 
     const activeHotelId = localStorage.getItem('activeHotelId')
@@ -43,7 +44,7 @@ api.interceptors.request.use(
     // Diagnostic logging for 403 Forbidden errors
     console.debug(`[API Request] ${config.method.toUpperCase()} ${config.url}`, {
       hasAuth: !!config.headers.Authorization,
-      hotelId: config.headers['X-Hotel-Id']
+      hotelId: config.headers['X-Hotel-Id'],
     })
 
     return config
@@ -51,7 +52,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error),
 )
 
-// Response Interceptor: Global Error Handling (Logout on 401)
+// Response Interceptor: Global Error Handling (Logout on 401, Debug on 403)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -60,6 +61,34 @@ api.interceptors.response.use(
       localStorage.clear()
       window.location.href = '/login'
     }
+
+    // 🔍 Deep 403 Debug — Temporary diagnostic (remove after fixing)
+    if (error.response && error.response.status === 403) {
+      const rawToken = localStorage.getItem('access_token')
+      let decodedRole = 'UNKNOWN'
+      try {
+        const cleanToken = String(rawToken).trim().replace(/^"|"$/g, '')
+        const payload = JSON.parse(atob(cleanToken.split('.')[1]))
+        decodedRole = payload.role || payload.roles || payload.authorities || 'NOT_FOUND_IN_TOKEN'
+        console.error('🔴 403 FORBIDDEN DEBUG:', {
+          url: error.config?.url,
+          method: error.config?.method?.toUpperCase(),
+          authHeader: error.config?.headers?.Authorization?.substring(0, 30) + '...',
+          hotelId: error.config?.headers?.['X-Hotel-Id'],
+          tokenRole: decodedRole,
+          fullTokenPayload: payload,
+          responseData: error.response.data,
+        })
+      } catch (e) {
+        console.error('🔴 403 FORBIDDEN DEBUG (token decode failed):', {
+          url: error.config?.url,
+          rawToken: rawToken?.substring(0, 30) + '...',
+          hotelId: localStorage.getItem('activeHotelId'),
+          error: e.message,
+        })
+      }
+    }
+
     return Promise.reject(error)
   },
 )

@@ -74,8 +74,11 @@ const PaymentTypeManagement = ({
                 <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">
                   Category
                 </th>
-                <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">
+                 <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">
                   Description
+                </th>
+                <th className="px-6 py-4 text-xs font-bold tracking-widest text-slate-500 uppercase">
+                  Payment Details
                 </th>
                 <th className="px-6 py-4 text-center text-xs font-bold tracking-widest text-slate-500 uppercase">
                   Credit Card Processing
@@ -118,6 +121,11 @@ const PaymentTypeManagement = ({
                     <td className="px-6 py-5">
                       <span className="line-clamp-1 text-xs font-medium text-slate-400 dark:text-slate-500">
                         {pt.description || 'No description provided'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-5">
+                      <span className="line-clamp-1 text-xs font-medium text-slate-400 dark:text-slate-500 italic">
+                        {pt.paymentDetails || 'N/A'}
                       </span>
                     </td>
                     <td className="px-6 py-5">
