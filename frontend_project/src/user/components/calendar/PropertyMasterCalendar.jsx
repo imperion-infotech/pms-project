@@ -102,7 +102,7 @@ const PropertyMasterCalendar = ({ onClose }) => {
   };
 
   const modalContent = (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-8">
+    <div className="fixed inset-0 z-9999 flex items-center justify-center p-4 sm:p-8">
       {/* Backdrop */}
       <motion.div 
         initial={{ opacity: 0 }}
