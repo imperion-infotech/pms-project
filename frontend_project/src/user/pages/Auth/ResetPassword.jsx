@@ -147,7 +147,7 @@ const ResetPassword = () => {
           <button
             type="submit"
             disabled={loading}
-            className="mt-3 flex cursor-pointer items-center justify-center gap-2 rounded-xl border-none bg-linear-to-br from-blue-500 to-blue-700 p-4 text-pms-card font-bold text-white shadow-lg shadow-blue-500/40 transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
+            className="text-pms-card mt-3 flex cursor-pointer items-center justify-center gap-2 rounded-xl border-none bg-linear-to-br from-blue-500 to-blue-700 p-4 font-bold text-white shadow-lg shadow-blue-500/40 transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
           >
             {loading ? <Loader2 size={18} className="animate-spin" /> : 'Reset Password'}
             {!loading && <ArrowRight size={18} />}

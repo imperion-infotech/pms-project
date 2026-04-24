@@ -13,7 +13,7 @@ const FloorSection = ({ floorName, rooms = [], isDark, onRoomClick, onContextMen
 
   return (
     <div
-      className={`group/floor mb-6 overflow-hidden rounded-3xl border transition-all duration-500 ${
+      className={`group/floor mb-6 overflow-hidden rounded-4xl border transition-all duration-500 ${
         isDark
           ? 'border-slate-800/60 bg-slate-900/40 shadow-2xl shadow-black/20 hover:border-slate-700/80'
           : 'border-slate-200/80 bg-white shadow-sm hover:border-emerald-500/30 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)]'
@@ -42,7 +42,7 @@ const FloorSection = ({ floorName, rooms = [], isDark, onRoomClick, onContextMen
 
           <div className="flex min-w-0 flex-col">
             <h3
-              className={`truncate text-pms-section font-black tracking-tight ${
+              className={`text-pms-section truncate font-black tracking-tight ${
                 isDark ? 'text-slate-100' : 'text-slate-900'
               }`}
             >
@@ -52,7 +52,7 @@ const FloorSection = ({ floorName, rooms = [], isDark, onRoomClick, onContextMen
 
           {/* Room Count Badge */}
           <div
-            className={`ml-4 hidden items-center gap-1.5 rounded-xl border px-3 py-1.5 text-pms-mini font-black transition-all sm:flex ${
+            className={`text-pms-mini ml-4 hidden items-center gap-1.5 rounded-xl border px-3 py-1.5 font-black transition-all sm:flex ${
               isDark
                 ? 'border-slate-700/50 bg-slate-800/50 text-slate-400 group-hover/floor:border-emerald-500/30 group-hover/floor:text-emerald-400'
                 : 'border-slate-200 bg-slate-50 text-slate-500 group-hover/floor:border-emerald-200 group-hover/floor:text-emerald-600'
@@ -92,16 +92,12 @@ const FloorSection = ({ floorName, rooms = [], isDark, onRoomClick, onContextMen
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
           >
-            <div
-              className={`relative grid grid-cols-2 gap-3 px-4 py-6 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-15 ${
-                isDark ? 'bg-slate-900/20' : 'bg-slate-50/30'
-              }`}
-            >
+            <div className={`relative p-4 sm:p-6 ${isDark ? 'bg-slate-900/20' : 'bg-slate-50/30'}`}>
               {/* Background Accent Gleam */}
               <div className="absolute top-0 left-0 h-px w-full bg-linear-to-r from-transparent via-emerald-500/10 to-transparent" />
 
               {rooms.length === 0 ? (
-                <div className="col-span-full flex flex-col items-center justify-center py-10 opacity-60">
+                <div className="flex flex-col items-center justify-center py-10 opacity-60">
                   <div
                     className={`mb-4 flex h-14 w-14 items-center justify-center rounded-full ${isDark ? 'bg-slate-800' : 'bg-slate-100'}`}
                   >
@@ -112,14 +108,83 @@ const FloorSection = ({ floorName, rooms = [], isDark, onRoomClick, onContextMen
                   </span>
                 </div>
               ) : (
-                rooms.map((room) => (
-                  <RoomCard
-                    key={room.id}
-                    room={room}
-                    onClick={() => onRoomClick(room)}
-                    onContextMenu={onContextMenu}
-                  />
-                ))
+                <div className="flex flex-col gap-12 py-4">
+                  {/* ─── LEFT SIDE (Odd Numbered Rooms) ─── */}
+                  <div className="group/wing space-y-4 px-2 sm:px-4">
+                    <div className="flex items-center justify-between border-b border-slate-200/60 pb-3 dark:border-slate-800">
+                      <div className="flex items-center gap-4">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500 ring-4 ring-emerald-500/5 transition-transform group-hover/wing:scale-110">
+                          <div className="h-2 w-2 animate-pulse rounded-full bg-current"></div>
+                        </div>
+                        <div className="flex flex-col">
+                          <h4 className="text-[9px] font-black tracking-[0.2em] text-slate-500 uppercase dark:text-slate-400">
+                            Left Side Wing
+                          </h4>
+                          <span className="text-[8px] font-bold text-slate-400 opacity-60">
+                            Odd Numbered Sequence
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <motion.div
+                      layout
+                      className="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-9 2xl:grid-cols-12"
+                    >
+                      {rooms
+                        .filter((r) => {
+                          const num = parseInt(String(r.roomName || '').replace(/[^0-9]/g, ''))
+                          return isNaN(num) || num % 2 !== 0
+                        })
+                        .map((room) => (
+                          <RoomCard
+                            key={room.id}
+                            room={{ ...room, side: 'left' }}
+                            onClick={() => onRoomClick(room)}
+                            onContextMenu={onContextMenu}
+                          />
+                        ))}
+                    </motion.div>
+                  </div>
+
+                  {/* ─── RIGHT SIDE (Even Numbered Rooms) ─── */}
+                  <div className="group/wing space-y-4 px-2 sm:px-4">
+                    <div className="flex items-center justify-between border-b border-slate-200/60 pb-3 dark:border-slate-800">
+                      <div className="flex items-center gap-4">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500 ring-4 ring-blue-500/5 transition-transform group-hover/wing:scale-110">
+                          <div className="h-2 w-2 animate-pulse rounded-full bg-current"></div>
+                        </div>
+                        <div className="flex flex-col">
+                          <h4 className="text-[9px] font-black tracking-[0.2em] text-slate-500 uppercase dark:text-slate-400">
+                            Right Side Wing
+                          </h4>
+                          <span className="text-[8px] font-bold text-slate-400 opacity-60">
+                            Even Numbered Sequence
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <motion.div
+                      layout
+                      className="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-9 2xl:grid-cols-12"
+                    >
+                      {rooms
+                        .filter((r) => {
+                          const num = parseInt(String(r.roomName || '').replace(/[^0-9]/g, ''))
+                          return !isNaN(num) && num % 2 === 0
+                        })
+                        .map((room) => (
+                          <RoomCard
+                            key={room.id}
+                            room={{ ...room, side: 'right' }}
+                            onClick={() => onRoomClick(room)}
+                            onContextMenu={onContextMenu}
+                          />
+                        ))}
+                    </motion.div>
+                  </div>
+                </div>
               )}
             </div>
           </motion.div>

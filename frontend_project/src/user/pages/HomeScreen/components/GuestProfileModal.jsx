@@ -86,9 +86,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
     fetchPersonalDetailById,
     addDocumentDetail,
     deleteDocumentDetail,
-    addStayDetail, // Added stay detail creation
-    documentDetails,
-    setDocumentDetails,
+    addStayDetail,
     buildings,
     floors,
     roomTypes,
@@ -102,6 +100,13 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
     rentDetails = [],
     stayDetails = [],
   } = usePmsData()
+
+  // Local state for Document Details (List of uploaded docs with types)
+  const [documentDetails, setDocumentDetails] = useState([])
+
+  // const activeHotelId = Number(localStorage.getItem('activeHotelId')) || 0
+  // const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
+
   const [localPreviews, setLocalPreviews] = useState({ profilePhoto: null, signature: null })
 
   // Initial state for the unified guest form
@@ -230,24 +235,18 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
         ccAuthorized: room.rentDetails?.ccAuthorized || '',
         deposite: room.rentDetails?.deposite || '',
         balance: room.rentDetails?.balance || '',
+        folioNo: '', // Clear old folio by default
       }
-      console.log('-------------------Initial Form-------------------', initialForm)
-      console.log(
-        '-------------------Initial Form buildingId-------------------',
-        initialForm.buildingId,
-      )
-      console.log('-------------------Initial Form floorId-------------------', initialForm.floorId)
-      console.log(
-        '-------------------Initial Form roomTypeId-------------------',
-        initialForm.roomTypeId,
-      )
+
       // 2. Fetch Fresh Data if ID exists
       if (targetId) {
         try {
-          const [profileRes] = await Promise.all([
+          const [profileRes, docs] = await Promise.all([
             fetchPersonalDetailById(targetId),
             fetchDocumentDetailsByPersonalDetailId(targetId),
           ])
+
+          setDocumentDetails(docs || [])
 
           if (profileRes?.data) {
             const p = profileRes.data
@@ -328,17 +327,24 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
           console.error('Core Data Load Error:', err)
         }
       } else {
-        // Only fetch folio if we don't have one and we're in creation mode
+        // Only fetch folio if we're in creation mode
         setDocumentDetails([])
-        if (!formData.folioNo) {
-          try {
-            const newFolio = await fetchFolioNo()
-            setFormData((prev) => ({ ...prev, ...initialForm, folioNo: newFolio || '' }))
-            return
-          } catch (err) {
-            console.warn('Folio fetch failed', err)
-          }
+        try {
+          console.log('[Folio] Fetching for new profile...')
+          const res = await fetchFolioNo()
+          // Robust extraction: Handle both raw string and object response
+          const folioValue = typeof res === 'object' && res?.folioNo ? res.folioNo : res
+          setFormData((prev) => ({
+            ...prev,
+            ...initialForm,
+            folioNo: String(folioValue || ''),
+          }))
+        } catch (err) {
+          console.warn('Folio fetch failed', err)
+          const fallbackFolio = '4382' + Date.now() + Math.floor(Math.random() * 1000)
+          setFormData((prev) => ({ ...prev, ...initialForm, folioNo: fallbackFolio }))
         }
+        return
       }
 
       setFormData((prev) => ({ ...prev, ...initialForm }))
@@ -733,15 +739,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                 <div
                   className={`flex items-center gap-6 rounded-lg px-4 py-2 ${isDark ? 'bg-slate-800/50' : 'bg-slate-50'}`}
                 >
-                  <div
-                    className="flex cursor-pointer flex-col items-end transition-opacity hover:opacity-80 active:scale-95"
-                    onClick={() => {
-                      const randomFolio =
-                        Math.floor(Math.random() * 900000000000000) + 100000000000000
-                      setFormData((prev) => ({ ...prev, folioNo: String(randomFolio) }))
-                    }}
-                    title="Click to generate random folio"
-                  >
+                  <div className="flex flex-col items-end">
                     <span className="text-pms-micro font-bold tracking-widest text-slate-400 uppercase">
                       Folio No.
                     </span>
@@ -749,7 +747,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                       type="text"
                       value={formData.folioNo || ''}
                       readOnly
-                      className="cursor-pointer bg-transparent text-right text-xs font-black text-blue-600 outline-none dark:text-blue-400"
+                      className="bg-transparent text-right text-xs font-black text-blue-600 outline-none dark:text-blue-400"
                       placeholder="—"
                     />
                   </div>
@@ -805,7 +803,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                             ) : (
                               <div className="flex h-full w-full flex-col items-center justify-center text-slate-300 dark:text-slate-600">
                                 <User size={32} />
-                                <span className="mt-1 text-pms-micro font-bold tracking-wider uppercase">
+                                <span className="text-pms-micro mt-1 font-bold tracking-wider uppercase">
                                   Photo
                                 </span>
                               </div>
@@ -1060,7 +1058,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                               <tr>
                                 <td
                                   colSpan="2"
-                                  className="px-3 py-4 text-center text-pms-micro font-bold text-slate-400"
+                                  className="text-pms-micro px-3 py-4 text-center font-bold text-slate-400"
                                 >
                                   No Documents
                                 </td>
@@ -1183,7 +1181,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                 type="button"
                 onClick={(e) => handleSubmit(e, 'Reservation')}
                 disabled={isSubmitting || uploadingType || isReserved}
-                className={`flex items-center gap-2 rounded-lg px-5 py-2.5 text-pms-tiny font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${
+                className={`text-pms-tiny flex items-center gap-2 rounded-lg px-5 py-2.5 font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${
                   isSubmitting || uploadingType || isReserved
                     ? 'cursor-not-allowed bg-slate-400 shadow-none'
                     : 'hover:opacity-90'
@@ -1205,7 +1203,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                 type="button"
                 onClick={(e) => handleSubmit(e, 'Occupied')}
                 disabled={isSubmitting || uploadingType}
-                className={`flex items-center gap-2 rounded-lg px-5 py-2.5 text-pms-tiny font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${
+                className={`text-pms-tiny flex items-center gap-2 rounded-lg px-5 py-2.5 font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${
                   isSubmitting || uploadingType
                     ? 'cursor-not-allowed bg-slate-400 shadow-none'
                     : 'hover:opacity-90'
@@ -1226,7 +1224,7 @@ const GuestProfileModal = ({ isOpen, onClose, room, isDark, onRefresh }) => {
                 type="submit"
                 form="guestProfileForm"
                 disabled={isSubmitting || uploadingType}
-                className={`flex items-center gap-2 rounded-lg px-5 py-2.5 text-pms-tiny font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-indigo-600 shadow-indigo-500/30 hover:bg-indigo-700 hover:shadow-indigo-500/40'}`}
+                className={`text-pms-tiny flex items-center gap-2 rounded-lg px-5 py-2.5 font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'bg-indigo-600 shadow-indigo-500/30 hover:bg-indigo-700 hover:shadow-indigo-500/40'}`}
               >
                 <RefreshCw size={14} className={isSubmitting ? 'animate-spin' : ''} />
                 <span>Update Profile</span>

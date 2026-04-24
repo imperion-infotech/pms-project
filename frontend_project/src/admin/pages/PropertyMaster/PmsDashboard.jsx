@@ -5,6 +5,7 @@ import { propertyService } from '../../../services/propertyService'
 import PageHeader from '../../components/layout/PageHeader'
 import Pagination from '../../components/common/Pagination'
 import LoadingProcess from '../../../components/common/LoadingProcess'
+import Tesseract from 'tesseract.js'
 
 // Contexts & Hooks
 import usePmsData from '../../../hooks/usePmsData'
@@ -286,6 +287,100 @@ const PmsDashboard = () => {
     uploadFormData.append('file', file)
 
     try {
+      // 1. OCR Logic: Extract text from image if it's a document (front/back)
+      if (type === 'front' || type === 'back') {
+        try {
+          const result = await Tesseract.recognize(file, 'eng', {
+            logger: (m) => console.log('[OCR Progress]:', m.progress),
+          })
+          const extractedText = result.data.text
+          console.log('[OCR Extracted Text]:', extractedText)
+
+          // Helper to extract ID pattern (Passport, Card, etc.)
+          const extractIdFromText = (text) => {
+            if (!text) return null
+            // 1. Priority: MRZ Line (Most accurate for Passports)
+            // Look for passport number at the start of the 2nd MRZ line
+            const mrzMatch = text.match(/\b([A-Z][0-9]{7})<[0-9]/i)
+            if (mrzMatch) return mrzMatch[1].toUpperCase()
+
+            // 2. Specific Pattern: Indian Passport (1 Letter + 7 Digits)
+            const passportMatch = text.match(/\b[A-Z][0-9]{7}\b/i)
+            if (passportMatch) return passportMatch[0].toUpperCase()
+
+            // 3. Common Pattern: Credit/Debit Card (13-19 digits)
+            const cardMatch = text.match(/\b(?:\d[ -]*?){13,19}\b/)
+            if (cardMatch) return cardMatch[0].replace(/[ -]/g, '')
+
+            // 4. Generic ID fallback (exclude common words)
+            const genericMatch = text.match(/\b[A-Z0-9]{7,12}\b/i)
+            if (genericMatch) {
+              const word = genericMatch[0].toUpperCase()
+              const blacklist = ['GUARDIAN', 'PASSPORT', 'REPUBLIC', 'INDIAN']
+              if (!blacklist.includes(word)) return word
+            }
+            return null
+          }
+
+          // Helper to extract Expiry Date pattern
+          const extractExpiryDate = (text) => {
+            if (!text) return null
+            // Collect all potential dates to find the one furthest in the future (Expiry)
+            const dateRegex = /\b(\d{2,4})[./-](\d{2})[./-](\d{2,4})\b/g
+            const matches = [...text.matchAll(dateRegex)]
+
+            if (matches.length > 0) {
+              const parsedDates = matches
+                .map((m) => {
+                  const p1 = m[1],
+                    p2 = m[2],
+                    p3 = m[3]
+                  let dateStr = ''
+                  if (p1.length === 4) dateStr = `${p1}-${p2}-${p3}`
+                  else if (p3.length === 4) dateStr = `${p3}-${p2}-${p1}`
+                  else dateStr = `20${p3}-${p2}-${p1}` // Assume 21st century
+
+                  const d = new Date(dateStr)
+                  return !isNaN(d.getTime()) ? d : null
+                })
+                .filter((d) => d !== null)
+
+              if (parsedDates.length > 0) {
+                // Return the date furthest in the future (likely Expiry, not DOB or Issue)
+                const latestDate = new Date(Math.max(...parsedDates))
+                return latestDate.toISOString().split('T')[0]
+              }
+            }
+
+            // Fallback for Card Expiry (MM/YY)
+            const cardExpiryMatch = text.match(/\b(0[1-9]|1[0-2])[/-]([2-9][0-9])\b/)
+            if (cardExpiryMatch) {
+              return `20${cardExpiryMatch[2]}-${cardExpiryMatch[1]}-01`
+            }
+            return null
+          }
+
+          const extractedId = extractIdFromText(extractedText)
+          const extractedExpiry = extractExpiryDate(extractedText)
+
+          if (extractedId || extractedExpiry) {
+            console.log('[OCR Result]:', { id: extractedId, expiry: extractedExpiry })
+            const updateFields = {}
+            if (extractedId) updateFields.documentNumber = extractedId
+            if (extractedExpiry) updateFields.validTill = extractedExpiry
+
+            if (modals.personalDetail) {
+              setPersonalFormData((prev) => ({ ...prev, ...updateFields }))
+            } else if (modals.personalDetailEdit) {
+              setEditPersonalFormData((prev) => ({ ...prev, ...updateFields }))
+            }
+          }
+        } catch (ocrErr) {
+          console.error('[OCR Error]:', ocrErr)
+        }
+      }
+
+      // 2. Original Upload Logic
       const response = await propertyService.uploadImage(uploadFormData)
       const responseData = response.data.fileName || response.data
 

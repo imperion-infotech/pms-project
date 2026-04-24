@@ -191,15 +191,7 @@ const HomeScreen = () => {
       stats: { occupied, available },
       counts: { typeCounts, statusCounts },
     }
-  }, [
-    rawRooms,
-    allFloors,
-    roomTypes,
-    roomStatuses,
-    personalDetails,
-    selectedType,
-    selectedStatus,
-  ])
+  }, [rawRooms, allFloors, roomTypes, roomStatuses, personalDetails, selectedType, selectedStatus])
 
   const { roomsByFloor, stats, counts } = mappedData
 

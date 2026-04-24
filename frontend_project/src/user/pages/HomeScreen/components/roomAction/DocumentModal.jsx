@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { X, FileText, Camera, Paperclip, Loader2 } from 'lucide-react'
+import Tesseract from 'tesseract.js'
 import { motion, AnimatePresence } from 'framer-motion'
 import { propertyService } from '../../../../../services/propertyService'
 import { usePmsDocumentDetails } from '../../../../../hooks/usePmsDocumentDetails'
@@ -99,6 +100,71 @@ const DocumentModal = ({
     uploadFormData.append('file', file)
 
     try {
+      // 1. OCR Logic: Extract ID and Expiry from document images
+      try {
+        const result = await Tesseract.recognize(file, 'eng', {
+          logger: (m) => console.log('[OCR User Progress]:', m.progress),
+        })
+        const text = result.data.text
+
+        // Helper: Extract ID
+        const extractId = (txt) => {
+          if (!txt) return null
+          const mrz = txt.match(/\b([A-Z][0-9]{7})<[0-9]/i)
+          if (mrz) return mrz[1].toUpperCase()
+          const pass = txt.match(/\b[A-Z][0-9]{7}\b/i)
+          if (pass) return pass[0].toUpperCase()
+          const card = txt.match(/\b(?:\d[ -]*?){13,19}\b/)
+          if (card) return card[0].replace(/[ -]/g, '')
+          const gen = txt.match(/\b[A-Z0-9]{7,12}\b/i)
+          if (gen) {
+            const word = gen[0].toUpperCase()
+            if (!['GUARDIAN', 'PASSPORT', 'REPUBLIC', 'INDIAN'].includes(word)) return word
+          }
+          return null
+        }
+
+        // Helper: Extract Expiry
+        const extractExp = (txt) => {
+          if (!txt) return null
+          const dateRegex = /\b(\d{2,4})[./-](\d{2})[./-](\d{2,4})\b/g
+          const matches = [...txt.matchAll(dateRegex)]
+          if (matches.length > 0) {
+            const parsed = matches
+              .map((m) => {
+                const [p1, p2, p3] = [m[1], m[2], m[3]]
+                let dStr =
+                  p1.length === 4
+                    ? `${p1}-${p2}-${p3}`
+                    : p3.length === 4
+                      ? `${p3}-${p2}-${p1}`
+                      : `20${p3}-${p2}-${p1}`
+                const d = new Date(dStr)
+                return !isNaN(d.getTime()) ? d : null
+              })
+              .filter(Boolean)
+            if (parsed.length > 0) return new Date(Math.max(...parsed)).toISOString().split('T')[0]
+          }
+          const cardExp = txt.match(/\b(0[1-9]|1[0-2])[/-]([2-9][0-9])\b/)
+          return cardExp ? `20${cardExp[2]}-${cardExp[1]}-01` : null
+        }
+
+        const id = extractId(text)
+        const exp = extractExp(text)
+
+        if (id || exp) {
+          console.log('[OCR User Result]:', { id, exp })
+          setDocFormData((prev) => ({
+            ...prev,
+            ...(id ? { documentNumber: id } : {}),
+            ...(exp ? { validTill: exp } : {}),
+          }))
+        }
+      } catch (ocrErr) {
+        console.error('[OCR User Error]:', ocrErr)
+      }
+
+      // 2. Original Upload Logic
       const response = await propertyService.uploadImage(uploadFormData)
       const responseData = response.data?.fileName || response.data
 
@@ -355,7 +421,7 @@ const DocumentModal = ({
             <button
               onClick={handleSave}
               disabled={isSubmitting || !!uploadingType}
-              className={`flex items-center gap-2 rounded-2xl bg-emerald-600 px-8 py-3 text-pms-tiny font-black tracking-widest text-white uppercase shadow-lg shadow-emerald-500/20 transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'hover:bg-emerald-700'}`}
+              className={`text-pms-tiny flex items-center gap-2 rounded-2xl bg-emerald-600 px-8 py-3 font-black tracking-widest text-white uppercase shadow-lg shadow-emerald-500/20 transition-all active:scale-95 ${isSubmitting || uploadingType ? 'cursor-not-allowed bg-slate-400 shadow-none' : 'hover:bg-emerald-700'}`}
             >
               {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : null}
               {uploadingType ? 'Uploading Assets...' : docFormData.id ? 'Update' : 'Save Document'}
