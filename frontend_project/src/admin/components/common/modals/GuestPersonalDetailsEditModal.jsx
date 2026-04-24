@@ -390,7 +390,7 @@ export const GuestPersonalDetailsEditModal = ({
 
                         <div>
                           <label className={labelClass}>
-                            Phone <span className="text-red-500">*</span>
+                            {formData.contactInformationTypeEnum || 'HOME'} Phone <span className="text-red-500">*</span>
                           </label>
                           <div className={inputContainerClass}>
                             <Phone size={14} className={iconClass} />
@@ -405,13 +405,13 @@ export const GuestPersonalDetailsEditModal = ({
                                 })
                               }
                               className={inputClass}
-                              placeholder="Phone"
+                              placeholder={`${formData.contactInformationTypeEnum || 'HOME'} Phone`}
                             />
                           </div>
                         </div>
                         <div>
                           <label className={labelClass}>
-                            Email <span className="text-red-500">*</span>
+                            {formData.contactInformationTypeEnum || 'HOME'} Email <span className="text-red-500">*</span>
                           </label>
                           <div className={inputContainerClass}>
                             <Mail size={14} className={iconClass} />
@@ -421,13 +421,13 @@ export const GuestPersonalDetailsEditModal = ({
                               value={formData.email}
                               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                               className={inputClass}
-                              placeholder="Email"
+                              placeholder={`${formData.contactInformationTypeEnum || 'HOME'} Email`}
                             />
                           </div>
                         </div>
                         <div className="col-span-2">
                           <label className={labelClass}>
-                            Full Address <span className="text-red-500">*</span>
+                            {formData.contactInformationTypeEnum || 'HOME'} Address <span className="text-red-500">*</span>
                           </label>
                           <textarea
                             required
@@ -435,7 +435,7 @@ export const GuestPersonalDetailsEditModal = ({
                             value={formData.address}
                             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                             className="w-full resize-none rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 transition-all outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white dark:focus:ring-blue-900/20 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-                            placeholder="Address"
+                            placeholder={`${formData.contactInformationTypeEnum || 'HOME'} Address`}
                           ></textarea>
                         </div>
                       </div>
@@ -482,7 +482,10 @@ export const GuestPersonalDetailsEditModal = ({
                               setFormData({ ...formData, documentNumber: e.target.value })
                             }
                             className={inputClass.replace('pl-10', 'px-3')}
-                            placeholder="ID No."
+                            placeholder={
+                              documentTypes?.find((t) => String(t.id) === String(formData.documentTypeId))
+                                ?.documentTypeName + ' No.' || 'ID No.'
+                            }
                           />
                         </div>
                         <div>
