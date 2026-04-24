@@ -48,6 +48,7 @@ const HomeScreen = () => {
     buildings,
     roomTypes,
     roomStatuses,
+    guestDetails = [],
     isLoading,
     error,
     fetchData: refreshData,
@@ -120,6 +121,17 @@ const HomeScreen = () => {
       const profile = personalDetails.find((p) => {
         const matchById = r.personalDetailId && String(p.id) === String(r.personalDetailId)
         const matchByRoomId = p.roomId && String(p.roomId) === String(r.id)
+        
+        // Match through GuestDetails if available
+        const activeGuestDetail = guestDetails?.find(
+          (g) =>
+            String(g.roomMasterId) === String(r.id) &&
+            String(g.personalDetailsId) === String(p.id) &&
+            (g.guestDetailsStatus?.toLowerCase().includes('reserv') || 
+             g.guestDetailsStatus?.toLowerCase().includes('occup') || 
+             g.guestDetailsStatus?.toLowerCase().includes('check'))
+        )
+        const matchByGuestDetail = !!activeGuestDetail
 
         // Name matching as fallback
         const pRoomName = String(p.roomName || p.roomname || '')
@@ -132,7 +144,7 @@ const HomeScreen = () => {
           .replace(/[^0-9]/g, '')
         const matchByName = pRoomName !== '' && pRoomName === rRoomName
 
-        return matchById || matchByRoomId || matchByName
+        return matchById || matchByRoomId || matchByGuestDetail || matchByName
       })
 
       const displayProfile = profile || null
@@ -191,7 +203,7 @@ const HomeScreen = () => {
       stats: { occupied, available },
       counts: { typeCounts, statusCounts },
     }
-  }, [rawRooms, allFloors, roomTypes, roomStatuses, personalDetails, selectedType, selectedStatus])
+  }, [rawRooms, allFloors, roomTypes, roomStatuses, personalDetails, guestDetails, selectedType, selectedStatus])
 
   const { roomsByFloor, stats, counts } = mappedData
 
