@@ -147,7 +147,10 @@ public class PaymentDetailsServiceImpl implements IPaymentDetailsService{
 	                    dto.setAmount(p.getAmount());
 	                    dto.setTotalAmount(p.getTotalAmount());
 //	                    dto.setPaymentMode(p.getPaymentTypes().get(0).getPaymentTypeName());
-	                    dto.setPaymentMode(p.getPaymentType().getPaymentTypeName());
+	                    if(p.getPaymentType()!= null)
+	                    {
+	                    	dto.setPaymentMode(p.getPaymentType().getPaymentTypeName());
+	                    }
 	                    dto.setReceiptNumber(p.getReceiptNo());
 	                    dto.setRemark(p.getRemark());
 	                    dto.setPaymentDate(p.getPaymentDate());

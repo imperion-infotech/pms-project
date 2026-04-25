@@ -85,7 +85,28 @@ static final Logger logger = LoggerFactory.getLogger(DocumentDetails.class);
     @ManyToOne
     @JoinColumn(name = "document_type_id")
     private DocumentType documentType;
+    
+    @Column(name = "request_trace_id")
+    private String requestTraceId;
+
+    @Column(name = "business_trace_id")
+    private String businessTraceId;
 	
+	public String getRequestTraceId() {
+		return requestTraceId;
+	}
+
+	public void setRequestTraceId(String requestTraceId) {
+		this.requestTraceId = requestTraceId;
+	}
+
+	public String getBusinessTraceId() {
+		return businessTraceId;
+	}
+
+	public void setBusinessTraceId(String businessTraceId) {
+		this.businessTraceId = businessTraceId;
+	}
 
 	public Long getId() {
 		return id;

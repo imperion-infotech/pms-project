@@ -36,6 +36,31 @@ public class AuditLog {
 	    
 	    private boolean success;
 	    private String errorMessage;
+	    private Long hotelId;
+	    @Column(name = "request_trace_id")
+	    private String requestTraceId;
+
+	    @Column(name = "business_trace_id")
+	    private String businessTraceId;
+	    
+		public String getRequestTraceId() {
+			return requestTraceId;
+		}
+		public void setRequestTraceId(String requestTraceId) {
+			this.requestTraceId = requestTraceId;
+		}
+		public String getBusinessTraceId() {
+			return businessTraceId;
+		}
+		public void setBusinessTraceId(String businessTraceId) {
+			this.businessTraceId = businessTraceId;
+		}
+		public Long getHotelId() {
+			return hotelId;
+		}
+		public void setHotelId(Long hotelId) {
+			this.hotelId = hotelId;
+		}
 		public Long getId() {
 			return id;
 		}

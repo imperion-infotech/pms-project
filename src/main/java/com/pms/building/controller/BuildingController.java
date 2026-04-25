@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +39,8 @@ public class BuildingController {
 	private IBuildingService service;
 
 //	@GetMapping("/admin/getfloors")
+	@PreAuthorize("hasAuthority('BUILDING_VIEW')")
+//	@PreAuthorize("hasAnyRole('SUPER_ADMIN','HOTEL_ADMIN','HOTEL_USER')")
 	@GetMapping("/user/getbuildings")
 	public ResponseEntity<List<Building>> getBuildings() {
 
@@ -47,14 +50,16 @@ public class BuildingController {
 	}
 
 //	@GetMapping("/admin/getfloor/{id}")
+	@PreAuthorize("hasAuthority('BUILDING_VIEW')")
 	@GetMapping("/user/getbuilding/{id}")
 	public ResponseEntity<Building> getBuilding(@PathVariable("id") Long id) {
 		Building building = service.getBuilding(id);
 		return new ResponseEntity<Building>(building, HttpStatus.OK);
 	}
 
-	@PostMapping("/admin/createbuilding")
-//	@PostMapping("/auth/createfloor")
+	@PreAuthorize("hasAuthority('BUILDING_CREATE')")
+	@PostMapping("/createbuilding")
+//	@PostMapping("/admin/createbuilding")
 	public ResponseEntity<?> createBuilding(@RequestBody Building building) {
 		// Validate input
 		if (building == null || building.getName() == null || building.getName().trim().isEmpty()) {
@@ -76,7 +81,8 @@ public class BuildingController {
 		}
 	}
 
-	@PutMapping("/admin/updatebuilding/{id}")
+	@PreAuthorize("hasAuthority('BUILDING_UPDATE')")
+	@PutMapping("/updatebuilding/{id}")
 //	@PutMapping("/auth/updatefloor/{id}")
 	public ResponseEntity<?> updateBuilding(@PathVariable Long id, @RequestBody Building buildingDetails,HttpSession session) {
 		// Validate input
@@ -114,7 +120,8 @@ public class BuildingController {
 		}
 	}
 
-	@DeleteMapping("/admin/deletebuilding/{id}")
+	@PreAuthorize("hasAuthority('BUILDING_DELETE')")
+	@DeleteMapping("/deletebuilding/{id}")
 //	@DeleteMapping("/user/deletefloor/{id}")
 	public ResponseEntity<String> deleteBuilding(@PathVariable("id") Long id) {
 		boolean isDeleted = service.deleteBuilding(id);
@@ -126,8 +133,8 @@ public class BuildingController {
 		return new ResponseEntity<String>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	
-	@GetMapping("/user/building/search")
+	@PreAuthorize("hasAuthority('BUILDING_SEARCH')")
+	@GetMapping("/buildingsearch")
     public List<Building> searchBuilding(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String description) {

@@ -19,6 +19,7 @@ com\pms\othercharge\repository\OtherChargeDetailsRepository.class
 com\pms\enumerated\controller\EnumController.class
 com\pms\document\dao\IDocumentTypeDAO.class
 com\pms\othercharge\entity\OtherCharge.class
+com\pms\common\service\SoftDeleteService.class
 com\pms\guestdetails\service\IGuestDetailsService.class
 com\pms\paymenttype\repository\PaymentTypeRepository.class
 com\pms\security\service\IUserService.class
@@ -73,6 +74,7 @@ com\pms\stay\dao\StayDetailsRepository.class
 com\pms\document\entity\DocumentType.class
 com\pms\floor\services\IBookStoreService.class
 com\pms\room\dao\impl\RoomMasterDAOImpl.class
+com\pms\security\configuration\JpaAuditConfig.class
 com\pms\search\specification\PersonalDetailsSpecification.class
 com\pms\document\service\impl\DocumentDetailsServiceImpl.class
 com\pms\document\service\impl\DocumentTypeServiceImpl.class
@@ -84,6 +86,7 @@ com\pms\booking\BookingRequest.class
 com\pms\personaldetails\controller\PersonalDetailsController.class
 com\pms\taxmaster\entity\TaxMaster.class
 com\pms\document\dao\DocumentDetailsRepository.class
+com\pms\common\repository\SoftDeleteRepository.class
 com\pms\security\service\CustomUserDetailsService.class
 com\pms\stay\entity\StayDetails.class
 com\pms\util\SnowflakeUtil.class
@@ -134,6 +137,7 @@ com\pms\document\service\IDocumentDetailsService.class
 com\pms\auditlog\annotation\Auditable.class
 com\pms\guestdetails\controller\GuestDetailsController.class
 com\pms\personaldetails\PersonalDetailsRepository.class
+com\pms\security\configuration\AuditAwareImpl.class
 com\pms\taxmaster\dao\TaxMastersRepository.class
 com\pms\search\specification\TaxMasterSpecification.class
 com\pms\document\dao\impl\DocumentDetailsDAOImpl.class

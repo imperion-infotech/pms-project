@@ -14,11 +14,13 @@ import org.springframework.stereotype.Component;
 
 //import com.pms.auditlog.annotation.Auditable;
 import com.pms.auditlog.annotation.Auditable;
+import com.pms.auditlog.context.BusinessTraceContext;
+import com.pms.auditlog.context.RequestTraceContext;
 import com.pms.auditlog.entity.AuditLog;
 import com.pms.auditlog.service.AuditService;
 import com.pms.auditlog.util.AuditUtil;
+import com.pms.security.configuration.HotelContext;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Aspect
@@ -72,6 +74,11 @@ public class AuditAspect {
         
         String oldValue = (String) AuditUtil.getSessionAttribute("oldValue");
         AuditUtil.removeSessionAttribute("oldValue");
+        
+        Long hotelId = HotelContext.getHotelId();
+		if (hotelId == null) {
+			throw new RuntimeException("Hotel not selected");
+		}
      
         
         AuditLog logEntity = new AuditLog();
@@ -80,12 +87,13 @@ public class AuditAspect {
         logEntity.setMethodName(method);
         logEntity.setNewValue(newValue);
         logEntity.setUsername(AuditUtil.getUsername());
-        logEntity.setTraceId(traceId);
+        logEntity.setRequestTraceId(RequestTraceContext.get());
+        logEntity.setBusinessTraceId(BusinessTraceContext.get());
         logEntity.setTimestamp(LocalDateTime.now());
         logEntity.setSuccess(success);
         logEntity.setErrorMessage(errorMessage);
         logEntity.setOldValue(oldValue);
-        
+        logEntity.setHotelId(hotelId);
         
 
         // 🔥 Fix for your Room ID capture

@@ -39,11 +39,13 @@ public class User {
     @Column(nullable = false, unique = false)
     private String password;
     private boolean enabled;
-   
     
-    @Column(nullable = false, unique = true)
     private String email;
     
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
+
     @ManyToOne
     @JoinColumn(name = "hotel_id")
     private Hotel hotel;
@@ -110,6 +112,14 @@ public class User {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public Role getRole() {
+		return role;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
 	}
 	
 	

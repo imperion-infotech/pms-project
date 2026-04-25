@@ -13,9 +13,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.pms.common.service.SoftDeleteService;
+import com.pms.room.entity.RoomMaster;
 import com.pms.search.specification.TaxMasterSpecification;
 import com.pms.security.configuration.HotelContext;
 import com.pms.security.configuration.UserContext;
+import com.pms.security.service.BaseHotelService;
 import com.pms.taxmaster.dao.ITaxMasterDAO;
 import com.pms.taxmaster.dao.TaxMastersRepository;
 import com.pms.taxmaster.entity.TaxMaster;
@@ -25,7 +27,7 @@ import com.pms.taxmaster.service.ITaxMasterService;
  * 
  */
 @Service
-public class TaxMasterServiceImpl implements ITaxMasterService {
+public class TaxMasterServiceImpl extends BaseHotelService implements ITaxMasterService {
 	
 	static final Logger logger = LoggerFactory.getLogger(TaxMasterServiceImpl.class);
 	
@@ -52,7 +54,13 @@ public class TaxMasterServiceImpl implements ITaxMasterService {
 	    if (hotelId == null) {
 	        throw new RuntimeException("Hotel not selected");
 	    }
-		return taxMastersRepository.findByHotelId(HotelContext.getHotelId());
+	    validateHotelAccess(hotelId);
+		
+		if (isSuperAdmin()) 
+	    	return taxMastersRepository.findAll();
+	    else 
+	    	return taxMastersRepository.findByHotelId(HotelContext.getHotelId());
+		
 	}
 
 	public TaxMaster createTaxMaster(TaxMaster taxMaster) {
@@ -61,11 +69,13 @@ public class TaxMasterServiceImpl implements ITaxMasterService {
 	    if (userId == null) {
 	        throw new RuntimeException("User not selected");
 	    }
+	    assignHotel(taxMaster, taxMaster.getHotelId());
 	    taxMaster.setCreatedBy(userId);
 		 return taxMastersRepository.saveAndFlush(taxMaster);
 	}
 
 	public TaxMaster updateTaxMaster(Long taxMasterId, TaxMaster taxMaster) {
+		validateHotelAccess(taxMaster.getHotelId());
 		Long userId = UserContext.getUserId();
 	    if (userId == null) {
 	        throw new RuntimeException("User not selected");
@@ -76,11 +86,19 @@ public class TaxMasterServiceImpl implements ITaxMasterService {
 	}
 
 	public TaxMaster getTaxMaster(int taxMasterId) {
+		Long hotelId = HotelContext.getHotelId();
+
+	    if (hotelId == null) {
+	        throw new RuntimeException("Hotel not selected");
+	    }
+		validateHotelAccess(hotelId);
 		return taxMastersRepository.findByIdAndHotelId(taxMasterId,HotelContext.getHotelId());
 	}
 
 	public boolean deleteTaxMaster(int taxMasterId) {
 		try {
+			TaxMaster b = getTaxMaster(taxMasterId);
+			validateHotelAccess(b.getHotelId());
 		softDeleteService.softDelete(taxMasterId, taxMastersRepository);
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -92,6 +110,11 @@ public class TaxMasterServiceImpl implements ITaxMasterService {
 	 @Override
 	 public List<TaxMaster> search(String taxMasterName, String taxTypeEnum) {
 		 Long hotelId = HotelContext.getHotelId(); 
+
+	     if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
+	     validateHotelAccess(hotelId);
 	        Specification<TaxMaster> spec = Specification
 	        		.where(TaxMasterSpecification.hasHotelId(hotelId)) 
 	                .and(TaxMasterSpecification.hasTaxMasterName(taxMasterName))

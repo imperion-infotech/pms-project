@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,23 +38,23 @@ public class GuestDetailsController {
 	@Autowired
 	private IGuestDetailsService service;
 	
+	@PreAuthorize("hasAuthority('GUESTDETAILS_VIEW')")
 	@GetMapping("/user/getguestdetails")
-//	@GetMapping("/auth/getroomstatuses")
 	public ResponseEntity<List<GuestDetails>> getGuestDetails() {
 
 		List<GuestDetails> guestDetails = service.getGuestDetails();
 		return new ResponseEntity<List<GuestDetails>>(guestDetails, HttpStatus.OK);
 	}
 	
+	@PreAuthorize("hasAuthority('GUESTDETAILS_VIEW')")
 	@GetMapping("/user/getguestdetail/{id}")
-//	@GetMapping("/auth/getroomstatus/{id}")
 	public ResponseEntity<GuestDetails> getGuestDetail(@PathVariable("id") Long id) {
 		GuestDetails guestDetails = service.getGuestDetail(id);
 		return new ResponseEntity<GuestDetails>(guestDetails, HttpStatus.OK);
 	}
 	
+	@PreAuthorize("hasAuthority('GUESTDETAILS_CREATE')")
 	@PostMapping("/admin/createguestdetail")
-//	@PostMapping("/auth/createroomstatus")
 	public ResponseEntity<?> createGuestDetails(@RequestBody GuestDetails guestDetails) {
 		// Validate input
 		
@@ -111,9 +112,8 @@ public class GuestDetailsController {
 		}
 	}
 	
-	
+	@PreAuthorize("hasAuthority('GUESTDETAILS_UPDATE')")
 	@PutMapping("/admin/updateguestdetail/{id}")
-//	@PutMapping("/auth/updateroomstatus/{id}")
 	public ResponseEntity<?> updateGuestDetails(@PathVariable Long id, @RequestBody GuestDetails guestDetails,HttpSession session) {
 		// Validate input
 		
@@ -158,8 +158,8 @@ public class GuestDetailsController {
 		}
 	}
 	
+	@PreAuthorize("hasAuthority('GUESTDETAILS_DELETE')")
 	@DeleteMapping("/admin/deleteguestdetail/{id}")
-//	@DeleteMapping("/auth/deleteroomstatus/{id}")
 	public ResponseEntity<String> deleteGuestDetail(@PathVariable("id") int id) {
 		boolean isDeleted = service.deleteSoftStayDetails(id);
 		if (isDeleted) {

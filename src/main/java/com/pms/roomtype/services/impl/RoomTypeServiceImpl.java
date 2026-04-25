@@ -20,12 +20,14 @@ import com.pms.roomtype.services.IRoomTypeService;
 import com.pms.search.specification.RoomTypeSpecification;
 import com.pms.security.configuration.HotelContext;
 import com.pms.security.configuration.UserContext;
+import com.pms.security.service.AuthService;
+import com.pms.security.service.BaseHotelService;
 
 /**
  * 
  */
 @Service
-public class RoomTypeServiceImpl implements IRoomTypeService  {
+public class RoomTypeServiceImpl extends BaseHotelService implements IRoomTypeService  {
 	
 static final Logger logger = LoggerFactory.getLogger(RoomTypeServiceImpl.class);
 	
@@ -37,6 +39,10 @@ static final Logger logger = LoggerFactory.getLogger(RoomTypeServiceImpl.class);
 	
 	@Autowired
 	private SoftDeleteService softDeleteService;
+	
+	@Autowired
+	private AuthService authService;
+
 
 	public List<RoomType> getRoomTypes() {
 		Long hotelId = HotelContext.getHotelId();

@@ -11,10 +11,14 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.pms.hotel.entity.Hotel;
 import com.pms.security.configuration.HotelContext;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 
@@ -55,6 +59,7 @@ public abstract class BaseEntity {
 
 	    @Column(name = "deleted_on")
 	    private LocalDateTime deletedOn;
+	    
 
 	    @PrePersist
 	    public void prePersist() {
@@ -135,5 +140,5 @@ public abstract class BaseEntity {
 		public void setDeletedOn(LocalDateTime deletedOn) {
 			this.deletedOn = deletedOn;
 		}
-	    
+
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.pms.baseentity.BaseEntity;
 import com.pms.common.repository.SoftDeleteRepository;
+import com.pms.hotel.repository.HotelRepository;
 import com.pms.security.configuration.HotelContext;
 import com.pms.security.configuration.UserContext;
 
@@ -42,4 +43,6 @@ public class SoftDeleteService {
 
         repository.save(entity);
     }
+
+	
 }

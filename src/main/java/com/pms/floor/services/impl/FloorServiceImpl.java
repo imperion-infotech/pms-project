@@ -18,9 +18,11 @@ import com.pms.floor.services.IFloorService;
 import com.pms.search.specification.FloorSpecification;
 import com.pms.security.configuration.HotelContext;
 import com.pms.security.configuration.UserContext;
+import com.pms.security.service.AuthService;
+import com.pms.security.service.BaseHotelService;
 
 @Service
-public class FloorServiceImpl implements IFloorService {
+public class FloorServiceImpl extends BaseHotelService implements IFloorService {
 	
 	static final Logger logger = LoggerFactory.getLogger(FloorServiceImpl.class);
 	
@@ -32,6 +34,9 @@ public class FloorServiceImpl implements IFloorService {
 	
 	@Autowired
     private SoftDeleteService softDeleteService;
+	
+	@Autowired
+	private AuthService authService;
 
 	public FloorServiceImpl(IFloorDAO dao, FloorsRepository floorsRepository) {
 		super();
@@ -53,16 +58,13 @@ public class FloorServiceImpl implements IFloorService {
 
 	public Floor createFloor(Floor floor) {
 //		return dao.createFloor(Floor);
-		Long userId = UserContext.getUserId();
-
-	    if (userId == null) {
-	        throw new RuntimeException("User not selected");
-	    }
-	    floor.setCreatedBy(userId);
+		assignHotel(floor, floor.getHotelId());
+		floor.setCreatedBy(authService.getCurrentUser().getId());
 		 return floorsRepository.saveAndFlush(floor);
 	}
 
 	public Floor updateFloor(Long floorId, Floor floor) {
+		validateHotelAccess(floor.getHotelId());
 		Long userId = UserContext.getUserId();
 	    if (userId == null) {
 	        throw new RuntimeException("User not selected");
@@ -79,8 +81,10 @@ public class FloorServiceImpl implements IFloorService {
 	}
 
 	public boolean deleteFloor(Long floorId) {
-		
+		Floor b= getFloor(floorId);
+		validateHotelAccess(b.getHotelId());
 		softDeleteService.softDelete(floorId, floorsRepository);
+		
 		 return true;
 	}
 	

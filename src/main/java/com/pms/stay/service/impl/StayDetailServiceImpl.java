@@ -12,12 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pms.auditlog.annotation.Auditable;
+import com.pms.auditlog.context.BusinessTraceContext;
+import com.pms.auditlog.context.RequestTraceContext;
 import com.pms.auditlog.entity.AuditLog;
 import com.pms.auditlog.repository.AuditLogRepository;
 import com.pms.auditlog.util.AuditUtil;
 import com.pms.common.service.SoftDeleteService;
 import com.pms.security.configuration.HotelContext;
 import com.pms.security.configuration.UserContext;
+import com.pms.security.service.BaseHotelService;
 import com.pms.security.util.SecurityUtils;
 import com.pms.stay.dao.IStatyDetailsDAO;
 import com.pms.stay.dao.StayDetailsRepository;
@@ -30,7 +33,7 @@ import jakarta.transaction.Transactional;
  * 
  */
 @Service
-public class StayDetailServiceImpl  implements IStayDetailsService {
+public class StayDetailServiceImpl extends BaseHotelService implements IStayDetailsService {
 	
 static final Logger logger = LoggerFactory.getLogger(StayDetailServiceImpl.class);
 	
@@ -50,10 +53,16 @@ static final Logger logger = LoggerFactory.getLogger(StayDetailServiceImpl.class
 
 	public List<StayDetails> getStayDetails() {
 		Long hotelId = HotelContext.getHotelId();
-  		 if (hotelId == null) {
-  	         throw new RuntimeException("Hotel not selected");
-  	     }
-		return repository.findByHotelIdAndIsDeletedFalse(hotelId);
+		 if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
+			validateHotelAccess(hotelId);
+		    if (isSuperAdmin()) 
+		    	return repository.findAll();
+		    else 
+			return repository.findByHotelIdAndIsDeletedFalse(HotelContext.getHotelId());
+		
+		
 	}
 
 	@Auditable(action = "CREATE", entity = "STAYDETAILS")
@@ -63,6 +72,11 @@ static final Logger logger = LoggerFactory.getLogger(StayDetailServiceImpl.class
 	    if (userId == null) {
 	        throw new RuntimeException("User not selected");
 	    }
+	    
+	    BusinessTraceContext.set(stayDetails.getBusinessTraceId());
+	    RequestTraceContext.set(stayDetails.getRequestTraceId());
+	    
+	    assignHotel(stayDetails, stayDetails.getHotelId());
 	    stayDetails.setCreatedBy(userId);
 		return repository.saveAndFlush(stayDetails);
 	}
@@ -70,6 +84,7 @@ static final Logger logger = LoggerFactory.getLogger(StayDetailServiceImpl.class
 	@Auditable(action = "UPDATE", entity = "STAYDETAILS")
 	public StayDetails updateStayDetails(Long stayDetailsId, StayDetails stayDetails) {
 		 
+		validateHotelAccess(stayDetails.getHotelId());
 		Long userId = UserContext.getUserId();
 	    if (userId == null) {
 	        throw new RuntimeException("User not selected");
@@ -86,6 +101,7 @@ static final Logger logger = LoggerFactory.getLogger(StayDetailServiceImpl.class
  		 if (hotelId == null) {
  	         throw new RuntimeException("Hotel not selected");
  	     }
+ 		validateHotelAccess(hotelId);
 		  return repository.findByIdAndHotelIdAndIsDeletedFalse(stayDetailsId,hotelId);
 	}
 
@@ -102,7 +118,7 @@ static final Logger logger = LoggerFactory.getLogger(StayDetailServiceImpl.class
 		 if (hotelId == null) {
 	         throw new RuntimeException("Hotel not selected");
 	     }
-
+		 validateHotelAccess(hotelId);
 		StayDetails entity = repository.findByIdAndHotelIdAndIsDeletedFalse( id,hotelId);
 
         // ✅ Soft delete

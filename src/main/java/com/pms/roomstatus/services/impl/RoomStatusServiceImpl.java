@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.pms.building.entity.Building;
 import com.pms.common.service.SoftDeleteService;
 import com.pms.roomstatus.dao.IRoomStatusDAO;
 import com.pms.roomstatus.dao.RoomStatusRepository;
@@ -20,12 +21,13 @@ import com.pms.roomstatus.services.IRoomStatusService;
 import com.pms.search.specification.RoomStatusSpecification;
 import com.pms.security.configuration.HotelContext;
 import com.pms.security.configuration.UserContext;
+import com.pms.security.service.BaseHotelService;
 
 /**
  * 
  */
 @Service
-public class RoomStatusServiceImpl  implements IRoomStatusService {
+public class RoomStatusServiceImpl extends BaseHotelService implements IRoomStatusService {
 	
 static final Logger logger = LoggerFactory.getLogger(RoomStatusServiceImpl.class);
 	
@@ -50,12 +52,16 @@ static final Logger logger = LoggerFactory.getLogger(RoomStatusServiceImpl.class
 	    if (hotelId == null) {
 	        throw new RuntimeException("Hotel not selected");
 	    }
-		return roomStatusRepository.findByHotelId(HotelContext.getHotelId());
+	    validateHotelAccess(hotelId);
+	    if (isSuperAdmin()) 
+	    	return roomStatusRepository.findAll();
+	    else 
+	    	return roomStatusRepository.findByHotelId(HotelContext.getHotelId());
 	}
 
 	public RoomStatus createRoomStatus(RoomStatus roomStatus) {
 		Long userId = UserContext.getUserId();
-
+		assignHotel(roomStatus, roomStatus.getHotelId());
 	    if (userId == null) {
 	        throw new RuntimeException("User not selected");
 	    }
@@ -68,16 +74,25 @@ static final Logger logger = LoggerFactory.getLogger(RoomStatusServiceImpl.class
 	    if (userId == null) {
 	        throw new RuntimeException("User not selected");
 	    }
+	    validateHotelAccess(roomStatus.getHotelId());
 	    roomStatus.setUpdatedBy(userId);
 	    roomStatus.setUpdatedOn(LocalDateTime.now());
 		return dao.updateRoomStatus(roomStatuseId, roomStatus);
 	}
 
 	public RoomStatus getRoomStatus(Long roomStatusId) {
+		Long hotelId = HotelContext.getHotelId();
+
+	    if (hotelId == null) {
+	        throw new RuntimeException("Hotel not selected");
+	    }
+	    validateHotelAccess(hotelId);
 		return roomStatusRepository.findByIdAndHotelId(roomStatusId,HotelContext.getHotelId());
 	}
 
 	public boolean deleteRoomStatus(Long roomStatusId) {
+		RoomStatus b = getRoomStatus(roomStatusId);
+		validateHotelAccess(b.getHotelId());
 		softDeleteService.softDelete(roomStatusId, roomStatusRepository);
 		return true;
 	}
@@ -85,8 +100,9 @@ static final Logger logger = LoggerFactory.getLogger(RoomStatusServiceImpl.class
 	
 	@Override
 	public RoomStatus getRoomStatusById(Long id) {
+		
 		 return roomStatusRepository.findByIdAndHotelId(id,HotelContext.getHotelId());
-	}
+	} 
 
 	@Override
 	public List<RoomStatus> search(String roomStatusName, String roomStatusDescription) {

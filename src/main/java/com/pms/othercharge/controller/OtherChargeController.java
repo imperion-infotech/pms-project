@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,6 +37,7 @@ public class OtherChargeController {
 	@Autowired
 	private IOtherChargeService service;
 
+	@PreAuthorize("hasAuthority('OTHERCHARGE_VIEW')")
 	@GetMapping("/user/getothercharges")
 	public ResponseEntity<List<OtherCharge>> getOtherCharges() {
 
@@ -43,12 +45,14 @@ public class OtherChargeController {
 		return new ResponseEntity<List<OtherCharge>>(otherCharge, HttpStatus.OK);
 	}
 	
+	@PreAuthorize("hasAuthority('OTHERCHARGE_VIEW')")
 	@GetMapping("/user/getothercharge/{id}")
 	public ResponseEntity<OtherCharge> getOtherCharge(@PathVariable("id") Long id) {
 		OtherCharge otherCharge = service.getOtherChargeById(id);
 		return new ResponseEntity<OtherCharge>(otherCharge, HttpStatus.OK);
 	}
 	
+	@PreAuthorize("hasAuthority('OTHERCHARGE_CREATE')")
 	@PostMapping("/admin/createothercharge")
 	public ResponseEntity<?> createOtherCharge(@RequestBody OtherCharge otherCharge) {
 		// Validate input
@@ -78,6 +82,7 @@ public class OtherChargeController {
 		}
 	}
 	
+	@PreAuthorize("hasAuthority('OTHERCHARGE_UPDATE')")
 	@PutMapping("/admin/updateothercharge/{id}")
 	public ResponseEntity<?> updateOtherCharge(@PathVariable Long id, @RequestBody OtherCharge otherChargeDetails) {
 		// Validate input
@@ -116,6 +121,7 @@ public class OtherChargeController {
 		}
 	}
 	
+	@PreAuthorize("hasAuthority('OTHERCHARGE_DELETE')")
 	@DeleteMapping("/admin/deleteothercharge/{id}")
 	public ResponseEntity<String> deleteOtherCharge(@PathVariable("id") Long id) {
 		boolean isDeleted = service.deleteOtherCharge(id);
@@ -127,6 +133,7 @@ public class OtherChargeController {
 		return new ResponseEntity<String>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@PreAuthorize("hasAuthority('OTHERCHARGE_SEARCH')")
 	@GetMapping("/user/othercharge/search")
     public List<OtherCharge> searchOtherCharge(
             @RequestParam(required = false) String otherChargeName,

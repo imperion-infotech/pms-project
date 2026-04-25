@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,7 +36,7 @@ public class TaxMasterController {
 	@Autowired
 	private ITaxMasterService service;
 
-//	@GetMapping("/admin/getfloors")
+	@PreAuthorize("hasAuthority('TAXMASTER_VIEW')")
 	@GetMapping("/user/gettaxmasters")
 	public ResponseEntity<List<TaxMaster>> getTaxMasters() {
 
@@ -44,15 +45,15 @@ public class TaxMasterController {
 
 	}
 
-//	@GetMapping("/admin/getfloor/{id}")
+	@PreAuthorize("hasAuthority('TAXMASTER_VIEW')")
 	@GetMapping("/user/gettaxmaster/{id}")
 	public ResponseEntity<TaxMaster> getTaxMaster(@PathVariable("id") Integer id) {
 		TaxMaster taxMaster = service.getTaxMaster(id);
 		return new ResponseEntity<TaxMaster>(taxMaster, HttpStatus.OK);
 	}
 
+	@PreAuthorize("hasAuthority('TAXMASTER_CREATE')")
 	@PostMapping("/admin/createtaxmaster")
-//	@PostMapping("/auth/createfloor")
 	public ResponseEntity<?> createTaxMaster(@RequestBody TaxMaster taxMaster) {
 		// Validate input
 		if (taxMaster == null || taxMaster.getTaxMasterName() == null || taxMaster.getTaxMasterName().trim().isEmpty()) {
@@ -75,7 +76,7 @@ public class TaxMasterController {
 	}
 
 	@PutMapping("/admin/updatetaxmaster/{id}")
-//	@PutMapping("/auth/updatefloor/{id}")
+	@PreAuthorize("hasAuthority('TAXMASTER_UPDATE')")
 	public ResponseEntity<?> updateTaxMaster(@PathVariable Integer id, @RequestBody TaxMaster taxMasterDetails) {
 		// Validate input
 		if (taxMasterDetails == null || taxMasterDetails.getTaxMasterName() == null || taxMasterDetails.getTaxMasterName().trim().isEmpty()) {
@@ -109,7 +110,7 @@ public class TaxMasterController {
 	}
 
 	@DeleteMapping("/admin/deletetaxmaster/{id}")
-//	@DeleteMapping("/user/deletefloor/{id}")
+	@PreAuthorize("hasAuthority('TAXMASTER_DELETE')")
 	public ResponseEntity<String> deleteTaxMaster(@PathVariable("id") int id) {
 		boolean isDeleted = service.deleteTaxMaster(id);
 		if (isDeleted) {
@@ -120,7 +121,7 @@ public class TaxMasterController {
 		return new ResponseEntity<String>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	
+	@PreAuthorize("hasAuthority('TAXMASTER_SEARCH')")
 	@GetMapping("/user/taxmaster/search")
     public List<TaxMaster> searchTaxMaster(
             @RequestParam(required = false) String taxMasterName,

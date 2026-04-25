@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +33,9 @@ public class PaymentTypeController {
 
 	@Autowired
 	private IPaymentTypeService service;
-
+	
+	
+	@PreAuthorize("hasAuthority('PAYMENTTYPE_VIEW')")
 	@GetMapping("/user/getpaymenttypes")
 	public ResponseEntity<List<PaymentType>> getPaymentTypes() {
 
@@ -40,12 +43,14 @@ public class PaymentTypeController {
 		return new ResponseEntity<List<PaymentType>>(paymentType, HttpStatus.OK);
 	}
 	
+	@PreAuthorize("hasAuthority('PAYMENTTYPE_VIEW')")
 	@GetMapping("/user/getpaymenttype/{id}")
 	public ResponseEntity<PaymentType> getPaymentType(@PathVariable("id") Long id) {
 		PaymentType paymentType = service.getPaymentTypeById(id);
 		return new ResponseEntity<PaymentType>(paymentType, HttpStatus.OK);
 	}
 	
+	@PreAuthorize("hasAuthority('PAYMENTTYPE_CREATE')")
 	@PostMapping("/admin/createpaymenttype")
 	public ResponseEntity<?> createPaymentType(@RequestBody PaymentType paymentType) {
 		// Validate input
@@ -71,6 +76,7 @@ public class PaymentTypeController {
 		}
 	}
 	
+	@PreAuthorize("hasAuthority('PAYMENTTYPE_UPDATE')")
 	@PutMapping("/admin/updatepaymenttype/{id}")
 	public ResponseEntity<?> updatePaymentType(@PathVariable Long id, @RequestBody PaymentType paymentTypeDetails) {
 		// Validate input
@@ -102,6 +108,7 @@ public class PaymentTypeController {
 		}
 	}
 	
+	@PreAuthorize("hasAuthority('PAYMENTTYPE_DELETE')")
 	@DeleteMapping("/admin/deletepaymenttype/{id}")
 	public ResponseEntity<String> deletePaymentType(@PathVariable("id") Integer id) {
 		boolean isDeleted = service.deletePaymentType(id);
@@ -113,6 +120,7 @@ public class PaymentTypeController {
 		return new ResponseEntity<String>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@PreAuthorize("hasAuthority('PAYMENTTYPE_SEARCH')")
 	@GetMapping("/user/paymenttype/search")
     public List<PaymentType> searchPaymentType(
             @RequestParam(required = false) String paymentTypeName,

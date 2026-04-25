@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,22 +37,22 @@ public class DocumentTypeController {
 	@Autowired
 	private IDocumentTypeService service;
 	
-//	@GetMapping("/admin/getfloors")
+	@PreAuthorize("hasAuthority('DOCUMENTTYPE_VIEW')")
 	@GetMapping("/user/getdocumenttypes")
 	public ResponseEntity<List<DocumentType>> getDocumentTypes() {
 		List<DocumentType> documentTypes = service.getDocumentTypes();
 		return new ResponseEntity<List<DocumentType>>(documentTypes, HttpStatus.OK);
 	}
 	
-//	@GetMapping("/admin/getfloor/{id}")
+	@PreAuthorize("hasAuthority('DOCUMENTTYPE_VIEW')")
 	@GetMapping("/user/getdocumenttype/{id}")
 	public ResponseEntity<DocumentType> getDocumentType(@PathVariable("id") Long id) {
 		DocumentType documentType = service.getDocumentType(id);
 		return new ResponseEntity<DocumentType>(documentType, HttpStatus.OK);
 	}
 	
+	@PreAuthorize("hasAuthority('DOCUMENTTYPE_CREATE')")
 	@PostMapping("/admin/createdocumenttype")
-//	@PostMapping("/auth/createfloor")
 	public ResponseEntity<?> createDocumentType(@RequestBody DocumentType documentType) {
 		// Validate input
 		if (documentType == null || documentType.getDocumentTypeCategory() == null || documentType.getDocumentTypeCategory().trim().isEmpty()) {
@@ -81,8 +82,8 @@ public class DocumentTypeController {
 		}
 	}
 	
+	@PreAuthorize("hasAuthority('DOCUMENTTYPE_UPDATE')")
 	@PutMapping("/admin/updatedocumenttype/{id}")
-//	@PutMapping("/auth/updatefloor/{id}")
 	public ResponseEntity<?> updateDocumentType(@PathVariable Long id, @RequestBody DocumentType documentType,HttpSession session) {
 		// Validate input
 		if (documentType == null || documentType.getDocumentTypeName() == null || documentType.getDocumentTypeName().trim().isEmpty()) {
@@ -118,6 +119,7 @@ public class DocumentTypeController {
 		}
 	}
 	
+	@PreAuthorize("hasAuthority('DOCUMENTTYPE_DELETE')")
 	@DeleteMapping("/admin/deletedocumenttype/{id}")
 //	@DeleteMapping("/user/deletefloor/{id}")
 	public ResponseEntity<String> deleteDocumentType(@PathVariable("id") Long id) {
@@ -130,7 +132,7 @@ public class DocumentTypeController {
 		return new ResponseEntity<String>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	
+	@PreAuthorize("hasAuthority('DOCUMENTTYPE_SEARCH')")
 	@GetMapping("/user/documenttype/search")
     public List<DocumentType> searchDocumentType(
             @RequestParam(required = false) String shortName,

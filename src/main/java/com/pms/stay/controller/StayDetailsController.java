@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,24 +39,23 @@ public class StayDetailsController {
 	@Autowired
 	private IStayDetailsService service;
 
+	@PreAuthorize("hasAuthority('STAYDETAILS_VIEW')")
 	@GetMapping("/user/getstaydetails")
-//	@GetMapping("/auth/getroommasters")
 	public ResponseEntity<List<StayDetails>> getStayDetails() {
 		List<StayDetails> stayDetails = service.getStayDetails();
 		return new ResponseEntity<List<StayDetails>>(stayDetails, HttpStatus.OK);
 
 	}
 	
-
+	@PreAuthorize("hasAuthority('STAYDETAILS_VIEW')")
 	@GetMapping("/user/getstaydetail/{id}")
-//	@GetMapping("/auth/getroommaster/{id}")
 	public ResponseEntity<StayDetails> getStayDetails(@PathVariable("id") Long id) {
 		StayDetails stayDetails = service.getStayDetail(id);
 		return new ResponseEntity<StayDetails>(stayDetails, HttpStatus.OK);
 	}
 
+	@PreAuthorize("hasAuthority('STAYDETAILS_CREATE')")
 	@PostMapping("/admin/createstaydetail")
-//	@PostMapping("/auth/createroommaster")
 	public ResponseEntity<?> createStayDetails(@RequestBody StayDetails stayDetails) {
 		// Validate input
 		if (stayDetails == null || stayDetails.getFloorId() == null
@@ -121,8 +121,8 @@ public class StayDetailsController {
 		}
 	}
 
+	@PreAuthorize("hasAuthority('STAYDETAILS_UPDATE')")
 	@PutMapping("/admin/updatestaydetails/{id}")
-//	@PutMapping("/auth/updateroommaster/{id}")
 	public ResponseEntity<?> updateRoomType(@PathVariable Long id, @RequestBody StayDetails stayDetails, HttpSession session) {
 		// Validate input
 		if (stayDetails == null || stayDetails.getFloorId() == null
@@ -209,8 +209,8 @@ public class StayDetailsController {
 		}
 	}
 
+	@PreAuthorize("hasAuthority('STAYDETAILS_DELETE')")
 	@DeleteMapping("/admin/deletestaydetails/{id}")
-//	@DeleteMapping("/auth/deleteroommaster/{id}")
 	public ResponseEntity<String> deleteStayDetails(@PathVariable("id") Long id) {
 		boolean isDeleted = service.deleteSoftStayDetails(id);
 		if (isDeleted) {

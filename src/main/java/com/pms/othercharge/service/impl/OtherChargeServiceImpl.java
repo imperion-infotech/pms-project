@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.pms.common.service.SoftDeleteService;
+import com.pms.document.entity.DocumentDetails;
 import com.pms.floor.entity.Floor;
 import com.pms.othercharge.entity.OtherCharge;
 import com.pms.othercharge.repository.OtherChargeRepository;
@@ -23,12 +24,13 @@ import com.pms.search.specification.OtherChargeSpecification;
 import com.pms.search.specification.PaymentTypeSpecification;
 import com.pms.security.configuration.HotelContext;
 import com.pms.security.configuration.UserContext;
+import com.pms.security.service.BaseHotelService;
 
 /**
  * 
  */
 @Service
-public class OtherChargeServiceImpl implements IOtherChargeService{
+public class OtherChargeServiceImpl extends BaseHotelService implements IOtherChargeService{
 	
 static final Logger logger = LoggerFactory.getLogger(OtherChargeServiceImpl.class);
 	
@@ -49,6 +51,10 @@ static final Logger logger = LoggerFactory.getLogger(OtherChargeServiceImpl.clas
 	    if (hotelId == null) {
 	        throw new RuntimeException("Hotel not selected");
 	    }
+	    validateHotelAccess(hotelId);
+	    if (isSuperAdmin()) 
+	    	return otherChargeRepository.findAll();
+	    else 
 		return otherChargeRepository.findByHotelId(HotelContext.getHotelId());
 	}
 
@@ -59,12 +65,18 @@ static final Logger logger = LoggerFactory.getLogger(OtherChargeServiceImpl.clas
 	    if (userId == null) {
 	        throw new RuntimeException("User not selected");
 	    }
+	    validateHotelAccess(otherCharge.getHotelId());
 	    otherCharge.setCreatedBy(userId);
 		return otherChargeRepository.saveAndFlush(otherCharge);
 	}
 
 	@Override
 	public OtherCharge updateOtherCharge(Long otherChargeId, OtherCharge otherCharge) {
+		Long userId = UserContext.getUserId();
+	    if (userId == null) {
+	        throw new RuntimeException("User not selected");
+	    }
+	    validateHotelAccess(otherCharge.getHotelId());
 				OtherCharge otherChargeFromDB = getOtherChargeById(otherChargeId);
 				otherChargeFromDB.setAlwaysCharge(otherCharge.isAlwaysCharge());
 				otherChargeFromDB.setCallLoggingCharge(otherCharge.isCallLoggingCharge());
@@ -77,10 +89,6 @@ static final Logger logger = LoggerFactory.getLogger(OtherChargeServiceImpl.clas
 				otherChargeFromDB.setForeCastingRevenue(otherCharge.isForeCastingRevenue());
 				otherChargeFromDB.setReoccureCharge(otherCharge.isReoccureCharge());
 				otherChargeFromDB.setReoccureChargeFrequency(otherCharge.getReoccureChargeFrequency());
-				Long userId = UserContext.getUserId();
-			    if (userId == null) {
-			        throw new RuntimeException("User not selected");
-			    }
 			    otherChargeFromDB.setUpdatedBy(userId);
 			    otherChargeFromDB.setUpdatedOn(LocalDateTime.now());
 				otherChargeRepository.saveAndFlush(otherChargeFromDB);
@@ -95,12 +103,17 @@ static final Logger logger = LoggerFactory.getLogger(OtherChargeServiceImpl.clas
 	    if (hotelId == null) {
 	        throw new RuntimeException("Hotel not selected");
 	    }
+	    validateHotelAccess(hotelId);
 		  return otherChargeRepository.findByIdAndHotelId(id,hotelId);
 	}
 
 	@Override
 	public boolean deleteOtherCharge(Long otherChargeId) {
-		
+		Long hotelId = HotelContext.getHotelId();
+		 if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
+		 validateHotelAccess(hotelId);
 		softDeleteService.softDelete(otherChargeId, otherChargeRepository);
 		
 		return true;
@@ -113,7 +126,7 @@ static final Logger logger = LoggerFactory.getLogger(OtherChargeServiceImpl.clas
 	     if (hotelId == null) {
 	         throw new RuntimeException("Hotel not selected");
 	     }
-		
+	     validateHotelAccess(hotelId);
 		 Specification<OtherCharge> spec = Specification
 				 	.where(OtherChargeSpecification.hasHotelId(hotelId)) 
 	                .and(OtherChargeSpecification.hasOtherChargeName(otherChargeName))

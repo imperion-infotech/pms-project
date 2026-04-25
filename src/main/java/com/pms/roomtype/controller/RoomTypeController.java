@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,7 +37,7 @@ public class RoomTypeController {
 	private IRoomTypeService service;
 
 	@GetMapping("/user/getroomtypes")
-//	@GetMapping("/auth/getroomtypes")
+	@PreAuthorize("hasAuthority('ROOMTYPE_VIEW')")
 	public ResponseEntity<List<RoomType>> getRoomTypes() {
 
 		List<RoomType> roomTypes = service.getRoomTypes();
@@ -46,13 +47,14 @@ public class RoomTypeController {
 
 	@GetMapping("/user/getroomtype/{id}")
 //	@GetMapping("/auth/getroomtype/{id}")
+	@PreAuthorize("hasAuthority('ROOMTYPE_VIEW')")
 	public ResponseEntity<RoomType> getRoomType(@PathVariable("id") Long id) {
 		RoomType roomType = service.getRoomType(id);
 		return new ResponseEntity<RoomType>(roomType, HttpStatus.OK);
 	}
 
 	@PostMapping("/admin/createroomtype")
-//	@PostMapping("/auth/createroomtype")
+	@PreAuthorize("hasAuthority('ROOMTYPE_CREATE')")
 	public ResponseEntity<?> createRoomType(@RequestBody RoomType roomType) {
 		// Validate input
 		if (roomType == null || roomType.getShortName() == null || roomType.getShortName().trim().isEmpty()) {
@@ -79,6 +81,7 @@ public class RoomTypeController {
 	}
 
 @PutMapping("/admin/updateroomtype/{id}")
+@PreAuthorize("hasAuthority('ROOMTYPE_UPDATE')")
 //	@PutMapping("/auth/updateroomtype/{id}")
 	public ResponseEntity<?> updateRoomType(@PathVariable Long id, @RequestBody RoomType roomTypeDetails) {
 		// Validate input
@@ -122,6 +125,7 @@ public class RoomTypeController {
 	}
 
 	@DeleteMapping("/admin/deleteroomtype/{id}")
+	@PreAuthorize("hasAuthority('ROOMTYPE_DELETE')")
 //	@DeleteMapping("/auth/deleteroomtype/{id}")
 	public ResponseEntity<String> deleteRoomType(@PathVariable("id") Long id) {
 		boolean isDeleted = service.deleteRoomType(id);
@@ -133,6 +137,7 @@ public class RoomTypeController {
 		return new ResponseEntity<String>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@PreAuthorize("hasAuthority('ROOMTYPE_SEARCH')")
 	@GetMapping("/user/roomtype/search")
     public List<RoomType> searchRoomType(
             @RequestParam(required = false) String shortName,

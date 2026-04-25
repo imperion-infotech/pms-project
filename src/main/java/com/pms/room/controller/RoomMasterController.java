@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,6 +55,7 @@ public class RoomMasterController {
 //	}
 	
 	@GetMapping("/user/getroommasters")
+	@PreAuthorize("hasAuthority('ROOMMASTER_VIEW')")
 	 public Page<RoomMaster> getRoomMasters(
 	            @RequestParam(defaultValue = "0") int page,
 	            @RequestParam(defaultValue = "100") int size,
@@ -71,12 +73,14 @@ public class RoomMasterController {
 	
 
 	@GetMapping("/user/getroommaster/{id}")
+	@PreAuthorize("hasAuthority('ROOMMASTER_VIEW')")
 //	@GetMapping("/auth/getroommaster/{id}")
 	public ResponseEntity<RoomMaster> getRoomMaster(@PathVariable("id") Long id) {
 		RoomMaster roomMaster = service.getRoomMaster(id);
 		return new ResponseEntity<RoomMaster>(roomMaster, HttpStatus.OK);
 	}
 
+	@PreAuthorize("hasAuthority('ROOMMASTER_CREATE')")
 	@PostMapping("/admin/createroommaster")
 //	@PostMapping("/auth/createroommaster")
 	public ResponseEntity<?> createRoomMaster(@RequestBody RoomMaster roomMaster) {
@@ -117,6 +121,7 @@ public class RoomMasterController {
 		}
 	}
 
+	@PreAuthorize("hasAuthority('ROOMMASTER_UPDATE')")
 	@PutMapping("/admin/updateroommaster/{id}")
 //	@PutMapping("/auth/updateroommaster/{id}")
 	public ResponseEntity<?> updateRoomType(@PathVariable Long id, @RequestBody RoomMaster roomMaster) {
@@ -181,6 +186,7 @@ public class RoomMasterController {
 		}
 	}
 
+	@PreAuthorize("hasAuthority('ROOMMASTER_DELETE')")
 	@DeleteMapping("/admin/deleteroommaster/{id}")
 //	@DeleteMapping("/auth/deleteroommaster/{id}")
 	public ResponseEntity<String> deleteRoomStatus(@PathVariable("id") Long id) {
@@ -194,6 +200,7 @@ public class RoomMasterController {
 	}
 	
 	
+	@PreAuthorize("hasAuthority('ROOMMASTER_SEARCH')")
 	@GetMapping("/user/roommaster/search")
     public List<RoomMaster> searchRoomMaster(
             @RequestParam(required = false) String roomName,

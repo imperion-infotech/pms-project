@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,7 +45,7 @@ public class DocumentDetailsController {
 	@Autowired
 	private IDocumentTypeService documentTypeService;
 
-//	@GetMapping("/admin/getfloors")
+	@PreAuthorize("hasAuthority('DOCUMENTDETAILS_VIEW')")
 	@GetMapping("/user/getdocumentdetails")
 	public ResponseEntity<List<DocumentDetails>> getDocumentDetails() {
 
@@ -53,15 +54,16 @@ public class DocumentDetailsController {
 
 	}
 
-//	@GetMapping("/admin/getfloor/{id}")
+	@PreAuthorize("hasAuthority('DOCUMENTDETAILS_VIEW')")
 	@GetMapping("/user/getdocumentdetail/{id}")
 	public ResponseEntity<DocumentDetails> getDocumentDetail(@PathVariable("id") Long id) {
 		DocumentDetails documentDetails = service.getDocumentDetail(id);//????
 		return new ResponseEntity<DocumentDetails>(documentDetails, HttpStatus.OK);
 	}
 
+	
+	@PreAuthorize("hasAuthority('DOCUMENTDETAILS_CREATE')")
 	@PostMapping("/admin/createdocumentdetail")
-//	@PostMapping("/auth/createfloor")
 	public ResponseEntity<?> createDocumentDetails(@RequestBody DocumentDetails documentDetails) {
 		// Validate input
 		if (documentDetails == null || documentDetails.getDocumentNumber() == null || documentDetails.getDocumentNumber().trim().isEmpty()) {
@@ -80,8 +82,8 @@ public class DocumentDetailsController {
 		}
 	}
 
+	@PreAuthorize("hasAuthority('DOCUMENTDETAILS_UPDATE')")
 	@PutMapping("/admin/updatedocumentdetails/{id}")
-//	@PutMapping("/auth/updatefloor/{id}")DocumentDetails
 	public ResponseEntity<?> updateDocumentDetails(@PathVariable Long id, @RequestBody DocumentDetails documentDetails,HttpSession session) {
 		// Validate input
 		if (documentDetails == null || documentDetails.getDocumentNumber() == null || documentDetails.getDocumentNumber().trim().isEmpty()) {
@@ -121,8 +123,8 @@ public class DocumentDetailsController {
 		}
 	}
 
+	@PreAuthorize("hasAuthority('DOCUMENTDETAILS_DELETE')")
 	@DeleteMapping("/admin/deletedocumentdetails/{id}")
-//	@DeleteMapping("/user/deletefloor/{id}")
 	public ResponseEntity<String> deleteDocumentDetails(@PathVariable("id") Long id) {
 		boolean isDeleted = service.deleteDocumentDetails(id);
 		if (isDeleted) {
@@ -133,7 +135,7 @@ public class DocumentDetailsController {
 		return new ResponseEntity<String>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	
+	@PreAuthorize("hasAuthority('DOCUMENTDETAILS_SEARCH')")
 	@GetMapping("/user/documentdetails/search")
     public List<DocumentDetails> searchDocumentDetails(
             @RequestParam(required = false) String documentTypeEnum,

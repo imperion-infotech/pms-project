@@ -17,10 +17,13 @@ import com.pms.building.service.IBuildingService;
 import com.pms.common.service.SoftDeleteService;
 import com.pms.search.specification.BuildingSpecification;
 import com.pms.security.configuration.HotelContext;
-import com.pms.security.configuration.UserContext;;
+import com.pms.security.configuration.UserContext;
+import com.pms.security.entity.User;
+import com.pms.security.service.AuthService;
+import com.pms.security.service.BaseHotelService;;
 
 @Service
-public class BuildingServiceImpl implements IBuildingService {
+public class BuildingServiceImpl extends BaseHotelService implements IBuildingService {
 
 static final Logger logger = LoggerFactory.getLogger(BuildingServiceImpl.class);
 	
@@ -33,7 +36,8 @@ static final Logger logger = LoggerFactory.getLogger(BuildingServiceImpl.class);
 	 @Autowired
      private SoftDeleteService softDeleteService;
 	
-	
+	@Autowired
+	private AuthService authService;
 
 	public BuildingServiceImpl(IBuildingDAO dao, BuildingsRepository buildingRepository) {
 		super();
@@ -47,25 +51,26 @@ static final Logger logger = LoggerFactory.getLogger(BuildingServiceImpl.class);
 	    if (hotelId == null) {
 	        throw new RuntimeException("Hotel not selected");
 	    }
-		return buildingRepository.findByHotelId(HotelContext.getHotelId());
+	    validateHotelAccess(hotelId);
+	    if (isSuperAdmin()) 
+	    	return buildingRepository.findAll();
+	    
+	    else 
+	    return buildingRepository.findByHotelId(HotelContext.getHotelId());
 	}
 	
 	
 	
 	@Auditable(action = "CREATE", entity = "BUILDING")
 	public Building createBuilding(Building building) {
-//		logger.info("Audit: {} performed on {}", audit.action(), audit.entity());
-		Long userId = UserContext.getUserId();
-
-	    if (userId == null) {
-	        throw new RuntimeException("User not selected");
-	    }
-	    building.setCreatedBy(userId);
-		 return buildingRepository.saveAndFlush(building);
+		assignHotel(building, building.getHotelId());
+	    building.setCreatedBy(authService.getCurrentUser().getId());
+	    return buildingRepository.saveAndFlush(building);
 	}
 
 	@Auditable(action = "UPDATE", entity = "BUILDING")
 	public Building updateBuilding(Long buildingId, Building building) {
+		validateHotelAccess(building.getHotelId());
 		Long userId = UserContext.getUserId();
 	    if (userId == null) {
 	        throw new RuntimeException("User not selected");
@@ -76,14 +81,23 @@ static final Logger logger = LoggerFactory.getLogger(BuildingServiceImpl.class);
 	}
 
 	public Building getBuilding(Long buildingId) {
-		return buildingRepository.findByIdAndHotelId(buildingId, HotelContext.getHotelId());
+		
+		Long hotelId = HotelContext.getHotelId();
+
+	    if (hotelId == null) {
+	        throw new RuntimeException("Hotel not selected");
+	    }
+	    validateHotelAccess(hotelId);
+		Building b= buildingRepository.findByIdAndHotelId(buildingId, HotelContext.getHotelId());
+		return b;
 	}
 
 	@Auditable(action = "DELETE", entity = "BUILDING")
 	public boolean deleteBuilding(Long buildingId) {
-
-	    softDeleteService.softDelete(buildingId, buildingRepository);
-
+		Building b = getBuildingById(buildingId);
+		validateHotelAccess(b.getHotelId());
+	   softDeleteService.softDelete(buildingId, buildingRepository);
+	    
 	    return true;
 	}
 	
@@ -101,7 +115,7 @@ static final Logger logger = LoggerFactory.getLogger(BuildingServiceImpl.class);
 	         throw new RuntimeException("Hotel not selected");
 	     }
 		 
-		 
+	     validateHotelAccess(hotelId);
 	     Specification<Building> spec = Specification
 	                 .where(BuildingSpecification.hasHotelId(hotelId))  
 	                .and(BuildingSpecification.hasName(name))

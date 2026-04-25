@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,24 +50,27 @@ public class PersonalDetailsController {
 		return new ResponseEntity<Long>(snowflakeUtil.generateId(), HttpStatus.OK);
 	}
 
+	
+	
+	@PreAuthorize("hasAuthority('PERSONALDETAILS_VIEW')")
     @GetMapping("/user/getpersonaldetails")
-//    @GetMapping("/auth/getpersonaldetails")
     public List<PersonalDetails> getAll() {
         return service.getAll();
     }
 
+	@PreAuthorize("hasAuthority('PERSONALDETAILS_VIEW')")
     @GetMapping("/user/getpersonaldetail/{id}")
-//    @GetMapping("/auth/getpersonaldetail/{id}")
     public ResponseEntity<PersonalDetails> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
-    
+	@PreAuthorize("hasAuthority('PERSONALDETAILS_CREATE')")
     @PostMapping(value= "/user/createpersonaldetail")
     public ResponseEntity<PersonalDetails> create(@Valid @RequestBody PersonalDetails details) throws IOException {
         return ResponseEntity.ok(service.create(details));
     }
     
+	@PreAuthorize("hasAuthority('PERSONALDETAILS_UPDATE')")
     @PutMapping("/user/updatepersonaldetail/{id}")
     public ResponseEntity<PersonalDetails> update(@PathVariable Long id, @Valid @RequestBody PersonalDetails details,HttpSession session) {
     	PersonalDetails existingPersonalDetails = service.getById(id);
@@ -76,6 +80,7 @@ public class PersonalDetailsController {
     	return ResponseEntity.ok(service.update(id, details));
     }
 
+	@PreAuthorize("hasAuthority('PERSONALDETAILS_DELETE')")
     @DeleteMapping("/user/deletepersonaldetail/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
         service.deletePersonalDetails(id);
@@ -93,6 +98,7 @@ public class PersonalDetailsController {
 		return new ResponseEntity<String>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }*/
     
+	@PreAuthorize("hasAuthority('PERSONALDETAILS_SEARCH')")
     @GetMapping("/user/personaldetail/search")
     public List<PersonalDetails> searchPersonalDetails(
             @RequestParam(required = false) String firstName,

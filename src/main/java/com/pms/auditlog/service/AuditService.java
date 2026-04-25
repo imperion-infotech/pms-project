@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 import com.pms.auditlog.entity.AuditLog;
 import com.pms.auditlog.repository.AuditLogRepository;
 
-import lombok.RequiredArgsConstructor;
-
 /**
  * 
  */

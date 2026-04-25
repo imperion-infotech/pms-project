@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.pms.building.entity.Building;
 import com.pms.common.service.SoftDeleteService;
 import com.pms.room.dao.IRoomMasterDAO;
 import com.pms.room.dao.impl.RoomMasterRepository;
@@ -20,9 +21,10 @@ import com.pms.roomstatus.dao.RoomStatusRepository;
 import com.pms.search.specification.RoomMasterSpecification;
 import com.pms.security.configuration.HotelContext;
 import com.pms.security.configuration.UserContext;
+import com.pms.security.service.BaseHotelService;
 
 @Service
-public class RoomMasterServiceImpl implements IRoomMasterService {
+public class RoomMasterServiceImpl extends BaseHotelService implements IRoomMasterService {
 
 static final Logger logger = LoggerFactory.getLogger(RoomMasterServiceImpl.class);
 	
@@ -47,13 +49,14 @@ static final Logger logger = LoggerFactory.getLogger(RoomMasterServiceImpl.class
 	}
 
 	public Page<RoomMaster> getRoomMasters(Pageable pageable) {
-
-	    Long hotelId = HotelContext.getHotelId();
-
+		Long hotelId = HotelContext.getHotelId();
 	    if (hotelId == null) {
 	        throw new RuntimeException("Hotel not selected");
 	    }
-
+	    validateHotelAccess(hotelId);
+	    if (isSuperAdmin()) 
+	    	return (Page<RoomMaster>) roomMasterRepository.findAll();
+	    else 
 	    return roomMasterRepository.findByHotelId(hotelId, pageable);
 	}
 	
@@ -63,11 +66,13 @@ static final Logger logger = LoggerFactory.getLogger(RoomMasterServiceImpl.class
 	    if (userId == null) {
 	        throw new RuntimeException("User not selected");
 	    }
+	    assignHotel(roomMaster, roomMaster.getHotelId());
 	    roomMaster.setCreatedBy(userId);
 		return roomMasterRepository.saveAndFlush(roomMaster);
 	}
 
 	public RoomMaster updateRoomMaster(Long roomMasterId, RoomMaster roomMaster) {
+		validateHotelAccess(roomMaster.getHotelId());
 		Long userId = UserContext.getUserId();
 	    if (userId == null) {
 	        throw new RuntimeException("User not selected");
@@ -79,10 +84,18 @@ static final Logger logger = LoggerFactory.getLogger(RoomMasterServiceImpl.class
 	}
 
 	public RoomMaster getRoomMaster(Long roomMasterId) {
+		Long hotelId = HotelContext.getHotelId();
+
+	    if (hotelId == null) {
+	        throw new RuntimeException("Hotel not selected");
+	    }
+	    validateHotelAccess(hotelId);
 		return roomMasterRepository.findByIdAndHotelId(roomMasterId,HotelContext.getHotelId());
 	}
 
 	public boolean deleteRoomMaster(Long roomMasterId) {
+		RoomMaster b = getRoomMaster(roomMasterId);
+		validateHotelAccess(b.getHotelId());
 		softDeleteService.softDelete(roomMasterId, roomMasterRepository);
 		return true;
 	}
@@ -102,7 +115,7 @@ static final Logger logger = LoggerFactory.getLogger(RoomMasterServiceImpl.class
 	     if (hotelId == null) {
 	         throw new RuntimeException("Hotel not selected");
 	     }
-	     
+	     validateHotelAccess(hotelId);
         Specification<RoomMaster> spec = Specification
         		 .where(RoomMasterSpecification.hasHotelId(hotelId))
                 .and(RoomMasterSpecification.hasRoomName(roomName))

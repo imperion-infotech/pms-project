@@ -19,12 +19,14 @@ import com.pms.document.service.IDocumentTypeService;
 import com.pms.search.specification.DocumentTypeSpecification;
 import com.pms.security.configuration.HotelContext;
 import com.pms.security.configuration.UserContext;
+import com.pms.security.service.BaseHotelService;
+import com.pms.taxmaster.entity.TaxMaster;
 
 /**
  * 
  */
 @Service
-public class DocumentTypeServiceImpl implements IDocumentTypeService {
+public class DocumentTypeServiceImpl extends BaseHotelService implements IDocumentTypeService {
 	
 	@Autowired
 	private IDocumentTypeDAO dao;
@@ -48,23 +50,33 @@ public class DocumentTypeServiceImpl implements IDocumentTypeService {
 	    if (hotelId == null) {
 	        throw new RuntimeException("Hotel not selected");
 	    }
+	    validateHotelAccess(hotelId);
+	    if (isSuperAdmin()) 
+	    	return documentTypeRepository.findAll();
+	    else 
 		return documentTypeRepository.findByHotelId(HotelContext.getHotelId());
 	}
 
 	@Override
 	public DocumentType getDocumentType(Long documentTypeId) {
+		Long hotelId = HotelContext.getHotelId();
+
+	    if (hotelId == null) {
+	        throw new RuntimeException("Hotel not selected");
+	    }
+		validateHotelAccess(hotelId);
 		return documentTypeRepository.findByIdAndHotelId(documentTypeId,HotelContext.getHotelId());
 	}
 
 	@Override
 	@Auditable(action = "CREATE", entity = "DOCUMENTTYPE")
 	public DocumentType createDocumentType(DocumentType documentType) {
-//		return dao.createFloor(Floor);
 		Long userId = UserContext.getUserId();
 
 	    if (userId == null) {
 	        throw new RuntimeException("User not selected");
 	    }
+	    assignHotel(documentType, documentType.getHotelId());
 	    documentType.setCreatedBy(userId);
 		 return documentTypeRepository.saveAndFlush(documentType);
 	}
@@ -72,6 +84,8 @@ public class DocumentTypeServiceImpl implements IDocumentTypeService {
 	@Override
 	@Auditable(action = "UPDATE", entity = "DOCUMENTTYPE")
 	public DocumentType updateDocumentType(Long documentTypeId, DocumentType documentType) {
+		
+		validateHotelAccess(documentType.getHotelId());
 		Long userId = UserContext.getUserId();
 	    if (userId == null) {
 	        throw new RuntimeException("User not selected");
@@ -84,6 +98,8 @@ public class DocumentTypeServiceImpl implements IDocumentTypeService {
 	@Override
 	@Auditable(action = "DELETE", entity = "DOCUMENTTYPE")
 	public boolean deleteDocumentType(Long documentTypeId) {
+		DocumentType b = getDocumentType(documentTypeId);
+		validateHotelAccess(b.getHotelId());
 		softDeleteService.softDelete(documentTypeId, documentTypeRepository);
 		return true;
 	}
@@ -102,6 +118,7 @@ public class DocumentTypeServiceImpl implements IDocumentTypeService {
 	     if (hotelId == null) {
 	         throw new RuntimeException("Hotel not selected");
 	     }
+	     validateHotelAccess(hotelId);
 	Specification<DocumentType> spec = Specification
 					.where(DocumentTypeSpecification.hasHotelId(hotelId))
 	                .and(DocumentTypeSpecification.hasShortName(shortName))

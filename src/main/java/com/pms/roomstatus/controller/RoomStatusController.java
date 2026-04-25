@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,7 +36,7 @@ public class RoomStatusController {
 	private IRoomStatusService service;
 
 	@GetMapping("/user/getroomstatuses")
-//	@GetMapping("/auth/getroomstatuses")
+	@PreAuthorize("hasAuthority('ROOMSTATUS_VIEW')")
 	public ResponseEntity<List<RoomStatus>> getRoomStatus() {
 
 		List<RoomStatus> roomStatuses = service.getRoomStatuses();
@@ -44,6 +45,7 @@ public class RoomStatusController {
 	}
 
 	@GetMapping("/user/getroomstatus/{id}")
+	@PreAuthorize("hasAuthority('ROOMSTATUS_VIEW')")
 //	@GetMapping("/auth/getroomstatus/{id}")
 	public ResponseEntity<RoomStatus> getRoomStatus(@PathVariable("id") Long id) {
 		RoomStatus roomStatus = service.getRoomStatus(id);
@@ -51,7 +53,7 @@ public class RoomStatusController {
 	}
 
 	@PostMapping("/admin/createroomstatus")
-//	@PostMapping("/auth/createroomstatus")
+	@PreAuthorize("hasAuthority('ROOMSTATUS_CREATE')")
 	public ResponseEntity<?> createRoomType(@RequestBody RoomStatus roomStatus) {
 		// Validate input
 		if (roomStatus == null || roomStatus.getRoomStatusName() == null
@@ -86,7 +88,7 @@ public class RoomStatusController {
 	}
 
 @PutMapping("/admin/updateroomstatus/{id}")
-//	@PutMapping("/auth/updateroomstatus/{id}")
+@PreAuthorize("hasAuthority('ROOMSTATUS_UPDATE')")
 	public ResponseEntity<?> updateRoomType(@PathVariable Long id, @RequestBody RoomStatus roomStatusDetails) {
 		// Validate input
 		if (roomStatusDetails == null || roomStatusDetails.getRoomStatusName() == null
@@ -137,6 +139,7 @@ public class RoomStatusController {
 		}
 	}
 
+	@PreAuthorize("hasAuthority('ROOMSTATUS_DELETE')")
 	@DeleteMapping("/admin/deleteroomstatus/{id}")
 //	@DeleteMapping("/auth/deleteroomstatus/{id}")
 	public ResponseEntity<String> deleteRoomStatus(@PathVariable("id") Long id) {
@@ -149,6 +152,7 @@ public class RoomStatusController {
 		return new ResponseEntity<String>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@PreAuthorize("hasAuthority('ROOMSTATUS_SEARCH')")
 	@GetMapping("/user/roomstatus/search")
     public List<RoomStatus> searchRoomStatus(
             @RequestParam(required = false) String roomStatusName,

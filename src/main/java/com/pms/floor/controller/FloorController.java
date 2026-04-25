@@ -28,25 +28,26 @@ public class FloorController {
 	@Autowired
 	private IFloorService service;
 
-//	@PreAuthorize("hasRole('USER')")
-//	@GetMapping("/admin/getfloors")
+	@PreAuthorize("hasAuthority('FLOOR_VIEW')")
 	@GetMapping("/user/getfloors")
+//	@GetMapping("/user/getfloors")
 	public ResponseEntity<List<Floor>> getFloors() {
 
 		List<Floor> floors = service.getFloors();
 		return new ResponseEntity<List<Floor>>(floors, HttpStatus.OK);
 
 	}
-
-//	@GetMapping("/admin/getfloor/{id}")
+	@PreAuthorize("hasAuthority('FLOOR_VIEW')")
 	@GetMapping("/user/getfloor/{id}")
+//	@GetMapping("/user/getfloor/{id}")
 	public ResponseEntity<Floor> getFloor(@PathVariable("id") Long id) {
 		Floor floor = service.getFloor(id);
 		return new ResponseEntity<Floor>(floor, HttpStatus.OK);
 	}
 
-	@PostMapping("/admin/createfloor")
-//	@PostMapping("/auth/createfloor")
+//	@PostMapping("/admin/createfloor")
+	@PreAuthorize("hasAuthority('FLOOR_CREATE')")
+	@PostMapping("/createfloor")
 	public ResponseEntity<?> createFloor(@RequestBody Floor floor) {
 		// Validate input
 		if (floor == null || floor.getName() == null || floor.getName().trim().isEmpty()) {
@@ -68,8 +69,8 @@ public class FloorController {
 		}
 	}
 
-	@PutMapping("/admin/updatefloor/{id}")
-//	@PutMapping("/auth/updatefloor/{id}")
+	@PreAuthorize("hasAuthority('FLOOR_UPDATE')")
+	@PutMapping("/updatefloor/{id}")
 	public ResponseEntity<?> updateFloor(@PathVariable Long id, @RequestBody Floor floorDetails) {
 		// Validate input
 		if (floorDetails == null || floorDetails.getName() == null || floorDetails.getName().trim().isEmpty()) {
@@ -79,8 +80,6 @@ public class FloorController {
 		if (floorDetails == null || floorDetails.getDescription() == null || floorDetails.getDescription().trim().isEmpty()) {
 			return ResponseEntity.badRequest().body("floor getDescription must not be null or empty");
 		}
-
-
 		try {
 			// Find existing floor
 			Floor existingFloor = service.getFloor(id);
@@ -106,8 +105,8 @@ public class FloorController {
 		}
 	}
 
+	@PreAuthorize("hasAuthority('FLOOR_DELETE')")
 	@DeleteMapping("/admin/deletefloor/{id}")
-//	@DeleteMapping("/user/deletefloor/{id}")
 	public ResponseEntity<String> deleteFloor(@PathVariable("id") Long id) {
 		boolean isDeleted = service.deleteFloor(id);
 		if (isDeleted) {
@@ -118,8 +117,8 @@ public class FloorController {
 		return new ResponseEntity<String>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	
-	@GetMapping("/user/floor/search")
+	@PreAuthorize("hasAuthority('FLOOR_SEARCH')")
+	@GetMapping("/floor/search")
     public List<Floor> searchFloor(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String description) {

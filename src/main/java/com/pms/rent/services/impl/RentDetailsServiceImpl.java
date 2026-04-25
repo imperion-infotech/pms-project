@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pms.auditlog.annotation.Auditable;
+import com.pms.auditlog.context.BusinessTraceContext;
+import com.pms.auditlog.context.RequestTraceContext;
 import com.pms.auditlog.entity.AuditLog;
 import com.pms.auditlog.repository.AuditLogRepository;
 import com.pms.auditlog.util.AuditUtil;
@@ -20,6 +22,7 @@ import com.pms.rent.dao.impl.RentDetailsRepository;
 import com.pms.rent.services.IRentDetailsService;
 import com.pms.security.configuration.HotelContext;
 import com.pms.security.configuration.UserContext;
+import com.pms.security.service.BaseHotelService;
 import com.pms.security.util.SecurityUtils;
 
 import jakarta.transaction.Transactional;
@@ -28,7 +31,7 @@ import jakarta.transaction.Transactional;
  * 
  */
 @Service
-public class RentDetailsServiceImpl implements IRentDetailsService {
+public class RentDetailsServiceImpl extends BaseHotelService implements IRentDetailsService {
 	
 	@Autowired
 	private IRentDetailsDAO dao;
@@ -55,7 +58,11 @@ public class RentDetailsServiceImpl implements IRentDetailsService {
  		 if (hotelId == null) {
  	         throw new RuntimeException("Hotel not selected");
  	     }
-		return rentDetailsRepository.findByHotelIdAndIsDeletedFalse(hotelId);
+		validateHotelAccess(hotelId);
+	    if (isSuperAdmin()) 
+	    	return rentDetailsRepository.findAll();
+	    else 
+	    	return rentDetailsRepository.findByHotelIdAndIsDeletedFalse(hotelId);
 	}
 	
 	@Auditable(action = "CREATE", entity = "RENTDETAILS")
@@ -65,6 +72,11 @@ public class RentDetailsServiceImpl implements IRentDetailsService {
 	    if (userId == null) {
 	        throw new RuntimeException("User not selected");
 	    }
+	    
+	    BusinessTraceContext.set(rentDetail.getBusinessTraceId());
+	    RequestTraceContext.set(rentDetail.getRequestTraceId());
+	    
+	    assignHotel(rentDetail, rentDetail.getHotelId());
 	    rentDetail.setCreatedBy(userId);
 		return rentDetailsRepository.saveAndFlush(rentDetail);
 	}
@@ -76,6 +88,11 @@ public class RentDetailsServiceImpl implements IRentDetailsService {
 	    if (userId == null) {
 	        throw new RuntimeException("User not selected");
 	    }
+	    Long hotelId = HotelContext.getHotelId();
+		 if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
+	    validateHotelAccess(hotelId);
 	    rentDetail.setUpdatedBy(userId);
 	    rentDetail.setUpdatedOn(LocalDateTime.now());
 		
@@ -89,6 +106,7 @@ public class RentDetailsServiceImpl implements IRentDetailsService {
 		 if (hotelId == null) {
 	         throw new RuntimeException("Hotel not selected");
 	     }
+		 validateHotelAccess(hotelId);
 		  return rentDetailsRepository.findByIdAndHotelIdAndIsDeletedFalse(Long.valueOf(rentDetailsId),hotelId);
 	}
 
@@ -106,9 +124,11 @@ public class RentDetailsServiceImpl implements IRentDetailsService {
 		if(userId == null) {
 			 throw new RuntimeException("User not selected");
 		}
+		 
 		 if (hotelId == null) {
 	         throw new RuntimeException("Hotel not selected");
 	     }
+		 validateHotelAccess(hotelId);
 		RentDetails entity = rentDetailsRepository.findByIdAndHotelIdAndIsDeletedFalse(id,hotelId);
 
 //        // ✅ Soft delete

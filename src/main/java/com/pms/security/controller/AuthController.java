@@ -91,31 +91,41 @@ public class AuthController {
 	
 	@PostMapping("/login")
 	public LoginResponse login(@RequestBody LoginRequest request, HttpSession httpSession) {
+		try {
+	    Authentication authentication = authenticationManager.authenticate(
+	            new UsernamePasswordAuthenticationToken(
+	                    request.username,
+	                    request.password
+	            )
+	    );
+		} catch (Exception e) {
+		    e.printStackTrace();
+		    throw e;
+		}
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.username, request.password));
+	    User user = userRepository.findByUsername(request.username)
+	            .orElseThrow(() -> new RuntimeException("User not found"));
 
-        User user = userRepository.findByUsername(request.username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        httpSession.setAttribute("user", user);
-        List<UserHotelMapping> mappings =
-                mappingRepository.findByUserId(user.getId());
+	    httpSession.setAttribute("user", user);
 
-        List<HotelDTO> hotels = mappings.stream()
-                .map(m -> new HotelDTO(
-                        m.getHotel().getId(),
-                        m.getHotel().getHotelName()))
-                .toList();
+	    List<UserHotelMapping> mappings = mappingRepository.findByUserId(user.getId());
 
-        // 🔥 token WITHOUT hotelId
-        String token = jwtUtil.generateToken(user, null);
+	    List<HotelDTO> hotels = mappings.stream()
+	            .map(m -> new HotelDTO(
+	                    m.getHotel().getId(),
+	                    m.getHotel().getHotelName()))
+	            .toList();
 
-        LoginResponse response = new LoginResponse();
-        response.setToken(token);
-        response.setHotels(hotels);
-        RefreshToken refreshToken = refreshTokenService.createToken(user);
-        return response;
+	    String token = jwtUtil.generateToken(user, null);
+
+	    RefreshToken refreshToken = refreshTokenService.createToken(user);
+
+	    LoginResponse response = new LoginResponse();
+	    response.setToken(token);
+	    response.setHotels(hotels);
+	    response.setRefreshToken(refreshToken.getToken());
+
+	    return response;
 	}
 	
 	@PostMapping("/select-hotel")

@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pms.auditlog.annotation.Auditable;
+import com.pms.auditlog.context.BusinessTraceContext;
+import com.pms.auditlog.context.RequestTraceContext;
 import com.pms.auditlog.entity.AuditLog;
 import com.pms.auditlog.repository.AuditLogRepository;
 import com.pms.auditlog.util.AuditUtil;
@@ -22,6 +24,7 @@ import com.pms.paymentdetails.entity.PaymentDetails;
 import com.pms.paymentdetails.repository.PaymentDetailsRepository;
 import com.pms.security.configuration.HotelContext;
 import com.pms.security.configuration.UserContext;
+import com.pms.security.service.BaseHotelService;
 import com.pms.security.util.SecurityUtils;
 
 import jakarta.transaction.Transactional;
@@ -30,7 +33,7 @@ import jakarta.transaction.Transactional;
  * 
  */
 @Service
-public class GuestDetailsServiceImpl implements IGuestDetailsService {
+public class GuestDetailsServiceImpl extends BaseHotelService implements IGuestDetailsService {
 	
 	@Autowired
 	private IGuestDetailsDAO dao;
@@ -57,11 +60,14 @@ public class GuestDetailsServiceImpl implements IGuestDetailsService {
 	@Override
 	public List<GuestDetails> getGuestDetails() {
 		Long hotelId = HotelContext.getHotelId();
- 		 if (hotelId == null) {
- 	         throw new RuntimeException("Hotel not selected");
- 	     }
-//		return guestDetailsRepository.findAll();
-		return guestDetailsRepository.findByHotelIdAndIsDeletedFalse(hotelId);
+		 if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
+			validateHotelAccess(hotelId);
+		    if (isSuperAdmin()) 
+		    	return guestDetailsRepository.findAll();
+		    else 
+			return guestDetailsRepository.findByHotelIdAndIsDeletedFalse(HotelContext.getHotelId());
 	}
 	
 	@Override
@@ -70,7 +76,7 @@ public class GuestDetailsServiceImpl implements IGuestDetailsService {
 		 if (hotelId == null) {
 	         throw new RuntimeException("Hotel not selected");
 	     }
-		
+		 validateHotelAccess(hotelId);
 		return guestDetailsRepository.findByIdAndHotelIdAndIsDeletedFalse(Long.valueOf(guestDetailsId),hotelId);
 	                
 	}
@@ -80,13 +86,23 @@ public class GuestDetailsServiceImpl implements IGuestDetailsService {
 	    if (userId == null) {
 	        throw new RuntimeException("User not selected");
 	    }
+	    
+	    BusinessTraceContext.set(guestDetails.getBusinessTraceId());
+	    RequestTraceContext.set(guestDetails.getRequestTraceId());
+	    
+	    
+	    assignHotel(guestDetails, guestDetails.getHotelId());
 	    guestDetails.setCreatedBy(userId);
 	    return guestDetailsRepository.save(guestDetails);		
 		
 	}
 	@Auditable(action = "UPDATE", entity = "GUESTDETAILS")
 	public GuestDetails updateGuestDetails(Long guestDetailsId, GuestDetails guestDetails) {
-		
+		Long hotelId = HotelContext.getHotelId();
+		 if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
+		validateHotelAccess(hotelId);
 		Long userId = UserContext.getUserId();
 	    if (userId == null) {
 	        throw new RuntimeException("User not selected");
@@ -109,7 +125,7 @@ public class GuestDetailsServiceImpl implements IGuestDetailsService {
 		 if (hotelId == null) {
 	         throw new RuntimeException("Hotel not selected");
 	     }
-
+		 validateHotelAccess(hotelId);
 		GuestDetails entity = guestDetailsRepository.findByIdAndHotelIdAndIsDeletedFalse(Long.valueOf(id),hotelId);
 		List<PaymentDetails> paymentDetails = paymentDetailsRepository.findByHotelId(hotelId);
 		

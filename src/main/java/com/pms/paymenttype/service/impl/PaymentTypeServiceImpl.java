@@ -13,18 +13,20 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.pms.common.service.SoftDeleteService;
+import com.pms.document.entity.DocumentType;
 import com.pms.paymenttype.entity.PaymentType;
 import com.pms.paymenttype.repository.PaymentTypeRepository;
 import com.pms.paymenttype.service.IPaymentTypeService;
 import com.pms.search.specification.PaymentTypeSpecification;
 import com.pms.security.configuration.HotelContext;
 import com.pms.security.configuration.UserContext;
+import com.pms.security.service.BaseHotelService;
 
 /**
  * 
  */
 @Service
-public class PaymentTypeServiceImpl implements IPaymentTypeService {
+public class PaymentTypeServiceImpl extends BaseHotelService implements IPaymentTypeService {
 
 	static final Logger logger = LoggerFactory.getLogger(PaymentTypeServiceImpl.class);
 
@@ -43,11 +45,20 @@ public class PaymentTypeServiceImpl implements IPaymentTypeService {
 		if (hotelId == null) {
 			throw new RuntimeException("Hotel not selected");
 		}
+		validateHotelAccess(hotelId);
+	    if (isSuperAdmin()) 
+	    	return paymentTypeRepository.findAll();
+	    else 
 		return paymentTypeRepository.findByHotelId(HotelContext.getHotelId());
 	}
 
 	public PaymentType getPaymentTypeById(Long id) {
+		Long hotelId = HotelContext.getHotelId();
 
+	    if (hotelId == null) {
+	        throw new RuntimeException("Hotel not selected");
+	    }
+		validateHotelAccess(hotelId);
 		return paymentTypeRepository.findByIdAndHotelId(id, HotelContext.getHotelId());
 
 	}
@@ -58,12 +69,13 @@ public class PaymentTypeServiceImpl implements IPaymentTypeService {
 	    if (userId == null) {
 	        throw new RuntimeException("User not selected");
 	    }
+	    assignHotel(paymentType, paymentType.getHotelId());
 	    paymentType.setCreatedBy(userId);
 		return paymentTypeRepository.saveAndFlush(paymentType);
 	}
 
 	public PaymentType updatePaymentType(Long paymentTypeId, PaymentType paymentType) {
-
+		validateHotelAccess(paymentType.getHotelId());
 		PaymentType paymentTypeFromDB = getPaymentTypeById(paymentTypeId);
 		paymentTypeFromDB.setCategoryName(paymentType.getCategoryName());
 		paymentTypeFromDB.setCreatedOn(paymentType.getCreatedOn());
@@ -85,7 +97,11 @@ public class PaymentTypeServiceImpl implements IPaymentTypeService {
 	@Override
 	public List<PaymentType> search(String paymentTypeName, String paymentTypeShortName, String categoryName,
 			String description) {
-
+		Long hotelId = HotelContext.getHotelId();   // 🔥 get from JWT
+	     if (hotelId == null) {
+	         throw new RuntimeException("Hotel not selected");
+	     }
+	     validateHotelAccess(hotelId);
 		Specification<PaymentType> spec = Specification
 				.where(PaymentTypeSpecification.hasHotelId(HotelContext.getHotelId())) // ✅ ADD THIS
 				.and(PaymentTypeSpecification.hasCategoryName(categoryName))
@@ -97,6 +113,8 @@ public class PaymentTypeServiceImpl implements IPaymentTypeService {
 
 	@Override
 	public boolean deletePaymentType(Integer paymentTypeId) {
+		PaymentType b = getPaymentTypeById((long) paymentTypeId);
+		validateHotelAccess(b.getHotelId());
 		softDeleteService.softDelete(paymentTypeId, paymentTypeRepository);
 		return true;
 	}

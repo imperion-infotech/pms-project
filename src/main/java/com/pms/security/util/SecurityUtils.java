@@ -17,6 +17,7 @@ public class SecurityUtils {
         if (auth == null || !auth.isAuthenticated()) {
             return "SYSTEM";
         }
+        System.out.println("Authorities = " + auth.getAuthorities());
 
         return auth.getName(); // email/username
     }
